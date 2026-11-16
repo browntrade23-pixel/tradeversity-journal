@@ -449,7 +449,7 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 /* countdown column: always at the right, same width, lined up row under row */
 .nrow .ncd.col{margin-inline-start:auto;width:138px;justify-content:center;flex:none}
 .nrow .nfp+.ncd.col{margin-inline-start:10px}
-.nrow .ncd.col~.nmore{margin-inline-start:2px}
+.nrow .ncd.col~.nmore,.nrow .nfp~.nmore{margin-inline-start:2px}
 @media(max-width:560px){.nrow .ncd.col{width:auto}}
 @media(prefers-reduced-motion:reduce){.ncd.soon{animation:none}}
 /* news explanations */
@@ -881,8 +881,12 @@ function cdText(ms){const s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.flo
 function cdState(at){const ms=new Date(at).getTime()-Date.now();return ms>0?(ms<15*60e3?"soon":"up"):ms>-5*60e3?"live":"done"}
 function cdInner(at,st){const ms=new Date(at).getTime()-Date.now();
   return st==="up"||st==="soon"?`<span>in</span> <b class="mono" data-notr>${cdText(ms)}</b>`:st==="live"?`<b>Live now</b>`:`<span>Released</span>`}
-function cdSpan(n,cls){const st=cdState(n.starts_at);return `<span class="ncd ${cls||""} ${st}" data-at="${n.starts_at}" data-st="${st}">${cdInner(n.starts_at,st)}</span>`}
-setInterval(()=>{if(document.hidden)return;$$(".ncd").forEach(el=>{const at=el.dataset.at,st=cdState(at);
+function cdSpan(n,cls){if(tzDate(n.starts_at,NY)!==todayStr())return "";  /* countdown only on the present trading day */
+  const st=cdState(n.starts_at);return `<span class="ncd ${cls||""} ${st}" data-at="${n.starts_at}" data-st="${st}">${cdInner(n.starts_at,st)}</span>`}
+let cdDay=todayStr();
+setInterval(()=>{if(document.hidden)return;
+  if(todayStr()!==cdDay){cdDay=todayStr();refreshNewsPanel();return}  /* new trading day: move the countdowns to today's events */
+  $$(".ncd").forEach(el=>{const at=el.dataset.at,st=cdState(at);
   if(st!==el.dataset.st){el.dataset.st=st;el.classList.remove("up","soon","live","done");el.classList.add(st);el.innerHTML=cdInner(at,st);return}
   if(st==="up"||st==="soon"){const b=el.querySelector("b");if(b)b.textContent=cdText(new Date(at).getTime()-Date.now())}})},1000);
 
