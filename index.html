@@ -439,6 +439,31 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .fc-net{display:flex;align-items:baseline;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap}.fc-net b{font-size:24px;font-weight:900}
 .kind-b{display:inline-block;margin-inline-start:6px;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:800;vertical-align:middle}
 .kind-b.fut{background:rgba(245,185,66,.15);color:var(--gold)}.kind-b.cfd{background:rgba(76,141,255,.16);color:var(--blue)}
+#bnav{display:none}
+@media(max-width:760px){
+  #bnav{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+    background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line2);box-shadow:0 -8px 24px -12px rgba(0,0,0,.6)}
+  #bnav>button{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border:0;background:none;color:var(--muted);font:inherit;font-size:10px;font-weight:700;cursor:pointer;border-radius:10px;transition:color .2s,transform .15s}
+  #bnav>button .ico{width:22px;height:22px}
+  #bnav>button.on{color:var(--gold)}#bnav>button.on .bn-ic{transform:translateY(-1px)}
+  #bnav>button.on::before{content:"";position:absolute;margin-top:-6px;width:22px;height:3px;border-radius:3px;background:var(--gold);box-shadow:0 0 8px var(--gold)}
+  #bnav>button:active{transform:scale(.92)}
+  .bn-sheet{position:absolute;right:8px;bottom:calc(100% + 8px);min-width:210px;padding:6px;border-radius:14px;border:1px solid var(--line2);background:var(--panel);box-shadow:0 12px 32px -8px rgba(0,0,0,.7);display:flex;flex-direction:column;gap:2px;animation:ckPop .2s ease}
+  .bn-sheet.hidden{display:none}
+  .bn-sheet button{display:flex;align-items:center;gap:10px;padding:10px 12px;border:0;border-radius:10px;background:none;color:var(--text);font:inherit;font-size:14px;font-weight:600;text-align:start;cursor:pointer}
+  .bn-sheet button.on{background:color-mix(in srgb,var(--gold) 12%,transparent);color:var(--gold)}
+  .bn-sheet .ico{width:20px;height:20px}
+  #app nav.tabs{display:none}
+  #app{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+  .review-bar{top:110px}
+  #toast{bottom:calc(84px + env(safe-area-inset-bottom))!important}
+}
+[dir=rtl] .bn-sheet{right:auto;left:8px}
+.review-card{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;border-color:rgba(76,141,255,.4);background:radial-gradient(110% 80% at 0% 0%,rgba(76,141,255,.14),transparent 60%),var(--panel)}
+.rv-ic{font-size:26px}.rv-tx{flex:1;min-width:200px;display:flex;flex-direction:column;gap:2px}.rv-tx .mut{font-size:12px}
+.review-bar{position:sticky;top:96px;z-index:5;margin-bottom:14px;padding:12px 14px;border-radius:14px;border:1px solid rgba(76,141,255,.45);background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(8px);display:flex;flex-direction:column;gap:10px}
+.rb-top{display:flex;align-items:center;gap:12px}.rb-top b{white-space:nowrap;color:var(--blue)}
+.rb-prog{flex:1;height:6px;border-radius:6px;background:var(--line);overflow:hidden}.rb-prog i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),#7fb0ff);transition:width .3s}
 .otp-head{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;font-size:13px}
 .otp-ic{font-size:34px;animation:ipBob 1.6s ease-in-out infinite}.otp-head>b:first-of-type{font-size:17px}
 .otp-mail{color:var(--gold);word-break:break-all}
@@ -1105,10 +1130,22 @@ function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button da
   if(S.readonly)h+=tab("student","Student file","admin");
   VIEWS.forEach(([k,l])=>{if(S.readonly&&k==="import")return;h+=tab(k,l)});
   t.innerHTML=h;$$("button",t).forEach(b=>b.onclick=()=>go(b.dataset.v));
-  const on=$("button.on",t);if(on&&t.scrollWidth>t.clientWidth)t.scrollTo({left:on.offsetLeft-(t.clientWidth-on.offsetWidth)/2,behavior:"smooth"})}
+  const on=$("button.on",t);if(on&&t.scrollWidth>t.clientWidth)t.scrollTo({left:on.offsetLeft-(t.clientWidth-on.offsetWidth)/2,behavior:"smooth"});
+  renderBottomNav()}
+/* phones: app-style bottom bar with the 5 main tabs + "More" */
+const BNAV_MAIN=[["journal","Journal"],["stats","Stats"],["news","News"],["plan","Plan"],["risk","Risk"]];
+function renderBottomNav(){let b=$("#bnav");if(!b){b=document.createElement("nav");b.id="bnav";b.setAttribute("aria-label","Main");$("#app").appendChild(b)}
+  const all=$$("#tabs button").map(x=>[x.dataset.v,x.querySelector("span:last-child").textContent]);const mainKeys=BNAV_MAIN.map(m=>m[0]);
+  const more=all.filter(([k])=>!mainKeys.includes(k)),inMore=more.some(([k])=>k===S.view);
+  b.innerHTML=BNAV_MAIN.map(([k,l])=>`<button type="button" data-v="${k}" class="${S.view===k?"on":""}"><span class="bn-ic t-${k}">${ico(k)}</span><span class="bn-l">${l}</span></button>`).join("")+
+    `<button type="button" id="bnMore" class="${inMore?"on":""}"><span class="bn-ic"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span><span class="bn-l">More</span></button>
+    <div class="bn-sheet hidden" id="bnSheet">${more.map(([k,l])=>`<button type="button" data-v="${k}" class="${S.view===k?"on":""}"><span class="bn-ic t-${k}">${ico(k)}</span><span>${l}</span></button>`).join("")}</div>`;
+  $$("button[data-v]",b).forEach(x=>x.onclick=()=>{$("#bnSheet").classList.add("hidden");go(x.dataset.v)});
+  $("#bnMore").onclick=e=>{e.stopPropagation();$("#bnSheet").classList.toggle("hidden")}}
+document.addEventListener("click",e=>{const s=$("#bnSheet");if(s&&!s.classList.contains("hidden")&&!e.target.closest("#bnav"))s.classList.add("hidden")});
 /* phones: swipe left / right on the page to move to the next / previous tab */
 (()=>{let sx=0,sy=0,st=0,ok=false;
-  const skip=el=>el.closest("input,textarea,select,button.term,.tw,nav.tabs,.rstrip,.seg,.rpills,canvas,[data-noswipe]");
+  const skip=el=>el.closest("input,textarea,select,button.term,.tw,nav.tabs,#bnav,.rstrip,.seg,.rpills,canvas,[data-noswipe]");
   document.addEventListener("touchstart",e=>{ok=false;if(!S.me||$("#app").classList.contains("hidden")||e.touches.length!==1||!$("#modal").classList.contains("hidden")||skip(e.target))return;
     const t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();ok=true},{passive:true});
   document.addEventListener("touchend",e=>{if(!ok)return;ok=false;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
@@ -1437,6 +1474,7 @@ function vJournal(el){
    <div class="row">${S.readonly?"":`<button class="btn pri" id="addT">+ New trade</button><button class="btn" id="impT">⬆ Import CSV</button>`}<button class="btn" id="expCsv">Export CSV</button></div></div>
    ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||S._impDone||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export: the trades appear below in your journal, ready for screenshots and notes</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
    ${coachCard()}
+   ${S.readonly?"":reviewCard()}
    ${filterBar()}
    <div class="grid g4" style="margin-bottom:16px">
      ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,`${st.n} trades`)}
@@ -1451,8 +1489,22 @@ function vJournal(el){
   if($("#impBody"))vImport($("#impBody"),true);
   if($("#impT"))$("#impT").onclick=()=>{const b=$("#impBox");b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
   $("#expCsv").onclick=exportCSV;
-  $$(".tcard",el).forEach(c=>c.onclick=()=>{S.page=c.dataset.id;render();window.scrollTo(0,0)});
+  $$(".tcard",el).forEach(c=>c.onclick=()=>{S.page=c.dataset.id;S._review=null;render();window.scrollTo(0,0)});
+  const rv=$("#rvStart",el);if(rv)rv.onclick=()=>{const ids=toReview().map(t=>t.id);if(!ids.length)return;S._review=ids;S.page=ids[0];render();window.scrollTo(0,0)};
 }
+/* imported trades with no screenshot, notes or emotions yet = waiting for review */
+const needsReview=t=>t.imported&&!t.reviewed&&!((t.shots||[]).length||String(t.notes||"").trim()||String(t.feeling||"").trim()||(t.emotions||[]).length);
+const toReview=()=>S.trades.filter(needsReview).sort(byDT);
+function reviewCard(){const n=toReview().length;if(!n)return "";
+  return `<div class="card review-card"><span class="rv-ic">📝</span><div class="rv-tx"><b>${n} imported trade${n===1?"":"s"} to review</b><span class="mut">Add the screenshot, your emotions and what you learned, one trade after another.</span></div><button class="btn pri" id="rvStart" type="button">Start review ›</button></div>`}
+function reviewBar(t){const L=S._review;if(!L||!L.includes(t.id))return "";const i=L.indexOf(t.id),n=L.length;
+  return `<div class="review-bar"><div class="rb-top"><b>📝 <span>Review</span> ${i+1} / ${n}</b><div class="rb-prog"><i style="width:${(i+1)/n*100}%"></i></div></div>
+   <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" id="rbPrev" ${i?"":"disabled"}>‹ <span>Previous</span></button><button class="btn sm pri" id="rbEdit">✎ <span>Add screenshot & notes</span></button>
+    <button class="btn sm" id="rbDone">✔ <span>Mark reviewed</span></button><button class="btn sm" id="rbNext">${i<n-1?"<span>Skip</span> ›":"<span>Finish</span>"}</button></div></div>`}
+function bindReviewBar(t){const L=S._review;if(!L||!$("#rbNext"))return;const i=L.indexOf(t.id);
+  const goTo=j=>{if(j<0)return;if(j>=L.length){S._review=null;S.page=null;toast("Review finished");render();return}S.page=L[j];render();window.scrollTo(0,0)};
+  $("#rbPrev").onclick=()=>goTo(i-1);$("#rbNext").onclick=()=>goTo(i+1);$("#rbEdit").onclick=()=>editTrade(t);
+  $("#rbDone").onclick=async()=>{const nt={...t,reviewed:true};try{await API.saveTrade(nt);const k=S.trades.findIndex(x=>x.id===t.id);if(k>=0)S.trades[k]=nt;toast("Marked as reviewed");goTo(i+1)}catch(e){toast("Couldn't save: "+(e.message||e))}}}
 function kpi(l,v,s){return `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div>${s?`<div class="s">${s}</div>`:""}</div>`}
 function tcard(t){const n=tradeNet(t),R=tradeR(t),res=resultOf(t);
   return `<div class="tcard" data-id="${t.id}">
@@ -1465,9 +1517,11 @@ function vTradePage(el,id){const t=S.trades.find(x=>x.id===id);if(!t){S.page=nul
   el.innerHTML=`<div class="page">
    <div class="row" style="justify-content:space-between;margin-bottom:14px"><button class="btn sm" id="back">${S._fromDay?"← Day":"← Journal"}</button>
    ${S.readonly?"":`<div class="row"><button class="btn sm" id="edit">Edit</button><button class="btn sm danger" id="del">Delete</button></div>`}</div>
+   ${S.readonly?"":reviewBar(t)}
    ${tradeDetail(t)}
   </div>`;
-  $("#back").onclick=()=>{S.page=null;if(S._fromDay){S.dayPage=S._fromDay;S._fromDay=null;S.view="stats";try{history.replaceState(null,"","#stats")}catch(e){}}render();window.scrollTo(0,0)};
+  bindReviewBar(t);
+  $("#back").onclick=()=>{S.page=null;S._review=null;if(S._fromDay){S.dayPage=S._fromDay;S._fromDay=null;S.view="stats";try{history.replaceState(null,"","#stats")}catch(e){}}render();window.scrollTo(0,0)};
   if($("#edit")){$("#edit").onclick=()=>editTrade(t);$("#del").onclick=()=>confirmBox("Delete this trade? This can't be undone.",async()=>{try{await API.deleteTrade(t);S.trades=S.trades.filter(x=>x.id!==t.id);S.page=null;render();toast("Trade deleted")}catch(e){toast(e.message)}})}
 }
 function tradeDetail(t,h="h1"){const n=tradeNet(t),R=tradeR(t),risk=tradeRisk(t),m=MK[rootOf(t.symbol)];
