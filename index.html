@@ -428,6 +428,17 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .id-grid small{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}.id-grid b{font-size:18px}.id-grid .mut{font-size:11px}
 @media(max-width:600px){.id-grid{grid-template-columns:repeat(2,1fr)}}
 @keyframes idPop{from{transform:scale(0)}to{transform:scale(1)}}
+.fcard{--fc:var(--gold);border-color:color-mix(in srgb,var(--fc) 45%,transparent);background:radial-gradient(110% 80% at 0% 0%,color-mix(in srgb,var(--fc) 14%,transparent),transparent 60%),var(--panel);animation:ckPop .35s ease}
+.fcard.cfd{--fc:var(--blue)}
+.fc-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.fc-kind{font-size:16px}.fc-kind b{color:var(--fc)}
+.fc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
+@media(max-width:640px){.fc-grid{grid-template-columns:1fr}}
+.fc-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.fc-ic{width:20px;text-align:center}.fc-l{color:var(--muted);flex:1}.fc-row b{text-align:end}
+.fc-net{display:flex;align-items:baseline;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap}.fc-net b{font-size:24px;font-weight:900}
+.kind-b{display:inline-block;margin-inline-start:6px;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:800;vertical-align:middle}
+.kind-b.fut{background:rgba(245,185,66,.15);color:var(--gold)}.kind-b.cfd{background:rgba(76,141,255,.16);color:var(--blue)}
 /* admin: student file */
 .lnk{color:var(--gold2);text-decoration:none}.lnk:hover{text-decoration:underline}
 .sf-head{display:flex;gap:16px;align-items:center;border-color:rgba(245,185,66,.3)}
@@ -592,6 +603,18 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 .term:hover .ti,.term.on .ti{transform:rotate(360deg) scale(1.1)}
 .term.badge{border:0;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700}
 .term.badge.min{background:rgba(245,185,66,.15);color:var(--gold)}.term.badge.mic{background:rgba(76,141,255,.15);color:var(--blue)}
+span.badge{display:inline-block;padding:1px 7px;border-radius:99px;font-size:10px;font-weight:800;margin-inline-start:4px;vertical-align:middle}
+span.badge.min{background:rgba(245,185,66,.15);color:var(--gold)}span.badge.mic{background:rgba(76,141,255,.15);color:var(--blue)}span.badge.pur{background:rgba(167,123,255,.16);color:#b48cff}
+.cchip.pur{background:rgba(167,123,255,.14);color:#b48cff;border:1px solid rgba(167,123,255,.4)}
+.lot-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.lot-legend .cchip{font-size:12px;padding:4px 10px}.lot-legend .cchip b{font-size:14px}
+table.specs tr.on td{background:color-mix(in srgb,var(--gold) 7%,transparent)}
+.rtabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 12px;max-width:560px}
+.rtabs button{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--line2);background:var(--panel);color:var(--text);cursor:pointer;font:inherit;text-align:start;transition:transform .18s,border-color .2s,box-shadow .2s}
+.rtabs button:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--gold) 50%,var(--line2))}
+.rtabs button.on{border-color:var(--gold);background:radial-gradient(120% 100% at 0% 0%,rgba(245,185,66,.18),transparent 70%),var(--panel);box-shadow:0 0 0 1px rgba(245,185,66,.3),0 8px 24px -12px rgba(245,185,66,.7)}
+.rt-ic{font-size:22px}.rt-tx{display:flex;flex-direction:column}.rt-tx small{font-size:11px;color:var(--muted)}
+.rtabs button.on b{color:var(--gold)}
+html[data-theme=light] .rtabs button.on b{color:#9a6512}
 table.specs th,table.specs td{white-space:nowrap}
 .tpop{position:fixed;z-index:120;padding:14px 15px;border-radius:14px;background:var(--panel);border:1px solid var(--line2);color:var(--text);
   box-shadow:0 18px 40px rgba(0,0,0,.45),0 0 0 1px rgba(245,185,66,.12);opacity:0;pointer-events:none;
@@ -882,7 +905,18 @@ function tradeGross(t){
   return 0;
 }
 const tradeNet=t=>tradeGross(t)-(num(t.fees)||0);
-function tradeRisk(t){const m=MK[rootOf(t.symbol)],e=num(t.entry),s=num(t.stop),q=num(t.qty)||0;if(m&&isFinite(e)&&isFinite(s)&&q&&e!==s)return Math.abs(e-s)*m.pv*q;return NaN}
+function tradeRisk(t){const m=MK[rootOf(t.symbol)],e=num(t.entry),s=num(t.stop),q=num(t.qty)||0;if(m&&isFinite(e)&&isFinite(s)&&q&&e!==s)return Math.abs(e-s)*m.pv*q;
+  const c=CFD[cfdOf(t.symbol)];if(c&&isFinite(e)&&isFinite(s)&&q&&e!==s)return Math.abs(e-s)/c.pip*c.pv*q;return NaN}
+/* CFD symbol names differ by broker: GOLD = XAUUSD, US100 / USTEC = NAS100, SPX500 = US500… (suffixes like .r or m are ignored) */
+const CFD_ALIAS=[["XAUUSD","XAUUSD"],["GOLD","XAUUSD"],["XAGUSD","XAGUSD"],["SILVER","XAGUSD"],["NAS100","NAS100"],["US100","NAS100"],["USTEC","NAS100"],["NDX100","NAS100"],["NSDQ100","NAS100"],["NASDAQ","NAS100"],
+  ["US30","US30"],["DJ30","US30"],["WS30","US30"],["DJI","US30"],["US500","US500"],["SPX500","US500"],["SP500","US500"],["EURUSD","EURUSD"],["GBPUSD","GBPUSD"],["BTCUSD","BTCUSD"]];
+function cfdOf(sym){const s=String(sym||"").toUpperCase().replace(/[^A-Z0-9]/g,"");const a=CFD_ALIAS.find(([k])=>s.startsWith(k));return a?a[1]:null}
+const FX_CCY="EUR|GBP|USD|AUD|NZD|CAD|CHF|JPY|XAU|XAG|SGD|HKD|NOK|SEK|ZAR|MXN|TRY|PLN";
+const FUT_PLAT=/Tradovate|NinjaTrader|Rithmic|TopstepX|ProjectX|Quantower|Sierra|Volumetrica|Tradesea|ATAS|Bookmap/i,CFD_PLAT=/MetaTrader|MT4|MT5|cTrader|Match-?Trader|DXtrade|TradeLocker/i;
+/* "Futures" (contracts) or "CFD" (lots) from the symbol, then the platform */
+function marketOf(sym,platform){const r=rootOf(sym);if(MK[r]||/^(CL|MCL|NG|SI|SIL|HG|ZB|ZN|ZF|6E|6B|6J|RTY|M2K|M6E|MBT|BTC|ETH|MET)$/.test(r))return "Futures";
+  const s=String(sym||"").toUpperCase().replace(/[^A-Z0-9]/g,"");if(cfdOf(sym)||new RegExp(`^(${FX_CCY})(${FX_CCY})`).test(s)||/^(US|UK|GER|DE|FRA|JP|AUS|HK|EU|SPA|ITA|CHN)\d{2,3}/.test(s))return "CFD";
+  return FUT_PLAT.test(platform||"")?"Futures":CFD_PLAT.test(platform||"")?"CFD":""}
 const tradeR=t=>{const r=tradeRisk(t);return isFinite(r)&&r>0?tradeNet(t)/r:NaN};
 const resultOf=t=>{const n=tradeNet(t);return n>0?"Win":n<0?"Loss":"BE"};
 const byDT=(a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||""));
@@ -1728,8 +1762,12 @@ function vPlan(el){
 }
 
 /* ============ RISK ============ */
-function vRisk(el){const st=S._risk||(S._risk={grp:"Nasdaq",bal:50000,mode:"$",risk:250,stopMode:"pts",stop:20,entry:"",stopPx:"",rr:2,fees:""});
-  el.innerHTML=`<h1>Risk calculator</h1><p class="sub">How many contracts can I take for this stop? Every market is different, so the calculator uses each one's dollar value per point.</p>
+const riskTabs=()=>`<div class="rtabs" role="tablist">
+  <button type="button" role="tab" data-rt="fut" class="${S._rtab!=="cfd"?"on":""}"><span class="rt-ic">📈</span><span class="rt-tx"><b>Futures</b><small>Contracts · NQ, ES, YM, GC</small></span></button>
+  <button type="button" role="tab" data-rt="cfd" class="${S._rtab==="cfd"?"on":""}"><span class="rt-ic">💹</span><span class="rt-tx"><b>CFDs</b><small>Lots · Gold, indices, forex</small></span></button></div>`;
+const bindRiskTabs=()=>$$(".rtabs [data-rt]").forEach(b=>b.onclick=()=>{S._rtab=b.dataset.rt;render()});
+function vRisk(el){if(S._rtab==="cfd")return vRiskCfd(el);const st=S._risk||(S._risk={grp:"Nasdaq",bal:50000,mode:"$",risk:250,stopMode:"pts",stop:20,entry:"",stopPx:"",rr:2,fees:""});
+  el.innerHTML=`<h1>Risk calculator</h1>${riskTabs()}<p class="sub">How many contracts can I take for this stop? Every market is different, so the calculator uses each one's dollar value per point.</p>
   <div class="grid g2">
    <div class="card grid">
     <div><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">Market</div><div class="seg" id="rGrp" style="flex-wrap:wrap">${Object.keys(GROUPS).map(g=>`<button data-g="${g}" class="${st.grp===g?"on":""}">${g}</button>`).join("")}</div></div>
@@ -1782,6 +1820,79 @@ function vRisk(el){const st=S._risk||(S._risk={grp:"Nasdaq",bal:50000,mode:"$",r
   $$("#rGrp button").forEach(b=>b.onclick=()=>{st.grp=b.dataset.g;if(st.grp==="Gold"&&st.stopMode==="pts"&&num(st.stop)>20)st.stop=5;render()});
   $$("#rMode button").forEach(b=>b.onclick=()=>{st.mode=b.dataset.m;if(st.mode==="%"&&num(st.risk)>10)st.risk=0.5;render()});
   $$("#rSM button").forEach(b=>b.onclick=()=>{st.stopMode=b.dataset.s;render()});
+  bindRiskTabs();
+}
+
+/* ============ CFD risk calculator (lots) ============ */
+/* typical broker specs for 1.00 lot. pip = the move traders count; pv = $ per pip for 1.00 lot. Brokers can differ. */
+const CFD={
+  XAUUSD:{name:"Gold",grp:"Metals",size:"100 oz",pip:0.10,pv:10,dg:2},
+  XAGUSD:{name:"Silver",grp:"Metals",size:"5,000 oz",pip:0.01,pv:50,dg:3},
+  NAS100:{name:"Nasdaq 100 (US100)",grp:"Indices",size:"1 × index",pip:1,pv:1,dg:1},
+  US30:{name:"Dow Jones (US30)",grp:"Indices",size:"1 × index",pip:1,pv:1,dg:1},
+  US500:{name:"S&P 500 (US500)",grp:"Indices",size:"1 × index",pip:1,pv:1,dg:1},
+  EURUSD:{name:"Euro / Dollar",grp:"Forex",size:"100,000 EUR",pip:0.0001,pv:10,dg:5},
+  GBPUSD:{name:"Pound / Dollar",grp:"Forex",size:"100,000 GBP",pip:0.0001,pv:10,dg:5},
+  BTCUSD:{name:"Bitcoin",grp:"Crypto",size:"1 BTC",pip:1,pv:1,dg:1}};
+function vRiskCfd(el){const st=S._cfd||(S._cfd={sym:"XAUUSD",bal:10000,mode:"%",risk:1,stopMode:"pips",stop:50,entry:"",stopPx:"",rr:2,comm:"",pv:{}});
+  const m=CFD[st.sym],pv=num(st.pv[st.sym])>0?num(st.pv[st.sym]):m.pv;
+  el.innerHTML=`<h1>Risk calculator</h1>${riskTabs()}<p class="sub">How many lots can I take for this stop? The calculator uses the dollar value of one pip for 1.00 lot on each market.</p>
+  <div class="grid g2">
+   <div class="card grid">
+    <div><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">Market</div><div class="seg" id="cfSym" style="flex-wrap:wrap">${Object.keys(CFD).map(k=>`<button data-s="${k}" class="${st.sym===k?"on":""}" data-notr>${k}</button>`).join("")}</div></div>
+    <div class="grid g2">
+     <label class="f">Account balance $<input class="i cf" type="number" step="any" data-k="bal" value="${st.bal}"></label>
+     <label class="f">Risk per trade <div class="row" style="flex-wrap:nowrap"><input class="i cf" type="number" step="any" data-k="risk" value="${st.risk}"><div class="seg" id="cfMode"><button data-m="$" class="${st.mode==="$"?"on":""}">$</button><button data-m="%" class="${st.mode==="%"?"on":""}">%</button></div></div></label>
+    </div>
+    <div><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">Stop loss</div><div class="seg" id="cfSM"><button data-s="pips" class="${st.stopMode==="pips"?"on":""}">Pips</button><button data-s="px" class="${st.stopMode==="px"?"on":""}">Entry & stop price</button></div></div>
+    ${st.stopMode==="px"?`<div class="grid g2"><label class="f">Entry price<input class="i cf" type="number" step="any" data-k="entry" value="${st.entry}"></label><label class="f">Stop price<input class="i cf" type="number" step="any" data-k="stopPx" value="${st.stopPx}"></label></div>`
+     :`<label class="f">Stop size in pips<input class="i cf" type="number" step="any" data-k="stop" value="${st.stop}"></label>`}
+    <div class="grid g3"><label class="f">$ per pip for 1.00 lot<input class="i" id="cfPv" type="number" step="any" value="${pv}"></label>
+     <label class="f">Reward : risk (target)<input class="i cf" type="number" step="any" data-k="rr" value="${st.rr}"></label>
+     <label class="f">Commission per lot $<input class="i cf" type="number" step="any" data-k="comm" value="${st.comm}" placeholder="optional"></label></div>
+    <p class="mut" style="font-size:12px;margin:0">1 <span data-notr>${st.sym}</span> ${term("pip","pip")} = <b class="mono">${m.pip}</b> <span>price move</span> · <span>Default is the most common broker value. Change it if your broker's specs are different.</span></p>
+   </div>
+   <div id="cfOut"></div>
+  </div>
+  <div class="card" style="margin-top:12px"><h3>CFD lot specs</h3>
+   <p class="mut" style="font-size:12px;margin:-2px 0 10px">👆 <span>Tap a word with a ? to see what it means.</span></p>
+   <div class="tw"><table class="t specs"><tr><th>Symbol</th><th>Market</th><th>1.00 ${term("lot","lot")} =</th><th>${term("pip","Pip")}</th><th>$ / pip <span class="badge min">1.00</span></th><th>$ / pip <span class="badge pur">0.10</span></th><th>$ / pip <span class="badge mic">0.01</span></th><th>$ / 1.00 move</th></tr>
+   ${Object.entries(CFD).map(([k,c])=>`<tr class="${k===st.sym?"on":""}"><td class="mono"><b>${k}</b></td><td>${c.name}</td><td class="mono" data-notr>${c.size}</td><td class="mono">${c.pip}</td><td class="mono">$${c.pv.toFixed(2)}</td><td class="mono">$${(c.pv/10).toFixed(2)}</td><td class="mono">$${(c.pv/100).toFixed(2)}</td><td class="mono">${c.grp==="Forex"?`<span class="mut">—</span>`:money(c.pv/c.pip,0)}</td></tr>`).join("")}</table></div>
+   <div class="lot-legend"><span class="cchip min"><b class="mono">1.00</b> <span>Standard lot</span></span><span class="cchip pur"><b class="mono">0.10</b> <span>Mini lot</span></span><span class="cchip mic"><b class="mono">0.01</b> <span>Micro lot</span></span></div>
+   <p class="mut" style="font-size:12px;margin:8px 0 0">${term("cfd","CFD")} <span>specs change between brokers and prop firms (contract size, $ per point on indices, minimum lot). Always check your broker's contract specifications.</span></p></div>`;
+  const prev={};
+  const out=()=>{const P=num($("#cfPv").value)>0?num($("#cfPv").value):m.pv;
+    const riskUsd=st.mode==="%"?num(st.bal)*num(st.risk)/100:num(st.risk);
+    const pips=st.stopMode==="pips"?num(st.stop):Math.abs(num(st.entry)-num(st.stopPx))/m.pip;
+    const comm=num(st.comm)||0,rr=num(st.rr)||0;
+    if(!(riskUsd>0)||!(pips>0)){$("#cfOut").innerHTML=`<div class="card empty">Enter your risk and stop size.</div>`;return}
+    const perLot=pips*P+comm,lots=Math.floor(riskUsd/perLot*100+1e-9)/100,micros=Math.round(lots*100);
+    const std=Math.floor(micros/100),mini=Math.floor((micros%100)/10),mic=micros%10;
+    const used=lots*perLot,dir=st.stopMode==="px"&&num(st.entry)>num(st.stopPx)?1:-1;
+    const tgtPx=st.stopMode==="px"&&isFinite(num(st.entry))?num(st.entry)+dir*pips*m.pip*rr:null;
+    const tile=(k,c,ty,val,unit,rows)=>{const bump=prev[k]!==val;prev[k]=val;return `<div class="ctile ${c} ${num(val)?"":"zero"}"><div class="ct-h"><span class="ct-ty">${ty}</span><span class="ct-sym mono" data-notr>${st.sym}</span></div>
+      <div class="ct-n"><b class="mono ${bump?"bump":""}">${val}</b><span>${unit}</span></div><div class="ct-rows">${rows}</div></div>`};
+    $("#cfOut").innerHTML=`<div class="card grid">
+      <div class="row" style="justify-content:space-between"><span class="mut">Max risk</span><span class="big">${money(riskUsd,0)}</span></div>
+      <div class="mut" style="font-size:13px">Stop: <b class="mono">${+pips.toFixed(1)} pips</b> = <b class="mono">${+(pips*m.pip).toFixed(m.dg)}</b> <span>price move</span>${st.mode==="%"?` · ${st.risk}% of ${money(num(st.bal),0)}`:` · ${pct(riskUsd/num(st.bal),2)} of account`}</div>
+      <div class="grid g2">
+       ${tile("lots","min","Lot size",lots.toFixed(2),"lots",`<div><span>Risk per 1.00 lot</span><b class="mono">${money(perLot)}</b></div><div><span>Total risk</span><b class="mono">${money(used)}</b></div><div><span>Target (${rr}R)</span><b class="mono up">${money(lots*(pips*P*rr-comm))}</b></div>`)}
+       ${tile("mic","mic","Micro lots",String(micros),"× 0.01 lot",`<div><span>Risk per 0.01 lot</span><b class="mono">${money(perLot/100)}</b></div><div><span>$ per pip (your size)</span><b class="mono">${money(lots*P)}</b></div>${m.grp==="Forex"?`<div><span>$ per 10 pips</span><b class="mono">${money(lots*P*10)}</b></div>`:`<div><span>$ per 1.00 move</span><b class="mono">${money(lots*P/m.pip)}</b></div>`}`)}
+      </div>
+      <div class="cmix"><div class="l">Your lot size in standard / mini / micro lots</div>
+       <div class="cm-chips">${[[std,"min","1.00"],[mini,"pur","0.10"],[mic,"mic","0.01"]].filter(x=>x[0]).map(([n,c,s],i)=>`${i?`<span class="cm-plus">+</span>`:""}<span class="cchip ${c}"><b class="mono">${n}</b> × <span class="mono">${s}</span></span>`).join("")||`<span class="cchip mic"><b class="mono">0</b> × <span class="mono">0.01</span></span>`}</div>
+       <div class="cm-bar"><i style="width:${Math.min(100,used/riskUsd*100)}%"></i></div>
+       <div class="mut" style="font-size:12px">Risk ${money(used)} · ${pct(used/riskUsd,0)} of your max${tgtPx!=null?` · Take profit at <b class="mono">${+tgtPx.toFixed(m.dg)}</b>`:""}</div></div>
+      ${micros===0?`<div class="status badd">✖ Stop is too wide: even 0.01 lot risks ${money(perLot/100)}. Tighten the stop or skip the trade.</div>`:""}
+    </div>`};
+  out();
+  $$(".cf").forEach(i=>i.oninput=()=>{st[i.dataset.k]=i.value;out()});
+  $("#cfPv").oninput=e=>{st.pv[st.sym]=e.target.value;out()};
+  $$("#cfSym button").forEach(b=>b.onclick=()=>{const was=CFD[st.sym].grp;st.sym=b.dataset.s;const g=CFD[st.sym].grp;
+    if(was!==g)st.stop=g==="Forex"?20:g==="Indices"?30:g==="Crypto"?300:50;render()});
+  $$("#cfMode button").forEach(b=>b.onclick=()=>{st.mode=b.dataset.m;if(st.mode==="%"&&num(st.risk)>10)st.risk=1;render()});
+  $$("#cfSM button").forEach(b=>b.onclick=()=>{st.stopMode=b.dataset.s;render()});
+  bindRiskTabs();
 }
 
 /* ============ CONSISTENCY ============ */
@@ -1963,13 +2074,13 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
       const D=I.det||{per:{},accts:[]},ra=D.ai>=0?String(r[D.ai]||"").trim():"",pr=D.per[ra]||{};
       const firm=D.accts.length>1?(pr.firm||D.firm):D.firm,size=D.accts.length>1?(pr.size||D.size):D.size;
       const account=I.acct||(ra?acctLabel(ra,firm,size):"Imported");
-      out.push({id:uuid(),user_id:S.subject.id,date:dt.date,time:dt.time,account,platform:D.platform||"",firm:firm||"",acctSize:size||"",symbol:sym,side:side||"Long",qty:Math.abs(pNum(g(r,"qty")))||1,
+      out.push({id:uuid(),user_id:S.subject.id,date:dt.date,time:dt.time,account,platform:D.platform||"",firm:firm||"",acctSize:size||"",market:marketOf(g(r,"symbol"),D.platform)||I.kind||"",symbol:sym,side:side||"Long",qty:Math.abs(pNum(g(r,"qty")))||1,
         entry:isFinite(entry)?entry:"",exit:isFinite(exit)?exit:"",stop:isFinite(sl)&&sl>0?sl:"",target:isFinite(tp)&&tp>0?tp:"",pnl:isFinite(pnl)?pnl:"",fees:isFinite(pNum(g(r,"fees")))?Math.abs(pNum(g(r,"fees"))):"",
         setup:"",session:"",emotions:[],feeling:"",followed:"",rating:0,shots:[],remark:"",notes:"",imported:true})});return out};
   const draw=()=>{if(!I.rows){$("#cMap").innerHTML="";return}const hd=I.rows[0];const prev=build();
-    const D=I.det||{accts:[]};const nAc=D.accts.length;
-    $("#cMap").innerHTML=`<div class="card det" style="margin-top:12px"><h3>🔍 Detected from your file</h3>
-     <div class="det-chips"><span class="det-chip ${D.platform?"ok":""}"><small>Platform</small><b>${D.platform?`<span data-notr>${esc(D.platform)}</span>`:"Not recognised"}</b></span>
+    const D=I.det||{accts:[]};const nAc=D.accts.length;const fs=fileStats(prev);
+    $("#cMap").innerHTML=`${prev.length?fileCard(fs,D):""}<div class="card det" style="margin-top:12px"><h3>🔍 Detected from your file</h3>
+     <div class="det-chips"><span class="det-chip ${fs.kind?"ok":""}"><small>Account type</small><b>${fs.kind==="CFD"?"💹 CFD":fs.kind==="Futures"?"📈 Futures":"Not sure"}</b></span><span class="det-chip ${D.platform?"ok":""}"><small>Platform</small><b>${D.platform?`<span data-notr>${esc(D.platform)}</span>`:"Not recognised"}</b></span>
       <span class="det-chip ${D.firm?"ok":""}"><small>Prop firm</small><b>${D.firm?`<span data-notr>${esc(D.firm)}</span>`:"Not found"}</b></span>
       <span class="det-chip ${D.size?"ok":""}"><small>Account size</small><b class="mono">${D.size?money(D.size,0):"Not found"}</b></span>
       <span class="det-chip ${nAc?"ok":""}"><small>${nAc>1?"Accounts in file":"Account"}</small><b>${nAc>1?nAc:nAc?`<span data-notr class="mono">${esc(D.accts[0])}</span>`:"Not in file"}</b></span></div>
@@ -1999,12 +2110,36 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
   const x=$(".imp-done .x",el);if(x)x.onclick=()=>{S._impDone=null;$(".imp-done",el).remove()};
   if(I.rows)draw();
 }
+/* simple facts about a list of trades: account type (Futures / CFD), instruments, volume, period */
+function fileStats(ts){const k={};ts.forEach(t=>{if(t.market)k[t.market]=(k[t.market]||0)+1});
+  const kind=Object.keys(k).sort((a,b)=>k[b]-k[a])[0]||"",mixed=Object.keys(k).length>1;
+  const sy={};ts.forEach(t=>sy[t.symbol]=(sy[t.symbol]||0)+1);const vol=ts.reduce((a,t)=>a+(num(t.qty)||0),0);const ds=ts.map(t=>t.date).sort();
+  const c=calc(ts);return {kind,mixed,n:ts.length,syms:Object.entries(sy).sort((a,b)=>b[1]-a[1]),vol,unit:kind==="CFD"?"lots":"contracts",
+    long:ts.filter(t=>t.side==="Long").length,short:ts.filter(t=>t.side==="Short").length,from:ds[0],to:ds[ds.length-1],days:c.nDays,net:c.net,wr:c.wr,w:c.w,l:c.l,
+    avgSize:ts.length?vol/ts.length:0,withSL:ts.filter(t=>t.stop!==""&&t.stop!=null).length}}
+function fileCard(f,D){const isC=f.kind==="CFD",L=[];
+  const row=(ic,l,v)=>`<div class="fc-row"><span class="fc-ic">${ic}</span><span class="fc-l">${l}</span><b>${v}</b></div>`;
+  return `<div class="card fcard ${isC?"cfd":"fut"}" style="margin-top:12px">
+   <div class="fc-head"><span class="fc-kind">${isC?"💹":"📈"} <b>${isC?"CFD account":f.kind==="Futures"?"Futures account":"Trading account"}</b></span><span class="mut" style="font-size:12px">${isC?"Size in lots":"Size in contracts"}${f.mixed?` · <span>Futures and CFD trades mixed</span>`:""}</span></div>
+   <div class="fc-grid">
+    ${row("🖥","Platform",D.platform?`<span data-notr>${esc(D.platform)}</span>`:"—")}
+    ${row("🏦","Prop firm",D.firm?`<span data-notr>${esc(D.firm)}</span>`:"—")}
+    ${row("💰","Account size",D.size?money(D.size,0):"—")}
+    ${row("📅","Period",f.from?`${fmtDate(f.from)} → ${fmtDate(f.to)}`:"—")}
+    ${row("🔁","Trades",`${f.n} <span class="mut">· ${f.days} <span>days</span></span>`)}
+    ${row("⚖️","Long / short",`<span class="pos">${f.long}</span> / <span class="neg">${f.short}</span>`)}
+    ${row("🎯","Instruments",`<span data-notr>${f.syms.slice(0,4).map(([s,n])=>`${esc(s)} ×${n}`).join(" · ")}</span>`)}
+    ${row(isC?"📦":"📄",isC?"Total lots":"Total contracts",`<span class="mono">${+f.vol.toFixed(2)}</span> <span class="mut">· <span>avg</span> ${+f.avgSize.toFixed(2)}</span>`)}
+    ${row("🛑","Trades with a stop loss",`${f.withSL} / ${f.n}`)}
+    ${row("📊","Win rate",`${pct(f.wr,0)} <span class="mut">· ${f.w}W ${f.l}L</span>`)}
+   </div>
+   <div class="fc-net"><span class="mut">Net P&L in this file</span><b class="mono ${cls(f.net)}">${smoney(f.net)}</b>${D.size?`<span class="${cls(f.net)}">${(f.net>0?"+":"")+pct(f.net/D.size,2)}</span>`:""}</div></div>`}
 /* summary of what was just imported */
-function impSummary(ts,D,fn){const c=calc(ts),ds=ts.map(t=>t.date).sort(),vals=ts.map(tradeNet);
-  return {n:ts.length,net:c.net,wr:c.wr,w:c.w,l:c.l,days:c.nDays,best:Math.max(...vals),worst:Math.min(...vals),from:ds[0],to:ds[ds.length-1],
+function impSummary(ts,D,fn){const c=calc(ts),ds=ts.map(t=>t.date).sort(),vals=ts.map(tradeNet),f=fileStats(ts);
+  return {n:ts.length,net:c.net,wr:c.wr,w:c.w,l:c.l,days:c.nDays,best:Math.max(...vals),worst:Math.min(...vals),from:ds[0],to:ds[ds.length-1],kind:f.kind,vol:f.vol,unit:f.unit,
     syms:[...new Set(ts.map(t=>t.symbol))].slice(0,6),acct:[...new Set(ts.map(t=>t.account))].join(", "),platform:(D&&D.platform)||"",size:(D&&D.size)||0,file:fn||""}}
 function impDoneHTML(s){return `<div class="imp-done"><button class="x" type="button" aria-label="Close">×</button>
-  <div class="id-head"><span class="id-check">✓</span><div><b>${s.n} trades imported</b><div class="mut" style="font-size:12px"><span data-notr>${esc(s.acct)}</span>${s.platform&&!s.acct.includes(s.platform)?` · <span data-notr>${esc(s.platform)}</span>`:""} · ${fmtDate(s.from)} → ${fmtDate(s.to)}</div></div></div>
+  <div class="id-head"><span class="id-check">✓</span><div><b>${s.n} trades imported</b>${s.kind?` <span class="kind-b ${s.kind==="CFD"?"cfd":"fut"}">${s.kind==="CFD"?"💹 CFD":"📈 Futures"}</span>`:""}<div class="mut" style="font-size:12px"><span data-notr>${esc(s.acct)}</span>${s.platform&&!s.acct.includes(s.platform)?` · <span data-notr>${esc(s.platform)}</span>`:""} · ${fmtDate(s.from)} → ${fmtDate(s.to)}</div></div></div>
   <div class="id-net mono ${cls(s.net)}">${smoney(s.net)}</div><div class="mut" style="text-align:center;font-size:12px;margin-top:-4px">Net P&L${s.size?` · <span class="${cls(s.net)}">${(s.net>0?"+":"")+pct(s.net/s.size,2)}</span> <span>of the account</span>`:""}</div>
   <div class="id-grid">
    <div><small>Win rate</small><b class="mono">${pct(s.wr,0)}</b><span class="mut">${s.w}W · ${s.l}L</span></div>
