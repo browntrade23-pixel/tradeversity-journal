@@ -48,7 +48,7 @@ begin
   select md5((e->>'title') || (e->>'date')), e->>'title', e->>'impact', (e->>'date')::timestamptz,
          nullif(e->>'forecast', ''), nullif(e->>'previous', ''), now()
   from jsonb_array_elements(body) e
-  where e->>'country' = 'USD' and e->>'impact' in ('High', 'Medium')
+  where e->>'country' = 'USD' and e->>'impact' in ('High', 'Medium', 'Holiday')
   on conflict (id) do update set forecast = excluded.forecast, previous = excluded.previous,
                                  impact = excluded.impact, updated_at = now();
   get diagnostics n = row_count;

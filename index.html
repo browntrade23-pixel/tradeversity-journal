@@ -253,7 +253,21 @@ hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
 .nb-e{font-size:12px;padding:4px 0}
 .nb-w{font-size:12px;color:#ff9d9a;background:rgba(239,83,80,.1);border-radius:8px;padding:6px 10px}
 .newsbox .btn{align-self:flex-start}
-#coachNews{display:flex;flex-direction:column;gap:6px}/* discipline coach card */
+#coachNews{display:flex;flex-direction:column;gap:6px}
+/* news page */
+.nextev{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 14px;border-radius:12px;border:1px solid rgba(245,185,66,.35);background:linear-gradient(135deg,rgba(245,185,66,.08),var(--panel2));font-size:14px}
+.ne-l{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:800}
+.ne-in{padding:2px 9px;border-radius:99px;background:var(--line);font-size:13px}.ne-in b{color:var(--gold2)}
+.ne-in.soon{background:rgba(239,83,80,.18);animation:pulse 1.6s ease-in-out infinite}.ne-in.soon b{color:#ff8a87}
+html[lang=ar] .ne-l{letter-spacing:0}
+.nday{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:12px 0 2px;display:flex;gap:6px;align-items:center}
+.nday.today{color:var(--gold)}
+.nrow.past{opacity:.45}
+.newspanel .nrow{padding:8px 0}
+.nrow.hol .hol-ic{font-size:14px}.nrow.hol .nt{font-size:11px;color:var(--muted);font-weight:700}
+.hol-note{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--line);color:var(--muted)}
+.nrow.hol.closed .hol-note{background:rgba(239,83,80,.15);color:#ff8a87}.nrow.hol.early .hol-note{background:rgba(245,185,66,.15);color:var(--gold2)}
+.hol-in{margin-inline-start:auto;font-size:12px;color:var(--muted)}.hol-in b{color:var(--text)}/* discipline coach card */
 .coach{display:grid;grid-template-columns:1.1fr 1fr;gap:14px 18px;border-color:rgba(245,185,66,.3);background:linear-gradient(135deg,rgba(245,185,66,.07),var(--panel) 55%)}
 @media(max-width:760px){.coach{grid-template-columns:1fr}}
 .coach-t{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:800}
@@ -563,7 +577,7 @@ async function loadSubject(u,readonly){
 }
 
 /* ============ nav ============ */
-const VIEWS=[["journal","📓 Journal"],["stats","📊 Statistics"],["plan","🧭 Tomorrow's plan"],["risk","🎯 Risk calculator"],["consistency","⚖️ Consistency rule"],["import","⬆️ Import CSV"]];
+const VIEWS=[["journal","📓 Journal"],["stats","📊 Statistics"],["news","📰 News"],["plan","🧭 Tomorrow's plan"],["risk","🎯 Risk calculator"],["consistency","⚖️ Consistency rule"],["import","⬆️ Import CSV"]];
 function renderTabs(){const t=$("#tabs");let h="";
   if(S.me.role==="admin")h+=`<button data-v="admin" class="admin ${S.view==="admin"?"on":""}">👑 Admin dashboard</button>`;
   VIEWS.forEach(([k,l])=>{if(S.readonly&&k==="import")return;h+=`<button data-v="${k}" class="${S.view===k?"on":""}">${l}</button>`});
@@ -574,7 +588,7 @@ function go(v){if(![...VIEWS.map(x=>x[0]),"admin"].includes(v))v=S.me.role==="ad
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
 function render(){renderTabs();const v=$("#view");
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
-  const fn={journal:vJournal,stats:vStats,plan:vPlan,risk:vRisk,consistency:vConsistency,import:vImport,admin:vAdmin}[S.view];
+  const fn={journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,import:vImport,admin:vAdmin}[S.view];
   v.innerHTML=h+'<div id="vb"></div>';fn($("#vb"));
   if(S.readonly)$("#backAdmin").onclick=()=>go("admin");}
 
@@ -594,29 +608,85 @@ S.news=[];S.newsLoaded=false;
 const tzDate=(iso,tz)=>new Intl.DateTimeFormat("en-CA",{timeZone:tz,year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date(iso));
 const tzTime=(iso,tz)=>new Date(iso).toLocaleTimeString("en-GB",{timeZone:tz,hour:"2-digit",minute:"2-digit"});
 const NY="America/New_York",DZ="Africa/Algiers";
-function newsFor(date){return S.news.filter(n=>tzDate(n.starts_at,NY)===date).sort((a,b)=>a.starts_at.localeCompare(b.starts_at))}
+function newsFor(date){return S.news.filter(n=>n.impact!=="Holiday"&&tzDate(n.starts_at,NY)===date).sort((a,b)=>a.starts_at.localeCompare(b.starts_at))}
+/* US bank / market holidays (NY). closed = US stock markets closed, early = early close 1:00 pm NY, bank = banks closed but markets open.
+   Add next years here. Forex Factory "Holiday" events are merged in automatically. */
+const US_HOL=[
+  ["2026-01-01","New Year's Day","closed"],["2026-01-19","Martin Luther King Jr. Day","closed"],["2026-02-16","Presidents' Day","closed"],
+  ["2026-04-03","Good Friday","closed"],["2026-05-25","Memorial Day","closed"],["2026-06-19","Juneteenth","closed"],
+  ["2026-07-03","Independence Day (observed)","closed"],["2026-09-07","Labor Day","closed"],["2026-10-12","Columbus Day","bank"],
+  ["2026-11-11","Veterans Day","bank"],["2026-11-26","Thanksgiving Day","closed"],["2026-11-27","Day after Thanksgiving","early"],
+  ["2026-12-24","Christmas Eve","early"],["2026-12-25","Christmas Day","closed"],
+  ["2027-01-01","New Year's Day","closed"],["2027-01-18","Martin Luther King Jr. Day","closed"],["2027-02-15","Presidents' Day","closed"],
+  ["2027-03-26","Good Friday","closed"],["2027-05-31","Memorial Day","closed"],["2027-06-18","Juneteenth (observed)","closed"],
+  ["2027-07-05","Independence Day (observed)","closed"],["2027-09-06","Labor Day","closed"],["2027-10-11","Columbus Day","bank"],
+  ["2027-11-11","Veterans Day","bank"],["2027-11-25","Thanksgiving Day","closed"],["2027-11-26","Day after Thanksgiving","early"],
+  ["2027-12-24","Christmas Day (observed)","closed"]
+];
+const HOL_NOTE={closed:"US markets closed",early:"Early close (1:00 pm NY)",bank:"Banks closed, markets open (low liquidity)",ff:"Bank holiday (low liquidity)"};
+function holidaysFor(date){const out=US_HOL.filter(h=>h[0]===date).map(h=>({date:h[0],title:h[1],kind:h[2]}));
+  if(!out.length)S.news.filter(n=>n.impact==="Holiday"&&tzDate(n.starts_at,NY)===date).forEach(n=>out.push({date,title:n.title,kind:"ff"}));return out}
+function upcomingHolidays(n){const t=todayStr();return US_HOL.filter(h=>h[0]>=t).slice(0,n).map(h=>({date:h[0],title:h[1],kind:h[2]}))}
+function holRows(list){return list.map(h=>`<div class="nrow hol ${h.kind}"><span class="hol-ic">🏦</span><span class="nt">All day</span><b class="ntitle" data-notr>${esc(h.title)}</b><span class="hol-note">${HOL_NOTE[h.kind]}</span></div>`).join("")}
+const daysUntil=d=>{const [y,m,dd]=d.split("-").map(Number);const a=new Date(y,m-1,dd),b=new Date();b.setHours(0,0,0,0);return Math.round((a-b)/864e5)};
 function newsWeekEnd(){const d=new Date();d.setDate(d.getDate()+(6-d.getDay()));return ymd(d)}  /* the feed covers the current week (to Saturday) */
 async function loadNews(){try{if(!API||!API.news)return;const a=new Date();a.setDate(a.getDate()-2);const b=new Date();b.setDate(b.getDate()+10);
   S.news=await API.news(a.toISOString(),b.toISOString());S.newsLoaded=true;
   const nb=$("#newsBox");if(nb){nb.outerHTML=newsBox(nb.dataset.date,nb.dataset.ins==="1");const ta=$("#pNews");if(ta&&!ta.value.trim()&&!ta.disabled)ta.value=newsText(nb.dataset.date);bindNewsIns(nb.dataset.date)}
-  const cn=$("#coachNews");if(cn)cn.innerHTML=coachNewsHTML()}catch(e){console.warn("news",e)}}
+  const cn=$("#coachNews");if(cn)cn.innerHTML=coachNewsHTML();refreshNewsPanel()}catch(e){console.warn("news",e)}}
 function bindNewsIns(date){if($("#newsIns"))$("#newsIns").onclick=()=>{const t=newsText(date);if(!t)return;const ta=$("#pNews");ta.value=ta.value.trim()?ta.value.trim()+"\n"+t:t;toast("News added to your plan")}}
 function newsLine(n){return `${n.impact==="High"?"🔴":"🟠"} ${tzTime(n.starts_at,NY)} NY / ${tzTime(n.starts_at,DZ)} DZ — ${n.title}`}
-function newsText(date){const ev=newsFor(date);if(!ev.length)return "";const lines=ev.map(newsLine);
+function newsText(date){const ev=newsFor(date),ho=holidaysFor(date);if(!ev.length&&!ho.length)return "";const lines=ho.map(x=>`🏦 ${x.title} — ${HOL_NOTE[x.kind]}`).concat(ev.map(newsLine));
   if(ev.some(n=>n.impact==="High"))lines.push("⚠️ Red folder: no new trades 5 min before and after.");return lines.join("\n")}
-function newsBox(date,canInsert){const ev=newsFor(date),later=date>newsWeekEnd();
+function newsBox(date,canInsert){const ev=newsFor(date),ho=holidaysFor(date),later=date>newsWeekEnd();
   const rows=ev.map(n=>`<div class="nrow"><i class="fold ${n.impact==="High"?"red":"org"}" title="${n.impact==="High"?"Red folder":"Orange folder"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}</div>`).join("");
   return `<div class="newsbox" id="newsBox" data-date="${date}" data-ins="${canInsert?1:0}">
     <div class="nb-h"><b>📰 USD news</b> <span class="mut">· Forex Factory</span><span class="nb-lg"><i class="fold red"></i><span>Red folder</span><i class="fold org"></i><span>Orange folder</span></span></div>
-    ${!S.newsLoaded?`<div class="mut nb-e">Loading news…</div>`:ev.length?rows:later?`<div class="mut nb-e"><span>Next week's calendar isn't published yet.</span> <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">Forex Factory</a></div>`:`<div class="mut nb-e">No red or orange USD news this day.</div>`}
+    ${holRows(ho)}${!S.newsLoaded?`<div class="mut nb-e">Loading news…</div>`:ev.length?rows:ho.length?"":later?`<div class="mut nb-e"><span>Next week's calendar isn't published yet.</span> <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">Forex Factory</a></div>`:`<div class="mut nb-e">No red or orange USD news this day.</div>`}
     ${ev.some(n=>n.impact==="High")?`<div class="nb-w">⚠️ Red folder: no new trades 5 min before and after. Expect volatility.</div>`:""}
     ${canInsert&&ev.length?`<button type="button" class="btn sm" id="newsIns">➕ Add to my plan</button>`:""}
   </div>`}
-function coachNewsHTML(){if(!S.newsLoaded)return "";const now=new Date().toISOString(),today=todayStr(),nd=nextTradingDay();
+function coachNewsHTML(){const today=todayStr(),nd=nextTradingDay(),now=new Date().toISOString();let hh="";
+  const hT=holidaysFor(today),hN=holidaysFor(nd),hW=upcomingHolidays(3).filter(x=>x.date>nd&&daysUntil(x.date)<=7);
+  hT.forEach(x=>hh+=`<div class="rem ${x.kind==="closed"?"bad":"warn"}"><span>🏦</span><span><b>Today</b> <span data-notr>${esc(x.title)}</span>: <span>${HOL_NOTE[x.kind]}</span></span></div>`);
+  hN.forEach(x=>hh+=`<div class="rem warn"><span>🏦</span><span><b>Next session</b> <span data-notr>(${esc(fmtDate(nd))}) ${esc(x.title)}</span>: <span>${HOL_NOTE[x.kind]}</span></span></div>`);
+  hW.forEach(x=>hh+=`<div class="rem"><span>🏦</span><span><span data-notr>${esc(fmtDate(x.date))} ${esc(x.title)}</span>: <span>${HOL_NOTE[x.kind]}</span></span></div>`);
+  if(!S.newsLoaded)return hh;
   const up=newsFor(today).filter(n=>n.starts_at>now),next=newsFor(nd);let h="";
   if(up.length)h+=`<div class="rem ${up.some(n=>n.impact==="High")?"bad":"warn"}"><span>📰</span><span><b>Today</b> <span data-notr>${up.slice(0,3).map(n=>esc(newsLine(n))).join("<br>")}</span></span></div>`;
   if(next.length)h+=`<div class="rem warn"><span>🗓️</span><span><b>Next session</b> <span data-notr>(${esc(fmtDate(nd))})</span><br><span data-notr>${next.slice(0,4).map(n=>esc(newsLine(n))).join("<br>")}</span><br><span>Put it in your plan.</span></span></div>`;
-  return h}
+  return hh+h}
+
+/* news panel: next-event countdown + Yesterday / Today / Tomorrow / This week */
+function prevTradingDay(){const d=new Date();do{d.setDate(d.getDate()-1)}while(d.getDay()===0||d.getDay()===6);return ymd(d)}
+function weekDays(){const d=new Date();const dow=d.getDay();const mon=new Date(d);mon.setDate(d.getDate()-((dow+6)%7));return [0,1,2,3,4].map(i=>{const x=new Date(mon);x.setDate(mon.getDate()+i);return ymd(x)})}
+function untilText(ms){const m=Math.max(0,Math.round(ms/60000)),dd=Math.floor(m/1440),hh=Math.floor(m%1440/60),mm=m%60;return dd?`${dd}d ${hh}h`:hh?`${hh}h ${mm}m`:`${mm}m`}
+function nextEventHTML(){if(!S.newsLoaded)return `<span class="mut">Loading news…</span>`;const now=Date.now();const n=S.news.filter(e=>new Date(e.starts_at).getTime()>now).sort((a,b)=>a.starts_at.localeCompare(b.starts_at))[0];
+  if(!n)return `<span class="mut">No upcoming red or orange USD news this week.</span>`;const ms=new Date(n.starts_at).getTime()-now;
+  return `<span class="ne-l">⏱ Next event</span> <i class="fold ${n.impact==="High"?"red":"org"}"></i> <b data-notr>${esc(n.title)}</b> <span class="ne-in ${ms<15*60e3?"soon":""}"><span>in</span> <b class="mono" data-notr>${untilText(ms)}</b></span> <span class="mut mono" data-notr>${tzTime(n.starts_at,NY)} NY / ${tzTime(n.starts_at,DZ)} DZ · ${esc(fmtDate(tzDate(n.starts_at,NY)))}</span>`}
+function newsRows(list){const now=new Date().toISOString();return list.map(n=>`<div class="nrow ${n.starts_at<now?"past":""}"><i class="fold ${n.impact==="High"?"red":"org"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}</div>`).join("")}
+function newsPanelBody(tab){if(!S.newsLoaded)return `<div class="mut nb-e">Loading news…</div>`;
+  if(tab==="week"){const days=weekDays();const html=days.map(d=>{const ev=newsFor(d),ho=holidaysFor(d);return ev.length||ho.length?`<div class="nday ${d===todayStr()?"today":""}"><span data-notr>${esc(fmtDate(d))}</span>${d===todayStr()?` <span class="tag">Today</span>`:""}</div>${holRows(ho)}${newsRows(ev)}`:""}).join("");
+    return html||`<div class="mut nb-e">No red or orange USD news this week.</div>`}
+  const d=tab==="yday"?prevTradingDay():tab==="tmrw"?nextTradingDay():todayStr();const ev=newsFor(d),ho=holidaysFor(d);
+  return `<div class="nday"><span data-notr>${esc(fmtDate(d))}</span></div>`+holRows(ho)+(ev.length?newsRows(ev):ho.length?"":d>newsWeekEnd()?`<div class="mut nb-e"><span>Next week's calendar isn't published yet.</span> <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">Forex Factory</a></div>`:`<div class="mut nb-e">No red or orange USD news this day.</div>`)+
+    (ev.some(n=>n.impact==="High")?`<div class="nb-w">⚠️ Red folder: no new trades 5 min before and after. Expect volatility.</div>`:"")}
+function newsPanel(){const tab=S._newsTab||"today";const tabs=[["yday","Yesterday"],["today","Today"],["tmrw","Tomorrow"],["week","This week"]];
+  return `<div class="card newspanel" id="newsPanel" style="margin-bottom:14px">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">📰 USD news <span class="mut" style="text-transform:none;letter-spacing:0;font-weight:500">· Forex Factory</span></h3>
+      <span class="nb-lg"><i class="fold red"></i><span>Red folder</span><i class="fold org"></i><span>Orange folder</span></span></div>
+    <div class="nextev" id="nextEv">${nextEventHTML()}</div>
+    <div class="seg" id="newsTabs" style="margin:10px 0 6px">${tabs.map(([k,l])=>`<button data-t="${k}" class="${tab===k?"on":""}">${l}</button>`).join("")}</div>
+    <div id="newsBody">${newsPanelBody(tab)}</div></div>`}
+function bindNewsPanel(){$$("#newsTabs button").forEach(b=>b.onclick=()=>{S._newsTab=b.dataset.t;$$("#newsTabs button").forEach(x=>x.classList.toggle("on",x===b));$("#newsBody").innerHTML=newsPanelBody(S._newsTab)})}
+function refreshNewsPanel(){const ne=$("#nextEv");if(ne)ne.innerHTML=nextEventHTML();const nb=$("#newsBody");if(nb)nb.innerHTML=newsPanelBody(S._newsTab||"today")}
+setInterval(()=>{const ne=$("#nextEv");if(ne&&!document.hidden)ne.innerHTML=nextEventHTML()},30000);
+function vNews(el){
+  const uh=upcomingHolidays(6);
+  el.innerHTML=`<h1>📰 USD news</h1><p class="sub">Red and orange folder USD events from Forex Factory, in New York and Algeria (DZ) time. Plan around them.</p>${newsPanel()}
+   <div class="card"><h3>🏦 Upcoming US holidays</h3>${uh.map(x=>`<div class="nrow hol ${x.kind}"><span class="hol-ic">🏦</span><span class="mono nt" data-notr>${esc(fmtDate(x.date))}</span><b class="ntitle" data-notr>${esc(x.title)}</b><span class="hol-note">${HOL_NOTE[x.kind]}</span><span class="hol-in"><span>in</span> <b class="mono" data-notr>${daysUntil(x.date)}</b> <span>days</span></span></div>`).join("")||`<div class="mut nb-e">No holidays listed.</div>`}</div>`;
+  bindNewsPanel();if(!S.newsLoaded)loadNews();
+}
 
 /* ============ discipline coach ============
    Goal: 5 disciplined trades in a row. A trade is "respected" when the plan was followed,

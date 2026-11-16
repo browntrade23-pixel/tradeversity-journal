@@ -30,6 +30,9 @@ Edit them in `index.html`, near the end of the script:
 ## USD news (Forex Factory)
 `news.sql` makes the database download the Forex Factory weekly calendar every 3 hours and keep USD red-folder (High) and orange-folder (Medium) events. The plan page lists them for the planned day with New York and Algeria (DZ) times and a button to add them to the plan; the coach card reminds students of today's remaining news and the next session's news. Next week's events appear once Forex Factory publishes them (usually over the weekend).
 
+### News tab and holidays
+The **📰 News** tab (next to Journal and Statistics) shows a live countdown to the next red/orange USD event, tabs for Yesterday / Today / Tomorrow / This week, and the upcoming US bank holidays (markets closed, early close, or banks closed with low liquidity). Holidays come from the built-in list `US_HOL` in index.html (2026-2027, add later years there) plus Forex Factory "Holiday" events.
+
 ## Telegram username is required
 Sign-up refuses accounts without a valid Telegram username (@name, 5-32 letters/numbers/_), and the database enforces the same rule.
 
