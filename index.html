@@ -240,6 +240,49 @@ html[lang=ar] .promo-tag,html[lang=ar] .promo-code{letter-spacing:0}
 .check{display:flex;gap:8px;align-items:flex-start;padding:6px 0}
 .check input{margin-top:3px;accent-color:var(--gold)}
 hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
+/* USD news box */
+.newsbox{border:1px solid var(--line2);border-radius:12px;padding:10px 12px;background:var(--panel2);display:flex;flex-direction:column;gap:6px;color:var(--text);font-weight:500}
+.nb-h{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px}
+.nb-lg{margin-inline-start:auto;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.fold{display:inline-block;width:12px;height:10px;border-radius:2px 2px 3px 3px;position:relative;flex:none}
+.fold::before{content:"";position:absolute;left:0;top:-3px;width:6px;height:4px;border-radius:2px 2px 0 0;background:inherit}
+.fold.red{background:#e53935}.fold.org{background:#fb8c00}
+.nrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13px;padding:5px 0;border-top:1px solid var(--line)}
+.nrow .nt{font-weight:700}.nrow .tzl{font-size:10px;color:var(--dim);margin-inline-end:4px}
+.nrow .ntitle{font-weight:700}.nrow .nfp{font-size:11px;margin-inline-start:auto}
+.nb-e{font-size:12px;padding:4px 0}
+.nb-w{font-size:12px;color:#ff9d9a;background:rgba(239,83,80,.1);border-radius:8px;padding:6px 10px}
+.newsbox .btn{align-self:flex-start}
+#coachNews{display:flex;flex-direction:column;gap:6px}/* discipline coach card */
+.coach{display:grid;grid-template-columns:1.1fr 1fr;gap:14px 18px;border-color:rgba(245,185,66,.3);background:linear-gradient(135deg,rgba(245,185,66,.07),var(--panel) 55%)}
+@media(max-width:760px){.coach{grid-template-columns:1fr}}
+.coach-t{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:800}
+.dots{display:flex;align-items:center;gap:8px;margin:10px 0 8px}
+.dots i{width:22px;height:22px;border-radius:50%;border:2px solid var(--line2);background:var(--panel2);transition:.3s}
+.dots i.on{background:radial-gradient(circle at 35% 35%,#ffe3a1,var(--gold));border-color:var(--gold);box-shadow:0 0 12px rgba(245,185,66,.55)}
+.dots b{margin-inline-start:6px;font-size:18px}
+.coach-m{font-weight:700;margin-bottom:6px}
+.coach-s{font-size:12px;color:var(--muted)}
+.coach-r{display:flex;flex-direction:column;gap:6px}
+.today-cnt{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.today-cnt b{font-size:16px;color:var(--text)}
+.today-cnt.warn{border-color:rgba(245,185,66,.5)}.today-cnt.warn b{color:var(--gold)}
+.today-cnt.bad{border-color:rgba(239,83,80,.6);background:rgba(239,83,80,.08)}.today-cnt.bad b{color:var(--red)}
+.rem{display:flex;gap:8px;align-items:flex-start;font-size:13px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.02)}
+.rem.warn{background:rgba(245,185,66,.08);color:var(--gold2)}.rem.bad{background:rgba(239,83,80,.1);color:#ff9d9a}
+.quote{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.25);font-style:italic}
+.quote .qm{font-size:30px;line-height:0;color:var(--gold);font-style:normal;transform:translateY(6px)}
+.quote #qText{flex:1}
+.quote .qby{font-style:normal;font-size:10px;letter-spacing:.2em;color:var(--gold);white-space:nowrap}
+html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
+.tag.over{background:rgba(239,83,80,.15);color:var(--red)}
+/* admin: today's discipline */
+.dyes,.dno{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.dyes{background:rgba(39,194,108,.12);color:var(--green)}
+.dno{background:rgba(239,83,80,.12);color:#ff8a87}
+.dyes .mono{font-weight:700}
+.d7{display:flex;align-items:center;gap:8px;min-width:110px}.d7 .bar{flex:1}
+#discT td{vertical-align:middle}
 /* founder signature */
 .foot.founder{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:22px}
 .foot.founder span{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--dim)}
@@ -323,7 +366,7 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
       <form id="signupForm" class="grid hidden">
         <label class="f">Full name<input class="i" name="name" required autocomplete="name"></label>
         <label class="f">Email<input class="i" name="email" type="email" required autocomplete="email"></label>
-        <label class="f">Telegram username<input class="i" name="telegram" placeholder="@username" required></label>
+        <label class="f">Telegram username (required)<input class="i" name="telegram" placeholder="@username" required pattern="@?[A-Za-z0-9_]{5,32}" title="Your Telegram username, e.g. @brown_algo (5-32 letters, numbers or _)"></label>
         <label class="f">Password<input class="i" name="password" type="password" minlength="8" required autocomplete="new-password"></label>
         <label class="f">Confirm password<input class="i" name="password2" type="password" minlength="8" required autocomplete="new-password"></label>
         <button class="btn pri" type="submit">Create my free account</button>
@@ -469,6 +512,7 @@ const Cloud={
   async setStatus(id,status){const{error}=await this.sb.rpc("set_student_status",{target:id,new_status:status});if(error)throw error},
   async allTradesLite(){const{data,error}=await this.sb.from("trades").select("id,user_id,trade_date,symbol,account,pnl,data").limit(20000);if(error)throw error;return data.map(r=>({...(r.data||{}),id:r.id,user_id:r.user_id,shots:[]}))},
   async allPlans(){const{data,error}=await this.sb.from("plans").select("*");if(error)throw error;return data.map(r=>({...(r.data||{}),user_id:r.user_id,date:r.plan_date}))},
+  async news(fromISO,toISO){const{data,error}=await this.sb.from("econ_news").select("title,impact,starts_at,forecast,previous").gte("starts_at",fromISO).lte("starts_at",toISO).order("starts_at");if(error)throw error;return data||[]},
   async resetPassword(email){const{error}=await this.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error}
 };
 
@@ -493,7 +537,8 @@ $("#loginForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.tar
   try{const u=await API.signIn(f.get("email").trim(),f.get("password"));await enter(u)}catch(err){$("#authMsg").innerHTML=`<span class="neg">${esc(err.message||err)}</span>`}};
 $("#signupForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);
   if(f.get("password")!==f.get("password2")){$("#authMsg").innerHTML='<span class="neg">Passwords don\'t match.</span>';return}
-  let tg=f.get("telegram").trim();if(tg&&!tg.startsWith("@"))tg="@"+tg;
+  let tg=f.get("telegram").trim().replace(/^https?:\/\/t\.me\//i,"");if(tg&&!tg.startsWith("@"))tg="@"+tg;
+  if(!/^@[A-Za-z0-9_]{5,32}$/.test(tg)){$("#authMsg").innerHTML=`<span class="neg">${esc(I18N.t("Your Telegram username is required to join (e.g. @brown_algo). Open Telegram > Settings to see it."))}</span>`;return}
   $("#authMsg").textContent="Creating your account…";
   try{const r=await API.signUp({email:f.get("email").trim(),password:f.get("password"),name:f.get("name").trim(),telegram:tg});
     if(r.needsConfirm){$("#authMsg").innerHTML='<span class="ok">Account created. Check your email to confirm it, then log in.</span>';$("#tabLogin").click();$("#authMsg").innerHTML='<span class="ok">Account created. Check your email to confirm it, then log in.</span>'}
@@ -512,8 +557,9 @@ async function enter(u){
   else{await loadSubject(u,false);go(location.hash.slice(1)||"journal")}
 }
 async function loadSubject(u,readonly){
-  S.subject=u;S.readonly=readonly;S.acct="all";S.page=null;
+  S.subject=u;S.readonly=readonly;S.acct="all";S.page=null;S._planDate=null;
   try{[S.trades,S.plans]=await Promise.all([API.listTrades(u.id),API.listPlans(u.id)])}catch(e){toast("Couldn't load data: "+(e.message||e));S.trades=[];S.plans=[]}
+  loadNews();
 }
 
 /* ============ nav ============ */
@@ -543,12 +589,114 @@ function filterBar(){const ac=accounts();
 function bindFilters(){const a=$("#fAcct");if(a)a.onchange=()=>{S.acct=a.value;render()};$$("#fRange button").forEach(b=>b.onclick=()=>{S.range=b.dataset.r;render()})}
 
 /* ============ JOURNAL ============ */
+/* ============ USD news (Forex Factory: red = High, orange = Medium) ============ */
+S.news=[];S.newsLoaded=false;
+const tzDate=(iso,tz)=>new Intl.DateTimeFormat("en-CA",{timeZone:tz,year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date(iso));
+const tzTime=(iso,tz)=>new Date(iso).toLocaleTimeString("en-GB",{timeZone:tz,hour:"2-digit",minute:"2-digit"});
+const NY="America/New_York",DZ="Africa/Algiers";
+function newsFor(date){return S.news.filter(n=>tzDate(n.starts_at,NY)===date).sort((a,b)=>a.starts_at.localeCompare(b.starts_at))}
+function newsWeekEnd(){const d=new Date();d.setDate(d.getDate()+(6-d.getDay()));return ymd(d)}  /* the feed covers the current week (to Saturday) */
+async function loadNews(){try{if(!API||!API.news)return;const a=new Date();a.setDate(a.getDate()-2);const b=new Date();b.setDate(b.getDate()+10);
+  S.news=await API.news(a.toISOString(),b.toISOString());S.newsLoaded=true;
+  const nb=$("#newsBox");if(nb){nb.outerHTML=newsBox(nb.dataset.date,nb.dataset.ins==="1");const ta=$("#pNews");if(ta&&!ta.value.trim()&&!ta.disabled)ta.value=newsText(nb.dataset.date);bindNewsIns(nb.dataset.date)}
+  const cn=$("#coachNews");if(cn)cn.innerHTML=coachNewsHTML()}catch(e){console.warn("news",e)}}
+function bindNewsIns(date){if($("#newsIns"))$("#newsIns").onclick=()=>{const t=newsText(date);if(!t)return;const ta=$("#pNews");ta.value=ta.value.trim()?ta.value.trim()+"\n"+t:t;toast("News added to your plan")}}
+function newsLine(n){return `${n.impact==="High"?"🔴":"🟠"} ${tzTime(n.starts_at,NY)} NY / ${tzTime(n.starts_at,DZ)} DZ — ${n.title}`}
+function newsText(date){const ev=newsFor(date);if(!ev.length)return "";const lines=ev.map(newsLine);
+  if(ev.some(n=>n.impact==="High"))lines.push("⚠️ Red folder: no new trades 5 min before and after.");return lines.join("\n")}
+function newsBox(date,canInsert){const ev=newsFor(date),later=date>newsWeekEnd();
+  const rows=ev.map(n=>`<div class="nrow"><i class="fold ${n.impact==="High"?"red":"org"}" title="${n.impact==="High"?"Red folder":"Orange folder"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}</div>`).join("");
+  return `<div class="newsbox" id="newsBox" data-date="${date}" data-ins="${canInsert?1:0}">
+    <div class="nb-h"><b>📰 USD news</b> <span class="mut">· Forex Factory</span><span class="nb-lg"><i class="fold red"></i><span>Red folder</span><i class="fold org"></i><span>Orange folder</span></span></div>
+    ${!S.newsLoaded?`<div class="mut nb-e">Loading news…</div>`:ev.length?rows:later?`<div class="mut nb-e"><span>Next week's calendar isn't published yet.</span> <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">Forex Factory</a></div>`:`<div class="mut nb-e">No red or orange USD news this day.</div>`}
+    ${ev.some(n=>n.impact==="High")?`<div class="nb-w">⚠️ Red folder: no new trades 5 min before and after. Expect volatility.</div>`:""}
+    ${canInsert&&ev.length?`<button type="button" class="btn sm" id="newsIns">➕ Add to my plan</button>`:""}
+  </div>`}
+function coachNewsHTML(){if(!S.newsLoaded)return "";const now=new Date().toISOString(),today=todayStr(),nd=nextTradingDay();
+  const up=newsFor(today).filter(n=>n.starts_at>now),next=newsFor(nd);let h="";
+  if(up.length)h+=`<div class="rem ${up.some(n=>n.impact==="High")?"bad":"warn"}"><span>📰</span><span><b>Today</b> <span data-notr>${up.slice(0,3).map(n=>esc(newsLine(n))).join("<br>")}</span></span></div>`;
+  if(next.length)h+=`<div class="rem warn"><span>🗓️</span><span><b>Next session</b> <span data-notr>(${esc(fmtDate(nd))})</span><br><span data-notr>${next.slice(0,4).map(n=>esc(newsLine(n))).join("<br>")}</span><br><span>Put it in your plan.</span></span></div>`;
+  return h}
+
+/* ============ discipline coach ============
+   Goal: 5 disciplined trades in a row. A trade is "respected" when the plan was followed,
+   the loss (if any) stayed within the planned risk (about -1R), and it was one of the first 2 trades of the day. */
+const DISC={goal:5,maxPerDay:2};
+function judgeTrades(ts){
+  const arr=[...ts].sort(byDT);const nthOfDay={};const out=new Map();
+  arr.forEach(t=>{nthOfDay[t.date]=(nthOfDay[t.date]||0)+1;const n=nthOfDay[t.date],R=tradeR(t),net=tradeNet(t);
+    let v="neutral",why="";
+    if(n>DISC.maxPerDay){v="broken";why="over"}
+    else if(t.followed==="No"){v="broken";why="plan"}
+    else if(net<0&&isFinite(R)&&R<-1.15){v="broken";why="stop"}
+    else if(t.followed==="Yes"){v="respected"}
+    out.set(t.id,{v,why,n})});
+  return {arr,out};
+}
+function discStreak(ts){const {arr,out}=judgeTrades(ts);let streak=0,lastBreak=null;
+  for(let i=arr.length-1;i>=0;i--){const j=out.get(arr[i].id);if(j.v==="neutral")continue;if(j.v==="broken"){lastBreak=j.why;break}streak++}
+  const best=(()=>{let b=0,c=0;arr.forEach(t=>{const j=out.get(t.id);if(j.v==="respected"){c++;b=Math.max(b,c)}else if(j.v==="broken")c=0});return b})();
+  const today=todayStr();return {streak,best,lastBreak,todayCount:arr.filter(t=>t.date===today).length,judged:out};
+}
+const QUOTES=[
+  "Discipline is the edge nobody can copy.",
+  "A respected loss is a win for your process.",
+  "Two good trades beat ten emotional ones.",
+  "Protect the account first. Profits follow.",
+  "No setup, no trade. Patience is a position.",
+  "The plan is made when you are calm. Trust it when you are not.",
+  "You don't need to trade every move. You need to trade your move.",
+  "Small losses are the price of staying in the game.",
+  "Consistency first, size later.",
+  "The market pays the patient and charges the impulsive.",
+  "Journal today what you want to master tomorrow.",
+  "Your stop loss is a promise to yourself. Keep it.",
+  "Every trade is a vote for the trader you are becoming.",
+  "Revenge trading is paying twice for the same mistake.",
+  "When you hit your limit, closing the platform is the trade.",
+  "Boring execution, exciting results.",
+  "One A+ setup a day is enough.",
+  "Fear and greed lose to a checklist.",
+  "Win or lose, follow the plan. That is the job.",
+  "Process over outcome. Every single day."
+];
+function coachCard(){
+  const today=todayStr(),nd=nextTradingDay(),d=discStreak(S.trades);const s=Math.min(d.streak,DISC.goal);
+  const planNext=S.plans.some(p=>p.date===nd),planToday=S.plans.find(p=>p.date===today),hr=new Date().getHours(),wd=new Date().getDay();
+  const reminders=[];
+  if(d.todayCount>DISC.maxPerDay)reminders.push(["⛔","bad","You took more than 2 trades today. Stop trading for today. Overtrading breaks the streak."]);
+  else if(d.todayCount===DISC.maxPerDay)reminders.push(["🛑","warn","2 trades done. That is your limit for today. Close the platform and review."]);
+  else reminders.push(["🎯","","Rule: 2 trades max per day. Pick only your A+ setups."]);
+  if(!planNext)reminders.push(["🧭","warn",hr>=15?"Plan tomorrow before you sleep. Bias, levels, max loss.":"Don't forget to plan the next session today."]);
+  if(wd>0&&wd<6&&!d.todayCount&&!(planToday&&(planToday.review||planToday.followed)))reminders.push(["📓","","Log today's trades, or write your review. A no-trade day is a decision too."]);
+  const msg=d.streak>=DISC.goal?["🏆","Goal reached: 5 disciplined trades in a row. Keep the chain going."]
+    :d.lastBreak&&d.streak===0?["🔁",d.lastBreak==="over"?"Your last day went over 2 trades. The count starts again. Next trade: follow the plan.":d.lastBreak==="stop"?"Your last loss went past the planned stop. The count starts again. Respect the stop.":"Your last trade broke the plan. The count starts again. Next trade: follow the plan."]
+    :["💪",`${DISC.goal-s} more disciplined trades to reach 5. A respected loss counts too.`];
+  const q=QUOTES[Math.floor(Math.random()*QUOTES.length)];
+  return `<div class="card coach" style="margin-bottom:14px">
+    <div class="coach-l">
+      <div class="coach-t">🎯 Discipline streak</div>
+      <div class="dots">${Array.from({length:DISC.goal},(_,i)=>`<i class="${i<s?"on":""}"></i>`).join("")}<b class="mono" data-notr>${s} / ${DISC.goal}</b></div>
+      <div class="coach-m"><span>${msg[0]}</span> <span>${msg[1]}</span></div>
+      <div class="coach-s"><span>Win or respected loss = counts.</span> <span>Broke the plan, ignored the stop, or more than 2 trades a day = resets.</span>${d.best?` <span class="mut">·</span> <span>Best streak:</span> <b class="mono" data-notr>${d.best}</b>`:""}</div>
+    </div>
+    <div class="coach-r">
+      <div class="today-cnt ${d.todayCount>DISC.maxPerDay?"bad":d.todayCount===DISC.maxPerDay?"warn":""}"><span>Trades today</span><b class="mono" data-notr>${d.todayCount} / ${DISC.maxPerDay}</b></div>
+      ${reminders.map(r=>`<div class="rem ${r[1]}"><span>${r[0]}</span><span>${r[2]}</span></div>`).join("")}
+      <div id="coachNews">${coachNewsHTML()}</div>
+    </div>
+    <div class="quote"><span class="qm">“</span><span id="qText">${esc(q)}</span><span class="qby">— BROWN ALGO</span><button class="btn sm ghost" id="qNext" title="Another quote">↻</button></div>
+  </div>`;
+}
+function bindCoach(){const b=$("#qNext");if(b)b.onclick=()=>{const cur=$("#qText").dataset.en||$("#qText").textContent;let q;do{q=QUOTES[Math.floor(Math.random()*QUOTES.length)]}while(q===cur&&QUOTES.length>1);$("#qText").textContent=q;$("#qText").dataset.en=q}}
+
 function vJournal(el){
   if(S.page)return vTradePage(el,S.page);
   const ts=filtered().sort((a,b)=>byDT(b,a));const st=calc(ts);
   const byDay={};ts.forEach(t=>(byDay[t.date]=byDay[t.date]||[]).push(t));
   el.innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:6px"><div><h1>Trading journal</h1><p class="sub">${S.readonly?"Student's":"Your"} trades, screenshots, feelings and lessons.</p></div>
    <div class="row">${S.readonly?"":`<button class="btn pri" id="addT">+ New trade</button>`}<button class="btn" id="expCsv">Export CSV</button></div></div>
+   ${coachCard()}
    ${filterBar()}
    <div class="grid g4" style="margin-bottom:16px">
      ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,`${st.n} trades`)}
@@ -559,7 +707,7 @@ function vJournal(el){
    ${ts.length?Object.keys(byDay).sort().reverse().map(d=>{const dn=byDay[d].reduce((a,t)=>a+tradeNet(t),0);
      return `<div class="day"><div class="dayh"><span>${fmtDate(d)}</span><span class="mono ${cls(dn)}">${smoney(dn)}</span></div>${byDay[d].map(tcard).join("")}</div>`}).join("")
    :`<div class="card empty">No trades yet. ${S.readonly?"":"Add your first trade or import a CSV from your broker."}</div>`}`;
-  bindFilters();if($("#addT"))$("#addT").onclick=()=>editTrade(null);
+  bindFilters();bindCoach();if($("#addT"))$("#addT").onclick=()=>editTrade(null);
   $("#expCsv").onclick=exportCSV;
   $$(".tcard",el).forEach(c=>c.onclick=()=>{S.page=c.dataset.id;render();window.scrollTo(0,0)});
 }
@@ -763,7 +911,7 @@ function vStats(el){const ts=filtered();const st=calc(ts);
 function vPlan(el){
   const dates=S.plans.map(p=>p.date).sort().reverse();
   let cur=S._planDate||(S.readonly?(dates[0]||nextTradingDay()):nextTradingDay());S._planDate=cur;
-  const p=S.plans.find(x=>x.date===cur)||{user_id:S.subject.id,date:cur,maxLoss:"",target:"",maxTrades:"",riskPerTrade:"",bias:{},htf:"",levels:"",news:"",session:"NY AM",model:"",noTrade:"",rules:{},mindset:"",followed:"",review:""};
+  const p=S.plans.find(x=>x.date===cur)||{user_id:S.subject.id,date:cur,maxLoss:"",target:"",maxTrades:2,riskPerTrade:"",bias:{},htf:"",levels:"",news:"",session:"NY AM",model:"",noTrade:"",rules:{},mindset:"",followed:"",review:""};
   const dayTrades=S.trades.filter(t=>t.date===cur),dn=dayTrades.reduce((a,t)=>a+tradeNet(t),0);
   const ro=S.readonly?"disabled":"";
   const RULES=["Daily bias defined","1H imbalance marked","15m entry confirmation only","Stop loss before entry","Max loss respected","No trading during red news"];
@@ -781,7 +929,8 @@ function vPlan(el){
    <div class="card grid g2">
     <label class="f">HTF narrative (Daily / 1H) & draw on liquidity<textarea class="i" name="htf" ${ro}>${esc(p.htf)}</textarea></label>
     <label class="f">Key levels (PDH, PDL, FVGs, opens…)<textarea class="i" name="levels" ${ro}>${esc(p.levels)}</textarea></label>
-    <label class="f">News & events<textarea class="i" name="news" ${ro} placeholder="Time · event · impact">${esc(p.news)}</textarea></label>
+    <div class="f" style="grid-column:1/-1">${newsBox(cur,!S.readonly)}</div>
+    <label class="f">News & events<textarea class="i" name="news" id="pNews" ${ro} placeholder="Time · event · impact">${esc(p.news||(!S.readonly?newsText(cur):""))}</textarea></label>
     <label class="f">Entry model / A+ setup I'm waiting for<textarea class="i" name="model" ${ro}>${esc(p.model)}</textarea></label>
     <label class="f">I will NOT trade if…<textarea class="i" name="noTrade" ${ro}>${esc(p.noTrade)}</textarea></label>
     <div class="grid"><label class="f">Session<select class="i" name="session" ${ro}>${SESSIONS.map(s=>`<option ${p.session===s?"selected":""}>${s}</option>`).join("")}</select></label>
@@ -797,7 +946,7 @@ function vPlan(el){
      <label class="f">Review note<input class="i" name="review" value="${esc(p.review)}" ${ro} placeholder="What went right / wrong?"></label></div></div>
    ${S.readonly?"":`<div class="row" style="justify-content:flex-end"><button class="btn pri" type="submit">Save plan</button></div>`}
   </form>`;
-  $("#pDate").onchange=e=>{S._planDate=e.target.value;render()};if($("#pHist"))$("#pHist").onchange=e=>{if(e.target.value){S._planDate=e.target.value;render()}};
+  bindNewsIns(cur);if($("#pHist"))$("#pHist").onchange=e=>{if(e.target.value){S._planDate=e.target.value;render()}};
   if(S.readonly)return;
   const bias={...(p.bias||{})};
   $$(".seg[data-g]").forEach(sg=>$$("button",sg).forEach(b=>b.onclick=()=>{const g=sg.dataset.g,v=b.dataset.b;bias[g]=bias[g]===v?"":v;$$("button",sg).forEach(x=>{x.className=bias[g]===x.dataset.b?"on "+(v==="Bullish"?"bull":v==="Bearish"?"bear":""):""})}));
@@ -959,12 +1108,44 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
     return {s,c,last,active:last>=wkS,plans:pl.length,hasNext:pl.some(p=>p.date>=todayStr()),brk,mlb,worstEmo:em.filter(r=>r.net<0).sort((a,b)=>a.net-b.net)[0]}}).sort((a,b)=>b.c.net-a.c.net);
   const all=calc(trades.filter(t=>students.some(s=>s.id===t.user_id)));
   const emoAll=groupBy(trades,t=>(t.emotions||[]).filter(e=>EMO_BAD.includes(e))).filter(r=>r.net<0).sort((a,b)=>a.net-b.net).slice(0,3);
+  /* today's discipline: journaled today? plan for today? plan for tomorrow? */
+  const today=todayStr();const d7=new Date();d7.setDate(d7.getDate()-6);const d7s=ymd(d7);
+  const disc=students.map(s=>{const ts=trades.filter(t=>t.user_id===s.id),pl=plans.filter(p=>p.user_id===s.id);
+    const tToday=ts.filter(t=>t.date===today),pToday=pl.find(p=>p.date===today),pNext=pl.find(p=>p.date===nd);
+    const reviewed=!!(pToday&&((pToday.review||"").trim()||pToday.followed));
+    const days7=new Set(ts.filter(t=>t.date>=d7s&&t.date<=today).map(t=>t.date)).size;
+    const ds=discStreak(ts);
+    return {s,tToday,pToday,pNext,reviewed,journaled:tToday.length>0||reviewed,days7,netToday:tToday.reduce((a,t)=>a+tradeNet(t),0),streak:ds.streak,over:tToday.length>DISC.maxPerDay}})
+    .sort((a,b)=>(a.journaled+!!a.pNext)-(b.journaled+!!b.pNext)||(a.s.name||"").localeCompare(b.s.name||""));
+  const nJ=disc.filter(r=>r.journaled).length,nPT=disc.filter(r=>r.pToday).length,nPN=disc.filter(r=>r.pNext).length;
+  const yes=(t)=>`<span class="dyes">✔ ${t||""}</span>`,no=t=>`<span class="dno">✖ ${t||""}</span>`;
+  const tgUser=s=>(s.telegram||"").replace(/^@/,"").replace(/^https?:\/\/t\.me\//,"").trim();
+  const discRow=r=>`<tr data-sid="${r.s.id}" data-miss="${r.journaled?"":"j"}${r.pNext?"":"p"}">
+     <td><b data-notr>${esc(r.s.name||"—")}</b><div class="mut mono" style="font-size:11px" data-notr>${esc(r.s.telegram||"")}</div></td>
+     <td>${r.journaled?yes(r.tToday.length?`<span data-notr>${r.tToday.length}</span> <span>${r.tToday.length===1?"trade":"trades"}</span> <span class="mono ${cls(r.netToday)}" data-notr>${smoney(r.netToday,0)}</span>`:"Review written"):no("Nothing yet")}${r.over?` <span class="tag over">Overtrading</span>`:""}</td>
+     <td>${r.pToday?yes(r.pToday.followed?`<span>Followed:</span> <span>${esc(r.pToday.followed)}</span>`:"Planned"):no("No plan")}</td>
+     <td>${r.pNext?yes("Planned"):no("Not yet")}</td>
+     <td><div class="d7" title="Journaling days in the last 7 days"><div class="bar"><i style="width:${r.days7/7*100}%;background:${r.days7>=4?"var(--green)":r.days7>=2?"var(--gold)":"var(--red)"}"></i></div><span class="mono" data-notr>${r.days7}/7</span></div></td>
+     <td><span class="mono ${r.streak>=DISC.goal?"pos":r.streak?"warn":"mut"}" data-notr>${Math.min(r.streak,DISC.goal)}/${DISC.goal}</span>${r.streak>=DISC.goal?" 🏆":""}</td>
+     <td><div class="row" style="justify-content:flex-end;flex-wrap:nowrap">
+       <button class="btn sm" data-open="journal">📓 Journal</button><button class="btn sm" data-open="plan">🧭 Plan</button><button class="btn sm" data-open="stats">📊 Stats</button>
+       ${tgUser(r.s)?`<a class="btn sm" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" title="Message on Telegram">💬</a>`:""}</div></td></tr>`;
   const reqRow=(p,rej)=>`<tr data-pid="${p.id}"><td><b data-notr>${esc(p.name||"—")}</b><div class="mut" style="font-size:11px" data-notr>${esc(p.email||"")}</div></td><td class="mono" data-notr>${esc(p.telegram||"")}</td><td class="mut" data-notr>${p.created_at?esc(fmtDate(p.created_at.slice(0,10))):""}</td>
      <td><div class="row" style="justify-content:flex-end">${rej?"":`<button class="btn sm danger" data-act="rejected">✖ Reject</button>`}<button class="btn sm pri" data-act="approved">✔ Approve</button></div></td></tr>`;
   el.innerHTML=`<h1>👑 Admin dashboard</h1><p class="sub">All your Tradeversity students in one place. Click a student to open their journal, stats and plans (read-only).</p>
    ${pending.length?`<div class="card" style="margin-bottom:12px;border-color:var(--gold)"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0;color:var(--gold)">🔔 Pending requests</h3><span class="tag" style="background:rgba(245,185,66,.15);color:var(--gold)">${pending.length}</span></div>
      <p class="mut" style="margin:0 0 8px;font-size:12px">These people signed up and are waiting for you. They can't use the journal until you approve them.</p>
      <div class="tw"><table class="t" id="reqT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${pending.map(p=>reqRow(p,false)).join("")}</table></div></div>`:""}
+   ${students.length?`<div class="card" style="margin-bottom:12px" id="discCard">
+     <div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">📅 Today's discipline — <span data-notr>${esc(fmtDate(today))}</span></h3>
+       <div class="seg" id="discF"><button data-f="all" class="on">All</button><button data-f="j">Missing journal</button><button data-f="p">Missing plan</button></div></div>
+     <div class="grid g3" style="margin-bottom:12px">
+       ${kpi("Journaled today",`<span class="${nJ===disc.length?"pos":nJ?"warn":"neg"}">${nJ} / ${disc.length}</span>`,`${disc.length-nJ} missing`)}
+       ${kpi("Plan for today",`<span class="${nPT===disc.length?"pos":nPT?"warn":"neg"}">${nPT} / ${disc.length}</span>`,fmtDate(today))}
+       ${kpi("Plan for tomorrow",`<span class="${nPN===disc.length?"pos":nPN?"warn":"neg"}">${nPN} / ${disc.length}</span>`,fmtDate(nd))}
+     </div>
+     <div class="tw"><table class="t" id="discT"><tr><th>Student</th><th>Journal today</th><th>Plan for today</th><th>Plan for tomorrow</th><th>Last 7 days</th><th>Streak</th><th></th></tr>${disc.map(discRow).join("")}</table></div>
+   </div>`:""}
    <div class="grid g4" style="margin-bottom:12px">
     ${kpi("Students",students.length,`${rows.filter(r=>r.active).length} active this week`)}
     ${kpi("Trades logged",all.n,"all students")}
@@ -980,6 +1161,13 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
   $$("tr[data-pid] button[data-act]",el).forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const id=b.closest("tr").dataset.pid,act=b.dataset.act;const p=profs.find(x=>x.id===id);
     const go_=async()=>{b.disabled=true;try{await API.setStatus(id,act);toast(act==="approved"?"Student approved":"Request rejected");vAdmin(el)}catch(e){b.disabled=false;toast(e.message||String(e))}};
     if(act==="rejected")confirmBox(`Reject ${p&&p.name||"this request"}? They won't be able to use the journal.`,go_);else go_()});
+  /* today's discipline: filters + open a student's journal / plan / stats */
+  $$("#discF button").forEach(b=>b.onclick=()=>{$$("#discF button").forEach(x=>x.classList.toggle("on",x===b));const f=b.dataset.f;
+    $$("#discT tr[data-sid]").forEach(tr=>tr.classList.toggle("hidden",f!=="all"&&!tr.dataset.miss.includes(f)))});
+  $$("#discT button[data-open]").forEach(b=>b.onclick=async()=>{const s=students.find(x=>x.id===b.closest("tr").dataset.sid);if(!s)return;const v=b.dataset.open;
+    const r=disc.find(x=>x.s.id===s.id);await loadSubject(s,true);
+    if(v==="plan")S._planDate=r&&r.pNext?nd:today;
+    S.view=v;render();window.scrollTo(0,0)});
   $("#aq").oninput=e=>{const q=e.target.value.toLowerCase();$$("#aT tr[data-q]").forEach(tr=>tr.classList.toggle("hidden",!tr.dataset.q.includes(q)))};
   $$("#aT tr[data-id]").forEach(tr=>tr.onclick=async()=>{const s=students.find(x=>x.id===tr.dataset.id);await loadSubject(s,true);S.view="journal";render();window.scrollTo(0,0)});
   $("#aExp").onclick=()=>{const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;saveFile(`tradeversity-students-${todayStr()}.csv`,["name,email,telegram,joined,trades,net_pnl,win_rate,profit_factor,broke_plan,max_loss_days,last_trade",...rows.map(r=>[r.s.name,r.s.email,r.s.telegram,(r.s.created_at||"").slice(0,10),r.c.n,r.c.net.toFixed(2),isFinite(r.c.wr)?(r.c.wr*100).toFixed(1):"",isFinite(r.c.pf)?r.c.pf.toFixed(2):"",r.brk,r.mlb,r.last].map(q).join(","))].join("\n"),"text/csv")};

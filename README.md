@@ -21,6 +21,18 @@ Edit them in `index.html`, near the end of the script:
 - `SOCIAL` — Students' results channel, Brown Algo Telegram channel, YouTube, Instagram, TikTok, Kick (shown top and bottom of the login screen and of the journal).
 - `PROMO` — Earn2Trade partner link and coupon code (`BROWN23`, 60% off).
 
+## Discipline rules (students)
+- **2 trades max per day** (a 3rd trade breaks the discipline streak). New plans start with "Max number of trades = 2".
+- **Goal: 5 disciplined trades in a row.** Counts: plan followed, win or respected loss (loss within about -1R). Resets: plan broken, stop ignored, or more than 2 trades in a day.
+- The journal shows a coach card with the streak, today's trade count, reminders and a new Brown Algo quote on every visit. Change the rules in `DISC` and the quotes in `QUOTES` (index.html).
+- The admin dashboard shows "Today's discipline": who journaled today, who planned today/tomorrow, 7-day consistency, streak, overtrading, with buttons to open each student's journal, plan and stats.
+
+## USD news (Forex Factory)
+`news.sql` makes the database download the Forex Factory weekly calendar every 3 hours and keep USD red-folder (High) and orange-folder (Medium) events. The plan page lists them for the planned day with New York and Algeria (DZ) times and a button to add them to the plan; the coach card reminds students of today's remaining news and the next session's news. Next week's events appear once Forex Factory publishes them (usually over the weekend).
+
+## Telegram username is required
+Sign-up refuses accounts without a valid Telegram username (@name, 5-32 letters/numbers/_), and the database enforces the same rule.
+
 ## Approving students
 New sign-ups appear in **Admin dashboard → 🔔 Pending requests** (and you get a Telegram message). Click **✔ Approve** to let them in, or **✖ Reject**. Until then they only see a "Waiting for approval" screen, and the database refuses to show or save their data. Rejected requests can still be approved later from the "Rejected requests" list.
 
