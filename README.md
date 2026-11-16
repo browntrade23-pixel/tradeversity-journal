@@ -33,6 +33,9 @@ Edit them in `index.html`, near the end of the script:
 ### News tab and holidays
 The **📰 News** tab (next to Journal and Statistics) shows a live countdown to the next red/orange USD event, tabs for Yesterday / Today / Tomorrow / This week, and the upcoming US bank holidays (markets closed, early close, or banks closed with low liquidity). Holidays come from the built-in list `US_HOL` in index.html (2026-2027, add later years there) plus Forex Factory "Holiday" events.
 
+## About us and results
+The login page and the **About us** tab show the numbers in `ABOUT` (index.html: years in the markets, number of students) and a link to the results channel. To show result screenshots, put the images in the `results/` folder and list the file names in `RESULTS`. They appear as a moving strip on the login page and a gallery in About us (click to enlarge).
+
 ## Telegram username is required
 Sign-up refuses accounts without a valid Telegram username (@name, 5-32 letters/numbers/_), and the database enforces the same rule.
 

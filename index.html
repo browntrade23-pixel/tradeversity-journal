@@ -297,6 +297,28 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .dyes .mono{font-weight:700}
 .d7{display:flex;align-items:center;gap:8px;min-width:110px}.d7 .bar{flex:1}
 #discT td{vertical-align:middle}
+/* about us */
+.about-mini{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:13px;color:var(--muted);opacity:0;animation:up .9s ease 3.3s forwards}
+.about-mini b{color:var(--gold2);font-size:15px}.about-mini .sep{color:var(--dim)}
+.about-auth{margin-top:14px;padding:16px;border-radius:14px;border:1px solid var(--line);background:rgba(14,19,31,.7);backdrop-filter:blur(6px);text-align:center}
+.about-auth p{margin:6px 0 12px;color:var(--muted);font-size:13px}
+.about-t{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:800}
+html[lang=ar] .about-t{letter-spacing:0}
+.astats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.astat{padding:12px 8px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.astat b{font-size:24px;font-weight:900;color:var(--gold);font-family:"JetBrains Mono",monospace}
+.astat span{font-size:11px;color:var(--muted);line-height:1.3}
+.about-hero{display:flex;gap:18px;align-items:center;margin-bottom:14px}
+@media(max-width:560px){.about-hero{flex-direction:column;text-align:center}.astat b{font-size:20px}}
+.rstrip{overflow:hidden;margin-top:12px;border-radius:10px;-webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.rtrack{display:flex;gap:8px;width:max-content;animation:marquee 40s linear infinite}
+.rtrack img{height:120px;border-radius:8px;border:1px solid var(--line2);cursor:zoom-in}
+.rstrip:hover .rtrack{animation-play-state:paused}
+@keyframes marquee{to{transform:translateX(-50%)}}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.rgrid img{width:100%;border-radius:10px;border:1px solid var(--line2);cursor:zoom-in}
+.copyright{text-align:center;font-size:11px;color:var(--dim);padding:6px 0 4px;letter-spacing:.04em}
+@media(prefers-reduced-motion:reduce){.rtrack,.about-mini{animation:none;opacity:1}}
 /* founder signature */
 .foot.founder{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:22px}
 .foot.founder span{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--dim)}
@@ -349,6 +371,7 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
     <button class="btn pri gate-btn" id="gateBtn">Enter</button>
     <div class="tg-links" id="socGate"></div>
     <div class="gate-promo" data-promo></div>
+    <div class="about-mini" data-about-mini></div>
     <div class="gate-hint">Founder · <b>BROWN ALGO</b></div>
   </div>
 
@@ -389,7 +412,9 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
     </div>
 
     <div data-promo style="margin-top:14px"></div>
+    <div class="about-auth" data-about-auth></div>
     <div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div>
+    <div class="copyright">© 2026 Tradeversity. All rights reserved.</div>
   </div>
   <div id="socTop" class="soc icons"></div>
   <div id="socBottom" class="soc"></div>
@@ -410,7 +435,7 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
     <nav class="tabs" id="tabs"></nav>
   </header>
   <main id="view"></main>
-  <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div id="socFoot" class="soc"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div></footer>
+  <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div id="socFoot" class="soc"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>
 </section>
 
 <div id="modal" class="modal hidden"><div class="box" id="mbox"></div></div>
@@ -577,7 +602,7 @@ async function loadSubject(u,readonly){
 }
 
 /* ============ nav ============ */
-const VIEWS=[["journal","📓 Journal"],["stats","📊 Statistics"],["news","📰 News"],["plan","🧭 Tomorrow's plan"],["risk","🎯 Risk calculator"],["consistency","⚖️ Consistency rule"],["import","⬆️ Import CSV"]];
+const VIEWS=[["journal","📓 Journal"],["stats","📊 Statistics"],["news","📰 News"],["plan","🧭 Tomorrow's plan"],["risk","🎯 Risk calculator"],["consistency","⚖️ Consistency rule"],["import","⬆️ Import CSV"],["about","ℹ️ About us"]];
 function renderTabs(){const t=$("#tabs");let h="";
   if(S.me.role==="admin")h+=`<button data-v="admin" class="admin ${S.view==="admin"?"on":""}">👑 Admin dashboard</button>`;
   VIEWS.forEach(([k,l])=>{if(S.readonly&&k==="import")return;h+=`<button data-v="${k}" class="${S.view===k?"on":""}">${l}</button>`});
@@ -588,7 +613,7 @@ function go(v){if(![...VIEWS.map(x=>x[0]),"admin"].includes(v))v=S.me.role==="ad
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
 function render(){renderTabs();const v=$("#view");
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
-  const fn={journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,import:vImport,admin:vAdmin}[S.view];
+  const fn={journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,import:vImport,about:vAbout,admin:vAdmin}[S.view];
   v.innerHTML=h+'<div id="vb"></div>';fn($("#vb"));
   if(S.readonly)$("#backAdmin").onclick=()=>go("admin");}
 
@@ -1262,6 +1287,32 @@ function socialHTML(keys){return SOCIAL.filter(s=>!keys||keys.includes(s.key)).m
 $("#socTop").innerHTML=socialHTML();$("#socBottom").innerHTML=socialHTML();
 $("#socHead").innerHTML=socialHTML();$("#socFoot").innerHTML=socialHTML();
 $("#socGate").innerHTML=socialHTML(["results","telegram"]);
+
+/* ============ About us ============
+   Change the numbers here. Put result screenshots in the "results" folder and list their file names in RESULTS. */
+const ABOUT={years:"6+",students:"300+",channel:"https://t.me/tradeversity_feedbackresult"};
+const RESULTS=[];   // e.g. ["result-01.jpg","result-02.jpg"]  (files in results/)
+function aboutStatsHTML(){return `<div class="astats">
+  <div class="astat"><b data-notr>${ABOUT.years}</b><span>years in the markets</span></div>
+  <div class="astat"><b data-notr>${ABOUT.students}</b><span>students with Tradeversity</span></div>
+  <div class="astat"><b>✔</b><span>real results, shared with full transparency</span></div></div>`}
+function resultsStripHTML(){if(!RESULTS.length)return "";const imgs=RESULTS.map(f=>`<img src="results/${encodeURI(f)}" alt="Student result" loading="lazy" data-res="${esc(f)}">`).join("");
+  return `<div class="rstrip"><div class="rtrack">${imgs}${imgs}</div></div>`}
+function resultsBtn(){return `<a class="tg-link res" href="${ABOUT.channel}" target="_blank" rel="noopener">${SOCIAL[0].icon}<span>See all results on Telegram</span></a>`}
+function vAbout(el){
+  el.innerHTML=`<div class="about-hero"><div class="logo lg" role="img" aria-label="Tradeversity"></div><div><h1>About Tradeversity</h1>
+    <p class="sub" style="max-width:640px">Tradeversity is a trading mentorship and community founded by <b>Brown Algo</b>. We teach a disciplined, rule-based way to trade futures: a clear daily bias, a written plan, strict risk, and an honest journal.</p></div></div>
+   ${aboutStatsHTML()}
+   <div class="grid g2" style="margin:14px 0">
+     <div class="card"><h3>What we believe</h3><div class="insight"><span class="ic">🎯</span><span>Discipline over excitement: 2 trades max per day, only A+ setups.</span></div><div class="insight"><span class="ic">🛡️</span><span>Protect the account first. A respected loss is part of the job.</span></div><div class="insight"><span class="ic">📓</span><span>Every trade is journaled, every day is planned and reviewed.</span></div></div>
+     <div class="card"><h3>Results</h3><p class="mut" style="margin-top:0">Results made by us and our students are shared on our Telegram channel, with full transparency.</p>${resultsBtn()}</div>
+   </div>
+   ${RESULTS.length?`<div class="card"><h3>Student results</h3><div class="rgrid">${RESULTS.map(f=>`<img src="results/${encodeURI(f)}" alt="Student result" loading="lazy" data-res="${esc(f)}">`).join("")}</div></div>`:""}`;
+}
+function fillAbout(){$$("[data-about-mini]").forEach(e=>e.innerHTML=`<span><b data-notr>${ABOUT.years}</b> <span>years in the markets</span></span><span class="sep">·</span><span><b data-notr>${ABOUT.students}</b> <span>students</span></span><span class="sep">·</span><span>real results</span>`);
+  $$("[data-about-auth]").forEach(e=>e.innerHTML=`<div class="about-t">Who we are</div><p>Tradeversity is a trading mentorship founded by <b>Brown Algo</b>: disciplined, rule-based futures trading.</p>${aboutStatsHTML()}${resultsStripHTML()}<div style="display:flex;justify-content:center;margin-top:10px">${resultsBtn()}</div>`)}
+fillAbout();
+document.addEventListener("click",e=>{const im=e.target.closest&&e.target.closest("img[data-res]");if(!im)return;openModal(`<div class="mhead"><h2>Student result</h2><button class="x" id="mx">×</button></div><img src="${im.src}" alt="Student result" style="width:100%;border-radius:10px;border:1px solid var(--line)">`);$("#mx").onclick=closeModal});
 
 /* ============ Earn2Trade partner promo ============ */
 const PROMO={url:"https://www.earn2trade.com/?a_pid=BROWN23",code:"BROWN23",pct:60};
