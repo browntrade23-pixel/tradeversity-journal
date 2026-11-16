@@ -462,6 +462,15 @@ html[lang=ar] .astat .apre{letter-spacing:0}
 .founder-chip b{color:var(--gold);letter-spacing:.16em}
 html[lang=ar] .foot.founder span,html[lang=ar] .foot.founder b,html[lang=ar] .founder-chip,html[lang=ar] .founder-chip b{letter-spacing:0}
 .founder-chip{white-space:nowrap}.brand>div,#whoChip,#logout{white-space:nowrap}
+@media(max-width:760px){
+  #app .topin{flex-wrap:wrap;row-gap:8px;padding:10px 12px}
+  #app .topin .brand{flex:1 1 auto;min-width:0}
+  #app .topin .spacer,#app .founder-chip,#whoChip{display:none}
+  #app #logout{order:1}
+  #app .theme-slot,#app #langTop{order:2}
+  #app #langTop .langSel{max-width:130px}
+  #app main#view{overflow-x:hidden}
+}
 @media(max-width:1180px){.founder-chip{display:none}}
 /* language picker */
 select.i.langSel{width:auto;padding:5px 8px;font-size:12px;border-radius:8px}
