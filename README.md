@@ -50,7 +50,8 @@ The site is connected to Supabase (see Current setup below). There is no demo mo
 ## Current setup (already done)
 - **Supabase project:** `tradeversity-journal` (organization *Tradeversity*, region West EU / Ireland). `schema.sql` and `notifications.sql` have been run.
 - **index.html** is connected to `https://szovzzkukzuytkzieuae.supabase.co` with the public anon key.
-- **Live site:** https://browntrade23-pixel.github.io/tradeversity-journal/ (GitHub Pages, from this repository's `main` branch). Send this link to students.
+- **Live site:** https://jointradeversity.com (GitHub Pages custom domain, from this repository's `main` branch; set by the `CNAME` file). Send this link to students. The old address https://browntrade23-pixel.github.io/tradeversity-journal/ redirects here.
+- **Domain:** registered at Namecheap. DNS: four `A` records for `@` → 185.199.108.153 / .109.153 / .110.153 / .111.153, and `CNAME` `www` → browntrade23-pixel.github.io.
 - **Supabase Site URL** is the live site. Allowed redirect URLs: the live site and `http://localhost:8080`.
 - **Email confirmation** is on.
 - **Telegram alerts** go to @tradeversity_alerts_bot (bot token and chat id are in Supabase Vault).
