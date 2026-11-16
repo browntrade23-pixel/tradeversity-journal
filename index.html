@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tradeversity Journal — by Brown Algo</title>
+<title>The Effective Journal — by Tradeversity</title>
 <link rel="icon" type="image/png" href="brand/logo-192.png">
 <link rel="apple-touch-icon" href="brand/logo-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -138,7 +138,6 @@ svg.ch text{fill:var(--dim);font-size:11px;font-family:Inter,sans-serif}
 #auth{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(800px 400px at 50% -10%,rgba(245,185,66,.18),transparent),var(--bg)}
 .authbox{width:100%;max-width:420px}
 .authbox .card{padding:22px}
-.demo{margin-top:14px;padding:12px;border-radius:12px;border:1px dashed var(--line2);color:var(--muted);font-size:12px}
 .banner{background:rgba(245,185,66,.1);border:1px solid rgba(245,185,66,.35);color:var(--gold2);padding:10px 14px;border-radius:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1b2436;border:1px solid var(--line2);padding:10px 16px;border-radius:10px;z-index:100;display:none;max-width:90vw}
 .empty{text-align:center;padding:40px 16px;color:var(--muted)}
@@ -146,6 +145,15 @@ svg.ch text{fill:var(--dim);font-size:11px;font-family:Inter,sans-serif}
 .check{display:flex;gap:8px;align-items:flex-start;padding:6px 0}
 .check input{margin-top:3px;accent-color:var(--gold)}
 hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
+/* founder signature */
+.foot.founder{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:22px}
+.foot.founder span{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--dim)}
+.foot.founder b{font-size:17px;letter-spacing:.32em;color:var(--gold);font-weight:800;text-shadow:0 0 18px rgba(245,185,66,.35)}
+.foot.founder::before{content:"";width:90px;height:1px;margin-bottom:8px;background:linear-gradient(90deg,transparent,rgba(245,185,66,.7),transparent)}
+.founder-chip{font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.founder-chip b{color:var(--gold);letter-spacing:.16em}
+html[lang=ar] .foot.founder span,html[lang=ar] .foot.founder b,html[lang=ar] .founder-chip,html[lang=ar] .founder-chip b{letter-spacing:0}
+@media(max-width:700px){.founder-chip{display:none}}
 /* language picker */
 select.i.langSel{width:auto;padding:5px 8px;font-size:12px;border-radius:8px}
 .langbar{display:flex;justify-content:flex-end;margin-bottom:10px}
@@ -171,8 +179,8 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
   <div class="authbox">
     <div class="langbar" id="langAuth"></div>
     <div class="brand stack" style="justify-content:center;margin-bottom:18px">
-      <div class="logo lg" role="img" aria-label="Brown Algo — Tradeversity logo"></div>
-      <div style="font-size:18px">Tradeversity Journal<small>BY BROWN ALGO</small></div>
+      <div class="logo lg" role="img" aria-label="The Effective Journal by Tradeversity — founder Brown Algo"></div>
+      <div style="font-size:18px">The Effective Journal<small>BY TRADEVERSITY</small></div>
     </div>
     <div class="card hidden" id="waitBox" style="text-align:center">
       <div style="font-size:40px;margin-bottom:6px" id="waitIcon">⏳</div>
@@ -204,14 +212,8 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
       </form>
       <div id="authMsg" class="mut" style="margin-top:10px;font-size:13px"></div>
     </div>
-    <div id="demoBox" class="demo hidden">
-      <b style="color:var(--gold)">Demo mode.</b> No backend connected yet, so data stays in this browser and passwords aren't checked. Try it:
-      <div class="row" style="margin-top:8px">
-        <button class="btn sm" id="demoStudent">Enter as a student</button>
-        <button class="btn sm" id="demoAdmin">Enter as admin (Brown Algo)</button>
-      </div>
-    </div>
-    <div class="foot">Made by Brown Algo · Tradeversity — for my students</div>
+
+    <div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div>
   </div>
 </section>
 
@@ -219,9 +221,10 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 <section id="app" class="hidden">
   <header class="top">
     <div class="topin">
-      <div class="brand"><div class="logo" role="img" aria-label="Brown Algo — Tradeversity logo"></div><div>Tradeversity Journal<small>BY BROWN ALGO</small></div></div>
+      <div class="brand"><div class="logo" role="img" aria-label="The Effective Journal by Tradeversity — founder Brown Algo"></div><div>The Effective Journal<small>BY TRADEVERSITY</small></div></div>
       <div class="spacer"></div>
       <span id="langTop"></span>
+      <span class="chip founder-chip" title="Founder"><span>Founder</span> <b>BROWN ALGO</b></span>
       <span class="chip" id="whoChip" data-notr></span>
       <button class="btn sm ghost" id="logout">Log out</button>
     </div>
@@ -237,8 +240,8 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 <script src="i18n.js"></script>
 <script>
 /* =====================================================================
-   CONFIG — paste your Supabase project values here to go live.
-   Leave empty = demo mode (data stays in the browser).
+   CONFIG — your Supabase project (the anon key is public by design;
+   security comes from the database rules in schema.sql / approval.sql).
    ===================================================================== */
 const CONFIG = {
   SUPABASE_URL: "https://szovzzkukzuytkzieuae.supabase.co",
@@ -319,100 +322,6 @@ function calc(ts){
     days,bestDay,worstDay,greenDays:dv.filter(d=>d[1]>0).length,redDays:dv.filter(d=>d[1]<0).length,nDays:dv.length};
 }
 
-/* ============ demo data ============ */
-function rng(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s^=s>>>17;s^=s<<5;return((s>>>0)%100000)/100000}}
-function chartShot(seed,dir,win){
-  const r=rng(seed);let p=100;const c=[];
-  for(let i=0;i<34;i++){const drift=i<12?-dir*.6:i<16?dir*.2:dir*(win?1.1:-.5);const o=p,cl=o+drift+(r()-.5)*3.2;const h=Math.max(o,cl)+r()*1.6,l=Math.min(o,cl)-r()*1.6;c.push([o,h,l,cl]);p=cl}
-  const all=c.flat(),mx=Math.max(...all),mn=Math.min(...all),H=300,W=480,y=v=>12+(mx-v)/(mx-mn)*(H-24);
-  let g=`<rect width="${W}" height="${H}" fill="#0d1320"/>`;
-  for(let k=1;k<5;k++)g+=`<line x1="0" x2="${W}" y1="${k*H/5}" y2="${k*H/5}" stroke="#1a2335"/>`;
-  const fvgI=13;const a=c[fvgI-1],b=c[fvgI+1];
-  const top=dir>0?b[2]:a[2],bot=dir>0?a[1]:b[1];
-  if((dir>0&&top>bot)||(dir<0&&bot<top)){}
-  g+=`<rect x="${fvgI*13.5}" y="${y(Math.max(a[1],b[2]))}" width="${W-fvgI*13.5}" height="${Math.max(6,Math.abs(y(a[1])-y(b[2])))}" fill="rgba(245,185,66,.12)"/>`;
-  c.forEach((k,i)=>{const x=10+i*13.5,col=k[3]>=k[0]?"#27c26c":"#ef5350";g+=`<line x1="${x+4}" x2="${x+4}" y1="${y(k[1])}" y2="${y(k[2])}" stroke="${col}"/><rect x="${x}" y="${y(Math.max(k[0],k[3]))}" width="8" height="${Math.max(1.5,Math.abs(y(k[0])-y(k[3])))}" fill="${col}" rx="1"/>`});
-  const ex=c[16][3];g+=`<line x1="${16*13.5}" x2="${W}" y1="${y(ex)}" y2="${y(ex)}" stroke="#4c8dff" stroke-dasharray="4 3"/><text x="${W-6}" y="${y(ex)-4}" fill="#8fb6ff" font-size="11" text-anchor="end" font-family="sans-serif">Entry</text>`;
-  const sl=ex-dir*4;g+=`<line x1="${16*13.5}" x2="${W}" y1="${y(sl)}" y2="${y(sl)}" stroke="#ef5350" stroke-dasharray="4 3"/><text x="${W-6}" y="${y(sl)+12}" fill="#ef5350" font-size="11" text-anchor="end" font-family="sans-serif">SL</text>`;
-  g+=`<text x="10" y="20" fill="#f5b942" font-size="12" font-family="sans-serif" font-weight="700">15m · ${dir>0?"Bullish FVG":"Bearish FVG"}</text>`;
-  return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">${g}</svg>`);
-}
-function genTrades(seed,skill,uid_,acct){
-  const r=rng(seed),out=[];const base={NQ:25400,MNQ:25400,ES:6800,MES:6800,YM:47000,MYM:47000,GC:4100,MGC:4100};
-  const d=new Date();d.setDate(d.getDate()-40);
-  for(let k=0;k<40;k++){d.setDate(d.getDate()+1);if(d.getDay()===0||d.getDay()===6)continue;
-    const nT=r()<.2?0:1+Math.floor(r()*2.4);
-    for(let j=0;j<nT;j++){
-      const sp=r();const sym=sp<.55?"MNQ":sp<.7?"NQ":sp<.85?"MES":sp<.93?"MGC":"MYM";
-      const m=MK[sym],qty=m.type==="Mini"?1:[2,3,4,5][Math.floor(r()*4)];
-      const disciplined=r()<skill;
-      const emotions=disciplined?[EMO_GOOD[Math.floor(r()*3)]]:[EMO_BAD[Math.floor(r()*5)]];
-      if(!disciplined&&r()<.4)emotions.push(EMO_BAD[5+Math.floor(r()*3)]);
-      const win=r()<(disciplined?.62:.28);const dir=r()<.55?1:-1;
-      const riskUsd=120+r()*160;const stopPts=Math.max(m.tick*4,Math.round(riskUsd/(m.pv*qty)/m.tick)*m.tick);
-      const entry=Math.round((base[sym]*(1+(r()-.5)*.03))/m.tick)*m.tick;
-      const R=win?(disciplined?1.2+r()*2:.5+r()*.8):(disciplined?-1:-(1+r()*.8));
-      const exit=Math.round((entry+dir*R*stopPts)/m.tick)*m.tick;
-      const ses=r()<.7?"NY AM":r()<.5?"London":"NY PM";
-      const t={id:uuid(),user_id:uid_,date:ymd(d),time:`${ses==="London"?"0"+(3+Math.floor(r()*3)):(9+Math.floor(r()*2))}:${pad(Math.floor(r()*60))}`.replace(/^(\d):/,"0$1:"),
-        account:acct,symbol:sym,side:dir>0?"Long":"Short",qty,entry,exit,stop:entry-dir*stopPts,target:entry+dir*2*stopPts,
-        pnl:"",fees:+(qty*(m.type==="Mini"?3.98:1.24)).toFixed(2),setup:disciplined?SETUPS[Math.floor(r()*3)]:(r()<.5?"Other":SETUPS[3+Math.floor(r()*2)]),session:ses,
-        emotions,feeling:disciplined?(win?"Waited for my 15m FVG, felt calm, let it run to target.":"Followed the model, stop got taken. Accepting the loss."):(win?"Entered early, got lucky. Not my model.":"Jumped in without confirmation after missing the first move."),
-        followed:disciplined?"Yes":"No",rating:disciplined?4+Math.round(r()):1+Math.round(r()*2),shots:[],remark:"",notes:""};
-      out.push(t);
-    }}
-  const firsts=out.slice(-8);
-  firsts.forEach((t,k)=>{const dir=t.side==="Long"?1:-1,win=tradeNet(t)>0,disciplined=t.followed==="Yes";t.shots=[chartShot(seed+k*13,dir,win)];
-    t.remark=win?"Clean displacement after the sweep, entry at the FVG CE, target the 1H liquidity.":"Entered before the 15m close — the FVG was not confirmed yet.";
-    t.notes="Pre-market: Daily bias "+(dir>0?"bullish":"bearish")+", 1H pulled back into imbalance.\nExecution: "+(disciplined?"followed the checklist step by step.":"skipped the 15m confirmation.")+"\nLesson: "+(disciplined?"Trust the model.":"No confirmation = no trade.");});
-  return out;
-}
-const DEMO_STUDENTS=[
-  {name:"Yacine B.",tg:"@yacine_nq",email:"yacine@example.com",skill:.7,acct:"Eval 50K"},
-  {name:"Amina K.",tg:"@amina_trades",email:"amina@example.com",skill:.55,acct:"Eval 100K"},
-  {name:"Riad M.",tg:"@riad_scalps",email:"riad@example.com",skill:.35,acct:"Funded 50K"},
-  {name:"Sofiane T.",tg:"@sof_ict",email:"sofiane@example.com",skill:.62,acct:"Eval 50K"}
-];
-function demoPlan(uid_){return {user_id:uid_,date:nextTradingDay(),maxLoss:300,target:600,maxTrades:3,riskPerTrade:150,
-  bias:{Nasdaq:"Bullish","S&P 500":"Bullish","Dow Jones":"Neutral",Gold:"Bearish"},
-  htf:"Daily closed above last week's high. Draw on liquidity: previous day high + equal highs on 1H.",
-  levels:"PDH 25,610 · PDL 25,380 · 1H FVG 25,450–25,470 · Midnight open 25,520",
-  news:"08:30 NY — CPI (high impact). No trades 5 min before/after.",session:"NY AM",
-  model:"Daily bias → 1H pullback into imbalance → 15m FVG entry after liquidity sweep.",
-  noTrade:"If CPI spikes through PDH before 9:30, I sit on my hands. After 2 losses I stop.",
-  rules:{"Daily bias defined":true,"1H imbalance marked":true,"15m entry confirmation only":true,"Stop loss before entry":true,"Max loss respected":false},
-  mindset:"Quality over quantity. One A+ setup is enough.",followed:"",review:""}}
-
-/* ============ backend: Demo ============ */
-const Demo={
-  key:"tvj_demo_v4",db:null,
-  load(){this.db=lsGet(this.key,null);if(!this.db){this.seed();}},
-  save(){lsSet(this.key,this.db)},
-  seed(){const db={users:{},trades:{},plans:{},current:null};
-    const admin={id:uuid(),name:"Brown Algo",telegram:"@brown_algo",email:"admin@tradeversity.demo",role:"admin",created_at:new Date().toISOString()};
-    db.users[admin.id]=admin;db.trades[admin.id]=[];db.plans[admin.id]=[];
-    DEMO_STUDENTS.forEach((s,i)=>{const id=uuid();db.users[id]={id,name:s.name,telegram:s.tg,email:s.email,role:"student",created_at:new Date(Date.now()-(30-i)*864e5).toISOString()};
-      db.trades[id]=genTrades(1000+i*77,s.skill,id,s.acct);db.plans[id]=[demoPlan(id)];});
-    this.db=db;this.save();},
-  async session(){return this.db.current?this.db.users[this.db.current]:null},
-  async signIn(email){const u=Object.values(this.db.users).find(u=>u.email.toLowerCase()===email.toLowerCase());if(!u)throw new Error("No account with that email (demo). Create one, or use the demo buttons below.");this.db.current=u.id;this.save();return u},
-  async signUp({email,name,telegram}){if(Object.values(this.db.users).some(u=>u.email.toLowerCase()===email.toLowerCase()))throw new Error("That email already has an account.");
-    const id=uuid();this.db.users[id]={id,name,telegram,email,role:"student",status:"pending",created_at:new Date().toISOString()};this.db.trades[id]=[];this.db.plans[id]=[];this.db.current=id;this.save();return {user:this.db.users[id],needsConfirm:false}},
-  async signOut(){this.db.current=null;this.save()},
-  async enterAs(role){const u=Object.values(this.db.users).find(u=>u.role===role);this.db.current=u.id;this.save();return u},
-  async listTrades(uid_){return JSON.parse(JSON.stringify(this.db.trades[uid_]||[]))},
-  async saveTrade(t){const a=this.db.trades[t.user_id]||(this.db.trades[t.user_id]=[]);const i=a.findIndex(x=>x.id===t.id);if(i>=0)a[i]=t;else a.push(t);if(!this.save())toast("Browser storage is full — remove some screenshots.")},
-  async saveTrades(ts){ts.forEach(t=>{const a=this.db.trades[t.user_id]||(this.db.trades[t.user_id]=[]);a.push(t)});this.save()},
-  async deleteTrade(t){this.db.trades[t.user_id]=(this.db.trades[t.user_id]||[]).filter(x=>x.id!==t.id);this.save()},
-  async listPlans(uid_){return JSON.parse(JSON.stringify(this.db.plans[uid_]||[]))},
-  async savePlan(p){const a=this.db.plans[p.user_id]||(this.db.plans[p.user_id]=[]);const i=a.findIndex(x=>x.date===p.date);if(i>=0)a[i]=p;else a.push(p);this.save()},
-  async listProfiles(){return Object.values(this.db.users)},
-  async setStatus(id,status){if(this.db.users[id]&&this.db.users[id].role!=="admin"){this.db.users[id].status=status;this.save()}},
-  async allTradesLite(){return Object.values(this.db.trades).flat().map(t=>({...t,shots:[]}))},
-  async allPlans(){return Object.values(this.db.plans).flat()},
-  async resetPassword(){throw new Error("Password reset works once Supabase is connected.")}
-};
-
 /* ============ backend: Supabase ============ */
 const Cloud={
   sb:null,
@@ -440,15 +349,15 @@ const Cloud={
   async resetPassword(email){const{error}=await this.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error}
 };
 
-let API=null;const DEMO=!(CONFIG.SUPABASE_URL&&CONFIG.SUPABASE_ANON_KEY);
+let API=Cloud;
 
 /* ============ state ============ */
 const S={me:null,subject:null,trades:[],plans:[],view:"journal",page:null,acct:"all",range:"all",calMonth:null,readonly:false};
 
 /* ============ auth UI ============ */
-function showAuth(){$("#app").classList.add("hidden");$("#auth").classList.remove("hidden");$("#demoBox").classList.toggle("hidden",!DEMO);
+function showAuth(){$("#app").classList.add("hidden");$("#auth").classList.remove("hidden");
   $("#waitBox").classList.add("hidden");$("#authCard").classList.remove("hidden")}
-function showWaiting(u){showAuth();$("#authCard").classList.add("hidden");$("#demoBox").classList.add("hidden");$("#waitBox").classList.remove("hidden");
+function showWaiting(u){showAuth();$("#authCard").classList.add("hidden");$("#waitBox").classList.remove("hidden");
   const rej=u.status==="rejected";$("#waitIcon").textContent=rej?"⛔":"⏳";
   $("#waitTitle").textContent=rej?"Request not accepted":"Waiting for approval";
   $("#waitText").textContent=rej?"Your request to join was not accepted. Contact Brown Algo on Telegram if you think this is a mistake.":"Your account was created. Brown Algo needs to accept you before you can use the journal. You'll be able to log in as soon as you're approved."}
@@ -468,8 +377,6 @@ $("#signupForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.ta
     else await enter(r.user)}catch(err){$("#authMsg").innerHTML=`<span class="neg">${esc(err.message||err)}</span>`}};
 $("#forgot").onclick=async e=>{e.preventDefault();const em=$("#loginForm [name=email]").value.trim();if(!em){$("#authMsg").textContent="Type your email above first.";return}
   try{await API.resetPassword(em);$("#authMsg").innerHTML='<span class="ok">Reset link sent — check your email.</span>'}catch(err){$("#authMsg").innerHTML=`<span class="neg">${esc(err.message)}</span>`}};
-$("#demoStudent").onclick=async()=>enter(await Demo.enterAs("student"));
-$("#demoAdmin").onclick=async()=>enter(await Demo.enterAs("admin"));
 $("#logout").onclick=async()=>{await API.signOut();S.me=null;S.subject=null;try{history.replaceState(null,"",location.pathname)}catch(e){}showAuth()};
 function openNewPassword(){openModal(`<div class="mhead"><h2>Set a new password</h2></div><form id="npf" class="grid"><input class="i" type="password" minlength="8" name="p" placeholder="New password" required><button class="btn pri">Save password</button></form>`);
   $("#npf").onsubmit=async e=>{e.preventDefault();const{error}=await Cloud.sb.auth.updateUser({password:new FormData(e.target).get("p")});if(error)toast(error.message);else{toast("Password updated");closeModal()}}}
@@ -963,9 +870,9 @@ I18N.start();
 /* ============ boot ============ */
 (async function boot(){
   try{
-    if(DEMO){Demo.load();API=Demo}else{await Cloud.init();API=Cloud}
+    await Cloud.init();API=Cloud;
     const u=await API.session();if(u)await enter(u);else showAuth();
-  }catch(e){console.error(e);if(!DEMO){document.body.insertAdjacentHTML("afterbegin",`<div class="banner" style="margin:12px">Couldn't reach the server: ${esc(e.message||e)}. Check CONFIG in index.html.</div>`)}Demo.load();API=API||Demo;showAuth()}
+  }catch(e){console.error(e);{document.body.insertAdjacentHTML("afterbegin",`<div class="banner" style="margin:12px">Couldn't reach the server: ${esc(e.message||e)}. Check CONFIG in index.html.</div>`)}showAuth()}
 })();
 </script>
 </body>

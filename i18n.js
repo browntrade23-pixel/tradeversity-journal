@@ -314,6 +314,8 @@ const T={
 "Student approved":["Élève accepté","تم قبول الطالب"],
 "Request rejected":["Demande refusée","تم رفض الطلب"],
 "Only the admin can do this":["Seul l'admin peut faire cela","المشرف فقط يمكنه فعل ذلك"],
+// brand
+"Founder":["Fondateur","المؤسس"],
 // language picker
 "Language":["Langue","اللغة"]
 };

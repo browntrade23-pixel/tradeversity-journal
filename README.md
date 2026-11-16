@@ -1,4 +1,5 @@
-# Tradeversity Journal — by Brown Algo
+# The Effective Journal — by Tradeversity
+Founder: **BROWN ALGO**
 
 A trading journal for your students: trades with screenshots and remarks, emotions, stats, tomorrow's plan, a risk calculator (NQ/MNQ, ES/MES, YM/MYM, GC/MGC), a consistency rule calculator, CSV import, free student accounts, and an admin dashboard for you.
 
@@ -13,7 +14,7 @@ Files:
 ## Approving students
 New sign-ups appear in **Admin dashboard → 🔔 Pending requests** (and you get a Telegram message). Click **✔ Approve** to let them in, or **✖ Reject**. Until then they only see a "Waiting for approval" screen, and the database refuses to show or save their data. Rejected requests can still be approved later from the "Rejected requests" list.
 
-Without the setup below, the site runs in **demo mode**: example students, data saved only in the browser.
+The site is connected to Supabase (see Current setup below). There is no demo mode: every account and trade is real.
 
 ## Current setup (already done)
 - **Supabase project:** `tradeversity-journal` (organization *Tradeversity*, region West EU / Ireland). `schema.sql` and `notifications.sql` have been run.
