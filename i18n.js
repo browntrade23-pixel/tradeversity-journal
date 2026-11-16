@@ -554,11 +554,17 @@ const T={
 "Theme":["Thème","المظهر"],"Dark":["Sombre","داكن"],"Light":["Clair","فاتح"],"System":["Système","النظام"],"Dark theme":["Thème sombre","المظهر الداكن"],"Light theme":["Thème clair","المظهر الفاتح"],"Same as my device":["Comme mon appareil","مثل جهازي"],
 "Tap any event to see what it means and how it usually moves the market.":["Touchez un événement pour voir ce qu'il signifie et comment il fait généralement bouger le marché.","اضغط على أي خبر لترى معناه وكيف يحرك السوق عادةً."],
 "Live now":["En direct","مباشر الآن"],"Released":["Publiée","صدر"],
+"A trading day with only wins or respected losses = counts.":["Une journée avec uniquement des gains ou des pertes respectées = compte.","يوم تداول بأرباح أو خسائر محترمة فقط = يُحتسب."],
+"Goal reached: 10 disciplined trading days in a row. Keep the chain going.":["Objectif atteint : 10 journées de trading disciplinées d'affilée. Continuez la série.","تم بلوغ الهدف: 10 أيام تداول منضبطة متتالية. واصل السلسلة."],
+"Your last trading day went over 2 trades. The count starts again. Next day: follow the plan.":["Votre dernière journée a dépassé 2 trades. Le compteur repart à zéro. Prochaine journée : suivez le plan.","تجاوزت صفقتين في آخر يوم تداول. العداد يبدأ من جديد. اليوم القادم: اتبع الخطة."],
+"On your last trading day a loss went past the planned stop. The count starts again. Respect the stop.":["Lors de votre dernière journée, une perte a dépassé le stop prévu. Le compteur repart à zéro. Respectez le stop.","في آخر يوم تداول تجاوزت خسارة الوقف المخطط. العداد يبدأ من جديد. احترم الوقف."],
+"Your last trading day broke the plan. The count starts again. Next day: follow the plan.":["Votre dernière journée n'a pas respecté le plan. Le compteur repart à zéro. Prochaine journée : suivez le plan.","آخر يوم تداول خالف الخطة. العداد يبدأ من جديد. اليوم القادم: اتبع الخطة."],
 "1D":["1J","يوم"],"7D":["7J","7 أيام"],"30D":["30J","30 يوماً"],"90D":["90J","90 يوماً"]
 };
 
 /* text with numbers / names inside  →  [regex, French, Arabic] */
 const P=[
+[/^(\d+) more disciplined trading days to reach 10\. A day with respected losses counts too\.$/,"Encore $1 journées disciplinées pour atteindre 10. Une journée avec des pertes respectées compte aussi.","$1 أيام تداول منضبطة أخرى للوصول إلى 10. اليوم الذي فيه خسائر محترمة يُحتسب أيضاً."],
 [/^Created (.+)$/,"Créé le $1","أُنشئ في $1"],
 [/^(.+) day win rate$/,"$1 de jours gagnants","$1 نسبة الأيام الرابحة"],
 [/^max drawdown (.+)$/,"drawdown max $1","أقصى تراجع $1"],

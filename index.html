@@ -991,7 +991,7 @@ function vStudent(el){const u=S.subject,ts=[...S.trades].sort((a,b)=>byDT(b,a)),
 /* ============ discipline coach ============
    Goal: 5 disciplined trades in a row. A trade is "respected" when the plan was followed,
    the loss (if any) stayed within the planned risk (about -1R), and it was one of the first 2 trades of the day. */
-const DISC={goal:5,maxPerDay:2};
+const DISC={goal:10,maxPerDay:2};  /* goal = disciplined trading days in a row */
 function judgeTrades(ts){
   const arr=[...ts].sort(byDT);const nthOfDay={};const out=new Map();
   arr.forEach(t=>{nthOfDay[t.date]=(nthOfDay[t.date]||0)+1;const n=nthOfDay[t.date],R=tradeR(t),net=tradeNet(t);
@@ -1003,9 +1003,14 @@ function judgeTrades(ts){
     out.set(t.id,{v,why,n})});
   return {arr,out};
 }
-function discStreak(ts){const {arr,out}=judgeTrades(ts);let streak=0,lastBreak=null;
-  for(let i=arr.length-1;i>=0;i--){const j=out.get(arr[i].id);if(j.v==="neutral")continue;if(j.v==="broken"){lastBreak=j.why;break}streak++}
-  const best=(()=>{let b=0,c=0;arr.forEach(t=>{const j=out.get(t.id);if(j.v==="respected"){c++;b=Math.max(b,c)}else if(j.v==="broken")c=0});return b})();
+/* streak counts TRADING DAYS: a day with only wins / respected losses = +1; any broken trade that day = reset; no-trade days are skipped */
+function judgeDays(arr,out){const days={};arr.forEach(t=>{const j=out.get(t.id);const d=days[t.date]||(days[t.date]={date:t.date,v:"neutral",why:""});
+    if(j.v==="broken"){const rank={over:3,stop:2,plan:1};if(d.v!=="broken"||rank[j.why]>rank[d.why]){d.v="broken";d.why=j.why}}
+    else if(j.v==="respected"&&d.v==="neutral")d.v="respected"});
+  return Object.values(days).sort((a,b)=>a.date.localeCompare(b.date))}
+function discStreak(ts){const {arr,out}=judgeTrades(ts);const days=judgeDays(arr,out);let streak=0,lastBreak=null;
+  for(let i=days.length-1;i>=0;i--){const d=days[i];if(d.v==="neutral")continue;if(d.v==="broken"){lastBreak=d.why;break}streak++}
+  const best=(()=>{let b=0,c=0;days.forEach(d=>{if(d.v==="respected"){c++;b=Math.max(b,c)}else if(d.v==="broken")c=0});return b})();
   const today=todayStr();return {streak,best,lastBreak,todayCount:arr.filter(t=>t.date===today).length,judged:out};
 }
 const QUOTES=[
@@ -1039,16 +1044,16 @@ function coachCard(){
   else reminders.push(["🎯","","Rule: 2 trades max per day. Pick only your A+ setups."]);
   if(!planNext)reminders.push(["🧭","warn",hr>=15?"Plan tomorrow before you sleep. Bias, levels, max loss.":"Don't forget to plan the next session today."]);
   if(wd>0&&wd<6&&!d.todayCount&&!(planToday&&(planToday.review||planToday.followed)))reminders.push(["📓","","Log today's trades, or write your review. A no-trade day is a decision too."]);
-  const msg=d.streak>=DISC.goal?["🏆","Goal reached: 5 disciplined trades in a row. Keep the chain going."]
-    :d.lastBreak&&d.streak===0?["🔁",d.lastBreak==="over"?"Your last day went over 2 trades. The count starts again. Next trade: follow the plan.":d.lastBreak==="stop"?"Your last loss went past the planned stop. The count starts again. Respect the stop.":"Your last trade broke the plan. The count starts again. Next trade: follow the plan."]
-    :["💪",`${DISC.goal-s} more disciplined trades to reach 5. A respected loss counts too.`];
+  const msg=d.streak>=DISC.goal?["🏆","Goal reached: 10 disciplined trading days in a row. Keep the chain going."]
+    :d.lastBreak&&d.streak===0?["🔁",d.lastBreak==="over"?"Your last trading day went over 2 trades. The count starts again. Next day: follow the plan.":d.lastBreak==="stop"?"On your last trading day a loss went past the planned stop. The count starts again. Respect the stop.":"Your last trading day broke the plan. The count starts again. Next day: follow the plan."]
+    :["💪",`${DISC.goal-s} more disciplined trading days to reach 10. A day with respected losses counts too.`];
   const q=QUOTES[Math.floor(Math.random()*QUOTES.length)];
   return `<div class="card coach" style="margin-bottom:14px">
     <div class="coach-l">
       <div class="coach-t">🎯 Discipline streak</div>
       <div class="dots">${Array.from({length:DISC.goal},(_,i)=>`<i class="${i<s?"on":""}"></i>`).join("")}<b class="mono" data-notr>${s} / ${DISC.goal}</b></div>
       <div class="coach-m"><span>${msg[0]}</span> <span>${msg[1]}</span></div>
-      <div class="coach-s"><span>Win or respected loss = counts.</span> <span>Broke the plan, ignored the stop, or more than 2 trades a day = resets.</span>${d.best?` <span class="mut">·</span> <span>Best streak:</span> <b class="mono" data-notr>${d.best}</b>`:""}</div>
+      <div class="coach-s"><span>A trading day with only wins or respected losses = counts.</span> <span>Broke the plan, ignored the stop, or more than 2 trades a day = resets.</span>${d.best?` <span class="mut">·</span> <span>Best streak:</span> <b class="mono" data-notr>${d.best}</b>`:""}</div>
     </div>
     <div class="coach-r">
       <div class="today-cnt ${d.todayCount>DISC.maxPerDay?"bad":d.todayCount===DISC.maxPerDay?"warn":""}"><span>Trades today</span><b class="mono" data-notr>${d.todayCount} / ${DISC.maxPerDay}</b></div>
