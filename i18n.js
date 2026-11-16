@@ -559,6 +559,9 @@ const T={
 "Your last trading day went over 2 trades. The count starts again. Next day: follow the plan.":["Votre dernière journée a dépassé 2 trades. Le compteur repart à zéro. Prochaine journée : suivez le plan.","تجاوزت صفقتين في آخر يوم تداول. العداد يبدأ من جديد. اليوم القادم: اتبع الخطة."],
 "On your last trading day a loss went past the planned stop. The count starts again. Respect the stop.":["Lors de votre dernière journée, une perte a dépassé le stop prévu. Le compteur repart à zéro. Respectez le stop.","في آخر يوم تداول تجاوزت خسارة الوقف المخطط. العداد يبدأ من جديد. احترم الوقف."],
 "Your last trading day broke the plan. The count starts again. Next day: follow the plan.":["Votre dernière journée n'a pas respecté le plan. Le compteur repart à zéro. Prochaine journée : suivez le plan.","آخر يوم تداول خالف الخطة. العداد يبدأ من جديد. اليوم القادم: اتبع الخطة."],
+"No trades on a holiday, a red news day, the day before red news, or a planned rest day = counts too.":["Pas de trade un jour férié, un jour de news rouge, la veille d'une news rouge ou un jour de repos prévu = compte aussi.","عدم التداول في عطلة أو يوم خبر أحمر أو اليوم الذي يسبق خبراً أحمر أو يوم راحة مخطط = يُحتسب أيضاً."],
+"😴 Rest day":["😴 Jour de repos","😴 يوم راحة"],
+"I'm not trading this day. A planned rest day counts for the discipline streak.":["Je ne trade pas ce jour-là. Un jour de repos prévu compte pour la série de discipline.","لن أتداول في هذا اليوم. يوم الراحة المخطط يُحتسب في سلسلة الانضباط."],
 "1D":["1J","يوم"],"7D":["7J","7 أيام"],"30D":["30J","30 يوماً"],"90D":["90J","90 يوماً"]
 };
 

@@ -439,6 +439,11 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 .det-chip small{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);font-weight:700}
 .det-chip b{font-size:13px;color:var(--muted)}.det-chip.ok{border-color:rgba(39,194,108,.4)}.det-chip.ok b{color:var(--text,#e8edf6)}
 .det-line{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 8px}
+/* rest day toggle in the plan */
+.rest-card{display:flex;align-items:center;gap:12px;cursor:pointer;border-style:dashed}
+.rest-card input{width:18px;height:18px;accent-color:var(--gold);flex:none}
+.rest-card>span{display:flex;flex-direction:column;gap:2px}.rest-card .mut{font-size:12px}
+.rest-card:has(input:checked){border-color:var(--gold);border-style:solid;background-color:color-mix(in srgb,var(--gold) 8%,var(--panel))}
 /* news countdown */
 .ncd{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .ncd b{color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
@@ -452,6 +457,27 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 .nrow .ncd.col~.nmore,.nrow .nfp~.nmore{margin-inline-start:2px}
 @media(max-width:560px){.nrow .ncd.col{width:auto}}
 @media(prefers-reduced-motion:reduce){.ncd.soon{animation:none}}
+/* news rows: title nudges on hover; click unfolds an animated explanation */
+.nrow.click .ntitle{display:inline-block;transition:transform .25s cubic-bezier(.2,.8,.2,1),color .25s}
+.nrow.click:hover .ntitle,.nrow.open .ntitle{transform:translateX(6px);color:var(--gold)}
+[dir=rtl] .nrow.click:hover .ntitle,[dir=rtl] .nrow.open .ntitle{transform:translateX(-6px)}
+.nmore{transition:transform .3s}.nrow.open .nmore{transform:rotate(90deg)}[dir=rtl] .nrow.open .nmore{transform:scaleX(-1) rotate(90deg)}
+.nrow.open{background:var(--panel2)}
+.nx{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .45s cubic-bezier(.2,.8,.2,1),opacity .35s}
+.nx.show{grid-template-rows:1fr;opacity:1}
+.nx-wrap{overflow:hidden;min-height:0}
+.nx-in{margin:6px 0 12px;padding:14px;border-radius:12px;border:1px solid var(--line2);border-inline-start:3px solid var(--gold);background:color-mix(in srgb,var(--panel2) 75%,transparent)}
+.nx-in.is-red{border-inline-start-color:var(--red)}.nx-in.is-org{border-inline-start-color:#f59e2a}.nx-in.is-hol{border-inline-start-color:var(--blue)}
+.nx-h{font-size:15px;margin-bottom:8px}.nx-h .ni-orig{display:inline}
+.nx.show .nx-in>*{animation:nxIn .6s cubic-bezier(.2,.8,.2,1) both}
+.nx.show .nx-in>*:nth-child(2){animation-delay:.08s}.nx.show .nx-in>*:nth-child(3){animation-delay:.16s}.nx.show .nx-in>*:nth-child(4){animation-delay:.3s}.nx.show .nx-in>*:nth-child(5){animation-delay:.44s}.nx.show .nx-in>*:nth-child(6){animation-delay:.56s}
+.nx.show .ni-sec p{animation:nxWipe 1.2s cubic-bezier(.3,.7,.2,1) .25s both}
+.nx.show .nx-in>*:nth-child(4) p{animation-delay:.45s}
+@keyframes nxIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes nxWipe{from{clip-path:inset(0 100% 0 0);opacity:.2}to{clip-path:inset(0 0 0 0);opacity:1}}
+@keyframes nxWipeR{from{clip-path:inset(0 0 0 100%);opacity:.2}to{clip-path:inset(0 0 0 0);opacity:1}}
+[dir=rtl] .nx.show .ni-sec p{animation-name:nxWipeR}
+@media(prefers-reduced-motion:reduce){.nx,.nx.show .nx-in>*,.nx.show .ni-sec p,.nrow.click .ntitle{animation:none!important;transition:none}}
 /* news explanations */
 .nrow.click{cursor:pointer;border-radius:8px;transition:background .15s}
 .nrow.click:hover{background:var(--panel2)}
@@ -848,10 +874,12 @@ function upcomingHolidays(n){const t=todayStr();return US_HOL.filter(h=>h[0]>=t)
 function holRows(list){return list.map(h=>`<div class="nrow hol click ${h.kind}" data-hk="${h.kind}" data-ht="${esc(h.title)}"><span class="hol-ic">🏦</span><span class="nt">All day</span><b class="ntitle" data-notr>${esc(h.title)}</b><span class="hol-note">${HOL_NOTE[h.kind]}</span></div>`).join("")}
 const daysUntil=d=>{const [y,m,dd]=d.split("-").map(Number);const a=new Date(y,m-1,dd),b=new Date();b.setHours(0,0,0,0);return Math.round((a-b)/864e5)};
 function newsWeekEnd(){const d=new Date();d.setDate(d.getDate()+(6-d.getDay()));return ymd(d)}  /* the feed covers the current week (to Saturday) */
-async function loadNews(){try{if(!API||!API.news)return;const a=new Date();a.setDate(a.getDate()-2);const b=new Date();b.setDate(b.getDate()+10);
+async function loadNews(){try{if(!API||!API.news)return;const a=new Date();a.setDate(a.getDate()-45);  /* history for the discipline streak (red news days) */const b=new Date();b.setDate(b.getDate()+10);
   S.news=await API.news(a.toISOString(),b.toISOString());S.newsLoaded=true;
   const nb=$("#newsBox");if(nb){nb.outerHTML=newsBox(nb.dataset.date,nb.dataset.ins==="1");const ta=$("#pNews");if(ta&&!ta.value.trim()&&!ta.disabled)ta.value=newsText(nb.dataset.date);bindNewsIns(nb.dataset.date)}
-  const cn=$("#coachNews");if(cn)cn.innerHTML=coachNewsHTML();refreshNewsPanel()}catch(e){console.warn("news",e)}}
+  const cn=$("#coachNews");if(cn)cn.innerHTML=coachNewsHTML();refreshNewsPanel();
+  if(S.view==="journal"&&$(".coach")&&!S.page)render()  /* news days can extend the discipline streak */
+  }catch(e){console.warn("news",e)}}
 function bindNewsIns(date){if($("#newsIns"))$("#newsIns").onclick=()=>{const t=newsText(date);if(!t)return;const ta=$("#pNews");ta.value=ta.value.trim()?ta.value.trim()+"\n"+t:t;toast("News added to your plan")}}
 function newsLine(n){return `${n.impact==="High"?"🔴":"🟠"} ${tzTime(n.starts_at,NY)} NY / ${tzTime(n.starts_at,DZ)} DZ — ${n.title}`}
 function newsText(date){const ev=newsFor(date),ho=holidaysFor(date);if(!ev.length&&!ho.length)return "";const lines=ho.map(x=>`🏦 ${x.title} — ${HOL_NOTE[x.kind]}`).concat(ev.map(newsLine));
@@ -909,8 +937,24 @@ function openNewsInfo(n){if(!window.NewsInfo)return;const U=NewsInfo.ui(),x=News
 function openHolInfo(kind,title){if(!window.NewsInfo)return;const U=NewsInfo.ui(),x=NewsInfo.holiday(kind);
   const head=`<span style="font-size:24px">🏦</span><div><h2>${esc(x.name)}</h2><div class="ni-orig mono">${esc(title)}</div></div>`;
   openModal(niBox(U,x,head,`<div class="ni-meta"><span class="ni-badge hol">${esc(U.hol)}</span></div>`,U.ruleHol,"is-hol"));$("#niX").onclick=closeModal;$("#niOk").onclick=closeModal}
-document.addEventListener("click",e=>{if(!e.target.closest)return;const r=e.target.closest("[data-ni]");if(r){const n=S.news[+r.dataset.ni];if(n){e.preventDefault();openNewsInfo(n)}return}
-  const h=e.target.closest("[data-hk]");if(h)openHolInfo(h.dataset.hk,h.dataset.ht)});
+/* inline fold-out explanation under the clicked row (animated) */
+function nxBody(U,x,meta,rule,cls,orig){return `<div class="nx-in ni ${cls}" data-notr>
+  <div class="nx-h"><b>${esc(x.name)}</b>${orig?` <span class="ni-orig mono">${esc(orig)}</span>`:""}</div>${meta}
+  <div class="ni-sec"><div class="ni-l">💡 ${esc(U.what)}</div><p>${esc(x.what)}</p></div>
+  ${x.move?`<div class="ni-sec"><div class="ni-l">📈 ${esc(U.move)}</div><p>${esc(x.move)}</p></div>`:""}
+  <div class="ni-rule"><b>🛡 ${esc(U.rule)}</b><span>${esc(rule)}</span></div>
+  <p class="ni-note">${esc(U.note)}</p></div>`}
+function nxNews(n){const U=NewsInfo.ui(),x=NewsInfo.event(n.title,n.impact),red=n.impact==="High";
+  const meta=`<div class="ni-meta"><span class="ni-badge ${red?"red":"org"}">${esc(red?U.red:U.org)}</span>${n.forecast?`<span class="chip"><span>${esc(U.f)}</span> <b class="mono">${esc(n.forecast)}</b></span>`:""}${n.previous?`<span class="chip"><span>${esc(U.p)}</span> <b class="mono">${esc(n.previous)}</b></span>`:""}</div>`;
+  return nxBody(U,x,meta,red?U.ruleRed:U.ruleOrg,red?"is-red":"is-org",x.name!==n.title?n.title:"")}
+function nxHol(kind,title){const U=NewsInfo.ui(),x=NewsInfo.holiday(kind);return nxBody(U,x,`<div class="ni-meta"><span class="ni-badge hol">${esc(U.hol)}</span></div>`,U.ruleHol,"is-hol",title)}
+function closeNx(w){w.classList.remove("show");const r=w.previousElementSibling;if(r)r.classList.remove("open");setTimeout(()=>w.remove(),450)}
+function toggleNx(row,html){const was=row.classList.contains("open");$$(".nx").forEach(closeNx);if(was)return;
+  const w=document.createElement("div");w.className="nx";w.innerHTML=`<div class="nx-wrap">${html}</div>`;row.after(w);row.classList.add("open");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>w.classList.add("show")))}
+document.addEventListener("click",e=>{if(!e.target.closest||!window.NewsInfo)return;const r=e.target.closest("[data-ni]");
+  if(r){const n=S.news[+r.dataset.ni];if(!n)return;e.preventDefault();if(r.classList.contains("nrow"))toggleNx(r,nxNews(n));else openNewsInfo(n);return}
+  const h=e.target.closest("[data-hk]");if(h)toggleNx(h,nxHol(h.dataset.hk,h.dataset.ht))});
 
 /* news panel: next-event countdown + Yesterday / Today / Tomorrow / This week */
 function prevTradingDay(){const d=new Date();do{d.setDate(d.getDate()-1)}while(d.getDay()===0||d.getDay()===6);return ymd(d)}
@@ -945,7 +989,7 @@ function vNews(el){
 }
 
 /* ============ student file (admin, read-only) ============ */
-function vStudent(el){const u=S.subject,ts=[...S.trades].sort((a,b)=>byDT(b,a)),st=calc(ts),d=discStreak(S.trades);
+function vStudent(el){const u=S.subject,ts=[...S.trades].sort((a,b)=>byDT(b,a)),st=calc(ts),d=discStreak(S.trades,S.plans);
   const tg=(u.telegram||"").replace(/^@/,"").replace(/^https?:\/\/t\.me\//,"").trim();
   const days=new Set(ts.map(t=>t.date)).size,plans=[...S.plans].sort((a,b)=>b.date.localeCompare(a.date));
   const field=(l,v)=>v&&String(v).trim()?`<div class="pf"><div class="pl">${l}</div><div class="pv notes" data-notr>${esc(v)}</div></div>`:"";
@@ -1008,7 +1052,18 @@ function judgeDays(arr,out){const days={};arr.forEach(t=>{const j=out.get(t.id);
     if(j.v==="broken"){const rank={over:3,stop:2,plan:1};if(d.v!=="broken"||rank[j.why]>rank[d.why]){d.v="broken";d.why=j.why}}
     else if(j.v==="respected"&&d.v==="neutral")d.v="respected"});
   return Object.values(days).sort((a,b)=>a.date.localeCompare(b.date))}
-function discStreak(ts){const {arr,out}=judgeTrades(ts);const days=judgeDays(arr,out);let streak=0,lastBreak=null;
+/* a weekday with NO trades counts as a disciplined day only if: US holiday, red-folder news that day,
+   the day before red-folder news, or the student marked it as a rest day in the plan. Otherwise it is skipped. */
+const addWeekday=(d,k)=>{const [y,m,dd]=d.split("-").map(Number);const x=new Date(y,m-1,dd);do{x.setDate(x.getDate()+k)}while(x.getDay()===0||x.getDay()===6);return ymd(x)};
+const redNewsOn=d=>S.news.some(n=>n.impact==="High"&&tzDate(n.starts_at,NY)===d);
+function restReason(d,plans){if((plans||[]).some(p=>p.date===d&&p.rest))return "rest";if(US_HOL.some(h=>h[0]===d))return "holiday";
+  if(redNewsOn(d))return "news";if(redNewsOn(addWeekday(d,1)))return "prenews";return ""}
+function withRestDays(days,plans,trades){const have=new Set(days.map(d=>d.date));const starts=[...days.map(d=>d.date),...(plans||[]).map(p=>p.date)].sort();if(!starts.length)return days;
+  const today=todayStr(),out=[...days];let d=starts[0];const [y,m,dd]=d.split("-").map(Number);if(new Date(y,m-1,dd).getDay()%6===0)d=addWeekday(d,1);
+  for(let guard=0;d<today&&guard<800;guard++){if(!have.has(d)){const r=restReason(d,plans);if(r)out.push({date:d,v:"respected",why:r,rest:true})}d=addWeekday(d,1)}
+  if(!have.has(today)&&(plans||[]).some(p=>p.date===today&&p.rest))out.push({date:today,v:"respected",why:"rest",rest:true});
+  return out.sort((a,b)=>a.date.localeCompare(b.date))}
+function discStreak(ts,plans){const {arr,out}=judgeTrades(ts);const days=withRestDays(judgeDays(arr,out),plans,ts);let streak=0,lastBreak=null;
   for(let i=days.length-1;i>=0;i--){const d=days[i];if(d.v==="neutral")continue;if(d.v==="broken"){lastBreak=d.why;break}streak++}
   const best=(()=>{let b=0,c=0;days.forEach(d=>{if(d.v==="respected"){c++;b=Math.max(b,c)}else if(d.v==="broken")c=0});return b})();
   const today=todayStr();return {streak,best,lastBreak,todayCount:arr.filter(t=>t.date===today).length,judged:out};
@@ -1036,7 +1091,7 @@ const QUOTES=[
   "Process over outcome. Every single day."
 ];
 function coachCard(){
-  const today=todayStr(),nd=nextTradingDay(),d=discStreak(S.trades);const s=Math.min(d.streak,DISC.goal);
+  const today=todayStr(),nd=nextTradingDay(),d=discStreak(S.trades,S.plans);const s=Math.min(d.streak,DISC.goal);
   const planNext=S.plans.some(p=>p.date===nd),planToday=S.plans.find(p=>p.date===today),hr=new Date().getHours(),wd=new Date().getDay();
   const reminders=[];
   if(d.todayCount>DISC.maxPerDay)reminders.push(["⛔","bad","You took more than 2 trades today. Stop trading for today. Overtrading breaks the streak."]);
@@ -1053,7 +1108,7 @@ function coachCard(){
       <div class="coach-t">🎯 Discipline streak</div>
       <div class="dots">${Array.from({length:DISC.goal},(_,i)=>`<i class="${i<s?"on":""}"></i>`).join("")}<b class="mono" data-notr>${s} / ${DISC.goal}</b></div>
       <div class="coach-m"><span>${msg[0]}</span> <span>${msg[1]}</span></div>
-      <div class="coach-s"><span>A trading day with only wins or respected losses = counts.</span> <span>Broke the plan, ignored the stop, or more than 2 trades a day = resets.</span>${d.best?` <span class="mut">·</span> <span>Best streak:</span> <b class="mono" data-notr>${d.best}</b>`:""}</div>
+      <div class="coach-s"><span>A trading day with only wins or respected losses = counts.</span> <span>No trades on a holiday, a red news day, the day before red news, or a planned rest day = counts too.</span> <span>Broke the plan, ignored the stop, or more than 2 trades a day = resets.</span>${d.best?` <span class="mut">·</span> <span>Best streak:</span> <b class="mono" data-notr>${d.best}</b>`:""}</div>
     </div>
     <div class="coach-r">
       <div class="today-cnt ${d.todayCount>DISC.maxPerDay?"bad":d.todayCount===DISC.maxPerDay?"warn":""}"><span>Trades today</span><b class="mono" data-notr>${d.todayCount} / ${DISC.maxPerDay}</b></div>
@@ -1394,6 +1449,7 @@ function vPlan(el){
   el.innerHTML=`<div class="row" style="justify-content:space-between"><div><h1>Trading plan</h1><p class="sub">Plan tomorrow tonight. Execute it tomorrow, then review it.</p></div>
    <div class="row"><input class="i" type="date" id="pDate" value="${cur}" style="width:auto">${dates.length?`<select class="i" id="pHist" style="width:auto"><option value="">Past plans…</option>${dates.map(d=>`<option value="${d}">${d}</option>`).join("")}</select>`:""}</div></div>
   <form id="pf" class="grid">
+   <label class="card rest-card"><input type="checkbox" name="rest" ${p.rest?"checked":""} ${ro}><span><b>😴 Rest day</b><span class="mut">I'm not trading this day. A planned rest day counts for the discipline streak.</span></span></label>
    <div class="card"><h3>Risk limits for ${fmtDate(cur)}</h3><div class="grid g4">
     <label class="f">Max daily loss $<input class="i" type="number" step="any" name="maxLoss" value="${esc(p.maxLoss)}" ${ro} placeholder="e.g. 300"></label>
     <label class="f">Daily profit target $<input class="i" type="number" step="any" name="target" value="${esc(p.target)}" ${ro} placeholder="e.g. 600"></label>
@@ -1426,7 +1482,7 @@ function vPlan(el){
   const bias={...(p.bias||{})};
   $$(".seg[data-g]").forEach(sg=>$$("button",sg).forEach(b=>b.onclick=()=>{const g=sg.dataset.g,v=b.dataset.b;bias[g]=bias[g]===v?"":v;$$("button",sg).forEach(x=>{x.className=bias[g]===x.dataset.b?"on "+(v==="Bullish"?"bull":v==="Bearish"?"bear":""):""})}));
   $("#pf").onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const rules={};$$("[data-r]").forEach(c=>rules[c.dataset.r]=c.checked);
-    const np={...p,...d,bias,rules,date:cur,user_id:S.subject.id};
+    const np={...p,...d,bias,rules,rest:!!e.target.rest.checked,date:cur,user_id:S.subject.id};
     try{await API.savePlan(np);const i=S.plans.findIndex(x=>x.date===cur);if(i>=0)S.plans[i]=np;else S.plans.push(np);toast("Plan saved");render()}catch(err){toast("Couldn't save: "+(err.message||err))}};
 }
 
@@ -1643,7 +1699,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
     const tToday=ts.filter(t=>t.date===today),pToday=pl.find(p=>p.date===today),pNext=pl.find(p=>p.date===nd);
     const reviewed=!!(pToday&&((pToday.review||"").trim()||pToday.followed));
     const days7=new Set(ts.filter(t=>t.date>=d7s&&t.date<=today).map(t=>t.date)).size;
-    const ds=discStreak(ts);
+    const ds=discStreak(ts,pl);
     return {s,tToday,pToday,pNext,reviewed,journaled:tToday.length>0||reviewed,days7,netToday:tToday.reduce((a,t)=>a+tradeNet(t),0),streak:ds.streak,over:tToday.length>DISC.maxPerDay}})
     .sort((a,b)=>(a.journaled+!!a.pNext)-(b.journaled+!!b.pNext)||(a.s.name||"").localeCompare(b.s.name||""));
   const nJ=disc.filter(r=>r.journaled).length,nPT=disc.filter(r=>r.pToday).length,nPN=disc.filter(r=>r.pNext).length;
