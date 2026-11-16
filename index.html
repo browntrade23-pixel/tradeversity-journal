@@ -496,6 +496,10 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 .sh-item{margin-bottom:10px}
 .sh-qr{text-align:center;margin-top:12px}.sh-qr img{width:min(300px,100%);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 #share main{max-width:1100px}
+#view.sw-n{animation:swN .32s cubic-bezier(.2,.8,.2,1)}#view.sw-p{animation:swP .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes swN{from{transform:translateX(48px);opacity:.3}to{transform:none;opacity:1}}
+@keyframes swP{from{transform:translateX(-48px);opacity:.3}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){#view.sw-n,#view.sw-p{animation:none}}
 .cal .c.cday{cursor:pointer;transition:transform .15s,box-shadow .2s,outline-color .2s;outline:1px solid transparent}
 .cal .c.cday:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 6px 18px -8px rgba(0,0,0,.6);outline-color:var(--gold);z-index:1;position:relative}
 .dp-hero{text-align:center;padding:20px 16px;border-radius:18px;margin-bottom:12px;border:1px solid var(--line2);background:var(--panel)}
@@ -971,7 +975,20 @@ function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button da
   if(S.me.role==="admin")h+=tab("admin","Admin dashboard","admin");
   if(S.readonly)h+=tab("student","Student file","admin");
   VIEWS.forEach(([k,l])=>{if(S.readonly&&k==="import")return;h+=tab(k,l)});
-  t.innerHTML=h;$$("button",t).forEach(b=>b.onclick=()=>go(b.dataset.v));}
+  t.innerHTML=h;$$("button",t).forEach(b=>b.onclick=()=>go(b.dataset.v));
+  const on=$("button.on",t);if(on&&t.scrollWidth>t.clientWidth)t.scrollTo({left:on.offsetLeft-(t.clientWidth-on.offsetWidth)/2,behavior:"smooth"})}
+/* phones: swipe left / right on the page to move to the next / previous tab */
+(()=>{let sx=0,sy=0,st=0,ok=false;
+  const skip=el=>el.closest("input,textarea,select,button.term,.tw,nav.tabs,.rstrip,.seg,.rpills,canvas,[data-noswipe]");
+  document.addEventListener("touchstart",e=>{ok=false;if(!S.me||$("#app").classList.contains("hidden")||e.touches.length!==1||!$("#modal").classList.contains("hidden")||skip(e.target))return;
+    const t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();ok=true},{passive:true});
+  document.addEventListener("touchend",e=>{if(!ok)return;ok=false;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+    if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*1.8||Date.now()-st>800)return;
+    if(window.getSelection&&String(window.getSelection()).length)return;
+    const order=$$("#tabs button").map(b=>b.dataset.v),i=order.indexOf(S.view);if(i<0)return;
+    const rtl=document.documentElement.dir==="rtl",step=(dx<0)!==rtl?1:-1,n=order[i+step];if(!n)return;
+    go(n);const v=$("#view");v.classList.remove("sw-n","sw-p");void v.offsetWidth;v.classList.add(step>0?"sw-n":"sw-p")},{passive:true});
+})();
 function go(v){if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
   S.view=v;S.page=null;S.dayPage=null;S._fromDay=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
