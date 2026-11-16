@@ -227,6 +227,9 @@ html[data-theme=light] .ctile.min{--cc:#b7791f}html[data-theme=light] .cchip.min
 #auth{min-height:100vh;display:grid;place-items:center;padding:56px 20px 24px;position:relative;overflow:hidden;isolation:isolate;
   background:radial-gradient(1100px 700px at 75% 20%,rgba(190,198,214,.10),transparent 60%),linear-gradient(#07080c,#030304)}
 #auth>.authbox,#auth>#gate{grid-area:1/1}
+#auth{grid-template-columns:minmax(0,1fr)}
+#auth>.authbox,#auth>#gate{min-width:0;max-width:min(420px,100%)}
+#auth .authbox .grid,#auth .authbox [class*="g3"]{min-width:0}
 #langAuth{position:absolute;top:14px;right:16px;z-index:5}
 [dir=rtl] #langAuth{right:auto;left:16px}
 #rain{position:absolute;inset:0;width:100%;height:100%;z-index:-2;pointer-events:none}
@@ -664,7 +667,7 @@ html[data-theme=light] #app::before,html[data-theme=light] #share::before{
     linear-gradient(180deg,#f8f9fc 0%,#f0f3f8 55%,#e9edf4 100%)}
 html[data-theme=light] #app::after,html[data-theme=light] #share::after{opacity:.035;mix-blend-mode:multiply}
 html[data-theme=light] #app header.top,html[data-theme=light] #share header.top{background:rgba(255,255,255,.72);border-bottom-color:var(--line)}
-html[data-theme=light] .card,html[data-theme=light] .kpi{background-color:rgba(255,255,255,.92);box-shadow:0 1px 2px rgba(16,24,40,.04),0 4px 14px rgba(16,24,40,.04)}
+html[data-theme=light] :is(#app,#share,.modal) :is(.card,.kpi){background-color:rgba(255,255,255,.92);box-shadow:0 1px 2px rgba(16,24,40,.04),0 4px 14px rgba(16,24,40,.04)}
 html[data-theme=light] .tcard{box-shadow:0 1px 2px rgba(16,24,40,.04)}
 html[data-theme=light] .btn.pri{background:#f2b53d;border-color:#e3a52c;color:#1b1305}
 html[data-theme=light] .btn.pri:hover{background:#f7c45e}
