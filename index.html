@@ -439,6 +439,14 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 .det-chip small{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);font-weight:700}
 .det-chip b{font-size:13px;color:var(--muted)}.det-chip.ok{border-color:rgba(39,194,108,.4)}.det-chip.ok b{color:var(--text,#e8edf6)}
 .det-line{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 8px}
+/* news countdown */
+.ncd{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.ncd b{color:var(--text);font-weight:700}
+.ncd.soon{background:rgba(239,83,80,.14);border-color:rgba(239,83,80,.45);color:var(--red);animation:pulse 1.6s ease-in-out infinite}.ncd.soon b{color:var(--red)}
+.ncd.live{background:var(--red);border-color:var(--red);color:#fff}.ncd.live b{color:#fff}
+.ncd.done{opacity:.55}
+.nextev .ncd{font-size:12px}
+@media(prefers-reduced-motion:reduce){.ncd.soon{animation:none}}
 /* news explanations */
 .nrow.click{cursor:pointer;border-radius:8px;transition:background .15s}
 .nrow.click:hover{background:var(--panel2)}
@@ -844,7 +852,7 @@ function newsLine(n){return `${n.impact==="High"?"🔴":"🟠"} ${tzTime(n.start
 function newsText(date){const ev=newsFor(date),ho=holidaysFor(date);if(!ev.length&&!ho.length)return "";const lines=ho.map(x=>`🏦 ${x.title} — ${HOL_NOTE[x.kind]}`).concat(ev.map(newsLine));
   if(ev.some(n=>n.impact==="High"))lines.push("⚠️ Red folder: no new trades 5 min before and after.");return lines.join("\n")}
 function newsBox(date,canInsert){const ev=newsFor(date),ho=holidaysFor(date),later=date>newsWeekEnd();
-  const rows=ev.map(n=>`<div class="nrow click" data-ni="${S.news.indexOf(n)}"><i class="fold ${n.impact==="High"?"red":"org"}" title="${n.impact==="High"?"Red folder":"Orange folder"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}<span class="nmore" aria-hidden="true">›</span></div>`).join("");
+  const rows=ev.map(n=>`<div class="nrow click" data-ni="${S.news.indexOf(n)}"><i class="fold ${n.impact==="High"?"red":"org"}" title="${n.impact==="High"?"Red folder":"Orange folder"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${cdSpan(n)}${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}<span class="nmore" aria-hidden="true">›</span></div>`).join("");
   return `<div class="newsbox" id="newsBox" data-date="${date}" data-ins="${canInsert?1:0}">
     <div class="nb-h"><b>📰 USD news</b> <span class="mut">· Forex Factory</span><span class="nb-lg"><i class="fold red"></i><span>Red folder</span><i class="fold org"></i><span>Orange folder</span></span></div>
     ${holRows(ho)}${!S.newsLoaded?`<div class="mut nb-e">Loading news…</div>`:ev.length?rows:ho.length?"":later?`<div class="mut nb-e"><span>Next week's calendar isn't published yet.</span> <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">Forex Factory</a></div>`:`<div class="mut nb-e">No red or orange USD news this day.</div>`}
@@ -861,6 +869,17 @@ function coachNewsHTML(){const today=todayStr(),nd=nextTradingDay(),now=new Date
   if(up.length)h+=`<div class="rem ${up.some(n=>n.impact==="High")?"bad":"warn"}"><span>📰</span><span><b>Today</b> <span data-notr>${up.slice(0,3).map(n=>esc(newsLine(n))).join("<br>")}</span></span></div>`;
   if(next.length)h+=`<div class="rem warn"><span>🗓️</span><span><b>Next session</b> <span data-notr>(${esc(fmtDate(nd))})</span><br><span data-notr>${next.slice(0,4).map(n=>esc(newsLine(n))).join("<br>")}</span><br><span>Put it in your plan.</span></span></div>`;
   return hh+h}
+
+/* live countdown for every news event */
+function cdText(ms){const s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60),x=s%60;
+  return d?`${d}d ${h}h`:h?`${h}h ${pad(m)}m`:`${m}m ${pad(x)}s`}
+function cdState(at){const ms=new Date(at).getTime()-Date.now();return ms>0?(ms<15*60e3?"soon":"up"):ms>-5*60e3?"live":"done"}
+function cdInner(at,st){const ms=new Date(at).getTime()-Date.now();
+  return st==="up"||st==="soon"?`<span>in</span> <b class="mono" data-notr>${cdText(ms)}</b>`:st==="live"?`<b>Live now</b>`:`<span>Released</span>`}
+function cdSpan(n,cls){const st=cdState(n.starts_at);return `<span class="ncd ${cls||""} ${st}" data-at="${n.starts_at}" data-st="${st}">${cdInner(n.starts_at,st)}</span>`}
+setInterval(()=>{if(document.hidden)return;$$(".ncd").forEach(el=>{const at=el.dataset.at,st=cdState(at);
+  if(st!==el.dataset.st){el.dataset.st=st;el.classList.remove("up","soon","live","done");el.classList.add(st);el.innerHTML=cdInner(at,st);return}
+  if(st==="up"||st==="soon"){const b=el.querySelector("b");if(b)b.textContent=cdText(new Date(at).getTime()-Date.now())}})},1000);
 
 /* click a news event or holiday → explanation in the student's language (news-info.js) */
 function niBox(U,x,head,meta,rule,cls){return `<div class="ni ${cls}" data-notr>
@@ -890,8 +909,8 @@ function weekDays(){const d=new Date();const dow=d.getDay();const mon=new Date(d
 function untilText(ms){const m=Math.max(0,Math.round(ms/60000)),dd=Math.floor(m/1440),hh=Math.floor(m%1440/60),mm=m%60;return dd?`${dd}d ${hh}h`:hh?`${hh}h ${mm}m`:`${mm}m`}
 function nextEventHTML(){if(!S.newsLoaded)return `<span class="mut">Loading news…</span>`;const now=Date.now();const n=S.news.filter(e=>new Date(e.starts_at).getTime()>now).sort((a,b)=>a.starts_at.localeCompare(b.starts_at))[0];
   if(!n)return `<span class="mut">No upcoming red or orange USD news this week.</span>`;const ms=new Date(n.starts_at).getTime()-now;
-  return `<span class="ne-l">⏱ Next event</span> <i class="fold ${n.impact==="High"?"red":"org"}"></i> <b class="ne-t" data-notr data-ni="${S.news.indexOf(n)}">${esc(n.title)}</b> <span class="ne-in ${ms<15*60e3?"soon":""}"><span>in</span> <b class="mono" data-notr>${untilText(ms)}</b></span> <span class="mut mono" data-notr>${tzTime(n.starts_at,NY)} NY / ${tzTime(n.starts_at,DZ)} DZ · ${esc(fmtDate(tzDate(n.starts_at,NY)))}</span>`}
-function newsRows(list){const now=new Date().toISOString();return list.map(n=>`<div class="nrow click ${n.starts_at<now?"past":""}" data-ni="${S.news.indexOf(n)}"><i class="fold ${n.impact==="High"?"red":"org"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}<span class="nmore" aria-hidden="true">›</span></div>`).join("")}
+  return `<span class="ne-l">⏱ Next event</span> <i class="fold ${n.impact==="High"?"red":"org"}"></i> <b class="ne-t" data-notr data-ni="${S.news.indexOf(n)}">${esc(n.title)}</b> ${cdSpan(n,"ne-in")} <span class="mut mono" data-notr>${tzTime(n.starts_at,NY)} NY / ${tzTime(n.starts_at,DZ)} DZ · ${esc(fmtDate(tzDate(n.starts_at,NY)))}</span>`}
+function newsRows(list){const now=new Date().toISOString();return list.map(n=>`<div class="nrow click ${n.starts_at<now?"past":""}" data-ni="${S.news.indexOf(n)}"><i class="fold ${n.impact==="High"?"red":"org"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${cdSpan(n)}${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}<span class="nmore" aria-hidden="true">›</span></div>`).join("")}
 function newsPanelBody(tab){if(!S.newsLoaded)return `<div class="mut nb-e">Loading news…</div>`;
   if(tab==="week"){const days=weekDays();const html=days.map(d=>{const ev=newsFor(d),ho=holidaysFor(d);return ev.length||ho.length?`<div class="nday ${d===todayStr()?"today":""}"><span data-notr>${esc(fmtDate(d))}</span>${d===todayStr()?` <span class="tag">Today</span>`:""}</div>${holRows(ho)}${newsRows(ev)}`:""}).join("");
     return html||`<div class="mut nb-e">No red or orange USD news this week.</div>`}

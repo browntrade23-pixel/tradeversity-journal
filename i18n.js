@@ -553,6 +553,7 @@ const T={
 "Journal":["Journal","اليومية"],"News":["News","الأخبار"],"Tomorrow's plan":["Plan de demain","خطة الغد"],"Consistency rule":["Règle de consistance","قاعدة الثبات"],"About us":["À propos","من نحن"],"Admin dashboard":["Tableau de bord admin","لوحة المشرف"],"Student file":["Fiche élève","ملف الطالب"],
 "Theme":["Thème","المظهر"],"Dark":["Sombre","داكن"],"Light":["Clair","فاتح"],"System":["Système","النظام"],"Dark theme":["Thème sombre","المظهر الداكن"],"Light theme":["Thème clair","المظهر الفاتح"],"Same as my device":["Comme mon appareil","مثل جهازي"],
 "Tap any event to see what it means and how it usually moves the market.":["Touchez un événement pour voir ce qu'il signifie et comment il fait généralement bouger le marché.","اضغط على أي خبر لترى معناه وكيف يحرك السوق عادةً."],
+"Live now":["En direct","مباشر الآن"],"Released":["Publiée","صدر"],
 "1D":["1J","يوم"],"7D":["7J","7 أيام"],"30D":["30J","30 يوماً"],"90D":["90J","90 يوماً"]
 };
 
