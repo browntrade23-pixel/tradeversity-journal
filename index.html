@@ -153,7 +153,10 @@ svg.ch text{fill:var(--dim);font-size:11px;font-family:Inter,sans-serif}
 .res .l,.cmix .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
 .ctile{--cc:var(--blue);position:relative;overflow:hidden;border-radius:16px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--cc) 40%,transparent);
   background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--cc) 18%,transparent),transparent 70%),var(--panel2);transition:transform .2s,box-shadow .2s}
-.ctile.min{--cc:var(--gold)}
+.ctile.min{--cc:var(--gold)}.ctile.grn{--cc:var(--green)}.ctile.red{--cc:var(--red)}
+.ctile.gt .ct-h{justify-content:center}.ctile.gt .ct-ty{text-align:center;white-space:normal;line-height:1.35}
+.ctile.gt .ct-n{margin:12px 0 6px}.ctile.gt .ct-n b{font-size:40px}
+.gt-sub{text-align:center;font-size:12px;color:var(--muted)}
 .ctile:hover{transform:translateY(-2px);box-shadow:0 8px 28px -10px color-mix(in srgb,var(--cc) 60%,transparent)}
 .ctile.zero{filter:saturate(.3);opacity:.7}
 .ct-h{display:flex;justify-content:space-between;align-items:center}
@@ -1632,7 +1635,7 @@ function vRisk(el){const st=S._risk||(S._risk={grp:"Nasdaq",bal:50000,mode:"$",r
 /* ============ CONSISTENCY ============ */
 function vConsistency(el){const c=S._cons||(S._cons={size:50000,target:3000,pct:30,total:"",best:"",acct:"all"});
   el.innerHTML=`<h1>Consistency rule calculator</h1><p class="sub">Most prop firms say your best day can't be more than <b>X%</b> of your total profit. This shows how much you can make per day and how much more you need.</p>
-  <div class="grid g2"><div class="card grid">
+  <div class="grid g2"><div class="card grid" style="align-self:start">
    <div class="grid g2">
     <label class="f">Account size $<input class="i ck" type="number" step="any" data-k="size" value="${c.size}"></label>
     <label class="f">Profit target $<input class="i ck" type="number" step="any" data-k="target" value="${c.target}"></label>
@@ -1644,21 +1647,24 @@ function vConsistency(el){const c=S._cons||(S._cons={size:50000,target:3000,pct:
    <div class="row"><select class="i" id="cAcct" style="width:auto"><option value="all">All accounts</option>${accounts().map(a=>`<option ${c.acct===a?"selected":""}>${esc(a)}</option>`).join("")}</select><button class="btn sm" id="cFill">Fill from my journal</button></div>
    <div class="pills">${[20,30,40,50].map(p=>`<span class="pill ${num(c.pct)===p?"on":""}" data-p="${p}">${p}% rule</span>`).join("")}</div>
   </div><div id="cOut"></div></div>`;
+  const prev={};
   const out=()=>{const P=num(c.pct)/100,T=num(c.target),tot=num(c.total)||0,best=num(c.best)||0;
     if(!(P>0&&P<=1)||!(T>0)){$("#cOut").innerHTML='<div class="card empty">Enter the target and rule %.</div>';return}
     const capAtTarget=T*P;const needTotal=Math.max(T,best>0?best/P:0);const remain=Math.max(0,needTotal-tot);const ratio=tot>0?best/tot:NaN;const minDays=Math.ceil(1/P-1e-9);
     const ok=tot>0&&best<=tot*P+1e-9;const maxToday=Math.max(0,(P*(tot)-best)/(1-P));
+    const gt=(k,cl,lab,val,sub)=>{const bump=prev[k]!==val;prev[k]=val;return `<div class="ctile gt ${cl}"><div class="ct-h"><span class="ct-ty">${lab}</span></div>
+      <div class="ct-n"><b class="mono ${bump?"bump":""}">${val}</b></div><div class="gt-sub">${sub}</div></div>`};
     $("#cOut").innerHTML=`<div class="card grid">
-     <div class="res"><div class="l">Max profit in one day (if you finish right at target)</div><div class="big">${money(capAtTarget,0)}</div><div class="mut" style="font-size:12px">${c.pct}% × ${money(T,0)}</div></div>
+     ${gt("cap","min","Max profit in one day (if you finish right at target)",money(capAtTarget,0),`${c.pct}% × ${money(T,0)}`)}
      <div class="grid g2">
-      <div class="res"><div class="l">Minimum trading days</div><div class="big">${minDays}</div><div class="mut" style="font-size:12px">if every day is at the cap</div></div>
-      <div class="res"><div class="l">Total profit you need</div><div class="big">${money(needTotal,0)}</div><div class="mut" style="font-size:12px">${best>0&&best/P>T?`your best day ${money(best,0)} ÷ ${c.pct}%`:"= profit target"}</div></div>
+      ${gt("days","mic","Minimum trading days",minDays,"if every day is at the cap")}
+      ${gt("need","grn","Total profit you need",money(needTotal,0),best>0&&best/P>T?`your best day ${money(best,0)} ÷ ${c.pct}%`:"= profit target")}
      </div>
-     ${tot>0||best>0?`<div class="res"><div class="l">Where you are now</div>
-      <div style="margin:6px 0"><div class="bar" style="height:10px"><i style="width:${Math.min(100,tot/needTotal*100)}%;background:var(--gold)"></i></div></div>
+     ${tot>0||best>0?`<div class="cmix"><div class="l">Where you are now</div>
+      <div class="cm-bar" style="height:10px;margin:10px 0"><i style="width:${Math.min(100,tot/needTotal*100)}%"></i></div>
       <div class="mut" style="font-size:13px">Profit ${money(tot,0)} of ${money(needTotal,0)} · <b>${money(remain,0)}</b> to go · best day = <b>${pct(ratio,1)}</b> of total</div></div>
       <div class="status ${ok&&tot>=T?"good":ok?"mid":"badd"}">${ok&&tot>=T?"✔ Target reached and consistent — you can request payout / pass":ok?`✔ Consistent so far. Keep going: ${money(remain,0)} left`:`✖ Not consistent yet: best day is ${pct(ratio,1)} of total (max ${c.pct}%). Make ${money(remain,0)} more without beating your best day.`}</div>
-      <div class="res"><div class="l">Tomorrow — don't make more than</div><div class="big warn">${money(Math.max(maxToday,best),0)}</div><div class="mut" style="font-size:12px">Above this, tomorrow becomes your new best day and pushes your required profit higher.</div></div>`:""}
+      ${gt("tmr","red","Tomorrow — don't make more than",money(Math.max(maxToday,best),0),"Above this, tomorrow becomes your new best day and pushes your required profit higher.")}`:""}
      <p class="mut" style="font-size:12px;margin:0">Formula: best day ≤ ${c.pct}% × total profit. Some firms count it differently (e.g. % of the profit target). Always check your firm's rules.</p>
     </div>`};
   out();
