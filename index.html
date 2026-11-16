@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tradeversity Journal — by Brown Algo</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="apple-touch-icon" href="favicon.svg">
+<link rel="icon" type="image/png" href="brand/logo-192.png">
+<link rel="apple-touch-icon" href="brand/logo-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -26,8 +26,10 @@ a{color:var(--gold)}
 header.top{position:sticky;top:0;z-index:20;background:rgba(10,14,22,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .topin{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:10px 16px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
-.logo{width:34px;height:34px;flex:none;border-radius:10px;background:url(raven.svg) center/86% no-repeat,linear-gradient(135deg,var(--gold),#b8791a);box-shadow:0 0 0 1px rgba(255,210,122,.35),0 0 14px rgba(245,185,66,.45);animation:aura 3.2s ease-in-out infinite}
-@keyframes aura{0%,100%{box-shadow:0 0 0 1px rgba(255,210,122,.3),0 0 10px rgba(245,185,66,.35)}50%{box-shadow:0 0 0 1px rgba(255,210,122,.6),0 0 22px rgba(245,185,66,.75)}}
+.logo{width:44px;height:44px;flex:none;border-radius:50%;background:url(brand/logo-192.png) center/cover no-repeat;animation:aura 3.2s ease-in-out infinite}
+.logo.lg{width:132px;height:132px;background-image:url(brand/logo-512.png)}
+.brand.stack{flex-direction:column;text-align:center;gap:6px}
+@keyframes aura{0%,100%{filter:drop-shadow(0 0 2px rgba(245,185,66,.35))}50%{filter:drop-shadow(0 0 10px rgba(245,185,66,.8))}}
 @media(prefers-reduced-motion:reduce){.logo{animation:none}}
 .brand small{display:block;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:.4px}
 .spacer{flex:1}
@@ -168,8 +170,8 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 <section id="auth" class="hidden">
   <div class="authbox">
     <div class="langbar" id="langAuth"></div>
-    <div class="brand" style="justify-content:center;margin-bottom:18px">
-      <div class="logo" role="img" aria-label="Tradeversity raven logo"></div>
+    <div class="brand stack" style="justify-content:center;margin-bottom:18px">
+      <div class="logo lg" role="img" aria-label="Brown Algo — Tradeversity logo"></div>
       <div style="font-size:18px">Tradeversity Journal<small>BY BROWN ALGO</small></div>
     </div>
     <div class="card hidden" id="waitBox" style="text-align:center">
@@ -217,7 +219,7 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 <section id="app" class="hidden">
   <header class="top">
     <div class="topin">
-      <div class="brand"><div class="logo" role="img" aria-label="Tradeversity raven logo"></div><div>Tradeversity Journal<small>BY BROWN ALGO</small></div></div>
+      <div class="brand"><div class="logo" role="img" aria-label="Brown Algo — Tradeversity logo"></div><div>Tradeversity Journal<small>BY BROWN ALGO</small></div></div>
       <div class="spacer"></div>
       <span id="langTop"></span>
       <span class="chip" id="whoChip" data-notr></span>
