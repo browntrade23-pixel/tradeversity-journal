@@ -169,7 +169,8 @@ svg.ch text{fill:var(--dim);font-size:11px;font-family:Inter,sans-serif}
 .rp.on b{color:var(--gold);text-shadow:0 0 16px rgba(245,185,66,.6)}
 .rp.on i{background:linear-gradient(90deg,var(--gold),#ffd98a);box-shadow:0 0 8px var(--gold)}
 html[data-theme=light] .rp.on,html[data-theme=light] .rp.on b{color:#9a6512}
-.cons-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}
+.cons-wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px}
+#cOut:empty{display:none}
 @media(max-width:900px){.cons-wrap{grid-template-columns:1fr}}
 .cs-sec{border-color:color-mix(in srgb,var(--gold) 18%,var(--line))}
 .cs-rows{display:grid;gap:8px}
@@ -1695,9 +1696,8 @@ function vConsistency(el){const c=S._cons||(S._cons={size:50000,target:3000,pct:
      <div class="cs-tot">Total net P/L: <b class="mono" id="cTot"></b></div>
      <button class="btn cs-check" id="cCheck" type="button">Check consistency</button>
     </div>
-    <div id="cOut"></div>
    </div>
-   <div class="grid" style="align-self:start" id="cSide"></div>
+   <div class="grid" style="align-self:start"><div id="cOut"></div><div class="grid" id="cSide"></div></div>
   </div>`;
   const prev={};
   const vals=()=>c.days.map(v=>num(v)).map(v=>isFinite(v)?v:0);
