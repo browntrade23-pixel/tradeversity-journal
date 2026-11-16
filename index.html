@@ -6,6 +6,8 @@
 <title>The Effective Journal — by Tradeversity</title>
 <link rel="icon" type="image/png" href="brand/logo-192.png?v=hq">
 <link rel="apple-touch-icon" href="brand/logo-192.png?v=hq">
+<script>/* apply the saved theme before the page paints (no white/dark flash) */
+try{var tm=localStorage.getItem("tv_theme")||"dark";if(tm==="light"||(tm==="system"&&matchMedia("(prefers-color-scheme: light)").matches))document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -13,7 +15,7 @@
   --bg:#0a0e16;--panel:#111827;--panel2:#0f1522;--line:#1f2a3d;--line2:#2a3850;
   --text:#e8eef8;--muted:#8d9ab0;--dim:#5f6c82;
   --gold:#f5b942;--gold2:#ffd27a;--green:#27c26c;--red:#ef5350;--blue:#4c8dff;--purple:#a67cff;
-  --r:14px;
+  --r:14px;--grid:#1a2335;--grid0:#3a4760;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
@@ -36,9 +38,14 @@ header.top{position:sticky;top:0;z-index:20;background:rgba(10,14,22,.92);backdr
 .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;border:1px solid var(--line2);background:var(--panel);font-size:12px;color:var(--muted)}
 nav.tabs{max-width:1200px;margin:0 auto;display:flex;gap:4px;padding:0 12px 8px;overflow-x:auto;scrollbar-width:none}
 nav.tabs::-webkit-scrollbar{display:none}
-nav.tabs button{background:none;border:0;padding:8px 12px;border-radius:10px;color:var(--muted);white-space:nowrap;cursor:pointer;font-weight:600}
+nav.tabs button{display:inline-flex;align-items:center;gap:7px;background:none;border:0;padding:8px 12px;border-radius:10px;color:var(--muted);white-space:nowrap;cursor:pointer;font-weight:600;transition:color .2s,background .2s}
+nav.tabs button:hover{color:var(--text);background:color-mix(in srgb,var(--panel) 60%,transparent)}
 nav.tabs button.on{background:var(--panel);color:var(--text);box-shadow:inset 0 0 0 1px var(--line2)}
 nav.tabs button.admin{color:var(--gold)}
+.ico{width:17px;height:17px;flex:none;display:block}
+nav.tabs .ico{opacity:.85;transition:transform .2s,opacity .2s,color .2s}
+nav.tabs button:hover .ico{opacity:1;transform:translateY(-1px)}
+nav.tabs button.on .ico{opacity:1;color:var(--gold)}
 main{max-width:1200px;margin:0 auto;padding:18px 16px 80px}
 h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:0 0 12px}h3{font-size:14px;margin:0 0 8px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px}
 .sub{color:var(--muted);margin:0 0 16px}
@@ -419,6 +426,46 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 .det-chip small{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);font-weight:700}
 .det-chip b{font-size:13px;color:var(--muted)}.det-chip.ok{border-color:rgba(39,194,108,.4)}.det-chip.ok b{color:var(--text,#e8edf6)}
 .det-line{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 8px}
+/* theme switcher */
+.theme-sw{display:inline-flex;gap:2px;padding:3px;border-radius:99px;border:1px solid var(--line2);background:var(--panel2)}
+.theme-sw button{width:30px;height:28px;display:grid;place-items:center;border:0;border-radius:99px;background:none;color:var(--muted);cursor:pointer;transition:background .2s,color .2s}
+.theme-sw button:hover{color:var(--text)}
+.theme-sw button.on{background:var(--panel);color:var(--gold);box-shadow:0 0 0 1px var(--line2)}
+.theme-sw .ico{width:16px;height:16px}
+@media(max-width:700px){.theme-sw button{width:26px}}
+
+/* ============ LIGHT THEME (inside the platform, popups and shared page; the login night scene stays dark) ============ */
+html[data-theme=light] :is(#app,#share,.modal,#tip,#toast){
+  --bg:#eef1f6;--panel:#ffffff;--panel2:#f4f6fa;--line:#e2e7ef;--line2:#cfd7e3;
+  --text:#111a2c;--muted:#56627a;--dim:#8a94a8;
+  --gold:#b07a1c;--gold2:#c48d2a;--green:#13914c;--red:#d6382f;--blue:#2f6fe0;--purple:#7650dd;
+  --grid:#e8ecf3;--grid0:#b7c1d1;color:var(--text)}
+html[data-theme=light]{color-scheme:light}
+html[data-theme=light] body:has(#app:not(.hidden)),html[data-theme=light] body:has(#share){background:#eef1f6}
+html[data-theme=light] #app::before,html[data-theme=light] #share::before{
+  background:radial-gradient(1000px 620px at 8% 6%,rgba(245,185,66,.20),rgba(245,185,66,.06) 42%,transparent 72%),
+    radial-gradient(800px 560px at 94% 14%,rgba(120,140,185,.14),transparent 65%),
+    linear-gradient(180deg,#f8f9fc 0%,#f0f3f8 55%,#e9edf4 100%)}
+html[data-theme=light] #app::after,html[data-theme=light] #share::after{opacity:.035;mix-blend-mode:multiply}
+html[data-theme=light] #app header.top,html[data-theme=light] #share header.top{background:rgba(255,255,255,.72);border-bottom-color:var(--line)}
+html[data-theme=light] .card,html[data-theme=light] .kpi{background-color:rgba(255,255,255,.92);box-shadow:0 1px 2px rgba(16,24,40,.04),0 4px 14px rgba(16,24,40,.04)}
+html[data-theme=light] .tcard{box-shadow:0 1px 2px rgba(16,24,40,.04)}
+html[data-theme=light] .btn.pri{background:#f2b53d;border-color:#e3a52c;color:#1b1305}
+html[data-theme=light] .btn.pri:hover{background:#f7c45e}
+html[data-theme=light] :is(.tag.bad,.dno,.ne-in.soon b,.nrow.hol.closed .hol-note,.nb-w,.rem.bad){color:#c22f27}
+html[data-theme=light] .tag.good{color:#2459c4}
+html[data-theme=light] .remark{color:#6a4a10;background:rgba(245,185,66,.12)}
+html[data-theme=light] #tip{background:#fff;box-shadow:0 8px 24px rgba(16,24,40,.14)}
+html[data-theme=light] #toast{background:#fff;box-shadow:0 8px 24px rgba(16,24,40,.16)}
+html[data-theme=light] .modal{background:rgba(15,23,42,.35)}
+html[data-theme=light] :is(#app,#share) .tg-link{background:rgba(255,255,255,.8)}
+html[data-theme=light] :is(#app,#share) .promo{background:linear-gradient(135deg,rgba(245,185,66,.18),rgba(255,255,255,.95) 60%)}
+html[data-theme=light] .quote{background:rgba(16,24,40,.03)}
+html[data-theme=light] .sh-priv{color:#17663a}
+html[data-theme=light] .sh-qr img{box-shadow:0 10px 30px rgba(16,24,40,.18)}
+html[data-theme=light] .about-v .astat:hover,html[data-theme=light] .about-v .card:hover{box-shadow:0 14px 30px rgba(16,24,40,.12),0 0 22px rgba(245,185,66,.18)}
+html[data-theme=light] :is(#app,#share) .tg-link[data-k=tiktok] svg [fill="#fff"]{fill:#111a2c}
+html[data-theme=light] .logo{animation:none;filter:drop-shadow(0 2px 6px rgba(16,24,40,.25))}
 @media(max-width:560px){[dir=rtl] .tpnl{text-align:right}}
 </style>
 </head>
@@ -504,6 +551,7 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
       <div class="brand"><div class="logo" role="img" aria-label="The Effective Journal by Tradeversity — founder Brown Algo"></div><div>The Effective Journal<small>BY TRADEVERSITY</small></div></div>
       <div class="spacer"></div>
       <span id="socHead" class="soc icons"></span>
+      <span class="theme-slot"></span>
       <span id="langTop"></span>
       <span class="chip founder-chip" title="Founder"><span>Founder</span> <b>BROWN ALGO</b></span>
       <span class="chip" id="whoChip" data-notr></span>
@@ -683,11 +731,26 @@ async function loadSubject(u,readonly){
 }
 
 /* ============ nav ============ */
-const VIEWS=[["journal","📓 Journal"],["stats","📊 Statistics"],["news","📰 News"],["plan","🧭 Tomorrow's plan"],["risk","🎯 Risk calculator"],["consistency","⚖️ Consistency rule"],["about","ℹ️ About us"]];
-function renderTabs(){const t=$("#tabs");let h="";
-  if(S.me.role==="admin")h+=`<button data-v="admin" class="admin ${S.view==="admin"?"on":""}">👑 Admin dashboard</button>`;
-  if(S.readonly)h+=`<button data-v="student" class="admin ${S.view==="student"?"on":""}">👤 Student file</button>`;
-  VIEWS.forEach(([k,l])=>{if(S.readonly&&k==="import")return;h+=`<button data-v="${k}" class="${S.view===k?"on":""}">${l}</button>`});
+/* crisp line icons (24×24, drawn with the current text colour) */
+const ICON={
+  journal:'<path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v14.5H7.5A2.5 2.5 0 0 0 5 20z"/><path d="M5 20a1.5 1.5 0 0 0 1.5 1.5H19v-4"/><path d="M9 7.5h6M9 11h4"/>',
+  stats:'<path d="M3.5 20.5h17"/><rect x="5" y="13" width="3.2" height="5" rx="1"/><rect x="10.4" y="10" width="3.2" height="8" rx="1"/><rect x="15.8" y="11.5" width="3.2" height="6.5" rx="1"/><path d="M4.5 9 9.5 5l4 3 6-4.5"/><path d="M16.5 3.5h3v3"/>',
+  news:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M12.8 11.5 10.5 15h3l-2.3 3.5"/>',
+  plan:'<circle cx="12" cy="12" r="9"/><path d="m15.8 8.2-2.3 5.3-5.3 2.3 2.3-5.3z"/><circle cx="12" cy="12" r=".6" fill="currentColor"/>',
+  risk:'<path d="M12 3 19.5 6v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="m9.3 14.7 5.4-5.4"/><circle cx="9.6" cy="9.6" r="1"/><circle cx="14.4" cy="14.4" r="1"/>',
+  consistency:'<path d="M12 4v16M7.5 20.5h9M5 7h14"/><circle cx="12" cy="4" r="1"/><path d="M5 7 2.5 13a2.5 2.5 0 0 0 5 0z"/><path d="M19 7l-2.5 6a2.5 2.5 0 0 0 5 0z"/>',
+  about:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".7" fill="currentColor"/>',
+  admin:'<path d="M3.5 8.5 8 12l4-6.5 4 6.5 4.5-3.5-1.8 10H5.3z"/><path d="M6 21.5h12"/>',
+  student:'<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/>',
+  moon:'<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
+  system:'<rect x="3" y="4" width="18" height="12.5" rx="2"/><path d="M8.5 20.5h7M12 16.5v4"/>'};
+const ico=(k,cls)=>`<svg class="ico ${cls||""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+const VIEWS=[["journal","Journal"],["stats","Statistics"],["news","News"],["plan","Tomorrow's plan"],["risk","Risk calculator"],["consistency","Consistency rule"],["about","About us"]];
+function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button data-v="${k}" class="${c||""} ${S.view===k?"on":""}">${ico(k)}<span>${l}</span></button>`;
+  if(S.me.role==="admin")h+=tab("admin","Admin dashboard","admin");
+  if(S.readonly)h+=tab("student","Student file","admin");
+  VIEWS.forEach(([k,l])=>{if(S.readonly&&k==="import")return;h+=tab(k,l)});
   t.innerHTML=h;$$("button",t).forEach(b=>b.onclick=()=>go(b.dataset.v));}
 function go(v){if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
@@ -1059,18 +1122,18 @@ const kfmt=v=>{const a=Math.abs(v);return (v<0?"-":"")+"$"+(a>=1000?(a/1000).toF
 function equityChart(curve){if(!curve.length)return '<div class="empty">No data</div>';
   const W=720,H=240,L=52,Rp=12,T=12,B=26;const ys=[0,...curve.map(c=>c.eq)];const tk=niceTicks(Math.min(...ys),Math.max(...ys));
   const y0=tk[0],y1=tk[tk.length-1],X=i=>L+(curve.length===1?0:i*(W-L-Rp)/(curve.length-1)),Y=v=>T+(y1-v)/(y1-y0)*(H-T-B);
-  let g=tk.map(v=>`<line x1="${L}" x2="${W-Rp}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v===0?"#3a4760":"#1a2335"}" ${v===0?'stroke-dasharray="3 3"':""}/><text x="${L-8}" y="${Y(v)+4}" text-anchor="end">${kfmt(v)}</text>`).join("");
+  let g=tk.map(v=>`<line x1="${L}" x2="${W-Rp}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(${v===0?"--grid0":"--grid"})" ${v===0?'stroke-dasharray="3 3"':""}/><text x="${L-8}" y="${Y(v)+4}" text-anchor="end">${kfmt(v)}</text>`).join("");
   const pts=curve.map((c,i)=>`${X(i)},${Y(c.eq)}`).join(" ");const last=curve[curve.length-1].eq,col=last>=0?"#27c26c":"#ef5350";
   g+=`<polygon points="${L},${Y(0)} ${pts} ${X(curve.length-1)},${Y(0)}" fill="${col}" opacity=".08"/><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`;
   const step=Math.max(1,Math.ceil(curve.length/6));curve.forEach((c,i)=>{if(i%step===0)g+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle">${c.t.date.slice(5)}</text>`});
   const w=(W-L-Rp)/Math.max(1,curve.length);
   curve.forEach((c,i)=>{const n=tradeNet(c.t);g+=`<g><rect class="hit" x="${X(i)-w/2}" y="${T}" width="${w}" height="${H-T-B}" data-tip="${esc(c.tip||`${fmtDate(c.t.date)} ${c.t.time||""}\n${c.t.symbol} ${c.t.side}: ${smoney(n)}\nEquity: ${money(c.eq)}`)}"/></g>`});
-  g+=`<circle cx="${X(curve.length-1)}" cy="${Y(last)}" r="4" fill="${col}" stroke="#111827" stroke-width="2"/>`;
+  g+=`<circle cx="${X(curve.length-1)}" cy="${Y(last)}" r="4" fill="${col}" style="stroke:var(--panel)" stroke-width="2"/>`;
   return `<svg class="ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="Equity curve">${g}</svg>`}
 function dailyBars(days){const ent=Object.entries(days).sort((a,b)=>a[0].localeCompare(b[0])).slice(-40);if(!ent.length)return '<div class="empty">No data</div>';
   const W=520,H=300,L=52,Rp=12,T=12,B=26;const vs=ent.map(e=>e[1]);const tk=niceTicks(Math.min(0,...vs),Math.max(0,...vs));const y0=tk[0],y1=tk[tk.length-1];
   const Y=v=>T+(y1-v)/(y1-y0)*(H-T-B),bw=(W-L-Rp)/ent.length;
-  let g=tk.map(v=>`<line x1="${L}" x2="${W-Rp}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v===0?"#3a4760":"#1a2335"}"/><text x="${L-8}" y="${Y(v)+4}" text-anchor="end">${kfmt(v)}</text>`).join("");
+  let g=tk.map(v=>`<line x1="${L}" x2="${W-Rp}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(${v===0?"--grid0":"--grid"})"/><text x="${L-8}" y="${Y(v)+4}" text-anchor="end">${kfmt(v)}</text>`).join("");
   ent.forEach(([d,v],i)=>{const x=L+i*bw+1,w=Math.max(2,bw-2),y=v>=0?Y(v):Y(0),h=Math.max(1,Math.abs(Y(v)-Y(0)));
     g+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${Math.min(3,w/2)}" fill="${v>=0?"#27c26c":"#ef5350"}"/>`;
     g+=`<rect class="hit" x="${L+i*bw}" y="${T}" width="${bw}" height="${H-T-B}" data-tip="${esc(fmtDate(d)+"\n"+smoney(v))}"/>`;
@@ -1218,11 +1281,11 @@ function drawShare(){const el=$("#shMain");const D=SH.data;
   $$("tr[data-m]").forEach(r=>r.onclick=()=>{SH.month=r.dataset.m;drawShare();$(".cal").scrollIntoView({behavior:"smooth",block:"center"})})}
 async function bootShare(tok){SH.tok=tok;$("#auth").classList.add("hidden");$("#app").classList.add("hidden");
   const sec=document.createElement("section");sec.id="share";
-  sec.innerHTML=`<header class="top"><div class="topin"><a class="brand" href="${location.pathname}" style="color:inherit;text-decoration:none"><div class="logo" role="img" aria-label="The Effective Journal by Tradeversity"></div><div>The Effective Journal<small>BY TRADEVERSITY</small></div></a><div class="spacer"></div><span class="soc icons" id="socShare"></span><span id="langShare"></span></div></header>
+  sec.innerHTML=`<header class="top"><div class="topin"><a class="brand" href="${location.pathname}" style="color:inherit;text-decoration:none"><div class="logo" role="img" aria-label="The Effective Journal by Tradeversity"></div><div>The Effective Journal<small>BY TRADEVERSITY</small></div></a><div class="spacer"></div><span class="soc icons" id="socShare"></span><span class="theme-slot"></span><span id="langShare"></span></div></header>
    <main id="shMain"><div class="empty">Loading results…</div></main>
    <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div class="soc" id="socShare2"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>`;
   document.body.insertBefore(sec,$("#modal"));
-  $("#langShare").innerHTML=I18N.picker();$("#socShare").innerHTML=socialHTML();$("#socShare2").innerHTML=socialHTML();$$("[data-promo]",sec).forEach(e=>e.innerHTML=promoHTML());
+  $("#langShare").innerHTML=I18N.picker();Theme.mount();$("#socShare").innerHTML=socialHTML();$("#socShare2").innerHTML=socialHTML();$$("[data-promo]",sec).forEach(e=>e.innerHTML=promoHTML());
   window.onLangChange=()=>{if(SH.data!==undefined)drawShare()};
   const load=async()=>{try{SH.data=await Cloud.getShare(tok);drawShare()}catch(e){$("#shMain").innerHTML=`<div class="card empty">Couldn't load: ${esc(e.message||e)}</div>`}};
   await Cloud.init();API=Cloud;await load();
@@ -1560,7 +1623,7 @@ const SOCIAL=[
   {key:"kick",href:"https://kick.com/brown_algo_trader",label:"Kick",
    icon:'<svg viewBox="0 0 24 24"><path fill="#53fc18" d="M3 3h6v5h2V6h2V4h2V3h6v6h-2v2h-2v2h2v2h2v6h-6v-1h-2v-2h-2v-2H9v5H3z"/></svg>'}
 ];
-function socialHTML(keys){return SOCIAL.filter(s=>!keys||keys.includes(s.key)).map(s=>`<a class="tg-link ${s.cls||""}" href="${s.href}" target="_blank" rel="noopener" title="${s.label}" aria-label="${s.label}">${s.icon}<span>${s.label}</span></a>`).join("")}
+function socialHTML(keys){return SOCIAL.filter(s=>!keys||keys.includes(s.key)).map(s=>`<a class="tg-link ${s.cls||""}" data-k="${s.key}" href="${s.href}" target="_blank" rel="noopener" title="${s.label}" aria-label="${s.label}">${s.icon}<span>${s.label}</span></a>`).join("")}
 $("#socTop").innerHTML=socialHTML();$("#socBottom").innerHTML=socialHTML();
 $("#socHead").innerHTML=socialHTML();$("#socFoot").innerHTML=socialHTML();
 $("#socGate").innerHTML=socialHTML(["results","telegram"]);
@@ -1629,6 +1692,18 @@ const _showWaiting=showWaiting;showWaiting=u=>{openGate(true);_showWaiting(u)};
       d.y+=d.v;d.x-=d.v*.2;if(d.y>H+30||d.x<-30)Object.assign(d,mk(true))}}
   function loop(){if(!$("#auth").classList.contains("hidden")&&!document.hidden)draw();requestAnimationFrame(loop)}
   addEventListener("resize",size);size();if(reduced)draw();else loop()})();
+
+/* ============ theme: dark / light / same as device ============ */
+const Theme={key:"tv_theme",mq:matchMedia("(prefers-color-scheme: light)"),
+  mode(){try{return localStorage.getItem(this.key)||"dark"}catch(e){return "dark"}},
+  apply(){const m=this.mode(),light=m==="light"||(m==="system"&&this.mq.matches);if(light)document.documentElement.setAttribute("data-theme","light");else document.documentElement.removeAttribute("data-theme");
+    $$(".theme-sw button").forEach(b=>{b.classList.toggle("on",b.dataset.t===m);b.setAttribute("aria-pressed",b.dataset.t===m)})},
+  set(m){try{localStorage.setItem(this.key,m)}catch(e){}this.apply();
+    if($("#share")&&SH.data!==undefined)drawShare();else if(S.me&&!$("#app").classList.contains("hidden"))render()},
+  html(){return `<div class="theme-sw" role="group" aria-label="Theme">${[["dark","moon","Dark theme"],["light","sun","Light theme"],["system","system","Same as my device"]].map(([k,i,t])=>`<button type="button" data-t="${k}" title="${t}" aria-label="${t}">${ico(i)}</button>`).join("")}</div>`},
+  mount(){$$(".theme-slot").forEach(s=>{if(!s.firstChild){s.innerHTML=this.html();$$("button",s).forEach(b=>b.onclick=()=>this.set(b.dataset.t))}});this.apply()}};
+Theme.mq.addEventListener("change",()=>{if(Theme.mode()==="system")Theme.set("system")});
+Theme.mount();
 
 /* ============ languages ============ */
 $("#langAuth").innerHTML=I18N.picker();$("#langTop").innerHTML=I18N.picker();
