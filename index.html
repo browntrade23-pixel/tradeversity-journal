@@ -403,6 +403,31 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .impbox[open] summary::after{transform:rotate(180deg)}
 .imp-ic{font-size:22px}.imp-sub{display:block;font-size:12px;font-weight:500}
 .impbox .drop{padding:22px;font-size:14px;border-color:rgba(245,185,66,.45)}
+.imp-prog{margin-top:12px;border-color:rgba(245,185,66,.35);animation:ckPop .3s ease}
+.ip-top{display:flex;align-items:center;gap:12px}
+.ip-ic{font-size:26px;animation:ipBob 1.1s ease-in-out infinite}
+.imp-prog.done .ip-ic{animation:none}
+.ip-t{flex:1;min-width:0;display:flex;flex-direction:column}.ip-t b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ip-t .mut{font-size:12px}
+.ip-pct{font-size:18px;color:var(--gold)}
+.ip-bar{position:relative;height:10px;border-radius:10px;background:var(--line);overflow:hidden;margin:12px 0 8px}
+.ip-bar i{position:absolute;inset:0 auto 0 0;width:0;border-radius:10px;background:linear-gradient(90deg,var(--gold),#ffd98a);box-shadow:0 0 12px rgba(245,185,66,.6)}
+.ip-bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:ipShine 1s linear infinite}
+.imp-prog.done .ip-bar i{background:linear-gradient(90deg,#27c26c,#5ee39b);box-shadow:0 0 12px rgba(39,194,108,.6)}
+.imp-prog.done .ip-pct{color:var(--green)}
+.ip-step{font-size:12px;color:var(--muted)}
+@keyframes ipBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes ipShine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.imp-done{position:relative;margin-bottom:12px;padding:18px 16px;border-radius:16px;border:1px solid rgba(39,194,108,.45);
+  background:radial-gradient(600px 200px at 50% 0,rgba(39,194,108,.16),transparent 70%),var(--panel2);animation:ckPop .4s ease}
+.imp-done .x{position:absolute;top:8px;inset-inline-end:10px;background:none;border:0;color:var(--muted);font-size:20px;cursor:pointer}
+.id-head{display:flex;gap:10px;align-items:center}
+.id-check{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#06210f;font-weight:900;flex:none;animation:idPop .5s cubic-bezier(.2,1.6,.4,1)}
+.id-net{text-align:center;font-size:36px;font-weight:900;margin:12px 0 6px}
+.id-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.id-grid>div{display:flex;flex-direction:column;gap:2px;padding:10px;border-radius:12px;background:var(--panel);border:1px solid var(--line)}
+.id-grid small{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}.id-grid b{font-size:18px}.id-grid .mut{font-size:11px}
+@media(max-width:600px){.id-grid{grid-template-columns:repeat(2,1fr)}}
+@keyframes idPop{from{transform:scale(0)}to{transform:scale(1)}}
 /* admin: student file */
 .lnk{color:var(--gold2);text-decoration:none}.lnk:hover{text-decoration:underline}
 .sf-head{display:flex;gap:16px;align-items:center;border-color:rgba(245,185,66,.3)}
@@ -1309,7 +1334,7 @@ function vJournal(el){
   const byDay={};ts.forEach(t=>(byDay[t.date]=byDay[t.date]||[]).push(t));
   el.innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:6px"><div><h1>Trading journal</h1><p class="sub">${S.readonly?"Student's":"Your"} trades, screenshots, feelings and lessons.</p></div>
    <div class="row">${S.readonly?"":`<button class="btn pri" id="addT">+ New trade</button><button class="btn" id="impT">⬆ Import CSV</button>`}<button class="btn" id="expCsv">Export CSV</button></div></div>
-   ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export: the trades appear below in your journal, ready for screenshots and notes</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
+   ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||S._impDone||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export: the trades appear below in your journal, ready for screenshots and notes</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
    ${coachCard()}
    ${filterBar()}
    <div class="grid g4" style="margin-bottom:16px">
@@ -1516,7 +1541,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   const meta=S.acct!=="all"?S.trades.find(t=>t.account===S.acct&&(t.firm||t.platform||t.acctSize)):null;const aSize=meta&&num(meta.acctSize)>0?num(meta.acctSize):null;
   el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px"><div><h1>Statistics</h1><p class="sub">${S.acct==="all"?"All accounts":esc(S.acct)} · ${ts.length} trades</p>
    ${meta?`<div class="det-line">${meta.firm?`<span class="chip">🏦 <span data-notr>${esc(meta.firm)}</span></span>`:""}${aSize?`<span class="chip">💰 ${money(aSize,0)}</span>`:""}${meta.platform?`<span class="chip">🖥 <span data-notr>${esc(meta.platform)}</span></span>`:""}</div>`:""}</div>${S.readonly?"":`<button class="btn pri share-btn" id="shareBtn">🔗 Share my results</button>`}</div>
-  ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export and see that account's stats and equity curve</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
+  ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||S._impDone||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export and see that account's stats and equity curve</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
   ${filterBar()}
   <div class="grid g4" style="margin-bottom:12px">
    ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,aSize?`${(st.net>0?"+":"")+pct(st.net/aSize,2)} of the account · ${st.nDays} trading days`:`${st.nDays} trading days`)}
@@ -1842,10 +1867,11 @@ function vConsistency(el){const c=S._cons||(S._cons={size:50000,target:3000,pct:
 }
 
 /* ============ IMPORT ============ */
-const FIELDS=[["date","Date / time"],["time","Time"],["symbol","Symbol"],["side","Side / direction"],["qty","Quantity"],["entry","Entry price"],["exit","Exit price"],["pnl","P&L"],["fees","Fees / commission"],["boughtTs","Bought timestamp"],["soldTs","Sold timestamp"],["buyPrice","Buy price"],["sellPrice","Sell price"]];
-const SYN={date:["date","trade date","open time","entry time","opened","datetime","time opened","entrytime"],time:["time"],symbol:["symbol","instrument","contract","product","market","ticker"],
-  side:["side","direction","b/s","action","type","position","long/short"],qty:["qty","quantity","contracts","size","volume","filled qty","lots"],
-  entry:["entry","entry price","avg entry","open price","entryprice","avg. entry"],exit:["exit","exit price","close price","avg exit","exitprice","avg. exit"],
+const FIELDS=[["date","Date / time"],["time","Time"],["symbol","Symbol"],["side","Side / direction"],["qty","Quantity"],["entry","Entry price"],["exit","Exit price"],["stop","Stop loss"],["target","Take profit"],["pnl","P&L"],["fees","Fees / commission"],["swap","Swap"],["boughtTs","Bought timestamp"],["soldTs","Sold timestamp"],["buyPrice","Buy price"],["sellPrice","Sell price"]];
+const SYN={date:["date","trade date","open time","entry time","opened","datetime","time opened","entrytime","open date","opening time"],time:["time"],symbol:["symbol","instrument","contract","product","market","ticker","item"],
+  side:["side","direction","b/s","action","type","position","long/short","trade type"],qty:["qty","quantity","contracts","size","volume","filled qty","lots"],
+  entry:["entry","entry price","avg entry","open price","entryprice","avg. entry","opening price"],exit:["exit","exit price","close price","avg exit","exitprice","avg. exit","closing price"],
+  stop:["sl","s / l","s/l","stop loss","stop","stoploss"],target:["tp","t / p","t/p","take profit","target","takeprofit"],swap:["swap","swaps","rollover"],
   pnl:["pnl","p&l","profit","net pnl","realized pnl","net p&l","gross pnl","profit/loss","p/l","realized p&l"],fees:["fees","commission","commissions","fee"],
   boughtTs:["boughttimestamp","bought timestamp","buy time"],soldTs:["soldtimestamp","sold timestamp","sell time"],buyPrice:["buyprice","buy price","avg buy"],sellPrice:["sellprice","sell price","avg sell"]};
 function parseCSV(text){const first=text.split(/\r?\n/)[0]||"";const cnt=ch=>first.split(ch).length;const del=cnt("\t")>cnt(",")&&cnt("\t")>cnt(";")?"\t":cnt(";")>cnt(",")?";":",";
@@ -1854,7 +1880,13 @@ function parseCSV(text){const first=text.split(/\r?\n/)[0]||"";const cnt=ch=>fir
     else if(c==='"')q=true;else if(c===del){row.push(f);f=""}else if(c==="\n"){row.push(f);rows.push(row);row=[];f=""}else if(c!=="\r")f+=c}
   if(f!==""||row.length){row.push(f);rows.push(row)}return rows.filter(r=>r.some(x=>x.trim()!==""))}
 function pNum(s){if(s==null)return NaN;s=String(s).trim();if(!s)return NaN;const neg=/^\(.*\)$/.test(s.replace(/[$€\s]/g,""))||/^-/.test(s.replace(/[$€\s]/g,""))||/\$\(/.test(s);const v=parseFloat(s.replace(/[^0-9.]/g,""));return isFinite(v)?(neg?-v:v):NaN}
-function pDT(s){if(!s)return null;s=String(s).trim();let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})[ T]?(\d{1,2}):?(\d{2})?/);
+/* header matching ignores spaces, case and punctuation: "openTime" = "Open Time" = "open_time" */
+const hNorm=h=>String(h||"").toLowerCase().replace(/[\s_.\-#()]/g,"");
+const NONTRADE=/balance|deposit|withdraw|credit|bonus|transfer|adjustment|correction/i; // account cash rows, not trades
+const findCol=(hd,k)=>{const want=SYN[k].map(hNorm);return hd.findIndex(h=>want.includes(hNorm(h)))};
+function pDT(s){if(!s)return null;s=String(s).trim();
+  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}.*(Z|[+-]\d{2}:?\d{2})$/.test(s)){const d=new Date(s);if(!isNaN(d))return {date:ymd(d),time:`${pad(d.getHours())}:${pad(d.getMinutes())}`,ts:d.getTime()}}
+  let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})[ T]?(\d{1,2}):?(\d{2})?/);
   if(m){let y=+m[3];if(y<100)y+=2000;return {date:`${y}-${pad(m[1])}-${pad(m[2])}`,time:m[4]?`${pad(m[4])}:${m[5]||"00"}`:"",ts:new Date(y,m[1]-1,m[2],m[4]||0,m[5]||0).getTime()}}
   m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);if(m)return {date:`${m[1]}-${m[2]}-${m[3]}`,time:m[4]?`${m[4]}:${m[5]}`:"",ts:new Date(+m[1],m[2]-1,+m[3],+(m[4]||0),+(m[5]||0)).getTime()};
   const d=new Date(s);if(!isNaN(d))return {date:ymd(d),time:`${pad(d.getHours())}:${pad(d.getMinutes())}`,ts:d.getTime()};return null}
@@ -1866,7 +1898,7 @@ const PLATFORMS=[ // [name, header signature: every word must be in the header r
   ["Rithmic R|Trader Pro",["avg fill price","buy/sell"]],["Rithmic R|Trader Pro",["qty to fill"]],["Rithmic R|Trader Pro",["closed profit/loss"]],
   ["Quantower",["position id","gross p/l"]],["Quantower",["net p/l","trade id","fee"]],
   ["TradingView",["trade #","signal","cum. profit"]],["TradingView",["placing time","closing time","order id"]],["TradingView",["run-up","drawdown","profit usd"]],
-  ["Sierra Chart",["entry datetime","exit datetime","trade quantity"]],["MetaTrader",["ticket","s / l","t / p"]],["MetaTrader",["swap","open time","close time","ticket"]],
+  ["Sierra Chart",["entry datetime","exit datetime","trade quantity"]],["MetaTrader",["ticket","s / l","t / p"]],["MetaTrader",["swap","open time","close time","ticket"]],["MetaTrader",["ticket","opentime","closetime","swap"]],
   ["Tradesea",["tradesea"]],["Volumetrica",["volumetrica"]],["ATAS",["atas"]],["Bookmap",["bookmap"]]];
 const FIRMS=[ // [name, regex on account number / file name / platform]
   ["Apex Trader Funding",/\bAPEX|^PA-?APEX|APEX-/i],["Topstep",/TOPSTEP|\d{2,3}KTC|\bTC-?V\d|EXPRESS-?V\d|\bXFA\b/i],["Earn2Trade",/E2T|EARN2TRADE|GAUNTLET|\bELTC?\d|\bTCP\d/i],
@@ -1886,6 +1918,8 @@ function detectSource(rows,fileName){const hd=rows[0].map(h=>h.trim().toLowerCas
   let size=findSize(accts.join(" "))||findSize(fn);
   if(!size){const bi=hd.findIndex(h=>/^(balance|account balance|cash balance|net liq|net liquidation|starting balance|start balance|equity)$/.test(h));
     if(bi>=0){const v=rows.slice(1).map(r=>pNum(r[bi])).filter(isFinite);if(v.length){const near=SIZES.reduce((a,s)=>Math.abs(s-v[0])<Math.abs(a-v[0])?s:a);if(Math.abs(near-v[0])/near<.12)size=near}}}
+  if(!size){const ti=findCol(hd,"side"),pi=findCol(hd,"pnl");if(ti>=0&&pi>=0){const dep=rows.slice(1).find(r=>NONTRADE.test(String(r[ti]||"")));const v=dep?pNum(dep[pi]):NaN;
+    if(isFinite(v)&&v>0){const near=SIZES.reduce((a,s)=>Math.abs(s-v)<Math.abs(a-v)?s:a);if(Math.abs(near-v)/near<.12)size=near}}}
   const per={};accts.forEach(a=>per[a]={firm:findFirm(a)||firm,size:findSize(a)||size});
   return {platform,firm,size,accts,ai,per}}
 const acctLabel=(id,f,sz)=>[f&&f.replace(/ (Trader Funding|Futures|Trading)$/,""),sz&&kSize(sz),id].filter(Boolean).join(" · ");
@@ -1895,28 +1929,42 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
    <div class="${embedded?"":"card "}grid"><div class="drop" id="cDrop">📄 Choose a CSV file (or drop it here)</div><input type="file" id="cFile" accept=".csv,.txt,text/csv" class="hidden">
    <label class="f">Account name for these trades<input class="i" id="cAcctName" list="acList2" value="${esc(I.acct)}" placeholder="e.g. Eval 50K"></label><datalist id="acList2">${accounts().map(a=>`<option>${esc(a)}</option>`).join("")}</datalist></div>
    <div id="cMap"></div>`;
-  const load=file=>{const r=new FileReader();r.onload=()=>{const rows=parseCSV(String(r.result));if(rows.length<2){toast("No rows found");return}I.rows=rows;const hd=rows[0].map(h=>h.trim().toLowerCase());I.map={};
-    FIELDS.forEach(([k])=>{const i=hd.findIndex(h=>SYN[k].includes(h));if(i>=0)I.map[k]=i});
+  /* animated progress card (file upload / import) */
+  const prog=(icon,title,sub)=>{$("#cMap").innerHTML=`<div class="card imp-prog"><div class="ip-top"><span class="ip-ic">${icon}</span><div class="ip-t"><b data-notr>${esc(title)}</b><span class="mut" data-notr>${esc(sub||"")}</span></div><b class="mono ip-pct" id="ipPct">0%</b></div>
+    <div class="ip-bar"><i id="ipBar"></i></div><div class="ip-step" id="ipStep"></div></div>`};
+  const anim=(a,b,ms,step)=>new Promise(res=>{const st=$("#ipStep");if(st&&step&&st.dataset.s!==step){st.dataset.s=step;st.textContent=I18N.t(step)}const t0=performance.now();
+    const f=t=>{const k=Math.min(1,(t-t0)/ms),p=a+(b-a)*(1-Math.pow(1-k,2));const bar=$("#ipBar"),pc=$("#ipPct");if(bar)bar.style.width=p+"%";if(pc)pc.textContent=Math.round(p)+"%";k<1?requestAnimationFrame(f):res()};
+    requestAnimationFrame(f);setTimeout(res,ms+400)});
+  const kb=n=>n>1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";
+  const load=async file=>{S._impDone=null;const sm=$(".imp-done");if(sm)sm.remove();prog("📄",file.name,kb(file.size));
+    const text=await Promise.all([new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result));r.onerror=rej;r.readAsText(file)}),anim(0,55,700,"Uploading file…")]).then(x=>x[0]).catch(()=>null);
+    if(text==null){$("#cMap").innerHTML="";toast("Couldn't read that file");return}
+    await anim(55,82,450,"Reading trades…");const rows=parseCSV(text);
+    if(rows.length<2){$("#cMap").innerHTML="";toast("No rows found");return}
+    I.rows=rows;const hd=rows[0];I.map={};FIELDS.forEach(([k])=>{const i=findCol(hd,k);if(i>=0)I.map[k]=i});
     if(I.map.boughtTs!=null&&I.map.date===I.map.boughtTs)delete I.map.date;
-    I.det=detectSource(rows,file.name);I.fileName=file.name;autoName();draw()};r.readAsText(file)};
+    I.det=detectSource(rows,file.name);I.fileName=file.name;autoName();
+    await anim(82,100,400,"Detecting platform and account…");$(".imp-prog").classList.add("done");await new Promise(r=>setTimeout(r,350));draw()};
   // suggested account name from what we detected (only if the student hasn't typed one)
   const autoName=()=>{const D=I.det;if(!D||(I.acct&&!I.acctAuto))return;
-    I.acct=D.accts.length>1?"":(D.accts.length===1||D.firm||D.size)?acctLabel(D.accts[0],D.firm,D.size):"";I.acctAuto=true;const f=$("#cAcctName");if(f)f.value=I.acct};
+    I.acct=D.accts.length>1?"":(D.accts.length===1||D.firm||D.size)?acctLabel(D.accts[0],D.firm||(D.accts.length?null:D.platform),D.size):"";I.acctAuto=true;const f=$("#cAcctName");if(f)f.value=I.acct};
   $("#cDrop").onclick=()=>$("#cFile").click();$("#cFile").onchange=e=>e.target.files[0]&&load(e.target.files[0]);
   $("#cDrop").ondragover=e=>{e.preventDefault()};$("#cDrop").ondrop=e=>{e.preventDefault();e.dataTransfer.files[0]&&load(e.dataTransfer.files[0])};
   $("#cAcctName").oninput=e=>{I.acct=e.target.value;I.acctAuto=false};
   const build=()=>{const hd=I.rows[0],M=I.map,g=(r,k)=>M[k]!=null?r[M[k]]:"";const out=[];
-    I.rows.slice(1).forEach(r=>{let dt=pDT(g(r,"date"));let side=String(g(r,"side")).toLowerCase();side=/sell|short|^s$/.test(side)?"Short":/buy|long|^b$/.test(side)?"Long":"";
+    I.rows.slice(1).forEach(r=>{if(NONTRADE.test(String(g(r,"side")))||NONTRADE.test(String(g(r,"symbol")))&&!(Math.abs(pNum(g(r,"qty")))>0))return;
+      let dt=pDT(g(r,"date"));let side=String(g(r,"side")).toLowerCase();side=/sell|short|^s$/.test(side)?"Short":/buy|long|^b$/.test(side)?"Long":"";
       let entry=pNum(g(r,"entry")),exit=pNum(g(r,"exit"));
       if(M.boughtTs!=null&&M.soldTs!=null){const b=pDT(g(r,"boughtTs")),s=pDT(g(r,"soldTs"));if(b&&s){side=b.ts<=s.ts?"Long":"Short";dt=side==="Long"?b:s;
         const bp=pNum(g(r,"buyPrice")),sp=pNum(g(r,"sellPrice"));if(isFinite(bp)&&isFinite(sp)){entry=side==="Long"?bp:sp;exit=side==="Long"?sp:bp}}}
       if(!dt)return;if(M.time!=null&&g(r,"time")&&!dt.time)dt.time=String(g(r,"time")).slice(0,5);
-      const sym=rootOf(g(r,"symbol"))||"?";const pnl=pNum(g(r,"pnl"));
+      const sym=rootOf(g(r,"symbol"))||"?";const sw=pNum(g(r,"swap"));const pnl=pNum(g(r,"pnl"))+(isFinite(sw)?sw:0);
+      const sl=pNum(g(r,"stop")),tp=pNum(g(r,"target"));
       const D=I.det||{per:{},accts:[]},ra=D.ai>=0?String(r[D.ai]||"").trim():"",pr=D.per[ra]||{};
       const firm=D.accts.length>1?(pr.firm||D.firm):D.firm,size=D.accts.length>1?(pr.size||D.size):D.size;
       const account=I.acct||(ra?acctLabel(ra,firm,size):"Imported");
       out.push({id:uuid(),user_id:S.subject.id,date:dt.date,time:dt.time,account,platform:D.platform||"",firm:firm||"",acctSize:size||"",symbol:sym,side:side||"Long",qty:Math.abs(pNum(g(r,"qty")))||1,
-        entry:isFinite(entry)?entry:"",exit:isFinite(exit)?exit:"",stop:"",target:"",pnl:isFinite(pnl)?pnl:"",fees:isFinite(pNum(g(r,"fees")))?Math.abs(pNum(g(r,"fees"))):"",
+        entry:isFinite(entry)?entry:"",exit:isFinite(exit)?exit:"",stop:isFinite(sl)&&sl>0?sl:"",target:isFinite(tp)&&tp>0?tp:"",pnl:isFinite(pnl)?pnl:"",fees:isFinite(pNum(g(r,"fees")))?Math.abs(pNum(g(r,"fees"))):"",
         setup:"",session:"",emotions:[],feeling:"",followed:"",rating:0,shots:[],remark:"",notes:"",imported:true})});return out};
   const draw=()=>{if(!I.rows){$("#cMap").innerHTML="";return}const hd=I.rows[0];const prev=build();
     const D=I.det||{accts:[]};const nAc=D.accts.length;
@@ -1939,10 +1987,31 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
     $("#cClear").onclick=()=>{S._imp=null;render()};
     const upd=(k,v)=>{I.det=I.det||{accts:[],per:{},ai:-1};I.det[k]=v;Object.values(I.det.per||{}).forEach(p=>{if(k==="firm")p.firm=v||p.firm;if(k==="size")p.size=v||p.size});autoName();draw()};
     $("#dPlat").onchange=e=>upd("platform",e.target.value.trim()||null);$("#dFirm").onchange=e=>upd("firm",e.target.value.trim()||null);$("#dSize").onchange=e=>upd("size",Number(e.target.value)||null);
-    $("#cGo").onclick=async()=>{const ts=build();$("#cGo").disabled=true;try{await API.saveTrades(ts);S.trades.push(...ts);const ua=[...new Set(ts.map(t=>t.account))];const acct=ua.length===1?ua[0]:"all";S._imp=null;toast(`Imported ${ts.length} trades`);
-      if(embedded){S.acct=acct;S.range="all";S.calMonth=null;render();window.scrollTo({top:0,behavior:"smooth"})}else go("journal")}catch(e){$("#cGo").disabled=false;toast("Import failed: "+(e.message||e))}}};
-  draw();
+    $("#cGo").onclick=async()=>{const ts=build();if(!ts.length)return;const keep=$("#cMap").innerHTML;
+      prog("⬆️",I.fileName||"CSV",`${ts.length} trades`);
+      try{await Promise.all([API.saveTrades(ts),anim(0,92,900,"Saving trades to your journal…")]);await anim(92,100,300,"Calculating your statistics…");$(".imp-prog").classList.add("done");
+        S.trades.push(...ts);const ua=[...new Set(ts.map(t=>t.account))];const acct=ua.length===1?ua[0]:"all";
+        S._impDone=impSummary(ts,I.det,I.fileName);S._imp=null;toast(`Imported ${ts.length} trades`);await new Promise(r=>setTimeout(r,350));
+        if(embedded){S.acct=acct;S.range="all";S.calMonth=null;render();const b=$("#impBox");if(b){b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"})}}else go("journal")}
+      catch(e){$("#cMap").innerHTML=keep;draw();toast("Import failed: "+(e.message||e))}}};
+  if(S._impDone)el.insertAdjacentHTML("afterbegin",impDoneHTML(S._impDone));
+  $$("[data-impgo]",el).forEach(b=>b.onclick=()=>{const v=b.dataset.impgo;S._impDone=null;go(v)});
+  const x=$(".imp-done .x",el);if(x)x.onclick=()=>{S._impDone=null;$(".imp-done",el).remove()};
+  if(I.rows)draw();
 }
+/* summary of what was just imported */
+function impSummary(ts,D,fn){const c=calc(ts),ds=ts.map(t=>t.date).sort(),vals=ts.map(tradeNet);
+  return {n:ts.length,net:c.net,wr:c.wr,w:c.w,l:c.l,days:c.nDays,best:Math.max(...vals),worst:Math.min(...vals),from:ds[0],to:ds[ds.length-1],
+    syms:[...new Set(ts.map(t=>t.symbol))].slice(0,6),acct:[...new Set(ts.map(t=>t.account))].join(", "),platform:(D&&D.platform)||"",size:(D&&D.size)||0,file:fn||""}}
+function impDoneHTML(s){return `<div class="imp-done"><button class="x" type="button" aria-label="Close">×</button>
+  <div class="id-head"><span class="id-check">✓</span><div><b>${s.n} trades imported</b><div class="mut" style="font-size:12px"><span data-notr>${esc(s.acct)}</span>${s.platform&&!s.acct.includes(s.platform)?` · <span data-notr>${esc(s.platform)}</span>`:""} · ${fmtDate(s.from)} → ${fmtDate(s.to)}</div></div></div>
+  <div class="id-net mono ${cls(s.net)}">${smoney(s.net)}</div><div class="mut" style="text-align:center;font-size:12px;margin-top:-4px">Net P&L${s.size?` · <span class="${cls(s.net)}">${(s.net>0?"+":"")+pct(s.net/s.size,2)}</span> <span>of the account</span>`:""}</div>
+  <div class="id-grid">
+   <div><small>Win rate</small><b class="mono">${pct(s.wr,0)}</b><span class="mut">${s.w}W · ${s.l}L</span></div>
+   <div><small>Trading days</small><b class="mono">${s.days}</b><span class="mut" data-notr>${s.syms.map(esc).join(" · ")}</span></div>
+   <div><small>Best trade</small><b class="mono pos">${smoney(s.best)}</b></div>
+   <div><small>Worst trade</small><b class="mono neg">${smoney(s.worst)}</b></div></div>
+  <div class="row" style="justify-content:center;gap:8px;margin-top:12px"><button class="btn pri" type="button" data-impgo="stats">📊 <span>Open Statistics</span></button><button class="btn" type="button" data-impgo="journal">📒 <span>View in Journal</span></button></div></div>`}
 
 /* ============ ADMIN ============ */
 async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</div>';
