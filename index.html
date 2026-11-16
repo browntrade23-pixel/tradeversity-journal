@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Effective Journal — by Tradeversity</title>
-<link rel="icon" type="image/png" href="brand/logo-192.png">
-<link rel="apple-touch-icon" href="brand/logo-192.png">
+<link rel="icon" type="image/png" href="brand/logo-192.png?v=silver">
+<link rel="apple-touch-icon" href="brand/logo-192.png?v=silver">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -26,10 +26,10 @@ a{color:var(--gold)}
 header.top{position:sticky;top:0;z-index:20;background:rgba(10,14,22,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .topin{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:10px 16px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
-.logo{width:44px;height:44px;flex:none;border-radius:50%;background:url(brand/logo-192.png) center/cover no-repeat;animation:aura 3.2s ease-in-out infinite}
-.logo.lg{width:132px;height:132px;background-image:url(brand/logo-512.png)}
+.logo{width:44px;height:44px;flex:none;border-radius:50%;background:url(brand/logo-192.png?v=silver) center/cover no-repeat;animation:aura 3.2s ease-in-out infinite}
+.logo.lg{width:132px;height:132px;background-image:url(brand/logo-512.png?v=silver)}
 .brand.stack{flex-direction:column;text-align:center;gap:6px}
-@keyframes aura{0%,100%{filter:drop-shadow(0 0 2px rgba(245,185,66,.35))}50%{filter:drop-shadow(0 0 10px rgba(245,185,66,.8))}}
+@keyframes aura{0%,100%{filter:drop-shadow(0 0 2px rgba(214,222,236,.35))}50%{filter:drop-shadow(0 0 10px rgba(214,222,236,.75))}}
 @media(prefers-reduced-motion:reduce){.logo{animation:none}}
 .brand small{display:block;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:.4px}
 .spacer{flex:1}
@@ -1146,7 +1146,7 @@ async function qrCard(url,label){const qrcode=await loadQR();const q=qrcode(0,"H
   x.fillStyle="#ffd27a";x.font="600 12px Inter,Arial,sans-serif";x.fillText("BY TRADEVERSITY",W/2,72);
   const ox=P,oy=96;x.fillStyle="#fff";x.fillRect(ox,oy,qs,qs);x.fillStyle="#05070b";
   for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))x.fillRect(ox+(k+m)*cs,oy+(r+m)*cs,cs,cs);
-  try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src="brand/logo-192.png"});
+  try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src="brand/logo-192.png?v=silver"});
     const ls=Math.round(qs*.2),lx=ox+(qs-ls)/2,ly=oy+(qs-ls)/2;x.fillStyle="#fff";x.fillRect(lx-6,ly-6,ls+12,ls+12);x.drawImage(im,lx,ly,ls,ls)}catch(e){}
   x.fillStyle="#fff";x.font="700 20px Inter,Arial,sans-serif";x.fillText(String(label||I18N.t("My trading results")).slice(0,40),W/2,oy+qs+44);
   x.fillStyle="#9aa6bd";x.font="500 14px Inter,Arial,sans-serif";x.fillText(I18N.t("Scan to see my P&L calendar · view only"),W/2,oy+qs+72);
