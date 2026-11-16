@@ -21,6 +21,9 @@ Edit them in `index.html`, near the end of the script:
 - `SOCIAL` — Students' results channel, Brown Algo Telegram channel, YouTube, Instagram, TikTok, Kick (shown top and bottom of the login screen and of the journal).
 - `PROMO` — Earn2Trade partner link and coupon code (`BROWN23`, 60% off).
 
+## CSV import
+The CSV import is inside **Statistics** (box "Import a CSV" at the top). After importing, the page shows that account's stats and equity curve.
+
 ## Discipline rules (students)
 - **2 trades max per day** (a 3rd trade breaks the discipline streak). New plans start with "Max number of trades = 2".
 - **Goal: 5 disciplined trades in a row.** Counts: plan followed, win or respected loss (loss within about -1R). Resets: plan broken, stop ignored, or more than 2 trades in a day.

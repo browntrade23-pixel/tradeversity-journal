@@ -415,6 +415,9 @@ const T={
 "Fear and greed lose to a checklist.":["La peur et l'avidité perdent face à une checklist.","الخوف والطمع يخسران أمام قائمة التحقق."],
 "Win or lose, follow the plan. That is the job.":["Gain ou perte, suivez le plan. C'est le métier.","ربح أو خسارة، اتبع الخطة. هذا هو العمل."],
 "Process over outcome. Every single day.":["Le process avant le résultat. Chaque jour.","المنهج قبل النتيجة. كل يوم."],
+// CSV import in Statistics
+"Import a CSV":["Importer un CSV","استيراد ملف CSV"],
+"Add your broker export and see that account's stats and equity curve":["Ajoutez l'export de votre broker et voyez les stats et la courbe d'équité de ce compte","أضف ملف التصدير من وسيطك وشاهد إحصائيات ذلك الحساب ومنحنى رأس المال"],
 // admin: student file
 "👤 Student file":["👤 Fiche élève","👤 ملف الطالب"],
 "👤 Open":["👤 Ouvrir","👤 فتح"],

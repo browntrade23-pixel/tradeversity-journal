@@ -290,6 +290,14 @@ html[lang=ar] .ne-l{letter-spacing:0}
 .quote .qby{font-style:normal;font-size:10px;letter-spacing:.2em;color:var(--gold);white-space:nowrap}
 html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .tag.over{background:rgba(239,83,80,.15);color:var(--red)}
+/* CSV import inside Statistics */
+.impbox{margin-bottom:14px;border-color:rgba(245,185,66,.35);background:linear-gradient(135deg,rgba(245,185,66,.08),var(--panel) 60%)}
+.impbox summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:12px}
+.impbox summary::-webkit-details-marker{display:none}
+.impbox summary::after{content:"▾";margin-inline-start:auto;color:var(--gold);transition:transform .2s}
+.impbox[open] summary::after{transform:rotate(180deg)}
+.imp-ic{font-size:22px}.imp-sub{display:block;font-size:12px;font-weight:500}
+.impbox .drop{padding:22px;font-size:14px;border-color:rgba(245,185,66,.45)}
 /* admin: student file */
 .lnk{color:var(--gold2);text-decoration:none}.lnk:hover{text-decoration:underline}
 .sf-head{display:flex;gap:16px;align-items:center;border-color:rgba(245,185,66,.3)}
@@ -628,13 +636,13 @@ async function loadSubject(u,readonly){
 }
 
 /* ============ nav ============ */
-const VIEWS=[["journal","📓 Journal"],["stats","📊 Statistics"],["news","📰 News"],["plan","🧭 Tomorrow's plan"],["risk","🎯 Risk calculator"],["consistency","⚖️ Consistency rule"],["import","⬆️ Import CSV"],["about","ℹ️ About us"]];
+const VIEWS=[["journal","📓 Journal"],["stats","📊 Statistics"],["news","📰 News"],["plan","🧭 Tomorrow's plan"],["risk","🎯 Risk calculator"],["consistency","⚖️ Consistency rule"],["about","ℹ️ About us"]];
 function renderTabs(){const t=$("#tabs");let h="";
   if(S.me.role==="admin")h+=`<button data-v="admin" class="admin ${S.view==="admin"?"on":""}">👑 Admin dashboard</button>`;
   if(S.readonly)h+=`<button data-v="student" class="admin ${S.view==="student"?"on":""}">👤 Student file</button>`;
   VIEWS.forEach(([k,l])=>{if(S.readonly&&k==="import")return;h+=`<button data-v="${k}" class="${S.view===k?"on":""}">${l}</button>`});
   t.innerHTML=h;$$("button",t).forEach(b=>b.onclick=()=>go(b.dataset.v));}
-function go(v){if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";
+function go(v){if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
   S.view=v;S.page=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
@@ -1045,7 +1053,9 @@ function insights(ts){const out=[];if(ts.length<3)return out;
   const wd=groupBy(ts,t=>{const[a,b,c]=t.date.split("-").map(Number);return WD[new Date(a,b-1,c).getDay()]});const bw=wd[wd.length-1];if(bw&&bw.net<0)out.push(["📅",`<b>${bw.k}</b> is your weakest day: ${smoney(bw.net,0)}.`]);
   return out}
 function vStats(el){const ts=filtered();const st=calc(ts);
-  el.innerHTML=`<h1>Statistics</h1><p class="sub">${S.acct==="all"?"All accounts":esc(S.acct)} · ${ts.length} trades</p>${filterBar()}
+  el.innerHTML=`<h1>Statistics</h1><p class="sub">${S.acct==="all"?"All accounts":esc(S.acct)} · ${ts.length} trades</p>
+  ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export and see that account's stats and equity curve</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
+  ${filterBar()}
   <div class="grid g4" style="margin-bottom:12px">
    ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,`${st.nDays} trading days`)}
    ${kpi("Win rate",pct(st.wr),`${st.w} wins · ${st.l} losses`)}
@@ -1069,7 +1079,7 @@ function vStats(el){const ts=filtered();const st=calc(ts);
    ${bdTable("By account",groupBy(ts,t=>t.account))}
    ${bdTable("Long vs short",groupBy(ts,t=>t.side))}
   </div>`;
-  bindFilters();
+  bindFilters();if($("#impBody"))vImport($("#impBody"),true);
   const shift=d=>{const keys=Object.keys(st.days).sort();const ref=S.calMonth||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7));const[y,m]=ref.split("-").map(Number);const n=new Date(y,m-1+d,1);S.calMonth=`${n.getFullYear()}-${pad(n.getMonth()+1)}`;render()};
   $("#calP").onclick=()=>shift(-1);$("#calN").onclick=()=>shift(1);
 }
@@ -1228,9 +1238,9 @@ function pDT(s){if(!s)return null;s=String(s).trim();let m=s.match(/^(\d{1,2})\/
   if(m){let y=+m[3];if(y<100)y+=2000;return {date:`${y}-${pad(m[1])}-${pad(m[2])}`,time:m[4]?`${pad(m[4])}:${m[5]||"00"}`:"",ts:new Date(y,m[1]-1,m[2],m[4]||0,m[5]||0).getTime()}}
   m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);if(m)return {date:`${m[1]}-${m[2]}-${m[3]}`,time:m[4]?`${m[4]}:${m[5]}`:"",ts:new Date(+m[1],m[2]-1,+m[3],+(m[4]||0),+(m[5]||0)).getTime()};
   const d=new Date(s);if(!isNaN(d))return {date:ymd(d),time:`${pad(d.getHours())}:${pad(d.getMinutes())}`,ts:d.getTime()};return null}
-function vImport(el){const I=S._imp||(S._imp={rows:null,map:{},acct:""});
-  el.innerHTML=`<h1>Import trades from CSV</h1><p class="sub">Works with Tradovate, NinjaTrader, Rithmic/R|Trader, TradingView and most broker exports. Columns are matched automatically — fix anything below before importing.</p>
-   <div class="card grid"><div class="drop" id="cDrop">📄 Choose a CSV file (or drop it here)</div><input type="file" id="cFile" accept=".csv,.txt,text/csv" class="hidden">
+function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""});
+  el.innerHTML=`${embedded?`<p class="mut" style="margin:0 0 10px;font-size:13px">Works with Tradovate, NinjaTrader, Rithmic/R|Trader, TradingView and most broker exports. Columns are matched automatically — fix anything below before importing.</p>`:`<h1>Import trades from CSV</h1><p class="sub">Works with Tradovate, NinjaTrader, Rithmic/R|Trader, TradingView and most broker exports. Columns are matched automatically — fix anything below before importing.</p>`}
+   <div class="${embedded?"":"card "}grid"><div class="drop" id="cDrop">📄 Choose a CSV file (or drop it here)</div><input type="file" id="cFile" accept=".csv,.txt,text/csv" class="hidden">
    <label class="f">Account name for these trades<input class="i" id="cAcctName" list="acList2" value="${esc(I.acct)}" placeholder="e.g. Eval 50K"></label><datalist id="acList2">${accounts().map(a=>`<option>${esc(a)}</option>`).join("")}</datalist></div>
    <div id="cMap"></div>`;
   const load=file=>{const r=new FileReader();r.onload=()=>{const rows=parseCSV(String(r.result));if(rows.length<2){toast("No rows found");return}I.rows=rows;const hd=rows[0].map(h=>h.trim().toLowerCase());I.map={};
@@ -1257,7 +1267,8 @@ function vImport(el){const I=S._imp||(S._imp={rows:null,map:{},acct:""});
      <div class="row" style="justify-content:flex-end"><button class="btn" id="cClear">Cancel</button><button class="btn pri" id="cGo" ${prev.length?"":"disabled"}>Import ${prev.length} trades</button></div></div>`;
     $$("[data-f]").forEach(s=>s.onchange=()=>{const v=s.value;if(v==="")delete I.map[s.dataset.f];else I.map[s.dataset.f]=Number(v);draw()});
     $("#cClear").onclick=()=>{S._imp=null;render()};
-    $("#cGo").onclick=async()=>{const ts=build();$("#cGo").disabled=true;try{await API.saveTrades(ts);S.trades.push(...ts);S._imp=null;toast(`Imported ${ts.length} trades`);go("journal")}catch(e){$("#cGo").disabled=false;toast("Import failed: "+(e.message||e))}}};
+    $("#cGo").onclick=async()=>{const ts=build();$("#cGo").disabled=true;try{await API.saveTrades(ts);S.trades.push(...ts);const acct=I.acct||"Imported";S._imp=null;toast(`Imported ${ts.length} trades`);
+      if(embedded){S.acct=acct;S.range="all";S.calMonth=null;render();window.scrollTo({top:0,behavior:"smooth"})}else go("journal")}catch(e){$("#cGo").disabled=false;toast("Import failed: "+(e.message||e))}}};
   draw();
 }
 
