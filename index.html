@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tradeversity Journal — by Brown Algo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e16;--panel:#111827;--panel2:#0f1522;--line:#1f2a3d;--line2:#2a3850;
+  --text:#e8eef8;--muted:#8d9ab0;--dim:#5f6c82;
+  --gold:#f5b942;--gold2:#ffd27a;--green:#27c26c;--red:#ef5350;--blue:#4c8dff;--purple:#a67cff;
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--gold)}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+.hidden{display:none!important}
+.pos{color:var(--green)}.neg{color:var(--red)}.mut{color:var(--muted)}
+/* layout */
+header.top{position:sticky;top:0;z-index:20;background:rgba(10,14,22,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topin{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:10px 16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
+.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#b8791a);display:grid;place-items:center;color:#1a1204;font-weight:900}
+.brand small{display:block;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:.4px}
+.spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;border:1px solid var(--line2);background:var(--panel);font-size:12px;color:var(--muted)}
+nav.tabs{max-width:1200px;margin:0 auto;display:flex;gap:4px;padding:0 12px 8px;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{background:none;border:0;padding:8px 12px;border-radius:10px;color:var(--muted);white-space:nowrap;cursor:pointer;font-weight:600}
+nav.tabs button.on{background:var(--panel);color:var(--text);box-shadow:inset 0 0 0 1px var(--line2)}
+nav.tabs button.admin{color:var(--gold)}
+main{max-width:1200px;margin:0 auto;padding:18px 16px 80px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:0 0 12px}h3{font-size:14px;margin:0 0 8px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+.sub{color:var(--muted);margin:0 0 16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:860px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.g2{grid-template-columns:1fr}}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid var(--line2);background:var(--panel2);padding:9px 14px;border-radius:10px;cursor:pointer;font-weight:600}
+.btn:hover{border-color:var(--dim)}
+.btn.pri{background:var(--gold);color:#1b1305;border-color:var(--gold)}
+.btn.pri:hover{background:var(--gold2)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn.danger{color:var(--red)}
+.btn.ghost{background:none}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:600}
+input.i,select.i,textarea.i{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:9px 11px;color:var(--text);outline:none}
+input.i:focus,select.i:focus,textarea.i:focus{border-color:var(--gold)}
+textarea.i{min-height:80px;resize:vertical}
+.seg{display:inline-flex;background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:3px}
+.seg button{border:0;background:none;padding:6px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:600}
+.seg button.on{background:var(--line2);color:var(--text)}
+.seg button.on.bull{background:rgba(39,194,108,.18);color:var(--green)}
+.seg button.on.bear{background:rgba(239,83,80,.18);color:var(--red)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{padding:5px 10px;border-radius:99px;border:1px solid var(--line2);background:var(--panel2);cursor:pointer;font-size:12px;color:var(--muted);user-select:none}
+.pill.on{border-color:var(--gold);color:var(--gold);background:rgba(245,185,66,.1)}
+.pill.on.bad{border-color:var(--red);color:var(--red);background:rgba(239,83,80,.1)}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:var(--line);color:var(--muted)}
+.tag.win{background:rgba(39,194,108,.15);color:var(--green)}.tag.loss{background:rgba(239,83,80,.15);color:var(--red)}
+.tag.long{color:var(--green)}.tag.short{color:var(--red)}
+.tag.bad{background:rgba(239,83,80,.12);color:#ff8a87}.tag.good{background:rgba(76,141,255,.14);color:#8fb6ff}
+/* kpis */
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+.kpi .v{font-size:22px;font-weight:800;margin-top:4px;font-family:"JetBrains Mono",monospace}
+.kpi .s{font-size:12px;color:var(--dim);margin-top:2px}
+/* journal */
+.day{margin-bottom:18px}
+.dayh{display:flex;justify-content:space-between;align-items:center;padding:6px 4px;color:var(--muted);font-weight:700;font-size:13px}
+.tcard{display:grid;grid-template-columns:96px 1fr auto;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.tcard:hover{border-color:var(--line2)}
+.thumb{width:96px;height:62px;border-radius:8px;background:var(--panel2) center/cover no-repeat;border:1px solid var(--line);display:grid;place-items:center;color:var(--dim);font-size:11px}
+.tmeta{min-width:0}.tmeta .t1{font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tmeta .t2{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tpnl{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:16px;text-align:right}
+@media(max-width:560px){.tcard{grid-template-columns:72px 1fr}.thumb{width:72px;height:52px}.tpnl{grid-column:2;text-align:left;font-size:14px}}
+/* trade page */
+.page{max-width:860px;margin:0 auto}
+.page .cover{width:100%;border-radius:12px;border:1px solid var(--line);display:block;background:#000}
+.remark{margin-top:8px;padding:10px 12px;border-left:3px solid var(--gold);background:rgba(245,185,66,.06);border-radius:0 10px 10px 0;color:#f3e2bb;white-space:pre-wrap}
+.props{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:13px;margin:14px 0}
+.props div:nth-child(odd){color:var(--muted)}
+.notes{white-space:pre-wrap;line-height:1.6}
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.shot{position:relative;aspect-ratio:16/10;border-radius:8px;border:1px solid var(--line2);background:var(--panel2) center/cover no-repeat}
+.shot button{position:absolute;top:4px;right:4px;border:0;background:rgba(0,0,0,.7);border-radius:6px;width:24px;height:24px;cursor:pointer;color:#fff}
+.drop{border:1.5px dashed var(--line2);border-radius:10px;padding:14px;text-align:center;color:var(--muted);cursor:pointer}
+.drop:hover{border-color:var(--gold);color:var(--gold)}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:24px 12px}
+.modal .box{background:var(--panel);border:1px solid var(--line2);border-radius:16px;width:100%;max-width:760px;padding:18px}
+.mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.x{border:0;background:none;font-size:22px;cursor:pointer;color:var(--muted)}
+.live{display:flex;gap:16px;flex-wrap:wrap;padding:10px 12px;background:var(--panel2);border-radius:10px;border:1px solid var(--line);font-size:13px}
+.live b{font-family:"JetBrains Mono",monospace}
+/* tables */
+table.t{width:100%;border-collapse:collapse;font-size:13px}
+table.t th{text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:8px;border-bottom:1px solid var(--line)}
+table.t td{padding:8px;border-bottom:1px solid var(--line)}
+table.t tr.click{cursor:pointer}table.t tr.click:hover td{background:var(--panel2)}
+.tw{overflow-x:auto}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;border-radius:3px}
+/* charts */
+svg.ch{width:100%;height:auto;display:block}
+svg.ch text{fill:var(--dim);font-size:11px;font-family:Inter,sans-serif}
+.hit{fill:transparent;cursor:crosshair}
+.hit:hover{fill:rgba(255,255,255,.04)}
+#tip{position:fixed;z-index:99;pointer-events:none;background:#0b111c;border:1px solid var(--line2);border-radius:8px;padding:7px 10px;font-size:12px;white-space:pre-line;box-shadow:0 8px 24px rgba(0,0,0,.4);display:none;max-width:260px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .h{font-size:11px;color:var(--dim);text-align:center;padding-bottom:2px}
+.cal .c{min-height:56px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);padding:5px;font-size:11px;display:flex;flex-direction:column;justify-content:space-between}
+.cal .c .d{color:var(--dim)}.cal .c .p{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:11px}
+.cal .c.e{background:none;border-color:transparent}
+.insight{display:flex;gap:10px;padding:10px 12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);margin-bottom:8px}
+.insight .ic{font-size:16px}
+/* calculators */
+.big{font-size:30px;font-weight:800;font-family:"JetBrains Mono",monospace}
+.res{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px}
+.res .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+.ok{color:var(--green)}.warn{color:var(--gold)}
+.status{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;font-weight:700}
+.status.good{background:rgba(39,194,108,.12);color:var(--green)}.status.badd{background:rgba(239,83,80,.12);color:var(--red)}.status.mid{background:rgba(245,185,66,.12);color:var(--gold)}
+/* auth */
+#auth{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(800px 400px at 50% -10%,rgba(245,185,66,.18),transparent),var(--bg)}
+.authbox{width:100%;max-width:420px}
+.authbox .card{padding:22px}
+.demo{margin-top:14px;padding:12px;border-radius:12px;border:1px dashed var(--line2);color:var(--muted);font-size:12px}
+.banner{background:rgba(245,185,66,.1);border:1px solid rgba(245,185,66,.35);color:var(--gold2);padding:10px 14px;border-radius:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1b2436;border:1px solid var(--line2);padding:10px 16px;border-radius:10px;z-index:100;display:none;max-width:90vw}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.foot{text-align:center;color:var(--dim);font-size:12px;padding:20px}
+.check{display:flex;gap:8px;align-items:flex-start;padding:6px 0}
+.check input{margin-top:3px;accent-color:var(--gold)}
+hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
+</style>
+</head>
+<body>
+
+<!-- ============ AUTH ============ -->
+<section id="auth" class="hidden">
+  <div class="authbox">
+    <div class="brand" style="justify-content:center;margin-bottom:18px">
+      <div class="logo">T</div>
+      <div style="font-size:18px">Tradeversity Journal<small>BY BROWN ALGO</small></div>
+    </div>
+    <div class="card">
+      <div class="seg" style="width:100%;margin-bottom:16px">
+        <button id="tabLogin" class="on" style="flex:1">Log in</button>
+        <button id="tabSignup" style="flex:1">Create free account</button>
+      </div>
+      <form id="loginForm" class="grid">
+        <label class="f">Email<input class="i" name="email" type="email" required autocomplete="email"></label>
+        <label class="f">Password<input class="i" name="password" type="password" required autocomplete="current-password"></label>
+        <button class="btn pri" type="submit">Log in</button>
+        <a href="#" id="forgot" style="font-size:12px;text-align:center">Forgot password?</a>
+      </form>
+      <form id="signupForm" class="grid hidden">
+        <label class="f">Full name<input class="i" name="name" required autocomplete="name"></label>
+        <label class="f">Email<input class="i" name="email" type="email" required autocomplete="email"></label>
+        <label class="f">Telegram username<input class="i" name="telegram" placeholder="@username" required></label>
+        <label class="f">Password<input class="i" name="password" type="password" minlength="8" required autocomplete="new-password"></label>
+        <label class="f">Confirm password<input class="i" name="password2" type="password" minlength="8" required autocomplete="new-password"></label>
+        <button class="btn pri" type="submit">Create my free account</button>
+      </form>
+      <div id="authMsg" class="mut" style="margin-top:10px;font-size:13px"></div>
+    </div>
+    <div id="demoBox" class="demo hidden">
+      <b style="color:var(--gold)">Demo mode.</b> No backend connected yet, so data stays in this browser and passwords aren't checked. Try it:
+      <div class="row" style="margin-top:8px">
+        <button class="btn sm" id="demoStudent">Enter as a student</button>
+        <button class="btn sm" id="demoAdmin">Enter as admin (Brown Algo)</button>
+      </div>
+    </div>
+    <div class="foot">Made by Brown Algo · Tradeversity — for my students</div>
+  </div>
+</section>
+
+<!-- ============ APP ============ -->
+<section id="app" class="hidden">
+  <header class="top">
+    <div class="topin">
+      <div class="brand"><div class="logo">T</div><div>Tradeversity Journal<small>BY BROWN ALGO</small></div></div>
+      <div class="spacer"></div>
+      <span class="chip" id="whoChip"></span>
+      <button class="btn sm ghost" id="logout">Log out</button>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+  </header>
+  <main id="view"></main>
+</section>
+
+<div id="modal" class="modal hidden"><div class="box" id="mbox"></div></div>
+<div id="tip"></div>
+<div id="toast"></div>
+
+<script>
+/* =====================================================================
+   CONFIG — paste your Supabase project values here to go live.
+   Leave empty = demo mode (data stays in the browser).
+   ===================================================================== */
+const CONFIG = {
+  SUPABASE_URL: "https://szovzzkukzuytkzieuae.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6b3Z6emt1a3p1eXRremlldWFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ3ODIyMTgsImV4cCI6MjExMDM1ODIxOH0.hEcb4PhOIrKOZiwvMG6YQQHdR2zr1AhHOHmWeCSKJG0"
+};
+
+/* ============ helpers ============ */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=v=>{if(v===""||v==null)return NaN;return Number(v)};
+const money=(v,d=2)=>{if(v==null||!isFinite(v))return "—";const s=Math.abs(v).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});return (v<0?"-$":"$")+s};
+const smoney=(v,d=2)=>(v>0?"+":"")+money(v,d);
+const cls=v=>v>0?"pos":v<0?"neg":"mut";
+const pct=(v,d=1)=>isFinite(v)?(v*100).toFixed(d)+"%":"—";
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const todayStr=()=>ymd(new Date());
+const nextTradingDay=()=>{const d=new Date();do{d.setDate(d.getDate()+1)}while(d.getDay()===0||d.getDay()===6);return ymd(d)};
+const uuid=()=>(crypto&&crypto.randomUUID)?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c=="x"?r:(r&3|8)).toString(16)});
+const fmtDate=s=>{if(!s)return"";const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"})};
+const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function toast(m,ms=2600){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",ms)}
+function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
+
+/* ============ markets ============ */
+const MK={
+  NQ:{name:"E-mini Nasdaq-100",pv:20,tick:.25,grp:"Nasdaq",type:"Mini"},
+  MNQ:{name:"Micro Nasdaq-100",pv:2,tick:.25,grp:"Nasdaq",type:"Micro"},
+  ES:{name:"E-mini S&P 500",pv:50,tick:.25,grp:"S&P 500",type:"Mini"},
+  MES:{name:"Micro S&P 500",pv:5,tick:.25,grp:"S&P 500",type:"Micro"},
+  YM:{name:"E-mini Dow ($5)",pv:5,tick:1,grp:"Dow Jones",type:"Mini"},
+  MYM:{name:"Micro Dow",pv:.5,tick:1,grp:"Dow Jones",type:"Micro"},
+  GC:{name:"Gold (100 oz)",pv:100,tick:.1,grp:"Gold",type:"Mini"},
+  MGC:{name:"Micro Gold (10 oz)",pv:10,tick:.1,grp:"Gold",type:"Micro"}
+};
+const GROUPS={"Nasdaq":["NQ","MNQ"],"S&P 500":["ES","MES"],"Dow Jones":["YM","MYM"],"Gold":["GC","MGC"]};
+function rootOf(sym){
+  let s=String(sym||"").toUpperCase().trim().replace(/^\//,"").split(/[\s.:]/)[0];
+  if(MK[s])return s;
+  const m=s.match(/^([A-Z]{1,4}?)([FGHJKMNQUVXZ])(\d{1,4})$/);
+  if(m&&MK[m[1]])return m[1];
+  return s;
+}
+const EMO_GOOD=["Calm","Confident","Disciplined","Patient","Focused"];
+const EMO_BAD=["FOMO","Fear","Greed","Revenge","Impatient","Hesitant","Overconfident","Bored","Frustrated"];
+const SESSIONS=["Asia","London","NY AM","NY Lunch","NY PM"];
+const SETUPS=["Daily bias + 1H + 15m FVG","Liquidity sweep + MSS","Order block","Breaker block","IFVG","Silver Bullet","Other"];
+
+/* ============ trade math ============ */
+function tradeGross(t){
+  if(t.pnl!==""&&t.pnl!=null&&isFinite(num(t.pnl)))return num(t.pnl);
+  const m=MK[rootOf(t.symbol)],e=num(t.entry),x=num(t.exit),q=num(t.qty)||0;
+  if(m&&isFinite(e)&&isFinite(x)&&q)return (x-e)*(t.side==="Short"?-1:1)*m.pv*q;
+  return 0;
+}
+const tradeNet=t=>tradeGross(t)-(num(t.fees)||0);
+function tradeRisk(t){const m=MK[rootOf(t.symbol)],e=num(t.entry),s=num(t.stop),q=num(t.qty)||0;if(m&&isFinite(e)&&isFinite(s)&&q&&e!==s)return Math.abs(e-s)*m.pv*q;return NaN}
+const tradeR=t=>{const r=tradeRisk(t);return isFinite(r)&&r>0?tradeNet(t)/r:NaN};
+const resultOf=t=>{const n=tradeNet(t);return n>0?"Win":n<0?"Loss":"BE"};
+const byDT=(a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||""));
+
+function calc(ts){
+  const arr=[...ts].sort(byDT);let eq=0,peak=0,mdd=0;const curve=[];
+  let w=0,l=0,be=0,gw=0,gl=0,best=null,worst=null,cs=0,maxW=0,maxL=0,rs=[];
+  const days={};
+  arr.forEach(t=>{const n=tradeNet(t);eq+=n;peak=Math.max(peak,eq);mdd=Math.max(mdd,peak-eq);curve.push({t,eq});
+    if(n>0){w++;gw+=n;cs=cs>0?cs+1:1;maxW=Math.max(maxW,cs)}else if(n<0){l++;gl+=-n;cs=cs<0?cs-1:-1;maxL=Math.max(maxL,-cs)}else{be++}
+    if(!best||n>tradeNet(best))best=t;if(!worst||n<tradeNet(worst))worst=t;
+    const r=tradeR(t);if(isFinite(r))rs.push(r);
+    days[t.date]=(days[t.date]||0)+n;});
+  const dv=Object.entries(days);
+  const bestDay=dv.reduce((a,b)=>!a||b[1]>a[1]?b:a,null),worstDay=dv.reduce((a,b)=>!a||b[1]<a[1]?b:a,null);
+  const n=arr.length,dec=w+l;
+  return {n,w,l,be,net:eq,gw,gl,wr:dec?w/dec:NaN,pf:gl?gw/gl:(gw?Infinity:NaN),avgW:w?gw/w:NaN,avgL:l?-gl/l:NaN,
+    exp:n?eq/n:NaN,mdd,curve,best,worst,maxW,maxL,avgR:rs.length?rs.reduce((a,b)=>a+b,0)/rs.length:NaN,
+    days,bestDay,worstDay,greenDays:dv.filter(d=>d[1]>0).length,redDays:dv.filter(d=>d[1]<0).length,nDays:dv.length};
+}
+
+/* ============ demo data ============ */
+function rng(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s^=s>>>17;s^=s<<5;return((s>>>0)%100000)/100000}}
+function chartShot(seed,dir,win){
+  const r=rng(seed);let p=100;const c=[];
+  for(let i=0;i<34;i++){const drift=i<12?-dir*.6:i<16?dir*.2:dir*(win?1.1:-.5);const o=p,cl=o+drift+(r()-.5)*3.2;const h=Math.max(o,cl)+r()*1.6,l=Math.min(o,cl)-r()*1.6;c.push([o,h,l,cl]);p=cl}
+  const all=c.flat(),mx=Math.max(...all),mn=Math.min(...all),H=300,W=480,y=v=>12+(mx-v)/(mx-mn)*(H-24);
+  let g=`<rect width="${W}" height="${H}" fill="#0d1320"/>`;
+  for(let k=1;k<5;k++)g+=`<line x1="0" x2="${W}" y1="${k*H/5}" y2="${k*H/5}" stroke="#1a2335"/>`;
+  const fvgI=13;const a=c[fvgI-1],b=c[fvgI+1];
+  const top=dir>0?b[2]:a[2],bot=dir>0?a[1]:b[1];
+  if((dir>0&&top>bot)||(dir<0&&bot<top)){}
+  g+=`<rect x="${fvgI*13.5}" y="${y(Math.max(a[1],b[2]))}" width="${W-fvgI*13.5}" height="${Math.max(6,Math.abs(y(a[1])-y(b[2])))}" fill="rgba(245,185,66,.12)"/>`;
+  c.forEach((k,i)=>{const x=10+i*13.5,col=k[3]>=k[0]?"#27c26c":"#ef5350";g+=`<line x1="${x+4}" x2="${x+4}" y1="${y(k[1])}" y2="${y(k[2])}" stroke="${col}"/><rect x="${x}" y="${y(Math.max(k[0],k[3]))}" width="8" height="${Math.max(1.5,Math.abs(y(k[0])-y(k[3])))}" fill="${col}" rx="1"/>`});
+  const ex=c[16][3];g+=`<line x1="${16*13.5}" x2="${W}" y1="${y(ex)}" y2="${y(ex)}" stroke="#4c8dff" stroke-dasharray="4 3"/><text x="${W-6}" y="${y(ex)-4}" fill="#8fb6ff" font-size="11" text-anchor="end" font-family="sans-serif">Entry</text>`;
+  const sl=ex-dir*4;g+=`<line x1="${16*13.5}" x2="${W}" y1="${y(sl)}" y2="${y(sl)}" stroke="#ef5350" stroke-dasharray="4 3"/><text x="${W-6}" y="${y(sl)+12}" fill="#ef5350" font-size="11" text-anchor="end" font-family="sans-serif">SL</text>`;
+  g+=`<text x="10" y="20" fill="#f5b942" font-size="12" font-family="sans-serif" font-weight="700">15m · ${dir>0?"Bullish FVG":"Bearish FVG"}</text>`;
+  return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">${g}</svg>`);
+}
+function genTrades(seed,skill,uid_,acct){
+  const r=rng(seed),out=[];const base={NQ:25400,MNQ:25400,ES:6800,MES:6800,YM:47000,MYM:47000,GC:4100,MGC:4100};
+  const d=new Date();d.setDate(d.getDate()-40);
+  for(let k=0;k<40;k++){d.setDate(d.getDate()+1);if(d.getDay()===0||d.getDay()===6)continue;
+    const nT=r()<.2?0:1+Math.floor(r()*2.4);
+    for(let j=0;j<nT;j++){
+      const sp=r();const sym=sp<.55?"MNQ":sp<.7?"NQ":sp<.85?"MES":sp<.93?"MGC":"MYM";
+      const m=MK[sym],qty=m.type==="Mini"?1:[2,3,4,5][Math.floor(r()*4)];
+      const disciplined=r()<skill;
+      const emotions=disciplined?[EMO_GOOD[Math.floor(r()*3)]]:[EMO_BAD[Math.floor(r()*5)]];
+      if(!disciplined&&r()<.4)emotions.push(EMO_BAD[5+Math.floor(r()*3)]);
+      const win=r()<(disciplined?.62:.28);const dir=r()<.55?1:-1;
+      const riskUsd=120+r()*160;const stopPts=Math.max(m.tick*4,Math.round(riskUsd/(m.pv*qty)/m.tick)*m.tick);
+      const entry=Math.round((base[sym]*(1+(r()-.5)*.03))/m.tick)*m.tick;
+      const R=win?(disciplined?1.2+r()*2:.5+r()*.8):(disciplined?-1:-(1+r()*.8));
+      const exit=Math.round((entry+dir*R*stopPts)/m.tick)*m.tick;
+      const ses=r()<.7?"NY AM":r()<.5?"London":"NY PM";
+      const t={id:uuid(),user_id:uid_,date:ymd(d),time:`${ses==="London"?"0"+(3+Math.floor(r()*3)):(9+Math.floor(r()*2))}:${pad(Math.floor(r()*60))}`.replace(/^(\d):/,"0$1:"),
+        account:acct,symbol:sym,side:dir>0?"Long":"Short",qty,entry,exit,stop:entry-dir*stopPts,target:entry+dir*2*stopPts,
+        pnl:"",fees:+(qty*(m.type==="Mini"?3.98:1.24)).toFixed(2),setup:disciplined?SETUPS[Math.floor(r()*3)]:(r()<.5?"Other":SETUPS[3+Math.floor(r()*2)]),session:ses,
+        emotions,feeling:disciplined?(win?"Waited for my 15m FVG, felt calm, let it run to target.":"Followed the model, stop got taken. Accepting the loss."):(win?"Entered early, got lucky. Not my model.":"Jumped in without confirmation after missing the first move."),
+        followed:disciplined?"Yes":"No",rating:disciplined?4+Math.round(r()):1+Math.round(r()*2),shots:[],remark:"",notes:""};
+      out.push(t);
+    }}
+  const firsts=out.slice(-8);
+  firsts.forEach((t,k)=>{const dir=t.side==="Long"?1:-1,win=tradeNet(t)>0,disciplined=t.followed==="Yes";t.shots=[chartShot(seed+k*13,dir,win)];
+    t.remark=win?"Clean displacement after the sweep, entry at the FVG CE, target the 1H liquidity.":"Entered before the 15m close — the FVG was not confirmed yet.";
+    t.notes="Pre-market: Daily bias "+(dir>0?"bullish":"bearish")+", 1H pulled back into imbalance.\nExecution: "+(disciplined?"followed the checklist step by step.":"skipped the 15m confirmation.")+"\nLesson: "+(disciplined?"Trust the model.":"No confirmation = no trade.");});
+  return out;
+}
+const DEMO_STUDENTS=[
+  {name:"Yacine B.",tg:"@yacine_nq",email:"yacine@example.com",skill:.7,acct:"Eval 50K"},
+  {name:"Amina K.",tg:"@amina_trades",email:"amina@example.com",skill:.55,acct:"Eval 100K"},
+  {name:"Riad M.",tg:"@riad_scalps",email:"riad@example.com",skill:.35,acct:"Funded 50K"},
+  {name:"Sofiane T.",tg:"@sof_ict",email:"sofiane@example.com",skill:.62,acct:"Eval 50K"}
+];
+function demoPlan(uid_){return {user_id:uid_,date:nextTradingDay(),maxLoss:300,target:600,maxTrades:3,riskPerTrade:150,
+  bias:{Nasdaq:"Bullish","S&P 500":"Bullish","Dow Jones":"Neutral",Gold:"Bearish"},
+  htf:"Daily closed above last week's high. Draw on liquidity: previous day high + equal highs on 1H.",
+  levels:"PDH 25,610 · PDL 25,380 · 1H FVG 25,450–25,470 · Midnight open 25,520",
+  news:"08:30 NY — CPI (high impact). No trades 5 min before/after.",session:"NY AM",
+  model:"Daily bias → 1H pullback into imbalance → 15m FVG entry after liquidity sweep.",
+  noTrade:"If CPI spikes through PDH before 9:30, I sit on my hands. After 2 losses I stop.",
+  rules:{"Daily bias defined":true,"1H imbalance marked":true,"15m entry confirmation only":true,"Stop loss before entry":true,"Max loss respected":false},
+  mindset:"Quality over quantity. One A+ setup is enough.",followed:"",review:""}}
+
+/* ============ backend: Demo ============ */
+const Demo={
+  key:"tvj_demo_v4",db:null,
+  load(){this.db=lsGet(this.key,null);if(!this.db){this.seed();}},
+  save(){lsSet(this.key,this.db)},
+  seed(){const db={users:{},trades:{},plans:{},current:null};
+    const admin={id:uuid(),name:"Brown Algo",telegram:"@brown_algo",email:"admin@tradeversity.demo",role:"admin",created_at:new Date().toISOString()};
+    db.users[admin.id]=admin;db.trades[admin.id]=[];db.plans[admin.id]=[];
+    DEMO_STUDENTS.forEach((s,i)=>{const id=uuid();db.users[id]={id,name:s.name,telegram:s.tg,email:s.email,role:"student",created_at:new Date(Date.now()-(30-i)*864e5).toISOString()};
+      db.trades[id]=genTrades(1000+i*77,s.skill,id,s.acct);db.plans[id]=[demoPlan(id)];});
+    this.db=db;this.save();},
+  async session(){return this.db.current?this.db.users[this.db.current]:null},
+  async signIn(email){const u=Object.values(this.db.users).find(u=>u.email.toLowerCase()===email.toLowerCase());if(!u)throw new Error("No account with that email (demo). Create one, or use the demo buttons below.");this.db.current=u.id;this.save();return u},
+  async signUp({email,name,telegram}){if(Object.values(this.db.users).some(u=>u.email.toLowerCase()===email.toLowerCase()))throw new Error("That email already has an account.");
+    const id=uuid();this.db.users[id]={id,name,telegram,email,role:"student",created_at:new Date().toISOString()};this.db.trades[id]=[];this.db.plans[id]=[];this.db.current=id;this.save();return {user:this.db.users[id],needsConfirm:false}},
+  async signOut(){this.db.current=null;this.save()},
+  async enterAs(role){const u=Object.values(this.db.users).find(u=>u.role===role);this.db.current=u.id;this.save();return u},
+  async listTrades(uid_){return JSON.parse(JSON.stringify(this.db.trades[uid_]||[]))},
+  async saveTrade(t){const a=this.db.trades[t.user_id]||(this.db.trades[t.user_id]=[]);const i=a.findIndex(x=>x.id===t.id);if(i>=0)a[i]=t;else a.push(t);if(!this.save())toast("Browser storage is full — remove some screenshots.")},
+  async saveTrades(ts){ts.forEach(t=>{const a=this.db.trades[t.user_id]||(this.db.trades[t.user_id]=[]);a.push(t)});this.save()},
+  async deleteTrade(t){this.db.trades[t.user_id]=(this.db.trades[t.user_id]||[]).filter(x=>x.id!==t.id);this.save()},
+  async listPlans(uid_){return JSON.parse(JSON.stringify(this.db.plans[uid_]||[]))},
+  async savePlan(p){const a=this.db.plans[p.user_id]||(this.db.plans[p.user_id]=[]);const i=a.findIndex(x=>x.date===p.date);if(i>=0)a[i]=p;else a.push(p);this.save()},
+  async listProfiles(){return Object.values(this.db.users)},
+  async allTradesLite(){return Object.values(this.db.trades).flat().map(t=>({...t,shots:[]}))},
+  async allPlans(){return Object.values(this.db.plans).flat()},
+  async resetPassword(){throw new Error("Password reset works once Supabase is connected.")}
+};
+
+/* ============ backend: Supabase ============ */
+const Cloud={
+  sb:null,
+  async init(){await new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+    this.sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
+    this.sb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY")openNewPassword()});},
+  async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,created_at:data.created_at}},
+  async session(){const{data}=await this.sb.auth.getSession();if(!data.session)return null;return this.profile(data.session.user.id)},
+  async signIn(email,password){const{data,error}=await this.sb.auth.signInWithPassword({email,password});if(error)throw error;return this.profile(data.user.id)},
+  async signUp({email,password,name,telegram}){const{data,error}=await this.sb.auth.signUp({email,password,options:{data:{full_name:name,telegram},emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
+    if(!data.session)return {needsConfirm:true};return {user:await this.profile(data.user.id),needsConfirm:false}},
+  async signOut(){await this.sb.auth.signOut()},
+  fromRow(r){return {...(r.data||{}),id:r.id,user_id:r.user_id,shots:r.shots||[]}},
+  toRow(t){const{shots,...rest}=t;return {id:t.id,user_id:t.user_id,trade_date:t.date,symbol:t.symbol,account:t.account||null,pnl:tradeNet(t),data:rest,shots:shots||[]}},
+  async listTrades(uid_){const{data,error}=await this.sb.from("trades").select("*").eq("user_id",uid_).order("trade_date",{ascending:false}).limit(5000);if(error)throw error;return data.map(r=>this.fromRow(r))},
+  async saveTrade(t){const{error}=await this.sb.from("trades").upsert(this.toRow(t));if(error)throw error},
+  async saveTrades(ts){for(let i=0;i<ts.length;i+=200){const{error}=await this.sb.from("trades").insert(ts.slice(i,i+200).map(t=>this.toRow(t)));if(error)throw error}},
+  async deleteTrade(t){const{error}=await this.sb.from("trades").delete().eq("id",t.id);if(error)throw error},
+  async listPlans(uid_){const{data,error}=await this.sb.from("plans").select("*").eq("user_id",uid_).order("plan_date",{ascending:false});if(error)throw error;return data.map(r=>({...(r.data||{}),user_id:r.user_id,date:r.plan_date}))},
+  async savePlan(p){const{error}=await this.sb.from("plans").upsert({user_id:p.user_id,plan_date:p.date,data:p},{onConflict:"user_id,plan_date"});if(error)throw error},
+  async listProfiles(){const{data,error}=await this.sb.from("profiles").select("*").order("created_at");if(error)throw error;return data.map(d=>({id:d.id,name:d.full_name,telegram:d.telegram,email:d.email,role:d.role,created_at:d.created_at}))},
+  async allTradesLite(){const{data,error}=await this.sb.from("trades").select("id,user_id,trade_date,symbol,account,pnl,data").limit(20000);if(error)throw error;return data.map(r=>({...(r.data||{}),id:r.id,user_id:r.user_id,shots:[]}))},
+  async allPlans(){const{data,error}=await this.sb.from("plans").select("*");if(error)throw error;return data.map(r=>({...(r.data||{}),user_id:r.user_id,date:r.plan_date}))},
+  async resetPassword(email){const{error}=await this.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error}
+};
+
+let API=null;const DEMO=!(CONFIG.SUPABASE_URL&&CONFIG.SUPABASE_ANON_KEY);
+
+/* ============ state ============ */
+const S={me:null,subject:null,trades:[],plans:[],view:"journal",page:null,acct:"all",range:"all",calMonth:null,readonly:false};
+
+/* ============ auth UI ============ */
+function showAuth(){$("#app").classList.add("hidden");$("#auth").classList.remove("hidden");$("#demoBox").classList.toggle("hidden",!DEMO)}
+$("#tabLogin").onclick=()=>{$("#tabLogin").classList.add("on");$("#tabSignup").classList.remove("on");$("#loginForm").classList.remove("hidden");$("#signupForm").classList.add("hidden");$("#authMsg").textContent=""};
+$("#tabSignup").onclick=()=>{$("#tabSignup").classList.add("on");$("#tabLogin").classList.remove("on");$("#signupForm").classList.remove("hidden");$("#loginForm").classList.add("hidden");$("#authMsg").textContent=""};
+$("#loginForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);$("#authMsg").textContent="Logging in…";
+  try{const u=await API.signIn(f.get("email").trim(),f.get("password"));await enter(u)}catch(err){$("#authMsg").innerHTML=`<span class="neg">${esc(err.message||err)}</span>`}};
+$("#signupForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);
+  if(f.get("password")!==f.get("password2")){$("#authMsg").innerHTML='<span class="neg">Passwords don\'t match.</span>';return}
+  let tg=f.get("telegram").trim();if(tg&&!tg.startsWith("@"))tg="@"+tg;
+  $("#authMsg").textContent="Creating your account…";
+  try{const r=await API.signUp({email:f.get("email").trim(),password:f.get("password"),name:f.get("name").trim(),telegram:tg});
+    if(r.needsConfirm){$("#authMsg").innerHTML='<span class="ok">Account created. Check your email to confirm it, then log in.</span>';$("#tabLogin").click();$("#authMsg").innerHTML='<span class="ok">Account created. Check your email to confirm it, then log in.</span>'}
+    else await enter(r.user)}catch(err){$("#authMsg").innerHTML=`<span class="neg">${esc(err.message||err)}</span>`}};
+$("#forgot").onclick=async e=>{e.preventDefault();const em=$("#loginForm [name=email]").value.trim();if(!em){$("#authMsg").textContent="Type your email above first.";return}
+  try{await API.resetPassword(em);$("#authMsg").innerHTML='<span class="ok">Reset link sent — check your email.</span>'}catch(err){$("#authMsg").innerHTML=`<span class="neg">${esc(err.message)}</span>`}};
+$("#demoStudent").onclick=async()=>enter(await Demo.enterAs("student"));
+$("#demoAdmin").onclick=async()=>enter(await Demo.enterAs("admin"));
+$("#logout").onclick=async()=>{await API.signOut();S.me=null;S.subject=null;try{history.replaceState(null,"",location.pathname)}catch(e){}showAuth()};
+function openNewPassword(){openModal(`<div class="mhead"><h2>Set a new password</h2></div><form id="npf" class="grid"><input class="i" type="password" minlength="8" name="p" placeholder="New password" required><button class="btn pri">Save password</button></form>`);
+  $("#npf").onsubmit=async e=>{e.preventDefault();const{error}=await Cloud.sb.auth.updateUser({password:new FormData(e.target).get("p")});if(error)toast(error.message);else{toast("Password updated");closeModal()}}}
+
+async function enter(u){
+  S.me=u;$("#auth").classList.add("hidden");$("#app").classList.remove("hidden");
+  $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;
+  if(u.role==="admin"){S.view="admin";await loadSubject(u,false);go("admin")}
+  else{await loadSubject(u,false);go(location.hash.slice(1)||"journal")}
+}
+async function loadSubject(u,readonly){
+  S.subject=u;S.readonly=readonly;S.acct="all";S.page=null;
+  try{[S.trades,S.plans]=await Promise.all([API.listTrades(u.id),API.listPlans(u.id)])}catch(e){toast("Couldn't load data: "+(e.message||e));S.trades=[];S.plans=[]}
+}
+
+/* ============ nav ============ */
+const VIEWS=[["journal","📓 Journal"],["stats","📊 Statistics"],["plan","🧭 Tomorrow's plan"],["risk","🎯 Risk calculator"],["consistency","⚖️ Consistency rule"],["import","⬆️ Import CSV"]];
+function renderTabs(){const t=$("#tabs");let h="";
+  if(S.me.role==="admin")h+=`<button data-v="admin" class="admin ${S.view==="admin"?"on":""}">👑 Admin dashboard</button>`;
+  VIEWS.forEach(([k,l])=>{if(S.readonly&&k==="import")return;h+=`<button data-v="${k}" class="${S.view===k?"on":""}">${l}</button>`});
+  t.innerHTML=h;$$("button",t).forEach(b=>b.onclick=()=>go(b.dataset.v));}
+function go(v){if(![...VIEWS.map(x=>x[0]),"admin"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";
+  if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
+  S.view=v;S.page=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
+window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
+function render(){renderTabs();const v=$("#view");
+  let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
+  const fn={journal:vJournal,stats:vStats,plan:vPlan,risk:vRisk,consistency:vConsistency,import:vImport,admin:vAdmin}[S.view];
+  v.innerHTML=h+'<div id="vb"></div>';fn($("#vb"));
+  if(S.readonly)$("#backAdmin").onclick=()=>go("admin");}
+
+/* ============ filters ============ */
+function accounts(){return [...new Set(S.trades.map(t=>t.account).filter(Boolean))].sort()}
+function filtered(){let ts=S.trades;if(S.acct!=="all")ts=ts.filter(t=>t.account===S.acct);
+  if(S.range!=="all"){const d=new Date();d.setDate(d.getDate()-Number(S.range));const c=ymd(d);ts=ts.filter(t=>t.date>=c)}return ts}
+function filterBar(){const ac=accounts();
+  return `<div class="row" style="margin-bottom:14px">
+  <select class="i" id="fAcct" style="width:auto"><option value="all">All accounts</option>${ac.map(a=>`<option ${S.acct===a?"selected":""}>${esc(a)}</option>`).join("")}</select>
+  <div class="seg" id="fRange">${[["7","7D"],["30","30D"],["90","90D"],["all","All"]].map(([k,l])=>`<button data-r="${k}" class="${S.range===k?"on":""}">${l}</button>`).join("")}</div></div>`}
+function bindFilters(){const a=$("#fAcct");if(a)a.onchange=()=>{S.acct=a.value;render()};$$("#fRange button").forEach(b=>b.onclick=()=>{S.range=b.dataset.r;render()})}
+
+/* ============ JOURNAL ============ */
+function vJournal(el){
+  if(S.page)return vTradePage(el,S.page);
+  const ts=filtered().sort((a,b)=>byDT(b,a));const st=calc(ts);
+  const byDay={};ts.forEach(t=>(byDay[t.date]=byDay[t.date]||[]).push(t));
+  el.innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:6px"><div><h1>Trading journal</h1><p class="sub">${S.readonly?"Student's":"Your"} trades, screenshots, feelings and lessons.</p></div>
+   <div class="row">${S.readonly?"":`<button class="btn pri" id="addT">+ New trade</button>`}<button class="btn" id="expCsv">Export CSV</button></div></div>
+   ${filterBar()}
+   <div class="grid g4" style="margin-bottom:16px">
+     ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,`${st.n} trades`)}
+     ${kpi("Win rate",pct(st.wr),`${st.w}W · ${st.l}L · ${st.be}BE`)}
+     ${kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):st.pf===Infinity?"∞":"—","gross win ÷ gross loss")}
+     ${kpi("Avg R",isFinite(st.avgR)?st.avgR.toFixed(2)+"R":"—","from trades with a stop")}
+   </div>
+   ${ts.length?Object.keys(byDay).sort().reverse().map(d=>{const dn=byDay[d].reduce((a,t)=>a+tradeNet(t),0);
+     return `<div class="day"><div class="dayh"><span>${fmtDate(d)}</span><span class="mono ${cls(dn)}">${smoney(dn)}</span></div>${byDay[d].map(tcard).join("")}</div>`}).join("")
+   :`<div class="card empty">No trades yet. ${S.readonly?"":"Add your first trade or import a CSV from your broker."}</div>`}`;
+  bindFilters();if($("#addT"))$("#addT").onclick=()=>editTrade(null);
+  $("#expCsv").onclick=exportCSV;
+  $$(".tcard",el).forEach(c=>c.onclick=()=>{S.page=c.dataset.id;render();window.scrollTo(0,0)});
+}
+function kpi(l,v,s){return `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div>${s?`<div class="s">${s}</div>`:""}</div>`}
+function tcard(t){const n=tradeNet(t),R=tradeR(t),res=resultOf(t);
+  return `<div class="tcard" data-id="${t.id}">
+    <div class="thumb" style="${t.shots&&t.shots[0]?`background-image:url('${t.shots[0]}')`:""}">${t.shots&&t.shots[0]?"":"no image"}</div>
+    <div class="tmeta"><div class="t1"><span class="mono">${esc(t.symbol)}</span><span class="tag ${t.side==="Long"?"long":"short"}">${t.side==="Long"?"▲ Long":"▼ Short"}</span><span class="tag ${res==="Win"?"win":res==="Loss"?"loss":""}">${res}</span>${(t.emotions||[]).map(e=>`<span class="tag ${EMO_BAD.includes(e)?"bad":"good"}">${esc(e)}</span>`).join("")}</div>
+      <div class="t2">${esc(t.time||"")} · ${esc(t.qty||"")} ct · ${esc(t.setup||"No setup")} · ${esc(t.account||"")}${t.remark?" · "+esc(t.remark):""}</div></div>
+    <div class="tpnl ${cls(n)}">${smoney(n)}<div class="mut" style="font-size:11px;font-weight:600">${isFinite(R)?R.toFixed(2)+"R":""}</div></div></div>`}
+
+function vTradePage(el,id){const t=S.trades.find(x=>x.id===id);if(!t){S.page=null;return vJournal(el)}
+  const n=tradeNet(t),R=tradeR(t),risk=tradeRisk(t),m=MK[rootOf(t.symbol)];
+  el.innerHTML=`<div class="page">
+   <div class="row" style="justify-content:space-between;margin-bottom:14px"><button class="btn sm" id="back">← Journal</button>
+   ${S.readonly?"":`<div class="row"><button class="btn sm" id="edit">Edit</button><button class="btn sm danger" id="del">Delete</button></div>`}</div>
+   <h1><span class="mono">${esc(t.symbol)}</span> ${t.side==="Long"?'<span class="pos">▲ Long</span>':'<span class="neg">▼ Short</span>'} · <span class="${cls(n)} mono">${smoney(n)}</span></h1>
+   <p class="sub">${fmtDate(t.date)} ${esc(t.time||"")} · ${esc(t.account||"No account")}</p>
+   ${(t.shots||[]).map((s,i)=>`<img class="cover" src="${s}" alt="Trade screenshot ${i+1}" style="margin-top:${i?10:0}px">`).join("")||`<div class="card empty">No screenshot</div>`}
+   ${t.remark?`<div class="remark">📝 ${esc(t.remark)}</div>`:""}
+   <div class="props">
+     <div>Result</div><div><span class="tag ${resultOf(t)==="Win"?"win":resultOf(t)==="Loss"?"loss":""}">${resultOf(t)}</span> ${isFinite(R)?`<b class="mono">${R.toFixed(2)}R</b>`:""}</div>
+     <div>Contracts</div><div class="mono">${esc(t.qty)} × ${esc(t.symbol)} ${m?`<span class="mut">(${m.name}, $${m.pv}/pt)</span>`:""}</div>
+     <div>Entry / Exit</div><div class="mono">${esc(t.entry||"—")} → ${esc(t.exit||"—")}</div>
+     <div>Stop / Target</div><div class="mono">${esc(t.stop||"—")} / ${esc(t.target||"—")}</div>
+     <div>Risk</div><div class="mono">${money(risk)}</div>
+     <div>Gross / Fees / Net</div><div class="mono">${money(tradeGross(t))} / ${money(num(t.fees)||0)} / <b class="${cls(n)}">${money(n)}</b></div>
+     <div>Setup</div><div>${esc(t.setup||"—")}</div>
+     <div>Session</div><div>${esc(t.session||"—")}</div>
+     <div>Followed plan</div><div>${t.followed==="Yes"?'<span class="ok">✔ Yes</span>':t.followed==="No"?'<span class="neg">✖ No</span>':"—"}</div>
+     <div>Execution rating</div><div>${"★".repeat(t.rating||0)}<span class="mut">${"★".repeat(5-(t.rating||0))}</span></div>
+     <div>Emotions</div><div class="pills">${(t.emotions||[]).map(e=>`<span class="tag ${EMO_BAD.includes(e)?"bad":"good"}">${esc(e)}</span>`).join("")||"—"}</div>
+   </div>
+   ${t.feeling?`<h3>How I felt</h3><div class="card notes" style="margin-bottom:12px">${esc(t.feeling)}</div>`:""}
+   ${t.notes?`<h3>Journal & lessons</h3><div class="card notes">${esc(t.notes)}</div>`:""}
+  </div>`;
+  $("#back").onclick=()=>{S.page=null;render()};
+  if($("#edit")){$("#edit").onclick=()=>editTrade(t);$("#del").onclick=()=>confirmBox("Delete this trade? This can't be undone.",async()=>{try{await API.deleteTrade(t);S.trades=S.trades.filter(x=>x.id!==t.id);S.page=null;render();toast("Trade deleted")}catch(e){toast(e.message)}})}
+}
+
+/* ============ modal ============ */
+function openModal(h){$("#mbox").innerHTML=h;$("#modal").classList.remove("hidden");document.body.style.overflow="hidden"}
+function closeModal(){$("#modal").classList.add("hidden");document.body.style.overflow="";document.onpaste=null}
+$("#modal").addEventListener("mousedown",e=>{if(e.target.id==="modal")closeModal()});
+function confirmBox(msg,yes){openModal(`<p style="margin:4px 0 16px">${esc(msg)}</p><div class="row" style="justify-content:flex-end"><button class="btn" id="cNo">Cancel</button><button class="btn pri" id="cYes">Yes</button></div>`);
+  $("#cNo").onclick=closeModal;$("#cYes").onclick=()=>{closeModal();yes()}}
+
+/* image compression */
+function compress(file,maxW=1280,maxBytes=170000){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{
+  let w=img.width,h=img.height;if(w>maxW){h=h*maxW/w;w=maxW}const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);
+  let q=.8,out=c.toDataURL("image/jpeg",q);while(out.length*.75>maxBytes&&q>.35){q-=.1;out=c.toDataURL("image/jpeg",q)}
+  if(out.length*.75>maxBytes){const c2=document.createElement("canvas");c2.width=w*.7;c2.height=h*.7;c2.getContext("2d").drawImage(c,0,0,c2.width,c2.height);out=c2.toDataURL("image/jpeg",.6)}
+  res(out)};img.onerror=rej;img.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
+
+function editTrade(t0){
+  const isNew=!t0;const t=t0?JSON.parse(JSON.stringify(t0)):{id:uuid(),user_id:S.subject.id,date:todayStr(),time:"",account:S.acct!=="all"?S.acct:(accounts()[0]||""),symbol:"MNQ",side:"Long",qty:1,entry:"",exit:"",stop:"",target:"",pnl:"",fees:"",setup:"",session:"NY AM",emotions:[],feeling:"",followed:"Yes",rating:3,shots:[],remark:"",notes:""};
+  const syms=Object.keys(MK);
+  openModal(`<div class="mhead"><h2>${isNew?"New trade":"Edit trade"}</h2><button class="x" id="mx">×</button></div>
+  <form id="tf" class="grid">
+   <div class="grid g4">
+    <label class="f">Date<input class="i" type="date" name="date" value="${esc(t.date)}" required></label>
+    <label class="f">Time<input class="i" type="time" name="time" value="${esc(t.time)}"></label>
+    <label class="f">Account<input class="i" name="account" list="acList" value="${esc(t.account)}" placeholder="Eval 50K"></label>
+    <label class="f">Instrument<input class="i" name="symbol" list="symList" value="${esc(t.symbol)}" required></label>
+   </div>
+   <datalist id="acList">${accounts().map(a=>`<option>${esc(a)}</option>`).join("")}</datalist>
+   <datalist id="symList">${syms.map(s=>`<option value="${s}">${MK[s].name}</option>`).join("")}</datalist>
+   <div class="grid g4">
+    <label class="f">Direction<select class="i" name="side"><option ${t.side==="Long"?"selected":""}>Long</option><option ${t.side==="Short"?"selected":""}>Short</option></select></label>
+    <label class="f">Contracts<input class="i" type="number" step="1" min="0" name="qty" value="${esc(t.qty)}"></label>
+    <label class="f">Entry price<input class="i" type="number" step="any" name="entry" value="${esc(t.entry)}"></label>
+    <label class="f">Exit price<input class="i" type="number" step="any" name="exit" value="${esc(t.exit)}"></label>
+    <label class="f">Stop loss<input class="i" type="number" step="any" name="stop" value="${esc(t.stop)}"></label>
+    <label class="f">Target<input class="i" type="number" step="any" name="target" value="${esc(t.target)}"></label>
+    <label class="f">P&L $ (optional)<input class="i" type="number" step="any" name="pnl" value="${esc(t.pnl)}" placeholder="auto from prices"></label>
+    <label class="f">Fees $<input class="i" type="number" step="any" name="fees" value="${esc(t.fees)}"></label>
+   </div>
+   <div class="live" id="live"></div>
+   <div class="grid g3">
+    <label class="f">Setup / model<input class="i" name="setup" list="setList" value="${esc(t.setup)}"></label>
+    <datalist id="setList">${SETUPS.map(s=>`<option>${esc(s)}</option>`).join("")}</datalist>
+    <label class="f">Session<select class="i" name="session">${SESSIONS.map(s=>`<option ${t.session===s?"selected":""}>${s}</option>`).join("")}</select></label>
+    <label class="f">Followed my plan?<select class="i" name="followed"><option ${t.followed==="Yes"?"selected":""}>Yes</option><option ${t.followed==="No"?"selected":""}>No</option></select></label>
+   </div>
+   <div><div class="f" style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">Execution rating</div><div class="seg" id="rate">${[1,2,3,4,5].map(i=>`<button type="button" data-v="${i}" class="${t.rating==i?"on":""}">${i}★</button>`).join("")}</div></div>
+   <div><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">Emotions while trading</div>
+    <div class="pills" id="emo">${[...EMO_GOOD,...EMO_BAD].map(e=>`<span class="pill ${(t.emotions||[]).includes(e)?"on":""} ${EMO_BAD.includes(e)?"bad":""}" data-e="${e}">${e}</span>`).join("")}</div></div>
+   <label class="f">How did you feel? (before, during, after)<textarea class="i" name="feeling">${esc(t.feeling)}</textarea></label>
+   <div><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">Screenshots (up to 3) — tap to upload, or paste with Ctrl+V</div>
+    <div class="shots" id="shots"></div>
+    <div class="drop" id="drop" style="margin-top:8px">📷 Add screenshot</div><input type="file" id="file" accept="image/*" multiple class="hidden"></div>
+   <label class="f">Remark below the screenshot<input class="i" name="remark" value="${esc(t.remark)}" placeholder="e.g. Entry at the 15m FVG after the sweep of PDL"></label>
+   <label class="f">Journal & lessons<textarea class="i" name="notes" style="min-height:110px" placeholder="What did I see? What did I do well? What will I do differently?">${esc(t.notes)}</textarea></label>
+   <div class="row" style="justify-content:flex-end"><button type="button" class="btn" id="cancel">Cancel</button><button class="btn pri" type="submit" id="saveT">Save trade</button></div>
+  </form>`);
+  const f=$("#tf");
+  const read=()=>{const d=Object.fromEntries(new FormData(f));Object.assign(t,d,{symbol:String(d.symbol).toUpperCase().trim()})};
+  const live=()=>{read();const n=tradeNet(t),r=tradeRisk(t),R=tradeR(t);$("#live").innerHTML=`<span>Net P&L <b class="${cls(n)}">${smoney(n)}</b></span><span>Risk <b>${money(r)}</b></span><span>R multiple <b>${isFinite(R)?R.toFixed(2)+"R":"—"}</b></span><span>Result <b>${resultOf(t)}</b></span>`};
+  f.addEventListener("input",live);live();
+  $$("#rate button").forEach(b=>b.onclick=()=>{t.rating=Number(b.dataset.v);$$("#rate button").forEach(x=>x.classList.toggle("on",x===b))});
+  $$("#emo .pill").forEach(p=>p.onclick=()=>{const e=p.dataset.e;t.emotions=t.emotions||[];if(t.emotions.includes(e))t.emotions=t.emotions.filter(x=>x!==e);else t.emotions.push(e);p.classList.toggle("on")});
+  const drawShots=()=>{$("#shots").innerHTML=(t.shots||[]).map((s,i)=>`<div class="shot" style="background-image:url('${s}')"><button type="button" data-i="${i}">×</button></div>`).join("");
+    $$("#shots button").forEach(b=>b.onclick=()=>{t.shots.splice(Number(b.dataset.i),1);drawShots()});$("#drop").classList.toggle("hidden",(t.shots||[]).length>=3)};
+  drawShots();
+  const addFiles=async files=>{for(const fl of files){if(!fl.type.startsWith("image/"))continue;if(t.shots.length>=3)break;try{t.shots.push(await compress(fl))}catch(e){toast("Couldn't read that image")}}drawShots()};
+  $("#drop").onclick=()=>$("#file").click();$("#file").onchange=e=>addFiles([...e.target.files]);
+  document.onpaste=e=>{const fs=[...(e.clipboardData||{}).files||[]];if(fs.length)addFiles(fs)};
+  $("#mx").onclick=$("#cancel").onclick=closeModal;
+  f.onsubmit=async e=>{e.preventDefault();read();t.qty=num(t.qty)||0;$("#saveT").disabled=true;
+    try{await API.saveTrade(t);const i=S.trades.findIndex(x=>x.id===t.id);if(i>=0)S.trades[i]=t;else S.trades.push(t);closeModal();S.page=t.id;S.view="journal";render();toast("Trade saved")}
+    catch(err){$("#saveT").disabled=false;toast("Couldn't save: "+(err.message||err))}};
+}
+
+/* ============ export ============ */
+async function saveFile(name,text,mime){
+  try{if(window.claude&&window.claude.use){const d=await Promise.race([window.claude.use("downloads"),new Promise(r=>setTimeout(()=>r(null),3000))]);if(d){await d.save({filename:name,data:new Blob([text],{type:mime})});return}}}catch(e){}
+  try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}catch(e){toast("Download blocked here")}
+}
+function exportCSV(){const cols=["date","time","account","symbol","side","qty","entry","exit","stop","target","fees","net_pnl","r_multiple","result","setup","session","followed","rating","emotions","remark","feeling","notes"];
+  const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;
+  const rows=filtered().sort(byDT).map(t=>[t.date,t.time,t.account,t.symbol,t.side,t.qty,t.entry,t.exit,t.stop,t.target,t.fees,tradeNet(t).toFixed(2),isFinite(tradeR(t))?tradeR(t).toFixed(2):"",resultOf(t),t.setup,t.session,t.followed,t.rating,(t.emotions||[]).join("|"),t.remark,t.feeling,t.notes].map(q).join(","));
+  saveFile(`tradeversity-journal-${todayStr()}.csv`,[cols.join(","),...rows].join("\n"),"text/csv")}
+
+/* ============ charts ============ */
+function niceTicks(mn,mx,n=4){if(mn===mx){mn-=1;mx+=1}const span=mx-mn,step0=span/n,mag=Math.pow(10,Math.floor(Math.log10(step0))),f=step0/mag,step=(f<1.5?1:f<3?2:f<7?5:10)*mag;
+  const lo=Math.floor(mn/step)*step,hi=Math.ceil(mx/step)*step,t=[];for(let v=lo;v<=hi+1e-9;v+=step)t.push(+v.toFixed(6));return t}
+const kfmt=v=>{const a=Math.abs(v);return (v<0?"-":"")+"$"+(a>=1000?(a/1000).toFixed(a>=1e4?0:1)+"k":a.toFixed(0))};
+function equityChart(curve){if(!curve.length)return '<div class="empty">No data</div>';
+  const W=720,H=240,L=52,Rp=12,T=12,B=26;const ys=[0,...curve.map(c=>c.eq)];const tk=niceTicks(Math.min(...ys),Math.max(...ys));
+  const y0=tk[0],y1=tk[tk.length-1],X=i=>L+(curve.length===1?0:i*(W-L-Rp)/(curve.length-1)),Y=v=>T+(y1-v)/(y1-y0)*(H-T-B);
+  let g=tk.map(v=>`<line x1="${L}" x2="${W-Rp}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v===0?"#3a4760":"#1a2335"}" ${v===0?'stroke-dasharray="3 3"':""}/><text x="${L-8}" y="${Y(v)+4}" text-anchor="end">${kfmt(v)}</text>`).join("");
+  const pts=curve.map((c,i)=>`${X(i)},${Y(c.eq)}`).join(" ");const last=curve[curve.length-1].eq,col=last>=0?"#27c26c":"#ef5350";
+  g+=`<polygon points="${L},${Y(0)} ${pts} ${X(curve.length-1)},${Y(0)}" fill="${col}" opacity=".08"/><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`;
+  const step=Math.max(1,Math.ceil(curve.length/6));curve.forEach((c,i)=>{if(i%step===0)g+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle">${c.t.date.slice(5)}</text>`});
+  const w=(W-L-Rp)/Math.max(1,curve.length);
+  curve.forEach((c,i)=>{const n=tradeNet(c.t);g+=`<g><rect class="hit" x="${X(i)-w/2}" y="${T}" width="${w}" height="${H-T-B}" data-tip="${esc(`${fmtDate(c.t.date)} ${c.t.time||""}\n${c.t.symbol} ${c.t.side}: ${smoney(n)}\nEquity: ${money(c.eq)}`)}"/></g>`});
+  g+=`<circle cx="${X(curve.length-1)}" cy="${Y(last)}" r="4" fill="${col}" stroke="#111827" stroke-width="2"/>`;
+  return `<svg class="ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="Equity curve">${g}</svg>`}
+function dailyBars(days){const ent=Object.entries(days).sort((a,b)=>a[0].localeCompare(b[0])).slice(-40);if(!ent.length)return '<div class="empty">No data</div>';
+  const W=520,H=300,L=52,Rp=12,T=12,B=26;const vs=ent.map(e=>e[1]);const tk=niceTicks(Math.min(0,...vs),Math.max(0,...vs));const y0=tk[0],y1=tk[tk.length-1];
+  const Y=v=>T+(y1-v)/(y1-y0)*(H-T-B),bw=(W-L-Rp)/ent.length;
+  let g=tk.map(v=>`<line x1="${L}" x2="${W-Rp}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v===0?"#3a4760":"#1a2335"}"/><text x="${L-8}" y="${Y(v)+4}" text-anchor="end">${kfmt(v)}</text>`).join("");
+  ent.forEach(([d,v],i)=>{const x=L+i*bw+1,w=Math.max(2,bw-2),y=v>=0?Y(v):Y(0),h=Math.max(1,Math.abs(Y(v)-Y(0)));
+    g+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${Math.min(3,w/2)}" fill="${v>=0?"#27c26c":"#ef5350"}"/>`;
+    g+=`<rect class="hit" x="${L+i*bw}" y="${T}" width="${bw}" height="${H-T-B}" data-tip="${esc(fmtDate(d)+"\n"+smoney(v))}"/>`;
+    if(i%Math.max(1,Math.ceil(ent.length/6))===0)g+=`<text x="${x+w/2}" y="${H-8}" text-anchor="middle">${d.slice(5)}</text>`});
+  return `<svg class="ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily P&L">${g}</svg>`}
+function calendar(days){const keys=Object.keys(days).sort();const ref=S.calMonth||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7));
+  const [y,m]=ref.split("-").map(Number);const first=new Date(y,m-1,1),dim=new Date(y,m,0).getDate();const mx=Math.max(1,...Object.values(days).map(Math.abs));
+  let h=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div class="h">${d}</div>`).join("");for(let i=0;i<first.getDay();i++)h+='<div class="c e"></div>';
+  let mt=0;for(let d=1;d<=dim;d++){const k=`${y}-${pad(m)}-${pad(d)}`,v=days[k];if(v!=null)mt+=v;const a=v==null?0:.12+.5*Math.abs(v)/mx;
+    h+=`<div class="c" style="${v!=null?`background:${v>=0?`rgba(39,194,108,${a})`:`rgba(239,83,80,${a})`}`:""}" ${v!=null?`data-tip="${esc(fmtDate(k)+"\n"+smoney(v))}"`:""}><span class="d">${d}</span>${v!=null?`<span class="p">${kfmt(v)}</span>`:""}</div>`}
+  return `<div class="row" style="justify-content:space-between;margin-bottom:8px"><button class="btn sm" id="calP">‹</button><b>${first.toLocaleDateString("en-US",{month:"long",year:"numeric"})} · <span class="${cls(mt)} mono">${smoney(mt)}</span></b><button class="btn sm" id="calN">›</button></div><div class="cal">${h}</div>`}
+document.addEventListener("mouseover",e=>{const el=e.target.closest&&e.target.closest("[data-tip]");const tp=$("#tip");if(!el){tp.style.display="none";return}tp.textContent=el.dataset.tip;tp.style.display="block"});
+document.addEventListener("mousemove",e=>{const tp=$("#tip");if(tp.style.display==="block"){const x=Math.min(e.clientX+14,innerWidth-tp.offsetWidth-8);tp.style.left=x+"px";tp.style.top=(e.clientY+14)+"px"}});
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-tip]");const tp=$("#tip");if(el&&matchMedia("(hover:none)").matches){tp.textContent=el.dataset.tip;tp.style.display="block";tp.style.left=Math.min(e.clientX,innerWidth-200)+"px";tp.style.top=(e.clientY+14)+"px"}});
+
+/* ============ STATS ============ */
+function groupBy(ts,keyFn){const g={};ts.forEach(t=>{[].concat(keyFn(t)).filter(k=>k!=null&&k!=="").forEach(k=>{(g[k]=g[k]||[]).push(t)})});
+  return Object.entries(g).map(([k,a])=>{const c=calc(a);return {k,n:c.n,wr:c.wr,net:c.net,avg:c.net/c.n}}).sort((a,b)=>b.net-a.net)}
+function bdTable(title,rows){if(!rows.length)return "";const mx=Math.max(...rows.map(r=>Math.abs(r.net)),1);
+  return `<div class="card"><h3>${title}</h3><div class="tw"><table class="t"><tr><th></th><th>Trades</th><th>Win %</th><th>Net P&L</th><th></th></tr>${rows.map(r=>`<tr><td>${esc(r.k)}</td><td class="mono">${r.n}</td><td class="mono">${pct(r.wr,0)}</td><td class="mono ${cls(r.net)}">${smoney(r.net,0)}</td><td style="width:30%"><div class="bar"><i style="width:${Math.abs(r.net)/mx*100}%;background:${r.net>=0?"var(--green)":"var(--red)"}"></i></div></td></tr>`).join("")}</table></div></div>`}
+function insights(ts){const out=[];if(ts.length<3)return out;
+  const em=groupBy(ts,t=>t.emotions||[]);const worst=em.filter(r=>r.net<0).sort((a,b)=>a.net-b.net)[0];if(worst)out.push(["⚠️",`Trades with <b>${esc(worst.k)}</b> cost you <b class="neg">${money(worst.net,0)}</b> over ${worst.n} trades (win rate ${pct(worst.wr,0)}).`]);
+  const fp=groupBy(ts,t=>t.followed?(t.followed==="Yes"?"Followed plan":"Broke plan"):null);const y=fp.find(r=>r.k==="Followed plan"),n=fp.find(r=>r.k==="Broke plan");
+  if(y&&n)out.push(["🧭",`Following your plan: <b class="${cls(y.net)}">${smoney(y.net,0)}</b> (${pct(y.wr,0)} win). Breaking it: <b class="${cls(n.net)}">${smoney(n.net,0)}</b> (${pct(n.wr,0)} win).`]);
+  const su=groupBy(ts,t=>t.setup);if(su.length&&su[0].net>0)out.push(["✅",`Best setup: <b>${esc(su[0].k)}</b> — ${smoney(su[0].net,0)} over ${su[0].n} trades.`]);
+  const wd=groupBy(ts,t=>{const[a,b,c]=t.date.split("-").map(Number);return WD[new Date(a,b-1,c).getDay()]});const bw=wd[wd.length-1];if(bw&&bw.net<0)out.push(["📅",`<b>${bw.k}</b> is your weakest day: ${smoney(bw.net,0)}.`]);
+  return out}
+function vStats(el){const ts=filtered();const st=calc(ts);
+  el.innerHTML=`<h1>Statistics</h1><p class="sub">${S.acct==="all"?"All accounts":esc(S.acct)} · ${ts.length} trades</p>${filterBar()}
+  <div class="grid g4" style="margin-bottom:12px">
+   ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,`${st.nDays} trading days`)}
+   ${kpi("Win rate",pct(st.wr),`${st.w} wins · ${st.l} losses`)}
+   ${kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):"—","above 1.5 is solid")}
+   ${kpi("Expectancy",`<span class="${cls(st.exp)}">${money(st.exp)}</span>`,"average per trade")}
+   ${kpi("Avg win / loss",`<span class="pos">${money(st.avgW,0)}</span> <span class="mut">/</span> <span class="neg">${money(st.avgL,0)}</span>`,isFinite(st.avgW/st.avgL)?`ratio ${Math.abs(st.avgW/st.avgL).toFixed(2)}`:"")}
+   ${kpi("Max drawdown",`<span class="neg">${money(-st.mdd,0)}</span>`,"peak to trough")}
+   ${kpi("Best / worst day",`<span class="pos">${st.bestDay?kfmt(st.bestDay[1]):"—"}</span> <span class="mut">/</span> <span class="neg">${st.worstDay?kfmt(st.worstDay[1]):"—"}</span>`,`${st.greenDays} green · ${st.redDays} red days`)}
+   ${kpi("Streaks",`${st.maxW}W <span class="mut">/</span> ${st.maxL}L`,"longest win / loss streak")}
+  </div>
+  ${insights(ts).length?`<div class="card" style="margin-bottom:12px"><h3>What your journal says</h3>${insights(ts).map(([i,t])=>`<div class="insight"><span class="ic">${i}</span><span>${t}</span></div>`).join("")}</div>`:""}
+  <div class="card" style="margin-bottom:12px"><h3>Equity curve</h3>${equityChart(st.curve)}</div>
+  <div class="grid g2" style="margin-bottom:12px"><div class="card"><h3>Daily P&L</h3>${dailyBars(st.days)}</div><div class="card"><h3>Calendar</h3>${calendar(st.days)}</div></div>
+  <div class="grid g2">
+   ${bdTable("By emotion",groupBy(ts,t=>t.emotions||[]))}
+   ${bdTable("By setup",groupBy(ts,t=>t.setup))}
+   ${bdTable("By instrument",groupBy(ts,t=>t.symbol))}
+   ${bdTable("By session",groupBy(ts,t=>t.session))}
+   ${bdTable("By weekday",groupBy(ts,t=>{const[a,b,c]=t.date.split("-").map(Number);return WD[new Date(a,b-1,c).getDay()]}))}
+   ${bdTable("Plan discipline",groupBy(ts,t=>t.followed?(t.followed==="Yes"?"Followed plan":"Broke plan"):null))}
+   ${bdTable("By account",groupBy(ts,t=>t.account))}
+   ${bdTable("Long vs short",groupBy(ts,t=>t.side))}
+  </div>`;
+  bindFilters();
+  const shift=d=>{const keys=Object.keys(st.days).sort();const ref=S.calMonth||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7));const[y,m]=ref.split("-").map(Number);const n=new Date(y,m-1+d,1);S.calMonth=`${n.getFullYear()}-${pad(n.getMonth()+1)}`;render()};
+  $("#calP").onclick=()=>shift(-1);$("#calN").onclick=()=>shift(1);
+}
+
+/* ============ PLAN ============ */
+function vPlan(el){
+  const dates=S.plans.map(p=>p.date).sort().reverse();
+  let cur=S._planDate||(S.readonly?(dates[0]||nextTradingDay()):nextTradingDay());S._planDate=cur;
+  const p=S.plans.find(x=>x.date===cur)||{user_id:S.subject.id,date:cur,maxLoss:"",target:"",maxTrades:"",riskPerTrade:"",bias:{},htf:"",levels:"",news:"",session:"NY AM",model:"",noTrade:"",rules:{},mindset:"",followed:"",review:""};
+  const dayTrades=S.trades.filter(t=>t.date===cur),dn=dayTrades.reduce((a,t)=>a+tradeNet(t),0);
+  const ro=S.readonly?"disabled":"";
+  const RULES=["Daily bias defined","1H imbalance marked","15m entry confirmation only","Stop loss before entry","Max loss respected","No trading during red news"];
+  const breach=num(p.maxLoss)>0&&dn<=-num(p.maxLoss),overT=num(p.maxTrades)>0&&dayTrades.length>num(p.maxTrades);
+  el.innerHTML=`<div class="row" style="justify-content:space-between"><div><h1>Trading plan</h1><p class="sub">Plan tomorrow tonight. Execute it tomorrow, then review it.</p></div>
+   <div class="row"><input class="i" type="date" id="pDate" value="${cur}" style="width:auto">${dates.length?`<select class="i" id="pHist" style="width:auto"><option value="">Past plans…</option>${dates.map(d=>`<option value="${d}">${d}</option>`).join("")}</select>`:""}</div></div>
+  <form id="pf" class="grid">
+   <div class="card"><h3>Risk limits for ${fmtDate(cur)}</h3><div class="grid g4">
+    <label class="f">Max daily loss $<input class="i" type="number" step="any" name="maxLoss" value="${esc(p.maxLoss)}" ${ro} placeholder="e.g. 300"></label>
+    <label class="f">Daily profit target $<input class="i" type="number" step="any" name="target" value="${esc(p.target)}" ${ro} placeholder="e.g. 600"></label>
+    <label class="f">Max number of trades<input class="i" type="number" name="maxTrades" value="${esc(p.maxTrades)}" ${ro} placeholder="e.g. 3"></label>
+    <label class="f">Risk per trade $<input class="i" type="number" step="any" name="riskPerTrade" value="${esc(p.riskPerTrade)}" ${ro} placeholder="e.g. 150"></label></div>
+    ${num(p.maxLoss)>0&&num(p.riskPerTrade)>0?`<p class="mut" style="margin:10px 0 0">→ You can take <b>${Math.floor(num(p.maxLoss)/num(p.riskPerTrade))}</b> full losses before you stop for the day.</p>`:""}</div>
+   <div class="card"><h3>Directional bias</h3><div class="grid g2">${Object.keys(GROUPS).map(gk=>{const v=(p.bias||{})[gk]||"";return `<div class="row" style="justify-content:space-between"><b>${gk}</b><div class="seg" data-g="${gk}">${["Bullish","Neutral","Bearish"].map(b=>`<button type="button" ${ro} data-b="${b}" class="${v===b?"on "+(b==="Bullish"?"bull":b==="Bearish"?"bear":""):""}">${b==="Bullish"?"▲ ":b==="Bearish"?"▼ ":""}${b}</button>`).join("")}</div></div>`}).join("")}</div></div>
+   <div class="card grid g2">
+    <label class="f">HTF narrative (Daily / 1H) & draw on liquidity<textarea class="i" name="htf" ${ro}>${esc(p.htf)}</textarea></label>
+    <label class="f">Key levels (PDH, PDL, FVGs, opens…)<textarea class="i" name="levels" ${ro}>${esc(p.levels)}</textarea></label>
+    <label class="f">News & events<textarea class="i" name="news" ${ro} placeholder="Time · event · impact">${esc(p.news)}</textarea></label>
+    <label class="f">Entry model / A+ setup I'm waiting for<textarea class="i" name="model" ${ro}>${esc(p.model)}</textarea></label>
+    <label class="f">I will NOT trade if…<textarea class="i" name="noTrade" ${ro}>${esc(p.noTrade)}</textarea></label>
+    <div class="grid"><label class="f">Session<select class="i" name="session" ${ro}>${SESSIONS.map(s=>`<option ${p.session===s?"selected":""}>${s}</option>`).join("")}</select></label>
+     <label class="f">Mindset / goal for the day<input class="i" name="mindset" value="${esc(p.mindset)}" ${ro}></label></div>
+   </div>
+   <div class="card"><h3>Pre-trade checklist</h3>${RULES.map(r=>`<label class="check"><input type="checkbox" data-r="${esc(r)}" ${(p.rules||{})[r]?"checked":""} ${ro}><span>${esc(r)}</span></label>`).join("")}</div>
+   <div class="card"><h3>End-of-day review</h3>
+    <div class="grid g3" style="margin-bottom:12px">
+     ${kpi("Day P&L (journal)",`<span class="${cls(dn)}">${smoney(dn)}</span>`,`${dayTrades.length} trade${dayTrades.length===1?"":"s"} logged`)}
+     <div class="kpi"><div class="l">Max loss</div><div style="margin-top:8px" class="status ${!dayTrades.length?"mid":breach?"badd":"good"}">${!dayTrades.length?"⏳ No trades yet":breach?"✖ Max loss hit":"✔ Respected"}</div></div>
+     <div class="kpi"><div class="l">Trade count</div><div style="margin-top:8px" class="status ${!dayTrades.length?"mid":overT?"badd":"good"}">${!dayTrades.length?"⏳ —":overT?`✖ ${dayTrades.length} / ${p.maxTrades}`:`✔ ${dayTrades.length}${p.maxTrades?" / "+p.maxTrades:""}`}</div></div></div>
+    <div class="grid g2"><label class="f">Did I follow my plan?<select class="i" name="followed" ${ro}><option value="">—</option>${["Yes","Partly","No"].map(o=>`<option ${p.followed===o?"selected":""}>${o}</option>`).join("")}</select></label>
+     <label class="f">Review note<input class="i" name="review" value="${esc(p.review)}" ${ro} placeholder="What went right / wrong?"></label></div></div>
+   ${S.readonly?"":`<div class="row" style="justify-content:flex-end"><button class="btn pri" type="submit">Save plan</button></div>`}
+  </form>`;
+  $("#pDate").onchange=e=>{S._planDate=e.target.value;render()};if($("#pHist"))$("#pHist").onchange=e=>{if(e.target.value){S._planDate=e.target.value;render()}};
+  if(S.readonly)return;
+  const bias={...(p.bias||{})};
+  $$(".seg[data-g]").forEach(sg=>$$("button",sg).forEach(b=>b.onclick=()=>{const g=sg.dataset.g,v=b.dataset.b;bias[g]=bias[g]===v?"":v;$$("button",sg).forEach(x=>{x.className=bias[g]===x.dataset.b?"on "+(v==="Bullish"?"bull":v==="Bearish"?"bear":""):""})}));
+  $("#pf").onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const rules={};$$("[data-r]").forEach(c=>rules[c.dataset.r]=c.checked);
+    const np={...p,...d,bias,rules,date:cur,user_id:S.subject.id};
+    try{await API.savePlan(np);const i=S.plans.findIndex(x=>x.date===cur);if(i>=0)S.plans[i]=np;else S.plans.push(np);toast("Plan saved");render()}catch(err){toast("Couldn't save: "+(err.message||err))}};
+}
+
+/* ============ RISK ============ */
+function vRisk(el){const st=S._risk||(S._risk={grp:"Nasdaq",bal:50000,mode:"$",risk:250,stopMode:"pts",stop:20,entry:"",stopPx:"",rr:2,fees:""});
+  el.innerHTML=`<h1>Risk calculator</h1><p class="sub">How many contracts can I take for this stop? Every market is different, so the calculator uses each one's dollar value per point.</p>
+  <div class="grid g2">
+   <div class="card grid">
+    <div><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">Market</div><div class="seg" id="rGrp" style="flex-wrap:wrap">${Object.keys(GROUPS).map(g=>`<button data-g="${g}" class="${st.grp===g?"on":""}">${g}</button>`).join("")}</div></div>
+    <div class="grid g2">
+     <label class="f">Account balance $<input class="i rk" type="number" step="any" data-k="bal" value="${st.bal}"></label>
+     <label class="f">Risk per trade <div class="row" style="flex-wrap:nowrap"><input class="i rk" type="number" step="any" data-k="risk" value="${st.risk}"><div class="seg" id="rMode"><button data-m="$" class="${st.mode==="$"?"on":""}">$</button><button data-m="%" class="${st.mode==="%"?"on":""}">%</button></div></div></label>
+    </div>
+    <div><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">Stop loss</div><div class="seg" id="rSM"><button data-s="pts" class="${st.stopMode==="pts"?"on":""}">Points</button><button data-s="ticks" class="${st.stopMode==="ticks"?"on":""}">Ticks</button><button data-s="px" class="${st.stopMode==="px"?"on":""}">Entry & stop price</button></div></div>
+    ${st.stopMode==="px"?`<div class="grid g2"><label class="f">Entry price<input class="i rk" type="number" step="any" data-k="entry" value="${st.entry}"></label><label class="f">Stop price<input class="i rk" type="number" step="any" data-k="stopPx" value="${st.stopPx}"></label></div>`
+     :`<label class="f">Stop size in ${st.stopMode==="pts"?"points":"ticks"}<input class="i rk" type="number" step="any" data-k="stop" value="${st.stop}"></label>`}
+    <div class="grid g2"><label class="f">Reward : risk (target)<input class="i rk" type="number" step="any" data-k="rr" value="${st.rr}"></label>
+     <label class="f">Fees per contract (round trip) $<input class="i rk" type="number" step="any" data-k="fees" value="${st.fees}" placeholder="optional"></label></div>
+   </div>
+   <div id="rOut"></div>
+  </div>
+  <div class="card" style="margin-top:12px"><h3>Contract specs</h3><div class="tw"><table class="t"><tr><th>Symbol</th><th>Contract</th><th>$ / point</th><th>Tick</th><th>$ / tick</th><th>10 micros =</th></tr>
+   ${Object.entries(MK).map(([k,m])=>`<tr><td class="mono"><b>${k}</b></td><td>${m.name}</td><td class="mono">$${m.pv}</td><td class="mono">${m.tick}</td><td class="mono">$${(m.pv*m.tick).toFixed(2)}</td><td class="mut">${m.type==="Micro"?"1 mini":""}</td></tr>`).join("")}</table></div>
+   <p class="mut" style="font-size:12px;margin:8px 0 0">Specs are the CME standard contracts. Check your prop firm's contract limits and fees.</p></div>`;
+  const out=()=>{const g=GROUPS[st.grp],mini=MK[g[0]],micro=MK[g[1]];
+    const riskUsd=st.mode==="%"?num(st.bal)*num(st.risk)/100:num(st.risk);
+    let pts=st.stopMode==="pts"?num(st.stop):st.stopMode==="ticks"?num(st.stop)*mini.tick:Math.abs(num(st.entry)-num(st.stopPx));
+    const fee=num(st.fees)||0;const rr=num(st.rr)||0;
+    if(!(riskUsd>0)||!(pts>0)){$("#rOut").innerHTML=`<div class="card empty">Enter your risk and stop size.</div>`;return}
+    const perMini=pts*mini.pv+fee,perMicro=pts*micro.pv+fee;
+    const nMini=Math.floor(riskUsd/perMini),nMicro=Math.floor(riskUsd/perMicro);
+    const mixMini=nMini,mixMicro=Math.floor((riskUsd-mixMini*perMini)/perMicro);
+    const mixRisk=mixMini*perMini+mixMicro*perMicro;
+    const dir=st.stopMode==="px"&&num(st.entry)>num(st.stopPx)?1:-1;
+    const tgtPx=st.stopMode==="px"&&isFinite(num(st.entry))?num(st.entry)+dir*pts*rr:null;
+    const ticks=pts/mini.tick;
+    $("#rOut").innerHTML=`<div class="card grid">
+      <div class="row" style="justify-content:space-between"><span class="mut">Max risk</span><span class="big">${money(riskUsd,0)}</span></div>
+      <div class="mut" style="font-size:13px">Stop: <b class="mono">${+pts.toFixed(4)} pts</b> = <b class="mono">${+ticks.toFixed(1)} ticks</b>${st.mode==="%"?` · ${st.risk}% of ${money(num(st.bal),0)}`:` · ${pct(riskUsd/num(st.bal),2)} of account`}</div>
+      <div class="grid g2">
+       <div class="res"><div class="l">${g[1]} · micro</div><div class="big">${nMicro}</div><div class="mut" style="font-size:12px">${money(perMicro)} risk each<br>Total risk ${money(nMicro*perMicro)}<br>Target (${rr}R) ${money(nMicro*(pts*micro.pv*rr-fee))}</div></div>
+       <div class="res"><div class="l">${g[0]} · mini</div><div class="big">${nMini}</div><div class="mut" style="font-size:12px">${money(perMini)} risk each<br>Total risk ${money(nMini*perMini)}<br>Target (${rr}R) ${money(nMini*(pts*mini.pv*rr-fee))}</div></div>
+      </div>
+      <div class="res"><div class="l">Best mix (closest to your risk)</div><div style="font-size:18px;font-weight:800;margin-top:4px">${mixMini} ${g[0]} + ${mixMicro} ${g[1]}</div><div class="mut" style="font-size:12px">Risk ${money(mixRisk)} · ${pct(mixRisk/riskUsd,0)} of your max${tgtPx!=null?` · Take profit at <b class="mono">${+tgtPx.toFixed(2)}</b>`:""}</div></div>
+      ${nMicro===0?`<div class="status badd">✖ Stop is too wide: even 1 ${g[1]} risks ${money(perMicro)}. Tighten the stop or skip the trade.</div>`:""}
+    </div>`};
+  out();
+  $$(".rk").forEach(i=>i.oninput=()=>{st[i.dataset.k]=i.value;out()});
+  $$("#rGrp button").forEach(b=>b.onclick=()=>{st.grp=b.dataset.g;if(st.grp==="Gold"&&st.stopMode==="pts"&&num(st.stop)>20)st.stop=5;render()});
+  $$("#rMode button").forEach(b=>b.onclick=()=>{st.mode=b.dataset.m;if(st.mode==="%"&&num(st.risk)>10)st.risk=0.5;render()});
+  $$("#rSM button").forEach(b=>b.onclick=()=>{st.stopMode=b.dataset.s;render()});
+}
+
+/* ============ CONSISTENCY ============ */
+function vConsistency(el){const c=S._cons||(S._cons={size:50000,target:3000,pct:30,total:"",best:"",acct:"all"});
+  el.innerHTML=`<h1>Consistency rule calculator</h1><p class="sub">Most prop firms say your best day can't be more than <b>X%</b> of your total profit. This shows how much you can make per day and how much more you need.</p>
+  <div class="grid g2"><div class="card grid">
+   <div class="grid g2">
+    <label class="f">Account size $<input class="i ck" type="number" step="any" data-k="size" value="${c.size}"></label>
+    <label class="f">Profit target $<input class="i ck" type="number" step="any" data-k="target" value="${c.target}"></label>
+    <label class="f">Consistency rule %<input class="i ck" type="number" step="any" data-k="pct" value="${c.pct}"></label>
+    <div></div>
+    <label class="f">Total profit so far $<input class="i ck" type="number" step="any" data-k="total" value="${c.total}" placeholder="0"></label>
+    <label class="f">Best day so far $<input class="i ck" type="number" step="any" data-k="best" value="${c.best}" placeholder="0"></label>
+   </div>
+   <div class="row"><select class="i" id="cAcct" style="width:auto"><option value="all">All accounts</option>${accounts().map(a=>`<option ${c.acct===a?"selected":""}>${esc(a)}</option>`).join("")}</select><button class="btn sm" id="cFill">Fill from my journal</button></div>
+   <div class="pills">${[20,30,40,50].map(p=>`<span class="pill ${num(c.pct)===p?"on":""}" data-p="${p}">${p}% rule</span>`).join("")}</div>
+  </div><div id="cOut"></div></div>`;
+  const out=()=>{const P=num(c.pct)/100,T=num(c.target),tot=num(c.total)||0,best=num(c.best)||0;
+    if(!(P>0&&P<=1)||!(T>0)){$("#cOut").innerHTML='<div class="card empty">Enter the target and rule %.</div>';return}
+    const capAtTarget=T*P;const needTotal=Math.max(T,best>0?best/P:0);const remain=Math.max(0,needTotal-tot);const ratio=tot>0?best/tot:NaN;const minDays=Math.ceil(1/P-1e-9);
+    const ok=tot>0&&best<=tot*P+1e-9;const maxToday=Math.max(0,(P*(tot)-best)/(1-P));
+    $("#cOut").innerHTML=`<div class="card grid">
+     <div class="res"><div class="l">Max profit in one day (if you finish right at target)</div><div class="big">${money(capAtTarget,0)}</div><div class="mut" style="font-size:12px">${c.pct}% × ${money(T,0)}</div></div>
+     <div class="grid g2">
+      <div class="res"><div class="l">Minimum trading days</div><div class="big">${minDays}</div><div class="mut" style="font-size:12px">if every day is at the cap</div></div>
+      <div class="res"><div class="l">Total profit you need</div><div class="big">${money(needTotal,0)}</div><div class="mut" style="font-size:12px">${best>0&&best/P>T?`your best day ${money(best,0)} ÷ ${c.pct}%`:"= profit target"}</div></div>
+     </div>
+     ${tot>0||best>0?`<div class="res"><div class="l">Where you are now</div>
+      <div style="margin:6px 0"><div class="bar" style="height:10px"><i style="width:${Math.min(100,tot/needTotal*100)}%;background:var(--gold)"></i></div></div>
+      <div class="mut" style="font-size:13px">Profit ${money(tot,0)} of ${money(needTotal,0)} · <b>${money(remain,0)}</b> to go · best day = <b>${pct(ratio,1)}</b> of total</div></div>
+      <div class="status ${ok&&tot>=T?"good":ok?"mid":"badd"}">${ok&&tot>=T?"✔ Target reached and consistent — you can request payout / pass":ok?`✔ Consistent so far. Keep going: ${money(remain,0)} left`:`✖ Not consistent yet: best day is ${pct(ratio,1)} of total (max ${c.pct}%). Make ${money(remain,0)} more without beating your best day.`}</div>
+      <div class="res"><div class="l">Tomorrow — don't make more than</div><div class="big warn">${money(Math.max(maxToday,best),0)}</div><div class="mut" style="font-size:12px">Above this, tomorrow becomes your new best day and pushes your required profit higher.</div></div>`:""}
+     <p class="mut" style="font-size:12px;margin:0">Formula: best day ≤ ${c.pct}% × total profit. Some firms count it differently (e.g. % of the profit target). Always check your firm's rules.</p>
+    </div>`};
+  out();
+  $$(".ck").forEach(i=>i.oninput=()=>{c[i.dataset.k]=i.value;out()});
+  $$(".pill[data-p]").forEach(p=>p.onclick=()=>{c.pct=Number(p.dataset.p);render()});
+  $("#cAcct").onchange=e=>c.acct=e.target.value;
+  $("#cFill").onclick=()=>{let ts=S.trades;if(c.acct!=="all")ts=ts.filter(t=>t.account===c.acct);const st=calc(ts);c.total=+st.net.toFixed(2);c.best=st.bestDay?+Math.max(0,st.bestDay[1]).toFixed(2):0;render();toast("Filled from journal")};
+}
+
+/* ============ IMPORT ============ */
+const FIELDS=[["date","Date / time"],["time","Time"],["symbol","Symbol"],["side","Side / direction"],["qty","Quantity"],["entry","Entry price"],["exit","Exit price"],["pnl","P&L"],["fees","Fees / commission"],["boughtTs","Bought timestamp"],["soldTs","Sold timestamp"],["buyPrice","Buy price"],["sellPrice","Sell price"]];
+const SYN={date:["date","trade date","open time","entry time","opened","datetime","time opened","entrytime"],time:["time"],symbol:["symbol","instrument","contract","product","market","ticker"],
+  side:["side","direction","b/s","action","type","position","long/short"],qty:["qty","quantity","contracts","size","volume","filled qty","lots"],
+  entry:["entry","entry price","avg entry","open price","entryprice","avg. entry"],exit:["exit","exit price","close price","avg exit","exitprice","avg. exit"],
+  pnl:["pnl","p&l","profit","net pnl","realized pnl","net p&l","gross pnl","profit/loss","p/l","realized p&l"],fees:["fees","commission","commissions","fee"],
+  boughtTs:["boughttimestamp","bought timestamp","buy time"],soldTs:["soldtimestamp","sold timestamp","sell time"],buyPrice:["buyprice","buy price","avg buy"],sellPrice:["sellprice","sell price","avg sell"]};
+function parseCSV(text){const first=text.split(/\r?\n/)[0]||"";const cnt=ch=>first.split(ch).length;const del=cnt("\t")>cnt(",")&&cnt("\t")>cnt(";")?"\t":cnt(";")>cnt(",")?";":",";
+  const rows=[];let row=[],f="",q=false;for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;else if(c===del){row.push(f);f=""}else if(c==="\n"){row.push(f);rows.push(row);row=[];f=""}else if(c!=="\r")f+=c}
+  if(f!==""||row.length){row.push(f);rows.push(row)}return rows.filter(r=>r.some(x=>x.trim()!==""))}
+function pNum(s){if(s==null)return NaN;s=String(s).trim();if(!s)return NaN;const neg=/^\(.*\)$/.test(s.replace(/[$€\s]/g,""))||/^-/.test(s.replace(/[$€\s]/g,""))||/\$\(/.test(s);const v=parseFloat(s.replace(/[^0-9.]/g,""));return isFinite(v)?(neg?-v:v):NaN}
+function pDT(s){if(!s)return null;s=String(s).trim();let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})[ T]?(\d{1,2}):?(\d{2})?/);
+  if(m){let y=+m[3];if(y<100)y+=2000;return {date:`${y}-${pad(m[1])}-${pad(m[2])}`,time:m[4]?`${pad(m[4])}:${m[5]||"00"}`:"",ts:new Date(y,m[1]-1,m[2],m[4]||0,m[5]||0).getTime()}}
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);if(m)return {date:`${m[1]}-${m[2]}-${m[3]}`,time:m[4]?`${m[4]}:${m[5]}`:"",ts:new Date(+m[1],m[2]-1,+m[3],+(m[4]||0),+(m[5]||0)).getTime()};
+  const d=new Date(s);if(!isNaN(d))return {date:ymd(d),time:`${pad(d.getHours())}:${pad(d.getMinutes())}`,ts:d.getTime()};return null}
+function vImport(el){const I=S._imp||(S._imp={rows:null,map:{},acct:""});
+  el.innerHTML=`<h1>Import trades from CSV</h1><p class="sub">Works with Tradovate, NinjaTrader, Rithmic/R|Trader, TradingView and most broker exports. Columns are matched automatically — fix anything below before importing.</p>
+   <div class="card grid"><div class="drop" id="cDrop">📄 Choose a CSV file (or drop it here)</div><input type="file" id="cFile" accept=".csv,.txt,text/csv" class="hidden">
+   <label class="f">Account name for these trades<input class="i" id="cAcctName" list="acList2" value="${esc(I.acct)}" placeholder="e.g. Eval 50K"></label><datalist id="acList2">${accounts().map(a=>`<option>${esc(a)}</option>`).join("")}</datalist></div>
+   <div id="cMap"></div>`;
+  const load=file=>{const r=new FileReader();r.onload=()=>{const rows=parseCSV(String(r.result));if(rows.length<2){toast("No rows found");return}I.rows=rows;const hd=rows[0].map(h=>h.trim().toLowerCase());I.map={};
+    FIELDS.forEach(([k])=>{const i=hd.findIndex(h=>SYN[k].includes(h));if(i>=0)I.map[k]=i});
+    if(I.map.boughtTs!=null&&I.map.date===I.map.boughtTs)delete I.map.date;draw()};r.readAsText(file)};
+  $("#cDrop").onclick=()=>$("#cFile").click();$("#cFile").onchange=e=>e.target.files[0]&&load(e.target.files[0]);
+  $("#cDrop").ondragover=e=>{e.preventDefault()};$("#cDrop").ondrop=e=>{e.preventDefault();e.dataTransfer.files[0]&&load(e.dataTransfer.files[0])};
+  $("#cAcctName").oninput=e=>I.acct=e.target.value;
+  const build=()=>{const hd=I.rows[0],M=I.map,g=(r,k)=>M[k]!=null?r[M[k]]:"";const out=[];
+    I.rows.slice(1).forEach(r=>{let dt=pDT(g(r,"date"));let side=String(g(r,"side")).toLowerCase();side=/sell|short|^s$/.test(side)?"Short":/buy|long|^b$/.test(side)?"Long":"";
+      let entry=pNum(g(r,"entry")),exit=pNum(g(r,"exit"));
+      if(M.boughtTs!=null&&M.soldTs!=null){const b=pDT(g(r,"boughtTs")),s=pDT(g(r,"soldTs"));if(b&&s){side=b.ts<=s.ts?"Long":"Short";dt=side==="Long"?b:s;
+        const bp=pNum(g(r,"buyPrice")),sp=pNum(g(r,"sellPrice"));if(isFinite(bp)&&isFinite(sp)){entry=side==="Long"?bp:sp;exit=side==="Long"?sp:bp}}}
+      if(!dt)return;if(M.time!=null&&g(r,"time")&&!dt.time)dt.time=String(g(r,"time")).slice(0,5);
+      const sym=rootOf(g(r,"symbol"))||"?";const pnl=pNum(g(r,"pnl"));
+      out.push({id:uuid(),user_id:S.subject.id,date:dt.date,time:dt.time,account:I.acct||"Imported",symbol:sym,side:side||"Long",qty:Math.abs(pNum(g(r,"qty")))||1,
+        entry:isFinite(entry)?entry:"",exit:isFinite(exit)?exit:"",stop:"",target:"",pnl:isFinite(pnl)?pnl:"",fees:isFinite(pNum(g(r,"fees")))?Math.abs(pNum(g(r,"fees"))):"",
+        setup:"",session:"",emotions:[],feeling:"",followed:"",rating:0,shots:[],remark:"",notes:"",imported:true})});return out};
+  const draw=()=>{if(!I.rows){$("#cMap").innerHTML="";return}const hd=I.rows[0];const prev=build();
+    $("#cMap").innerHTML=`<div class="card" style="margin-top:12px"><h3>Match columns</h3><div class="grid g4">${FIELDS.map(([k,l])=>`<label class="f">${l}<select class="i" data-f="${k}"><option value="">— none —</option>${hd.map((h,i)=>`<option value="${i}" ${I.map[k]===i?"selected":""}>${esc(h)}</option>`).join("")}</select></label>`).join("")}</div></div>
+    <div class="card" style="margin-top:12px"><h3>Preview — ${prev.length} trades</h3><div class="tw"><table class="t"><tr><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th><th>Net P&L</th></tr>
+     ${prev.slice(0,8).map(t=>`<tr><td>${t.date} ${t.time}</td><td class="mono">${esc(t.symbol)}</td><td>${t.side}</td><td>${t.qty}</td><td class="mono">${t.entry}</td><td class="mono">${t.exit}</td><td class="mono ${cls(tradeNet(t))}">${smoney(tradeNet(t))}</td></tr>`).join("")}</table></div>
+     <p class="mut" style="font-size:12px">Total: <b class="${cls(prev.reduce((a,t)=>a+tradeNet(t),0))}">${smoney(prev.reduce((a,t)=>a+tradeNet(t),0))}</b>. After importing, open any trade to add the screenshot, emotions and notes.</p>
+     <div class="row" style="justify-content:flex-end"><button class="btn" id="cClear">Cancel</button><button class="btn pri" id="cGo" ${prev.length?"":"disabled"}>Import ${prev.length} trades</button></div></div>`;
+    $$("[data-f]").forEach(s=>s.onchange=()=>{const v=s.value;if(v==="")delete I.map[s.dataset.f];else I.map[s.dataset.f]=Number(v);draw()});
+    $("#cClear").onclick=()=>{S._imp=null;render()};
+    $("#cGo").onclick=async()=>{const ts=build();$("#cGo").disabled=true;try{await API.saveTrades(ts);S.trades.push(...ts);S._imp=null;toast(`Imported ${ts.length} trades`);go("journal")}catch(e){$("#cGo").disabled=false;toast("Import failed: "+(e.message||e))}}};
+  draw();
+}
+
+/* ============ ADMIN ============ */
+async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</div>';
+  let profs,trades,plans;try{[profs,trades,plans]=await Promise.all([API.listProfiles(),API.allTradesLite(),API.allPlans()])}catch(e){el.innerHTML=`<div class="card empty">Couldn't load: ${esc(e.message||e)}</div>`;return}
+  const students=profs.filter(p=>p.role!=="admin");const wk=new Date();wk.setDate(wk.getDate()-7);const wkS=ymd(wk);const nd=nextTradingDay();
+  const rows=students.map(s=>{const ts=trades.filter(t=>t.user_id===s.id);const c=calc(ts);const last=ts.map(t=>t.date).sort().pop()||"";
+    const pl=plans.filter(p=>p.user_id===s.id);const brk=ts.filter(t=>t.followed==="No").length;
+    let mlb=0;pl.forEach(p=>{const dn=ts.filter(t=>t.date===p.date).reduce((a,t)=>a+tradeNet(t),0);if(num(p.maxLoss)>0&&dn<=-num(p.maxLoss))mlb++});
+    const em=groupBy(ts,t=>(t.emotions||[]).filter(e=>EMO_BAD.includes(e)));
+    return {s,c,last,active:last>=wkS,plans:pl.length,hasNext:pl.some(p=>p.date>=todayStr()),brk,mlb,worstEmo:em.filter(r=>r.net<0).sort((a,b)=>a.net-b.net)[0]}}).sort((a,b)=>b.c.net-a.c.net);
+  const all=calc(trades.filter(t=>students.some(s=>s.id===t.user_id)));
+  const emoAll=groupBy(trades,t=>(t.emotions||[]).filter(e=>EMO_BAD.includes(e))).filter(r=>r.net<0).sort((a,b)=>a.net-b.net).slice(0,3);
+  el.innerHTML=`<h1>👑 Admin dashboard</h1><p class="sub">All your Tradeversity students in one place. Click a student to open their journal, stats and plans (read-only).</p>
+   <div class="grid g4" style="margin-bottom:12px">
+    ${kpi("Students",students.length,`${rows.filter(r=>r.active).length} active this week`)}
+    ${kpi("Trades logged",all.n,"all students")}
+    ${kpi("Combined net",`<span class="${cls(all.net)}">${money(all.net,0)}</span>`,`win rate ${pct(all.wr,0)}`)}
+    ${kpi("Plans for next session",rows.filter(r=>r.hasNext).length+" / "+students.length,fmtDate(nd))}
+   </div>
+   ${emoAll.length?`<div class="card" style="margin-bottom:12px"><h3>Group weak spots</h3>${emoAll.map(r=>`<div class="insight"><span class="ic">⚠️</span><span><b>${esc(r.k)}</b> trades across students: <b class="neg">${money(r.net,0)}</b> over ${r.n} trades (${pct(r.wr,0)} win). Good topic for the next live.</span></div>`).join("")}</div>`:""}
+   <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">Students</h3><div class="row"><input class="i" id="aq" placeholder="Search name, email, Telegram" style="width:240px"><button class="btn sm" id="aExp">Export CSV</button></div></div>
+   <div class="tw"><table class="t" id="aT"><tr><th>Student</th><th>Telegram</th><th>Trades</th><th>Net P&L</th><th>Win %</th><th>PF</th><th>Broke plan</th><th>Max-loss days</th><th>Weak spot</th><th>Last trade</th><th>Plan</th></tr>
+   ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b>${esc(r.s.name)}</b><div class="mut" style="font-size:11px">${esc(r.s.email)}</div></td><td class="mono">${esc(r.s.telegram||"")}</td><td class="mono">${r.c.n}</td><td class="mono ${cls(r.c.net)}">${smoney(r.c.net,0)}</td><td class="mono">${pct(r.c.wr,0)}</td><td class="mono">${isFinite(r.c.pf)?r.c.pf.toFixed(2):"—"}</td>
+     <td class="mono ${r.brk?"neg":""}">${r.brk}</td><td class="mono ${r.mlb?"neg":""}">${r.mlb}</td><td>${r.worstEmo?`<span class="tag bad">${esc(r.worstEmo.k)}</span>`:"—"}</td><td>${r.last?r.last.slice(5):"—"} ${r.active?"":'<span class="tag">idle</span>'}</td><td>${r.hasNext?'<span class="ok">✔</span>':'<span class="mut">—</span>'}</td></tr>`).join("")||`<tr><td colspan="11" class="empty">No students yet. Share the website link — they sign up for free.</td></tr>`}</table></div></div>`;
+  $("#aq").oninput=e=>{const q=e.target.value.toLowerCase();$$("#aT tr[data-q]").forEach(tr=>tr.classList.toggle("hidden",!tr.dataset.q.includes(q)))};
+  $$("#aT tr[data-id]").forEach(tr=>tr.onclick=async()=>{const s=students.find(x=>x.id===tr.dataset.id);await loadSubject(s,true);S.view="journal";render();window.scrollTo(0,0)});
+  $("#aExp").onclick=()=>{const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;saveFile(`tradeversity-students-${todayStr()}.csv`,["name,email,telegram,joined,trades,net_pnl,win_rate,profit_factor,broke_plan,max_loss_days,last_trade",...rows.map(r=>[r.s.name,r.s.email,r.s.telegram,(r.s.created_at||"").slice(0,10),r.c.n,r.c.net.toFixed(2),isFinite(r.c.wr)?(r.c.wr*100).toFixed(1):"",isFinite(r.c.pf)?r.c.pf.toFixed(2):"",r.brk,r.mlb,r.last].map(q).join(","))].join("\n"),"text/csv")};
+}
+
+/* ============ boot ============ */
+(async function boot(){
+  try{
+    if(DEMO){Demo.load();API=Demo}else{await Cloud.init();API=Cloud}
+    const u=await API.session();if(u)await enter(u);else showAuth();
+  }catch(e){console.error(e);if(!DEMO){document.body.insertAdjacentHTML("afterbegin",`<div class="banner" style="margin:12px">Couldn't reach the server: ${esc(e.message||e)}. Check CONFIG in index.html.</div>`)}Demo.load();API=API||Demo;showAuth()}
+})();
+</script>
+</body>
+</html>
