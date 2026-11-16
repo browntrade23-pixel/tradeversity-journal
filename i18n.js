@@ -437,6 +437,10 @@ const T={
 // brand
 "Founder":["Fondateur","المؤسس"],
 "Founder ·":["Fondateur ·","المؤسس ·"],
+"Founders":["Fondateurs","المؤسسون"],
+"Founders ·":["Fondateurs ·","المؤسسون ·"],
+"and":["et","و"],
+"&":["&","و"],
 // gate
 "Not everyone gets in.":["Tout le monde n'entre pas.","ليس الجميع يدخل."],
 "Only the disciplined see what's behind this door.":["Seuls les disciplinés voient ce qui se cache derrière cette porte.","وحدهم المنضبطون يرون ما وراء هذا الباب."],

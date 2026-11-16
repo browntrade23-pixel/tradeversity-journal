@@ -327,7 +327,8 @@ html[lang=ar] .about-t{letter-spacing:0}
 .founder-chip{font-size:10px;letter-spacing:.12em;text-transform:uppercase}
 .founder-chip b{color:var(--gold);letter-spacing:.16em}
 html[lang=ar] .foot.founder span,html[lang=ar] .foot.founder b,html[lang=ar] .founder-chip,html[lang=ar] .founder-chip b{letter-spacing:0}
-@media(max-width:700px){.founder-chip{display:none}}
+.founder-chip{white-space:nowrap}.brand>div,#whoChip,#logout{white-space:nowrap}
+@media(max-width:1180px){.founder-chip{display:none}}
 /* language picker */
 select.i.langSel{width:auto;padding:5px 8px;font-size:12px;border-radius:8px}
 .langbar{display:flex;justify-content:flex-end;margin-bottom:10px}
@@ -372,7 +373,7 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
     <div class="tg-links" id="socGate"></div>
     <div class="gate-promo" data-promo></div>
     <div class="about-mini" data-about-mini></div>
-    <div class="gate-hint">Founder · <b>BROWN ALGO</b></div>
+    <div class="gate-hint">Founders · <b>BROWN ALGO</b> &amp; <b>ZNTRADING</b></div>
   </div>
 
   <div class="authbox sealed">
@@ -413,7 +414,7 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 
     <div data-promo style="margin-top:14px"></div>
     <div class="about-auth" data-about-auth></div>
-    <div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div>
+    <div class="foot founder"><span>Founders</span> <b>BROWN ALGO &amp; ZNTRADING</b></div>
     <div class="copyright">© 2026 Tradeversity. All rights reserved.</div>
   </div>
   <div id="socTop" class="soc icons"></div>
@@ -428,14 +429,14 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
       <div class="spacer"></div>
       <span id="socHead" class="soc icons"></span>
       <span id="langTop"></span>
-      <span class="chip founder-chip" title="Founder"><span>Founder</span> <b>BROWN ALGO</b></span>
+      <span class="chip founder-chip" title="Founders"><span>Founders</span> <b>BROWN ALGO &amp; ZNTRADING</b></span>
       <span class="chip" id="whoChip" data-notr></span>
       <button class="btn sm ghost" id="logout">Log out</button>
     </div>
     <nav class="tabs" id="tabs"></nav>
   </header>
   <main id="view"></main>
-  <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div id="socFoot" class="soc"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>
+  <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div id="socFoot" class="soc"></div><div class="foot founder"><span>Founders</span> <b>BROWN ALGO &amp; ZNTRADING</b></div><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>
 </section>
 
 <div id="modal" class="modal hidden"><div class="box" id="mbox"></div></div>
@@ -1301,7 +1302,7 @@ function resultsStripHTML(){if(!RESULTS.length)return "";const imgs=RESULTS.map(
 function resultsBtn(){return `<a class="tg-link res" href="${ABOUT.channel}" target="_blank" rel="noopener">${SOCIAL[0].icon}<span>See all results on Telegram</span></a>`}
 function vAbout(el){
   el.innerHTML=`<div class="about-hero"><div class="logo lg" role="img" aria-label="Tradeversity"></div><div><h1>About Tradeversity</h1>
-    <p class="sub" style="max-width:640px">Tradeversity is a trading mentorship and community founded by <b>Brown Algo</b>. We teach a disciplined, rule-based way to trade futures: a clear daily bias, a written plan, strict risk, and an honest journal.</p></div></div>
+    <p class="sub" style="max-width:640px">Tradeversity is a trading mentorship and community founded by <b>Brown Algo</b> and <b>ZNtrading</b>. We teach a disciplined, rule-based way to trade futures: a clear daily bias, a written plan, strict risk, and an honest journal.</p></div></div>
    ${aboutStatsHTML()}
    <div class="grid g2" style="margin:14px 0">
      <div class="card"><h3>What we believe</h3><div class="insight"><span class="ic">🎯</span><span>Discipline over excitement: 2 trades max per day, only A+ setups.</span></div><div class="insight"><span class="ic">🛡️</span><span>Protect the account first. A respected loss is part of the job.</span></div><div class="insight"><span class="ic">📓</span><span>Every trade is journaled, every day is planned and reviewed.</span></div></div>
@@ -1310,7 +1311,7 @@ function vAbout(el){
    ${RESULTS.length?`<div class="card"><h3>Student results</h3><div class="rgrid">${RESULTS.map(f=>`<img src="results/${encodeURI(f)}" alt="Student result" loading="lazy" data-res="${esc(f)}">`).join("")}</div></div>`:""}`;
 }
 function fillAbout(){$$("[data-about-mini]").forEach(e=>e.innerHTML=`<span><b data-notr>${ABOUT.years}</b> <span>years in the markets</span></span><span class="sep">·</span><span><b data-notr>${ABOUT.students}</b> <span>students</span></span><span class="sep">·</span><span>real results</span>`);
-  $$("[data-about-auth]").forEach(e=>e.innerHTML=`<div class="about-t">Who we are</div><p>Tradeversity is a trading mentorship founded by <b>Brown Algo</b>: disciplined, rule-based futures trading.</p>${aboutStatsHTML()}${resultsStripHTML()}<div style="display:flex;justify-content:center;margin-top:10px">${resultsBtn()}</div>`)}
+  $$("[data-about-auth]").forEach(e=>e.innerHTML=`<div class="about-t">Who we are</div><p>Tradeversity is a trading mentorship founded by <b>Brown Algo</b> and <b>ZNtrading</b>: disciplined, rule-based futures trading.</p>${aboutStatsHTML()}${resultsStripHTML()}<div style="display:flex;justify-content:center;margin-top:10px">${resultsBtn()}</div>`)}
 fillAbout();
 document.addEventListener("click",e=>{const im=e.target.closest&&e.target.closest("img[data-res]");if(!im)return;openModal(`<div class="mhead"><h2>Student result</h2><button class="x" id="mx">×</button></div><img src="${im.src}" alt="Student result" style="width:100%;border-radius:10px;border:1px solid var(--line)">`);$("#mx").onclick=closeModal});
 

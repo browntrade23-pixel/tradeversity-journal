@@ -1,5 +1,5 @@
 # The Effective Journal — by Tradeversity
-Founder: **BROWN ALGO**
+Founders: **BROWN ALGO** & **ZNTRADING**
 
 A trading journal for your students: trades with screenshots and remarks, emotions, stats, tomorrow's plan, a risk calculator (NQ/MNQ, ES/MES, YM/MYM, GC/MGC), a consistency rule calculator, CSV import, free student accounts, and an admin dashboard for you.
 
