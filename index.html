@@ -607,9 +607,9 @@ html[lang=ar] .about-t{letter-spacing:0}
 .astat .apre{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2);font-weight:700;margin-bottom:-4px}
 html[lang=ar] .astat .apre{letter-spacing:0}
 .about-hero{display:flex;gap:18px;align-items:center;margin-bottom:14px}
-@keyframes aboutFloat{0%,100%{transform:translateY(0) rotate(0) scale(1);filter:drop-shadow(0 6px 14px rgba(245,185,66,.25))}50%{transform:translateY(-7px) rotate(-3deg) scale(1.03);filter:drop-shadow(0 14px 24px rgba(245,185,66,.5))}}
-.about-hero .logo.lg{animation:aboutFloat 3.6s ease-in-out infinite;flex:none}
-@media(prefers-reduced-motion:reduce){.about-hero .logo.lg{animation:none}}
+.about-hero .logo.lg{flex:none;transition:transform .35s ease,filter .35s ease}
+.about-hero .logo.lg:hover{transform:translateY(-3px) rotate(-2deg) scale(1.02);filter:drop-shadow(0 8px 16px rgba(245,185,66,.4))}
+@media(prefers-reduced-motion:reduce){.about-hero .logo.lg{transition:none}}
 @media(max-width:560px){.about-hero{flex-direction:column;text-align:center}.astat b{font-size:20px}}
 .rstrip{overflow:hidden;margin-top:12px;border-radius:10px;-webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
 .rtrack{display:flex;gap:8px;width:max-content;animation:marquee 40s linear infinite}
