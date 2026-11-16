@@ -588,6 +588,9 @@ html[lang=ar] .tp-ex span{letter-spacing:0}
 .rest-card input{width:18px;height:18px;accent-color:var(--gold);flex:none}
 .rest-card>span{display:flex;flex-direction:column;gap:2px}.rest-card .mut{font-size:12px}
 .rest-card:has(input:checked){border-color:var(--gold);border-style:solid;background-color:color-mix(in srgb,var(--gold) 8%,var(--panel))}
+.daytype{gap:12px}
+.trade-card input{accent-color:var(--green)}
+.trade-card:has(input:checked){border-color:var(--green);background-color:color-mix(in srgb,var(--green) 9%,var(--panel))}
 /* news countdown */
 .ncd{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .ncd b{color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
@@ -1650,7 +1653,10 @@ function vPlan(el){
   el.innerHTML=`<div class="row" style="justify-content:space-between"><div><h1>Trading plan</h1><p class="sub">Plan tomorrow tonight. Execute it tomorrow, then review it.</p></div>
    <div class="row"><input class="i" type="date" id="pDate" value="${cur}" style="width:auto">${dates.length?`<select class="i" id="pHist" style="width:auto"><option value="">Past plans…</option>${dates.map(d=>`<option value="${d}">${d}</option>`).join("")}</select>`:""}</div></div>
   <form id="pf" class="grid">
-   <label class="card rest-card"><input type="checkbox" name="rest" ${p.rest?"checked":""} ${ro}><span><b>😴 Rest day</b><span class="mut">I'm not trading this day. A planned rest day counts for the discipline streak.</span></span></label>
+   <div class="grid g2 daytype">
+    <label class="card rest-card trade-card"><input type="radio" name="dayType" value="trade" ${!p.rest&&p.dayType==="trade"?"checked":""} ${ro}><span><b>📈 Trading day</b><span class="mut">I'm trading this day. I follow my plan and my pre-trade checklist.</span></span></label>
+    <label class="card rest-card"><input type="radio" name="dayType" value="rest" ${p.rest?"checked":""} ${ro}><span><b>😴 Rest day</b><span class="mut">I'm not trading this day. A planned rest day counts for the discipline streak.</span></span></label>
+   </div>
    <div class="card"><h3>Risk limits for ${fmtDate(cur)}</h3><div class="grid g4">
     <label class="f">Max daily loss $<input class="i" type="number" step="any" name="maxLoss" value="${esc(p.maxLoss)}" ${ro} placeholder="e.g. 300"></label>
     <label class="f">Daily profit target $<input class="i" type="number" step="any" name="target" value="${esc(p.target)}" ${ro} placeholder="e.g. 600"></label>
@@ -1685,10 +1691,11 @@ function vPlan(el){
   if(S.readonly)return;
   const ckUpd=()=>{const n=$$(".ck-card [data-r]").filter(c=>c.checked).length;$("#ckN").textContent=`${n} / ${RULES.length}`;$("#ckBar").style.width=n/RULES.length*100+"%";$("#ckGo").classList.toggle("on",n===RULES.length)};
   $$(".ck-card [data-r]").forEach(c=>c.onchange=ckUpd);
+  $$('.daytype input[name="dayType"]').forEach(r=>{r.onpointerdown=()=>{r._was=r.checked};r.onclick=()=>{if(r._was){r.checked=false;r._was=false}}});
   const bias={...(p.bias||{})};
   $$(".seg[data-g]").forEach(sg=>$$("button",sg).forEach(b=>b.onclick=()=>{const g=sg.dataset.g,v=b.dataset.b;bias[g]=bias[g]===v?"":v;$$("button",sg).forEach(x=>{x.className=bias[g]===x.dataset.b?"on "+(v==="Bullish"?"bull":v==="Bearish"?"bear":""):""})}));
   $("#pf").onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const rules={};$$("[data-r]").forEach(c=>rules[c.dataset.r]=c.checked);
-    const np={...p,...d,bias,rules,rest:!!e.target.rest.checked,date:cur,user_id:S.subject.id};
+    const dt=d.dayType||"";const np={...p,...d,bias,rules,dayType:dt,rest:dt==="rest",date:cur,user_id:S.subject.id};
     try{await API.savePlan(np);const i=S.plans.findIndex(x=>x.date===cur);if(i>=0)S.plans[i]=np;else S.plans.push(np);toast("Plan saved");render()}catch(err){toast("Couldn't save: "+(err.message||err))}};
 }
 
