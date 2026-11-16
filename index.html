@@ -156,6 +156,45 @@ svg.ch text{fill:var(--dim);font-size:11px;font-family:Inter,sans-serif}
 .ctile.min{--cc:var(--gold)}.ctile.grn{--cc:var(--green)}.ctile.red{--cc:var(--red)}
 .ctile.gt .ct-h{justify-content:center}.ctile.gt .ct-ty{text-align:center;white-space:normal;line-height:1.35}
 .ctile.gt .ct-n{margin:12px 0 6px}.ctile.gt .ct-n b{font-size:40px}
+.rpills{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rp{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 12px;border-radius:12px;cursor:pointer;
+  border:1px solid var(--line2);background:var(--panel2);color:var(--muted);font:inherit;transition:transform .18s,border-color .2s,box-shadow .2s,color .2s}
+.rp b{font-size:20px;font-weight:900;line-height:1;color:var(--text)}
+.rp span{font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.rp i{position:absolute;left:0;bottom:0;height:3px;width:var(--w);background:var(--line2);border-radius:0 3px 3px 0;transition:background .2s}
+.rp:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--gold) 55%,var(--line2))}
+.rp:hover i{background:color-mix(in srgb,var(--gold) 60%,transparent)}
+.rp.on{border-color:var(--gold);color:var(--gold);background:radial-gradient(120% 100% at 50% 0%,rgba(245,185,66,.22),transparent 70%),var(--panel2);
+  box-shadow:0 0 0 1px rgba(245,185,66,.35),0 6px 22px -8px rgba(245,185,66,.7)}
+.rp.on b{color:var(--gold);text-shadow:0 0 16px rgba(245,185,66,.6)}
+.rp.on i{background:linear-gradient(90deg,var(--gold),#ffd98a);box-shadow:0 0 8px var(--gold)}
+html[data-theme=light] .rp.on,html[data-theme=light] .rp.on b{color:#9a6512}
+.cons-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}
+@media(max-width:900px){.cons-wrap{grid-template-columns:1fr}}
+.cs-sec{border-color:color-mix(in srgb,var(--gold) 18%,var(--line))}
+.cs-rows{display:grid;gap:8px}
+.cs-row{display:grid;grid-template-columns:64px minmax(0,1fr) 70px 34px;gap:10px;align-items:center;animation:ckPop .25s ease}
+.cs-d{font-size:12px;color:var(--muted)}.cs-d b{color:var(--text)}
+.cs-in{height:40px}
+.cs-sh{position:relative;text-align:center;font-weight:800;font-size:14px;padding-bottom:6px;color:var(--green)}
+.cs-sh i{position:absolute;left:0;bottom:0;height:3px;border-radius:3px;background:var(--green);transition:width .3s}
+.cs-row.over .cs-sh{color:var(--red)}.cs-row.over .cs-sh i{background:var(--red);box-shadow:0 0 8px var(--red)}
+.cs-row.over .cs-in{border-color:color-mix(in srgb,var(--red) 60%,transparent)}
+.cs-x{width:34px;height:34px;border-radius:8px;border:1px solid var(--line2);background:var(--panel2);color:var(--red);cursor:pointer;font-size:14px;transition:background .2s,transform .15s}
+.cs-x:hover{background:color-mix(in srgb,var(--red) 15%,var(--panel2));transform:scale(1.06)}
+.cs-add{border-color:color-mix(in srgb,var(--green) 50%,transparent);color:var(--green)}
+.cs-tot{font-size:14px;font-weight:600;padding-top:4px;border-top:1px solid var(--line)}
+.cs-check{width:100%;height:44px;font-weight:800;font-size:15px;border:none;color:#111;cursor:pointer;
+  background:linear-gradient(90deg,var(--gold),#ffd98a);box-shadow:0 8px 24px -10px rgba(245,185,66,.8);transition:transform .15s,box-shadow .2s}
+.cs-check:hover{transform:translateY(-1px);box-shadow:0 10px 30px -8px rgba(245,185,66,.95)}
+.cs-pop{animation:ckPop .4s ease}
+.cs-tip{display:flex;gap:12px;padding:14px 16px;border-radius:14px;font-size:13.5px;line-height:1.5;
+  border:1px solid color-mix(in srgb,var(--gold) 45%,transparent);background:radial-gradient(120% 100% at 0% 0%,rgba(245,185,66,.18),transparent 70%),var(--panel)}
+.cs-tip>div>b:first-child{color:var(--gold);display:block;margin-bottom:2px}
+.cs-ti{font-size:20px;line-height:1}
+.cs-rules h3{margin-top:0}
+.cs-kv{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line)}.cs-kv span{color:var(--muted)}
+.cs-rules p{font-size:13px;margin:12px 0 6px}
 .gt-sub{text-align:center;font-size:12px;color:var(--muted)}
 .ctile:hover{transform:translateY(-2px);box-shadow:0 8px 28px -10px color-mix(in srgb,var(--cc) 60%,transparent)}
 .ctile.zero{filter:saturate(.3);opacity:.7}
@@ -1633,45 +1672,86 @@ function vRisk(el){const st=S._risk||(S._risk={grp:"Nasdaq",bal:50000,mode:"$",r
 }
 
 /* ============ CONSISTENCY ============ */
-function vConsistency(el){const c=S._cons||(S._cons={size:50000,target:3000,pct:30,total:"",best:"",acct:"all"});
-  el.innerHTML=`<h1>Consistency rule calculator</h1><p class="sub">Most prop firms say your best day can't be more than <b>X%</b> of your total profit. This shows how much you can make per day and how much more you need.</p>
-  <div class="grid g2"><div class="card grid" style="align-self:start">
-   <div class="grid g2">
-    <label class="f">Account size $<input class="i ck" type="number" step="any" data-k="size" value="${c.size}"></label>
-    <label class="f">Profit target $<input class="i ck" type="number" step="any" data-k="target" value="${c.target}"></label>
-    <label class="f">Consistency rule %<input class="i ck" type="number" step="any" data-k="pct" value="${c.pct}"></label>
-    <div></div>
-    <label class="f">Total profit so far $<input class="i ck" type="number" step="any" data-k="total" value="${c.total}" placeholder="0"></label>
-    <label class="f">Best day so far $<input class="i ck" type="number" step="any" data-k="best" value="${c.best}" placeholder="0"></label>
+function vConsistency(el){const c=S._cons||(S._cons={size:50000,target:3000,pct:30,acct:"all",days:["",""],checked:false});
+  if(!Array.isArray(c.days))c.days=["",""];
+  const SIZES_C=[25000,50000,75000,100000,150000];
+  const kTxt=v=>num(v)>=1000?`$${+(num(v)/1000).toFixed(1)}K`:money(num(v),0);
+  el.innerHTML=`<h1>Consistency rule calculator</h1><p class="sub">Most prop firms say your best day can't be more than <b>X%</b> of your total profit. Enter your daily P/L and check if you pass.</p>
+  <div class="cons-wrap">
+   <div class="grid" style="align-self:start">
+    <div class="card grid cs-sec">
+     <div class="grid g3">
+      <label class="f">Account size<select class="i" id="cSize">${SIZES_C.map(s=>`<option value="${s}" ${num(c.size)===s?"selected":""}>${kTxt(s)}</option>`).join("")}${SIZES_C.includes(num(c.size))?"":`<option value="${c.size}" selected>${kTxt(c.size)}</option>`}</select></label>
+      <label class="f">Profit target $<input class="i ck cs-tgt" type="number" step="any" data-k="target" value="${c.target}"></label>
+      <label class="f">Consistency rule %<input class="i ck" type="number" step="any" data-k="pct" value="${c.pct}"></label>
+     </div>
+     <div class="rpills">${[20,30,40,50].map(p=>`<button type="button" class="rp ${num(c.pct)===p?"on":""}" data-p="${p}"><b class="mono">${p}%</b><span>rule</span><i style="--w:${p*2}%"></i></button>`).join("")}</div>
+    </div>
+    <div class="card grid cs-sec">
+     <div class="row" style="justify-content:space-between"><h3 style="margin:0">Daily P/L</h3>
+      <div class="row"><select class="i" id="cAcct" style="width:auto"><option value="all">All accounts</option>${accounts().map(a=>`<option ${c.acct===a?"selected":""}>${esc(a)}</option>`).join("")}</select>
+       <button class="btn sm" id="cFill" type="button">Fill from my journal</button><button class="btn sm cs-add" id="cAdd" type="button">+ Add day</button></div></div>
+     <div id="cRows" class="cs-rows"></div>
+     <div class="cs-tot">Total net P/L: <b class="mono" id="cTot"></b></div>
+     <button class="btn cs-check" id="cCheck" type="button">Check consistency</button>
+    </div>
+    <div id="cOut"></div>
    </div>
-   <div class="row"><select class="i" id="cAcct" style="width:auto"><option value="all">All accounts</option>${accounts().map(a=>`<option ${c.acct===a?"selected":""}>${esc(a)}</option>`).join("")}</select><button class="btn sm" id="cFill">Fill from my journal</button></div>
-   <div class="pills">${[20,30,40,50].map(p=>`<span class="pill ${num(c.pct)===p?"on":""}" data-p="${p}">${p}% rule</span>`).join("")}</div>
-  </div><div id="cOut"></div></div>`;
+   <div class="grid" style="align-self:start" id="cSide"></div>
+  </div>`;
   const prev={};
-  const out=()=>{const P=num(c.pct)/100,T=num(c.target),tot=num(c.total)||0,best=num(c.best)||0;
+  const vals=()=>c.days.map(v=>num(v)).map(v=>isFinite(v)?v:0);
+  const rows=()=>{const P=num(c.pct)/100,vs=vals(),tot=vs.reduce((a,b)=>a+b,0);
+    $("#cRows").innerHTML=c.days.map((v,i)=>{const x=vs[i],sh=tot>0&&x>0?x/tot:0,over=P>0&&sh>P+1e-9;
+      return `<div class="cs-row ${over?"over":""}"><span class="cs-d">Day <b>${i+1}</b></span>
+       <input class="i cs-in mono" type="number" step="any" data-i="${i}" value="${esc(v)}" placeholder="Enter daily P/L">
+       <span class="cs-sh mono">${pct(sh,0)}<i style="width:${Math.min(100,sh*100)}%"></i></span>
+       <button class="cs-x" type="button" data-x="${i}" title="Remove">✕</button></div>`}).join("");
+    $$(".cs-in").forEach(inp=>inp.oninput=()=>{c.days[+inp.dataset.i]=inp.value;upd(inp)});
+    $$(".cs-x").forEach(b=>b.onclick=()=>{c.days.splice(+b.dataset.x,1);if(!c.days.length)c.days=[""];rows();side();out()});
+    $("#cTot").textContent=money(tot);$("#cTot").className="mono "+cls(tot)};
+  /* update shares without rebuilding inputs (keeps the cursor in place) */
+  const upd=()=>{const P=num(c.pct)/100,vs=vals(),tot=vs.reduce((a,b)=>a+b,0);
+    $$(".cs-row").forEach((r,i)=>{const x=vs[i],sh=tot>0&&x>0?x/tot:0;r.classList.toggle("over",P>0&&sh>P+1e-9);const s=$(".cs-sh",r);s.firstChild.textContent=pct(sh,0);$("i",s).style.width=Math.min(100,sh*100)+"%"});
+    $("#cTot").textContent=money(tot);$("#cTot").className="mono "+cls(tot);out()};
+  const side=()=>{const P=num(c.pct)/100,T=num(c.target);const n=P>0?Math.ceil(1/P-1e-9):0;
+    $("#cSide").innerHTML=`${P>0&&T>0?`<div class="cs-tip"><div class="cs-ti">💡</div><div><b>Tip</b><div>To pass a <b>${kTxt(c.size)}</b> account in <b>${n}</b> days, aim for <b>${money(T/n,0)}</b> profit days.</div></div></div>`:""}
+     <div class="card cs-rules"><h3>Rules</h3>
+      <div class="cs-kv"><span>Account size</span><b>${kTxt(c.size)}</b></div>
+      <div class="cs-kv"><span>Profit target</span><b>${money(T,0)}</b></div>
+      <div class="cs-kv"><span>Consistency rule</span><b>${c.pct}%</b></div>
+      <div class="cs-kv"><span>Max profit in one day</span><b>${money(T*P,0)}</b></div>
+      <p>No single day's profit may exceed <b>${c.pct}%</b> of your total net profit.</p>
+      <p class="mut" style="font-size:12px;margin:0">Some firms count it differently (e.g. % of the profit target). Always check your firm's rules.</p></div>`};
+  const out=()=>{if(!c.checked){$("#cOut").innerHTML="";return}
+    const P=num(c.pct)/100,T=num(c.target),vs=vals(),tot=vs.reduce((a,b)=>a+b,0),best=Math.max(0,...vs);
     if(!(P>0&&P<=1)||!(T>0)){$("#cOut").innerHTML='<div class="card empty">Enter the target and rule %.</div>';return}
-    const capAtTarget=T*P;const needTotal=Math.max(T,best>0?best/P:0);const remain=Math.max(0,needTotal-tot);const ratio=tot>0?best/tot:NaN;const minDays=Math.ceil(1/P-1e-9);
-    const ok=tot>0&&best<=tot*P+1e-9;const maxToday=Math.max(0,(P*(tot)-best)/(1-P));
+    if(!vs.some(v=>v)){$("#cOut").innerHTML='<div class="card empty">Enter your daily P/L first.</div>';return}
+    const needTotal=Math.max(T,best>0?best/P:0),remain=Math.max(0,needTotal-tot),ratio=tot>0?best/tot:NaN;
+    const ok=tot>0&&best<=tot*P+1e-9,maxToday=Math.max(0,(P*tot-best)/(1-P));
     const gt=(k,cl,lab,val,sub)=>{const bump=prev[k]!==val;prev[k]=val;return `<div class="ctile gt ${cl}"><div class="ct-h"><span class="ct-ty">${lab}</span></div>
       <div class="ct-n"><b class="mono ${bump?"bump":""}">${val}</b></div><div class="gt-sub">${sub}</div></div>`};
-    $("#cOut").innerHTML=`<div class="card grid">
-     ${gt("cap","min","Max profit in one day (if you finish right at target)",money(capAtTarget,0),`${c.pct}% × ${money(T,0)}`)}
+    $("#cOut").innerHTML=`<div class="card grid cs-res">
+     <div class="status ${ok&&tot>=T?"good":ok?"mid":"badd"}">${ok&&tot>=T?"✔ Target reached and consistent — you can request payout / pass":ok?`✔ Consistent so far. Keep going: ${money(remain,0)} left`:`✖ Not consistent yet: best day is ${pct(ratio,1)} of total (max ${c.pct}%). Make ${money(remain,0)} more without beating your best day.`}</div>
      <div class="grid g2">
-      ${gt("days","mic","Minimum trading days",minDays,"if every day is at the cap")}
-      ${gt("need","grn","Total profit you need",money(needTotal,0),best>0&&best/P>T?`your best day ${money(best,0)} ÷ ${c.pct}%`:"= profit target")}
+      ${gt("best",ok?"grn":"red","Best day share",isFinite(ratio)?pct(ratio,1):"—",`best day ${money(best,0)} · max ${c.pct}%`)}
+      ${gt("need","min","Total profit you need",money(needTotal,0),best>0&&best/P>T?`your best day ${money(best,0)} ÷ ${c.pct}%`:"= profit target")}
      </div>
-     ${tot>0||best>0?`<div class="cmix"><div class="l">Where you are now</div>
-      <div class="cm-bar" style="height:10px;margin:10px 0"><i style="width:${Math.min(100,tot/needTotal*100)}%"></i></div>
-      <div class="mut" style="font-size:13px">Profit ${money(tot,0)} of ${money(needTotal,0)} · <b>${money(remain,0)}</b> to go · best day = <b>${pct(ratio,1)}</b> of total</div></div>
-      <div class="status ${ok&&tot>=T?"good":ok?"mid":"badd"}">${ok&&tot>=T?"✔ Target reached and consistent — you can request payout / pass":ok?`✔ Consistent so far. Keep going: ${money(remain,0)} left`:`✖ Not consistent yet: best day is ${pct(ratio,1)} of total (max ${c.pct}%). Make ${money(remain,0)} more without beating your best day.`}</div>
-      ${gt("tmr","red","Tomorrow — don't make more than",money(Math.max(maxToday,best),0),"Above this, tomorrow becomes your new best day and pushes your required profit higher.")}`:""}
-     <p class="mut" style="font-size:12px;margin:0">Formula: best day ≤ ${c.pct}% × total profit. Some firms count it differently (e.g. % of the profit target). Always check your firm's rules.</p>
+     <div class="cmix"><div class="l">Where you are now</div>
+      <div class="cm-bar" style="height:10px;margin:10px 0"><i style="width:${Math.min(100,Math.max(0,tot)/needTotal*100)}%"></i></div>
+      <div class="mut" style="font-size:13px">Profit ${money(tot,0)} of ${money(needTotal,0)} · <b>${money(remain,0)}</b> to go</div></div>
+     ${remain>0?gt("tmr","mic","Tomorrow — don't make more than",money(Math.max(maxToday,best),0),"Above this, tomorrow becomes your new best day and pushes your required profit higher."):""}
     </div>`};
-  out();
-  $$(".ck").forEach(i=>i.oninput=()=>{c[i.dataset.k]=i.value;out()});
-  $$(".pill[data-p]").forEach(p=>p.onclick=()=>{c.pct=Number(p.dataset.p);render()});
+  rows();side();out();
+  $$(".ck").forEach(i=>i.oninput=()=>{c[i.dataset.k]=i.value;$$(".rp").forEach(b=>b.classList.toggle("on",num(c.pct)===+b.dataset.p));upd();side()});
+  $$(".rp[data-p]").forEach(p=>p.onclick=()=>{c.pct=Number(p.dataset.p);render()});
+  $("#cSize").onchange=e=>{const old=num(c.size);c.size=+e.target.value;if(num(c.target)===Math.round(old*0.06))c.target=Math.round(c.size*0.06);render()};
+  $("#cAdd").onclick=()=>{c.days.push("");rows();upd();const ins=$$(".cs-in");ins[ins.length-1].focus()};
+  $("#cCheck").onclick=()=>{c.checked=true;for(const k in prev)delete prev[k];out();const o=$("#cOut");o.classList.remove("cs-pop");void o.offsetWidth;o.classList.add("cs-pop");o.scrollIntoView({behavior:"smooth",block:"nearest"})};
   $("#cAcct").onchange=e=>c.acct=e.target.value;
-  $("#cFill").onclick=()=>{let ts=S.trades;if(c.acct!=="all")ts=ts.filter(t=>t.account===c.acct);const st=calc(ts);c.total=+st.net.toFixed(2);c.best=st.bestDay?+Math.max(0,st.bestDay[1]).toFixed(2):0;render();toast("Filled from journal")};
+  $("#cFill").onclick=()=>{let ts=S.trades;if(c.acct!=="all")ts=ts.filter(t=>t.account===c.acct);const by={};ts.forEach(t=>by[t.date]=(by[t.date]||0)+tradeNet(t));
+    const ds=Object.keys(by).sort();if(!ds.length){toast("No trades in your journal yet");return}
+    c.days=ds.map(d=>String(+by[d].toFixed(2)));c.checked=true;render();toast("Filled from journal")};
 }
 
 /* ============ IMPORT ============ */
