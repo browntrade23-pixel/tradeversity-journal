@@ -43,25 +43,22 @@ nav.tabs button:hover{color:var(--text);background:color-mix(in srgb,var(--panel
 nav.tabs button.on{background:var(--panel);color:var(--text);box-shadow:inset 0 0 0 1px var(--line2)}
 nav.tabs button.admin{color:var(--gold)}
 .ico{width:17px;height:17px;flex:none;display:block}
-/* 3D-style coloured icon tiles */
-.tico{position:relative;width:26px;height:26px;flex:none;display:grid;place-items:center;border-radius:8px;color:#fff;overflow:hidden;
-  background:linear-gradient(150deg,var(--c1),var(--c2));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(0,0,0,.28),0 2px 4px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.18);
-  transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s,filter .22s;filter:saturate(.85) brightness(.92)}
-.tico::after{content:"";position:absolute;inset:0 0 50% 0;border-radius:8px 8px 40% 40%;background:linear-gradient(rgba(255,255,255,.38),rgba(255,255,255,.04));pointer-events:none}
-.tico .ico{width:15px;height:15px;stroke-width:2.1;position:relative;z-index:1;filter:drop-shadow(0 1px 0 rgba(0,0,0,.3))}
-nav.tabs button:hover .tico{transform:translateY(-2px) scale(1.06);filter:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 3px rgba(0,0,0,.28),0 5px 10px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.18)}
-nav.tabs button.on .tico{filter:none;transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 3px rgba(0,0,0,.28),0 4px 12px color-mix(in srgb,var(--c2) 55%,transparent),0 0 0 1px rgba(0,0,0,.18)}
-.t-journal{--c1:#ffd27a;--c2:#d4891a}
-.t-stats{--c1:#5ee39a;--c2:#12945a}
-.t-news{--c1:#ff8a7a;--c2:#d4332b}
-.t-plan{--c1:#7fb2ff;--c2:#2b62d9}
-.t-risk{--c1:#c7a2ff;--c2:#7646d6}
-.t-consistency{--c1:#5fe0d6;--c2:#0f8f8a}
-.t-about{--c1:#dfe6f2;--c2:#7d8aa3}
-.t-admin{--c1:#ffe08a;--c2:#c7861a}
-.t-student{--c1:#9aa8ff;--c2:#4a55d4}
-html[data-theme=light] .tico{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 3px rgba(0,0,0,.18),0 2px 4px rgba(16,24,40,.18),0 0 0 1px rgba(16,24,40,.08)}
+/* flat duotone icons: coloured line + soft tinted fill, no tile */
+.tico{width:20px;height:20px;flex:none;display:grid;place-items:center;color:var(--c1);transition:transform .2s,color .2s}
+.tico .ico{width:20px;height:20px;stroke-width:1.7}
+.tico .ico :is(rect,circle,path[d$="z"]):not([fill="currentColor"]){fill:currentColor;fill-opacity:.18}
+nav.tabs button:hover .tico{transform:translateY(-1px)}
+nav.tabs button.on .tico .ico :is(rect,circle,path[d$="z"]):not([fill="currentColor"]){fill-opacity:.32}
+.t-journal{--c1:#f5b942;--c2:#b97a12}
+.t-stats{--c1:#34d17f;--c2:#13914c}
+.t-news{--c1:#ff6b5e;--c2:#d6382f}
+.t-plan{--c1:#5b9bff;--c2:#2b62d9}
+.t-risk{--c1:#b38cff;--c2:#7046d6}
+.t-consistency{--c1:#2fd3c8;--c2:#0d8a85}
+.t-about{--c1:#b9c4d6;--c2:#5d6b84}
+.t-admin{--c1:#ffd27a;--c2:#b07a1c}
+.t-student{--c1:#8e9cff;--c2:#4a55d4}
+html[data-theme=light] .tico{color:var(--c2)}
 main{max-width:1200px;margin:0 auto;padding:18px 16px 80px}
 h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:0 0 12px}h3{font-size:14px;margin:0 0 8px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px}
 .sub{color:var(--muted);margin:0 0 16px}
