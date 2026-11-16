@@ -439,6 +439,27 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 .det-chip small{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);font-weight:700}
 .det-chip b{font-size:13px;color:var(--muted)}.det-chip.ok{border-color:rgba(39,194,108,.4)}.det-chip.ok b{color:var(--text,#e8edf6)}
 .det-line{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 8px}
+/* news explanations */
+.nrow.click{cursor:pointer;border-radius:8px;transition:background .15s}
+.nrow.click:hover{background:var(--panel2)}
+.nmore{margin-inline-start:auto;color:var(--dim);font-size:18px;line-height:1;padding:0 4px}
+[dir=rtl] .nmore{transform:scaleX(-1)}
+.ne-t{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+.ni-hint{font-size:12px;color:var(--dim);margin-top:8px}
+.ni .ni-h{display:flex;align-items:center;gap:10px}.ni .ni-h h2{margin:0}
+.ni .ni-h .fold{transform:scale(1.4)}
+.ni-orig{font-size:11px;color:var(--dim);margin-top:2px}
+.ni-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.ni-badge{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px}
+.ni-badge.red{background:rgba(239,83,80,.14);color:var(--red)}.ni-badge.org{background:rgba(245,150,40,.14);color:#f59e2a}.ni-badge.hol{background:rgba(76,141,255,.14);color:var(--blue)}
+.ni-sec{padding:12px 14px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);margin-bottom:10px}
+.ni-sec p{margin:6px 0 0;line-height:1.65}
+.ni-l{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.ni-rule{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:12px;border:1px solid rgba(245,185,66,.35);background:rgba(245,185,66,.07);margin-bottom:10px}
+.ni-rule b{color:var(--gold)}
+.ni.is-red .ni-rule{border-color:rgba(239,83,80,.4);background:rgba(239,83,80,.07)}.ni.is-red .ni-rule b{color:var(--red)}
+.ni-note{font-size:11px;color:var(--dim);margin:6px 0 12px}
+html[lang=ar] .ni-l{letter-spacing:0}
 /* theme switcher */
 .theme-sw{display:inline-flex;gap:2px;padding:3px;border-radius:99px;border:1px solid var(--line2);background:var(--panel2)}
 .theme-sw button{width:30px;height:28px;display:grid;place-items:center;border:0;border-radius:99px;background:none;color:var(--muted);cursor:pointer;transition:background .2s,color .2s}
@@ -581,6 +602,7 @@ html[data-theme=light] .logo{animation:none;filter:drop-shadow(0 2px 6px rgba(16
 <div id="toast"></div>
 
 <script src="i18n.js"></script>
+<script src="news-info.js"></script>
 <script>
 /* =====================================================================
    CONFIG — your Supabase project (the anon key is public by design;
@@ -810,7 +832,7 @@ const HOL_NOTE={closed:"US markets closed",early:"Early close (1:00 pm NY)",bank
 function holidaysFor(date){const out=US_HOL.filter(h=>h[0]===date).map(h=>({date:h[0],title:h[1],kind:h[2]}));
   if(!out.length)S.news.filter(n=>n.impact==="Holiday"&&tzDate(n.starts_at,NY)===date).forEach(n=>out.push({date,title:n.title,kind:"ff"}));return out}
 function upcomingHolidays(n){const t=todayStr();return US_HOL.filter(h=>h[0]>=t).slice(0,n).map(h=>({date:h[0],title:h[1],kind:h[2]}))}
-function holRows(list){return list.map(h=>`<div class="nrow hol ${h.kind}"><span class="hol-ic">🏦</span><span class="nt">All day</span><b class="ntitle" data-notr>${esc(h.title)}</b><span class="hol-note">${HOL_NOTE[h.kind]}</span></div>`).join("")}
+function holRows(list){return list.map(h=>`<div class="nrow hol click ${h.kind}" data-hk="${h.kind}" data-ht="${esc(h.title)}"><span class="hol-ic">🏦</span><span class="nt">All day</span><b class="ntitle" data-notr>${esc(h.title)}</b><span class="hol-note">${HOL_NOTE[h.kind]}</span></div>`).join("")}
 const daysUntil=d=>{const [y,m,dd]=d.split("-").map(Number);const a=new Date(y,m-1,dd),b=new Date();b.setHours(0,0,0,0);return Math.round((a-b)/864e5)};
 function newsWeekEnd(){const d=new Date();d.setDate(d.getDate()+(6-d.getDay()));return ymd(d)}  /* the feed covers the current week (to Saturday) */
 async function loadNews(){try{if(!API||!API.news)return;const a=new Date();a.setDate(a.getDate()-2);const b=new Date();b.setDate(b.getDate()+10);
@@ -822,7 +844,7 @@ function newsLine(n){return `${n.impact==="High"?"🔴":"🟠"} ${tzTime(n.start
 function newsText(date){const ev=newsFor(date),ho=holidaysFor(date);if(!ev.length&&!ho.length)return "";const lines=ho.map(x=>`🏦 ${x.title} — ${HOL_NOTE[x.kind]}`).concat(ev.map(newsLine));
   if(ev.some(n=>n.impact==="High"))lines.push("⚠️ Red folder: no new trades 5 min before and after.");return lines.join("\n")}
 function newsBox(date,canInsert){const ev=newsFor(date),ho=holidaysFor(date),later=date>newsWeekEnd();
-  const rows=ev.map(n=>`<div class="nrow"><i class="fold ${n.impact==="High"?"red":"org"}" title="${n.impact==="High"?"Red folder":"Orange folder"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}</div>`).join("");
+  const rows=ev.map(n=>`<div class="nrow click" data-ni="${S.news.indexOf(n)}"><i class="fold ${n.impact==="High"?"red":"org"}" title="${n.impact==="High"?"Red folder":"Orange folder"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}<span class="nmore" aria-hidden="true">›</span></div>`).join("");
   return `<div class="newsbox" id="newsBox" data-date="${date}" data-ins="${canInsert?1:0}">
     <div class="nb-h"><b>📰 USD news</b> <span class="mut">· Forex Factory</span><span class="nb-lg"><i class="fold red"></i><span>Red folder</span><i class="fold org"></i><span>Orange folder</span></span></div>
     ${holRows(ho)}${!S.newsLoaded?`<div class="mut nb-e">Loading news…</div>`:ev.length?rows:ho.length?"":later?`<div class="mut nb-e"><span>Next week's calendar isn't published yet.</span> <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">Forex Factory</a></div>`:`<div class="mut nb-e">No red or orange USD news this day.</div>`}
@@ -840,14 +862,36 @@ function coachNewsHTML(){const today=todayStr(),nd=nextTradingDay(),now=new Date
   if(next.length)h+=`<div class="rem warn"><span>🗓️</span><span><b>Next session</b> <span data-notr>(${esc(fmtDate(nd))})</span><br><span data-notr>${next.slice(0,4).map(n=>esc(newsLine(n))).join("<br>")}</span><br><span>Put it in your plan.</span></span></div>`;
   return hh+h}
 
+/* click a news event or holiday → explanation in the student's language (news-info.js) */
+function niBox(U,x,head,meta,rule,cls){return `<div class="ni ${cls}" data-notr>
+  <div class="mhead"><div class="ni-h">${head}</div><button class="x" id="niX" aria-label="${esc(U.close)}">×</button></div>
+  ${meta}
+  <div class="ni-sec"><div class="ni-l">💡 ${esc(U.what)}</div><p>${esc(x.what)}</p></div>
+  ${x.move?`<div class="ni-sec"><div class="ni-l">📈 ${esc(U.move)}</div><p>${esc(x.move)}</p></div>`:""}
+  <div class="ni-rule"><b>🛡 ${esc(U.rule)}</b><span>${esc(rule)}</span></div>
+  <p class="ni-note">${esc(U.note)}</p>
+  <div class="row" style="justify-content:flex-end"><button class="btn" id="niOk">${esc(U.close)}</button></div></div>`}
+function openNewsInfo(n){if(!window.NewsInfo)return;const U=NewsInfo.ui(),x=NewsInfo.event(n.title,n.impact),red=n.impact==="High";
+  const d=tzDate(n.starts_at,NY);
+  const head=`<i class="fold ${red?"red":"org"}"></i><div><h2>${esc(x.name)}</h2><div class="ni-orig mono">${esc(n.title)}</div></div>`;
+  const meta=`<div class="ni-meta"><span class="ni-badge ${red?"red":"org"}">${esc(red?U.red:U.org)}</span>
+    <span class="chip mono">${esc(fmtDate(d))}</span><span class="chip mono">${tzTime(n.starts_at,NY)} NY · ${tzTime(n.starts_at,DZ)} DZ</span>
+    ${n.forecast?`<span class="chip"><span>${esc(U.f)}</span> <b class="mono">${esc(n.forecast)}</b></span>`:""}${n.previous?`<span class="chip"><span>${esc(U.p)}</span> <b class="mono">${esc(n.previous)}</b></span>`:""}</div>`;
+  openModal(niBox(U,x,head,meta,red?U.ruleRed:U.ruleOrg,red?"is-red":"is-org"));$("#niX").onclick=closeModal;$("#niOk").onclick=closeModal}
+function openHolInfo(kind,title){if(!window.NewsInfo)return;const U=NewsInfo.ui(),x=NewsInfo.holiday(kind);
+  const head=`<span style="font-size:24px">🏦</span><div><h2>${esc(x.name)}</h2><div class="ni-orig mono">${esc(title)}</div></div>`;
+  openModal(niBox(U,x,head,`<div class="ni-meta"><span class="ni-badge hol">${esc(U.hol)}</span></div>`,U.ruleHol,"is-hol"));$("#niX").onclick=closeModal;$("#niOk").onclick=closeModal}
+document.addEventListener("click",e=>{if(!e.target.closest)return;const r=e.target.closest("[data-ni]");if(r){const n=S.news[+r.dataset.ni];if(n){e.preventDefault();openNewsInfo(n)}return}
+  const h=e.target.closest("[data-hk]");if(h)openHolInfo(h.dataset.hk,h.dataset.ht)});
+
 /* news panel: next-event countdown + Yesterday / Today / Tomorrow / This week */
 function prevTradingDay(){const d=new Date();do{d.setDate(d.getDate()-1)}while(d.getDay()===0||d.getDay()===6);return ymd(d)}
 function weekDays(){const d=new Date();const dow=d.getDay();const mon=new Date(d);mon.setDate(d.getDate()-((dow+6)%7));return [0,1,2,3,4].map(i=>{const x=new Date(mon);x.setDate(mon.getDate()+i);return ymd(x)})}
 function untilText(ms){const m=Math.max(0,Math.round(ms/60000)),dd=Math.floor(m/1440),hh=Math.floor(m%1440/60),mm=m%60;return dd?`${dd}d ${hh}h`:hh?`${hh}h ${mm}m`:`${mm}m`}
 function nextEventHTML(){if(!S.newsLoaded)return `<span class="mut">Loading news…</span>`;const now=Date.now();const n=S.news.filter(e=>new Date(e.starts_at).getTime()>now).sort((a,b)=>a.starts_at.localeCompare(b.starts_at))[0];
   if(!n)return `<span class="mut">No upcoming red or orange USD news this week.</span>`;const ms=new Date(n.starts_at).getTime()-now;
-  return `<span class="ne-l">⏱ Next event</span> <i class="fold ${n.impact==="High"?"red":"org"}"></i> <b data-notr>${esc(n.title)}</b> <span class="ne-in ${ms<15*60e3?"soon":""}"><span>in</span> <b class="mono" data-notr>${untilText(ms)}</b></span> <span class="mut mono" data-notr>${tzTime(n.starts_at,NY)} NY / ${tzTime(n.starts_at,DZ)} DZ · ${esc(fmtDate(tzDate(n.starts_at,NY)))}</span>`}
-function newsRows(list){const now=new Date().toISOString();return list.map(n=>`<div class="nrow ${n.starts_at<now?"past":""}"><i class="fold ${n.impact==="High"?"red":"org"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}</div>`).join("")}
+  return `<span class="ne-l">⏱ Next event</span> <i class="fold ${n.impact==="High"?"red":"org"}"></i> <b class="ne-t" data-notr data-ni="${S.news.indexOf(n)}">${esc(n.title)}</b> <span class="ne-in ${ms<15*60e3?"soon":""}"><span>in</span> <b class="mono" data-notr>${untilText(ms)}</b></span> <span class="mut mono" data-notr>${tzTime(n.starts_at,NY)} NY / ${tzTime(n.starts_at,DZ)} DZ · ${esc(fmtDate(tzDate(n.starts_at,NY)))}</span>`}
+function newsRows(list){const now=new Date().toISOString();return list.map(n=>`<div class="nrow click ${n.starts_at<now?"past":""}" data-ni="${S.news.indexOf(n)}"><i class="fold ${n.impact==="High"?"red":"org"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}<span class="nmore" aria-hidden="true">›</span></div>`).join("")}
 function newsPanelBody(tab){if(!S.newsLoaded)return `<div class="mut nb-e">Loading news…</div>`;
   if(tab==="week"){const days=weekDays();const html=days.map(d=>{const ev=newsFor(d),ho=holidaysFor(d);return ev.length||ho.length?`<div class="nday ${d===todayStr()?"today":""}"><span data-notr>${esc(fmtDate(d))}</span>${d===todayStr()?` <span class="tag">Today</span>`:""}</div>${holRows(ho)}${newsRows(ev)}`:""}).join("");
     return html||`<div class="mut nb-e">No red or orange USD news this week.</div>`}
@@ -859,6 +903,7 @@ function newsPanel(){const tab=S._newsTab||"today";const tabs=[["yday","Yesterda
     <div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">📰 USD news <span class="mut" style="text-transform:none;letter-spacing:0;font-weight:500">· Forex Factory</span></h3>
       <span class="nb-lg"><i class="fold red"></i><span>Red folder</span><i class="fold org"></i><span>Orange folder</span></span></div>
     <div class="nextev" id="nextEv">${nextEventHTML()}</div>
+    <div class="ni-hint">👆 <span>Tap any event to see what it means and how it usually moves the market.</span></div>
     <div class="seg" id="newsTabs" style="margin:10px 0 6px">${tabs.map(([k,l])=>`<button data-t="${k}" class="${tab===k?"on":""}">${l}</button>`).join("")}</div>
     <div id="newsBody">${newsPanelBody(tab)}</div></div>`}
 function bindNewsPanel(){$$("#newsTabs button").forEach(b=>b.onclick=()=>{S._newsTab=b.dataset.t;$$("#newsTabs button").forEach(x=>x.classList.toggle("on",x===b));$("#newsBody").innerHTML=newsPanelBody(S._newsTab)})}
@@ -867,7 +912,7 @@ setInterval(()=>{const ne=$("#nextEv");if(ne&&!document.hidden)ne.innerHTML=next
 function vNews(el){
   const uh=upcomingHolidays(6);
   el.innerHTML=`<h1>📰 USD news</h1><p class="sub">Red and orange folder USD events from Forex Factory, in New York and Algeria (DZ) time. Plan around them.</p>${newsPanel()}
-   <div class="card"><h3>🏦 Upcoming US holidays</h3>${uh.map(x=>`<div class="nrow hol ${x.kind}"><span class="hol-ic">🏦</span><span class="mono nt" data-notr>${esc(fmtDate(x.date))}</span><b class="ntitle" data-notr>${esc(x.title)}</b><span class="hol-note">${HOL_NOTE[x.kind]}</span><span class="hol-in"><span>in</span> <b class="mono" data-notr>${daysUntil(x.date)}</b> <span>days</span></span></div>`).join("")||`<div class="mut nb-e">No holidays listed.</div>`}</div>`;
+   <div class="card"><h3>🏦 Upcoming US holidays</h3>${uh.map(x=>`<div class="nrow hol click ${x.kind}" data-hk="${x.kind}" data-ht="${esc(x.title)}"><span class="hol-ic">🏦</span><span class="mono nt" data-notr>${esc(fmtDate(x.date))}</span><b class="ntitle" data-notr>${esc(x.title)}</b><span class="hol-note">${HOL_NOTE[x.kind]}</span><span class="hol-in"><span>in</span> <b class="mono" data-notr>${daysUntil(x.date)}</b> <span>days</span></span></div>`).join("")||`<div class="mut nb-e">No holidays listed.</div>`}</div>`;
   bindNewsPanel();if(!S.newsLoaded)loadNews();
 }
 
