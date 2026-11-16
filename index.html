@@ -4,8 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tradeversity Journal — by Brown Algo</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0a0e16;--panel:#111827;--panel2:#0f1522;--line:#1f2a3d;--line2:#2a3850;
@@ -24,7 +26,9 @@ a{color:var(--gold)}
 header.top{position:sticky;top:0;z-index:20;background:rgba(10,14,22,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .topin{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:10px 16px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
-.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#b8791a);display:grid;place-items:center;color:#1a1204;font-weight:900}
+.logo{width:34px;height:34px;flex:none;border-radius:10px;background:url(raven.svg) center/86% no-repeat,linear-gradient(135deg,var(--gold),#b8791a);box-shadow:0 0 0 1px rgba(255,210,122,.35),0 0 14px rgba(245,185,66,.45);animation:aura 3.2s ease-in-out infinite}
+@keyframes aura{0%,100%{box-shadow:0 0 0 1px rgba(255,210,122,.3),0 0 10px rgba(245,185,66,.35)}50%{box-shadow:0 0 0 1px rgba(255,210,122,.6),0 0 22px rgba(245,185,66,.75)}}
+@media(prefers-reduced-motion:reduce){.logo{animation:none}}
 .brand small{display:block;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:.4px}
 .spacer{flex:1}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;border:1px solid var(--line2);background:var(--panel);font-size:12px;color:var(--muted)}
@@ -140,6 +144,22 @@ svg.ch text{fill:var(--dim);font-size:11px;font-family:Inter,sans-serif}
 .check{display:flex;gap:8px;align-items:flex-start;padding:6px 0}
 .check input{margin-top:3px;accent-color:var(--gold)}
 hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
+/* language picker */
+select.i.langSel{width:auto;padding:5px 8px;font-size:12px;border-radius:8px}
+.langbar{display:flex;justify-content:flex-end;margin-bottom:10px}
+/* Arabic: right-to-left */
+html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
+[dir=rtl] table.t th{text-align:right}
+[dir=rtl] .tpnl{text-align:left}
+[dir=rtl] .remark{border-left:0;border-right:3px solid var(--gold);border-radius:10px 0 0 10px}
+[dir=rtl] .shot button{right:auto;left:4px}
+[dir=rtl] svg.ch{direction:ltr}
+[dir=rtl] .mono,[dir=rtl] .kpi .v,[dir=rtl] .big,[dir=rtl] .tpnl,[dir=rtl] .cal .p{unicode-bidi:isolate;direction:ltr}
+[dir=rtl] .kpi .v,[dir=rtl] .big{text-align:right}
+[dir=rtl] .tpnl{text-align:left}
+[dir=rtl] input[type=number],[dir=rtl] input[type=email],[dir=rtl] input[type=date],[dir=rtl] input[type=time]{direction:ltr;text-align:right}
+[dir=rtl] .props{direction:rtl}
+@media(max-width:560px){[dir=rtl] .tpnl{text-align:right}}
 </style>
 </head>
 <body>
@@ -147,11 +167,21 @@ hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
 <!-- ============ AUTH ============ -->
 <section id="auth" class="hidden">
   <div class="authbox">
+    <div class="langbar" id="langAuth"></div>
     <div class="brand" style="justify-content:center;margin-bottom:18px">
-      <div class="logo">T</div>
+      <div class="logo" role="img" aria-label="Tradeversity raven logo"></div>
       <div style="font-size:18px">Tradeversity Journal<small>BY BROWN ALGO</small></div>
     </div>
-    <div class="card">
+    <div class="card hidden" id="waitBox" style="text-align:center">
+      <div style="font-size:40px;margin-bottom:6px" id="waitIcon">⏳</div>
+      <h2 id="waitTitle">Waiting for approval</h2>
+      <p class="mut" id="waitText">Your account was created. Brown Algo needs to accept you before you can use the journal. You'll be able to log in as soon as you're approved.</p>
+      <div class="row" style="justify-content:center;margin-top:12px">
+        <button class="btn pri" id="waitCheck">Check again</button>
+        <button class="btn" id="waitOut">Log out</button>
+      </div>
+    </div>
+    <div class="card" id="authCard">
       <div class="seg" style="width:100%;margin-bottom:16px">
         <button id="tabLogin" class="on" style="flex:1">Log in</button>
         <button id="tabSignup" style="flex:1">Create free account</button>
@@ -187,9 +217,10 @@ hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
 <section id="app" class="hidden">
   <header class="top">
     <div class="topin">
-      <div class="brand"><div class="logo">T</div><div>Tradeversity Journal<small>BY BROWN ALGO</small></div></div>
+      <div class="brand"><div class="logo" role="img" aria-label="Tradeversity raven logo"></div><div>Tradeversity Journal<small>BY BROWN ALGO</small></div></div>
       <div class="spacer"></div>
-      <span class="chip" id="whoChip"></span>
+      <span id="langTop"></span>
+      <span class="chip" id="whoChip" data-notr></span>
       <button class="btn sm ghost" id="logout">Log out</button>
     </div>
     <nav class="tabs" id="tabs"></nav>
@@ -201,6 +232,7 @@ hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div id="tip"></div>
 <div id="toast"></div>
 
+<script src="i18n.js"></script>
 <script>
 /* =====================================================================
    CONFIG — paste your Supabase project values here to go live.
@@ -225,7 +257,7 @@ const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const todayStr=()=>ymd(new Date());
 const nextTradingDay=()=>{const d=new Date();do{d.setDate(d.getDate()+1)}while(d.getDay()===0||d.getDay()===6);return ymd(d)};
 const uuid=()=>(crypto&&crypto.randomUUID)?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c=="x"?r:(r&3|8)).toString(16)});
-const fmtDate=s=>{if(!s)return"";const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"})};
+const fmtDate=s=>{if(!s)return"";const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString(I18N.locale(),{weekday:"short",month:"short",day:"numeric",year:"numeric"})};
 const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 function toast(m,ms=2600){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",ms)}
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
@@ -363,7 +395,7 @@ const Demo={
   async session(){return this.db.current?this.db.users[this.db.current]:null},
   async signIn(email){const u=Object.values(this.db.users).find(u=>u.email.toLowerCase()===email.toLowerCase());if(!u)throw new Error("No account with that email (demo). Create one, or use the demo buttons below.");this.db.current=u.id;this.save();return u},
   async signUp({email,name,telegram}){if(Object.values(this.db.users).some(u=>u.email.toLowerCase()===email.toLowerCase()))throw new Error("That email already has an account.");
-    const id=uuid();this.db.users[id]={id,name,telegram,email,role:"student",created_at:new Date().toISOString()};this.db.trades[id]=[];this.db.plans[id]=[];this.db.current=id;this.save();return {user:this.db.users[id],needsConfirm:false}},
+    const id=uuid();this.db.users[id]={id,name,telegram,email,role:"student",status:"pending",created_at:new Date().toISOString()};this.db.trades[id]=[];this.db.plans[id]=[];this.db.current=id;this.save();return {user:this.db.users[id],needsConfirm:false}},
   async signOut(){this.db.current=null;this.save()},
   async enterAs(role){const u=Object.values(this.db.users).find(u=>u.role===role);this.db.current=u.id;this.save();return u},
   async listTrades(uid_){return JSON.parse(JSON.stringify(this.db.trades[uid_]||[]))},
@@ -373,6 +405,7 @@ const Demo={
   async listPlans(uid_){return JSON.parse(JSON.stringify(this.db.plans[uid_]||[]))},
   async savePlan(p){const a=this.db.plans[p.user_id]||(this.db.plans[p.user_id]=[]);const i=a.findIndex(x=>x.date===p.date);if(i>=0)a[i]=p;else a.push(p);this.save()},
   async listProfiles(){return Object.values(this.db.users)},
+  async setStatus(id,status){if(this.db.users[id]&&this.db.users[id].role!=="admin"){this.db.users[id].status=status;this.save()}},
   async allTradesLite(){return Object.values(this.db.trades).flat().map(t=>({...t,shots:[]}))},
   async allPlans(){return Object.values(this.db.plans).flat()},
   async resetPassword(){throw new Error("Password reset works once Supabase is connected.")}
@@ -384,7 +417,7 @@ const Cloud={
   async init(){await new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.onload=res;s.onerror=rej;document.head.appendChild(s)});
     this.sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
     this.sb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY")openNewPassword()});},
-  async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,created_at:data.created_at}},
+  async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,status:data.status,created_at:data.created_at}},
   async session(){const{data}=await this.sb.auth.getSession();if(!data.session)return null;return this.profile(data.session.user.id)},
   async signIn(email,password){const{data,error}=await this.sb.auth.signInWithPassword({email,password});if(error)throw error;return this.profile(data.user.id)},
   async signUp({email,password,name,telegram}){const{data,error}=await this.sb.auth.signUp({email,password,options:{data:{full_name:name,telegram},emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
@@ -398,7 +431,8 @@ const Cloud={
   async deleteTrade(t){const{error}=await this.sb.from("trades").delete().eq("id",t.id);if(error)throw error},
   async listPlans(uid_){const{data,error}=await this.sb.from("plans").select("*").eq("user_id",uid_).order("plan_date",{ascending:false});if(error)throw error;return data.map(r=>({...(r.data||{}),user_id:r.user_id,date:r.plan_date}))},
   async savePlan(p){const{error}=await this.sb.from("plans").upsert({user_id:p.user_id,plan_date:p.date,data:p},{onConflict:"user_id,plan_date"});if(error)throw error},
-  async listProfiles(){const{data,error}=await this.sb.from("profiles").select("*").order("created_at");if(error)throw error;return data.map(d=>({id:d.id,name:d.full_name,telegram:d.telegram,email:d.email,role:d.role,created_at:d.created_at}))},
+  async listProfiles(){const{data,error}=await this.sb.from("profiles").select("*").order("created_at");if(error)throw error;return data.map(d=>({id:d.id,name:d.full_name,telegram:d.telegram,email:d.email,role:d.role,status:d.status,created_at:d.created_at}))},
+  async setStatus(id,status){const{error}=await this.sb.rpc("set_student_status",{target:id,new_status:status});if(error)throw error},
   async allTradesLite(){const{data,error}=await this.sb.from("trades").select("id,user_id,trade_date,symbol,account,pnl,data").limit(20000);if(error)throw error;return data.map(r=>({...(r.data||{}),id:r.id,user_id:r.user_id,shots:[]}))},
   async allPlans(){const{data,error}=await this.sb.from("plans").select("*");if(error)throw error;return data.map(r=>({...(r.data||{}),user_id:r.user_id,date:r.plan_date}))},
   async resetPassword(email){const{error}=await this.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error}
@@ -410,7 +444,15 @@ let API=null;const DEMO=!(CONFIG.SUPABASE_URL&&CONFIG.SUPABASE_ANON_KEY);
 const S={me:null,subject:null,trades:[],plans:[],view:"journal",page:null,acct:"all",range:"all",calMonth:null,readonly:false};
 
 /* ============ auth UI ============ */
-function showAuth(){$("#app").classList.add("hidden");$("#auth").classList.remove("hidden");$("#demoBox").classList.toggle("hidden",!DEMO)}
+function showAuth(){$("#app").classList.add("hidden");$("#auth").classList.remove("hidden");$("#demoBox").classList.toggle("hidden",!DEMO);
+  $("#waitBox").classList.add("hidden");$("#authCard").classList.remove("hidden")}
+function showWaiting(u){showAuth();$("#authCard").classList.add("hidden");$("#demoBox").classList.add("hidden");$("#waitBox").classList.remove("hidden");
+  const rej=u.status==="rejected";$("#waitIcon").textContent=rej?"⛔":"⏳";
+  $("#waitTitle").textContent=rej?"Request not accepted":"Waiting for approval";
+  $("#waitText").textContent=rej?"Your request to join was not accepted. Contact Brown Algo on Telegram if you think this is a mistake.":"Your account was created. Brown Algo needs to accept you before you can use the journal. You'll be able to log in as soon as you're approved."}
+$("#waitOut").onclick=async()=>{await API.signOut();showAuth()};
+$("#waitCheck").onclick=async()=>{try{const u=await API.session();if(u)await enter(u);else showAuth()}catch(e){toast(e.message||String(e))}};
+const isApproved=u=>u.role==="admin"||!u.status||u.status==="approved";
 $("#tabLogin").onclick=()=>{$("#tabLogin").classList.add("on");$("#tabSignup").classList.remove("on");$("#loginForm").classList.remove("hidden");$("#signupForm").classList.add("hidden");$("#authMsg").textContent=""};
 $("#tabSignup").onclick=()=>{$("#tabSignup").classList.add("on");$("#tabLogin").classList.remove("on");$("#signupForm").classList.remove("hidden");$("#loginForm").classList.add("hidden");$("#authMsg").textContent=""};
 $("#loginForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);$("#authMsg").textContent="Logging in…";
@@ -431,6 +473,7 @@ function openNewPassword(){openModal(`<div class="mhead"><h2>Set a new password<
   $("#npf").onsubmit=async e=>{e.preventDefault();const{error}=await Cloud.sb.auth.updateUser({password:new FormData(e.target).get("p")});if(error)toast(error.message);else{toast("Password updated");closeModal()}}}
 
 async function enter(u){
+  if(!isApproved(u)){S.me=null;showWaiting(u);return}
   S.me=u;$("#auth").classList.add("hidden");$("#app").classList.remove("hidden");
   $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;
   if(u.role==="admin"){S.view="admin";await loadSubject(u,false);go("admin")}
@@ -637,7 +680,7 @@ function calendar(days){const keys=Object.keys(days).sort();const ref=S.calMonth
   let h=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div class="h">${d}</div>`).join("");for(let i=0;i<first.getDay();i++)h+='<div class="c e"></div>';
   let mt=0;for(let d=1;d<=dim;d++){const k=`${y}-${pad(m)}-${pad(d)}`,v=days[k];if(v!=null)mt+=v;const a=v==null?0:.12+.5*Math.abs(v)/mx;
     h+=`<div class="c" style="${v!=null?`background:${v>=0?`rgba(39,194,108,${a})`:`rgba(239,83,80,${a})`}`:""}" ${v!=null?`data-tip="${esc(fmtDate(k)+"\n"+smoney(v))}"`:""}><span class="d">${d}</span>${v!=null?`<span class="p">${kfmt(v)}</span>`:""}</div>`}
-  return `<div class="row" style="justify-content:space-between;margin-bottom:8px"><button class="btn sm" id="calP">‹</button><b>${first.toLocaleDateString("en-US",{month:"long",year:"numeric"})} · <span class="${cls(mt)} mono">${smoney(mt)}</span></b><button class="btn sm" id="calN">›</button></div><div class="cal">${h}</div>`}
+  return `<div class="row" style="justify-content:space-between;margin-bottom:8px"><button class="btn sm" id="calP">‹</button><b>${first.toLocaleDateString(I18N.locale(),{month:"long",year:"numeric"})} · <span class="${cls(mt)} mono">${smoney(mt)}</span></b><button class="btn sm" id="calN">›</button></div><div class="cal">${h}</div>`}
 document.addEventListener("mouseover",e=>{const el=e.target.closest&&e.target.closest("[data-tip]");const tp=$("#tip");if(!el){tp.style.display="none";return}tp.textContent=el.dataset.tip;tp.style.display="block"});
 document.addEventListener("mousemove",e=>{const tp=$("#tip");if(tp.style.display==="block"){const x=Math.min(e.clientX+14,innerWidth-tp.offsetWidth-8);tp.style.left=x+"px";tp.style.top=(e.clientY+14)+"px"}});
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-tip]");const tp=$("#tip");if(el&&matchMedia("(hover:none)").matches){tp.textContent=el.dataset.tip;tp.style.display="block";tp.style.left=Math.min(e.clientX,innerWidth-200)+"px";tp.style.top=(e.clientY+14)+"px"}});
@@ -873,7 +916,10 @@ function vImport(el){const I=S._imp||(S._imp={rows:null,map:{},acct:""});
 /* ============ ADMIN ============ */
 async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</div>';
   let profs,trades,plans;try{[profs,trades,plans]=await Promise.all([API.listProfiles(),API.allTradesLite(),API.allPlans()])}catch(e){el.innerHTML=`<div class="card empty">Couldn't load: ${esc(e.message||e)}</div>`;return}
-  const students=profs.filter(p=>p.role!=="admin");const wk=new Date();wk.setDate(wk.getDate()-7);const wkS=ymd(wk);const nd=nextTradingDay();
+  const stOf=p=>p.status||"approved";
+  const pending=profs.filter(p=>p.role!=="admin"&&stOf(p)==="pending").sort((a,b)=>(a.created_at||"").localeCompare(b.created_at||""));
+  const rejected=profs.filter(p=>p.role!=="admin"&&stOf(p)==="rejected");
+  const students=profs.filter(p=>p.role!=="admin"&&stOf(p)==="approved");const wk=new Date();wk.setDate(wk.getDate()-7);const wkS=ymd(wk);const nd=nextTradingDay();
   const rows=students.map(s=>{const ts=trades.filter(t=>t.user_id===s.id);const c=calc(ts);const last=ts.map(t=>t.date).sort().pop()||"";
     const pl=plans.filter(p=>p.user_id===s.id);const brk=ts.filter(t=>t.followed==="No").length;
     let mlb=0;pl.forEach(p=>{const dn=ts.filter(t=>t.date===p.date).reduce((a,t)=>a+tradeNet(t),0);if(num(p.maxLoss)>0&&dn<=-num(p.maxLoss))mlb++});
@@ -881,7 +927,12 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
     return {s,c,last,active:last>=wkS,plans:pl.length,hasNext:pl.some(p=>p.date>=todayStr()),brk,mlb,worstEmo:em.filter(r=>r.net<0).sort((a,b)=>a.net-b.net)[0]}}).sort((a,b)=>b.c.net-a.c.net);
   const all=calc(trades.filter(t=>students.some(s=>s.id===t.user_id)));
   const emoAll=groupBy(trades,t=>(t.emotions||[]).filter(e=>EMO_BAD.includes(e))).filter(r=>r.net<0).sort((a,b)=>a.net-b.net).slice(0,3);
+  const reqRow=(p,rej)=>`<tr data-pid="${p.id}"><td><b data-notr>${esc(p.name||"—")}</b><div class="mut" style="font-size:11px" data-notr>${esc(p.email||"")}</div></td><td class="mono" data-notr>${esc(p.telegram||"")}</td><td class="mut" data-notr>${p.created_at?esc(fmtDate(p.created_at.slice(0,10))):""}</td>
+     <td><div class="row" style="justify-content:flex-end">${rej?"":`<button class="btn sm danger" data-act="rejected">✖ Reject</button>`}<button class="btn sm pri" data-act="approved">✔ Approve</button></div></td></tr>`;
   el.innerHTML=`<h1>👑 Admin dashboard</h1><p class="sub">All your Tradeversity students in one place. Click a student to open their journal, stats and plans (read-only).</p>
+   ${pending.length?`<div class="card" style="margin-bottom:12px;border-color:var(--gold)"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0;color:var(--gold)">🔔 Pending requests</h3><span class="tag" style="background:rgba(245,185,66,.15);color:var(--gold)">${pending.length}</span></div>
+     <p class="mut" style="margin:0 0 8px;font-size:12px">These people signed up and are waiting for you. They can't use the journal until you approve them.</p>
+     <div class="tw"><table class="t" id="reqT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${pending.map(p=>reqRow(p,false)).join("")}</table></div></div>`:""}
    <div class="grid g4" style="margin-bottom:12px">
     ${kpi("Students",students.length,`${rows.filter(r=>r.active).length} active this week`)}
     ${kpi("Trades logged",all.n,"all students")}
@@ -892,11 +943,20 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">Students</h3><div class="row"><input class="i" id="aq" placeholder="Search name, email, Telegram" style="width:240px"><button class="btn sm" id="aExp">Export CSV</button></div></div>
    <div class="tw"><table class="t" id="aT"><tr><th>Student</th><th>Telegram</th><th>Trades</th><th>Net P&L</th><th>Win %</th><th>PF</th><th>Broke plan</th><th>Max-loss days</th><th>Weak spot</th><th>Last trade</th><th>Plan</th></tr>
    ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b>${esc(r.s.name)}</b><div class="mut" style="font-size:11px">${esc(r.s.email)}</div></td><td class="mono">${esc(r.s.telegram||"")}</td><td class="mono">${r.c.n}</td><td class="mono ${cls(r.c.net)}">${smoney(r.c.net,0)}</td><td class="mono">${pct(r.c.wr,0)}</td><td class="mono">${isFinite(r.c.pf)?r.c.pf.toFixed(2):"—"}</td>
-     <td class="mono ${r.brk?"neg":""}">${r.brk}</td><td class="mono ${r.mlb?"neg":""}">${r.mlb}</td><td>${r.worstEmo?`<span class="tag bad">${esc(r.worstEmo.k)}</span>`:"—"}</td><td>${r.last?r.last.slice(5):"—"} ${r.active?"":'<span class="tag">idle</span>'}</td><td>${r.hasNext?'<span class="ok">✔</span>':'<span class="mut">—</span>'}</td></tr>`).join("")||`<tr><td colspan="11" class="empty">No students yet. Share the website link — they sign up for free.</td></tr>`}</table></div></div>`;
+     <td class="mono ${r.brk?"neg":""}">${r.brk}</td><td class="mono ${r.mlb?"neg":""}">${r.mlb}</td><td>${r.worstEmo?`<span class="tag bad">${esc(r.worstEmo.k)}</span>`:"—"}</td><td>${r.last?r.last.slice(5):"—"} ${r.active?"":'<span class="tag">idle</span>'}</td><td>${r.hasNext?'<span class="ok">✔</span>':'<span class="mut">—</span>'}</td></tr>`).join("")||`<tr><td colspan="11" class="empty">No students yet. Share the website link — they sign up for free.</td></tr>`}</table></div></div>
+   ${rejected.length?`<details class="card" style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:600">Rejected requests (${rejected.length})</summary><div class="tw" style="margin-top:8px"><table class="t" id="rejT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${rejected.map(p=>reqRow(p,true)).join("")}</table></div></details>`:""}`;
+  $$("tr[data-pid] button[data-act]",el).forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const id=b.closest("tr").dataset.pid,act=b.dataset.act;const p=profs.find(x=>x.id===id);
+    const go_=async()=>{b.disabled=true;try{await API.setStatus(id,act);toast(act==="approved"?"Student approved":"Request rejected");vAdmin(el)}catch(e){b.disabled=false;toast(e.message||String(e))}};
+    if(act==="rejected")confirmBox(`Reject ${p&&p.name||"this request"}? They won't be able to use the journal.`,go_);else go_()});
   $("#aq").oninput=e=>{const q=e.target.value.toLowerCase();$$("#aT tr[data-q]").forEach(tr=>tr.classList.toggle("hidden",!tr.dataset.q.includes(q)))};
   $$("#aT tr[data-id]").forEach(tr=>tr.onclick=async()=>{const s=students.find(x=>x.id===tr.dataset.id);await loadSubject(s,true);S.view="journal";render();window.scrollTo(0,0)});
   $("#aExp").onclick=()=>{const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;saveFile(`tradeversity-students-${todayStr()}.csv`,["name,email,telegram,joined,trades,net_pnl,win_rate,profit_factor,broke_plan,max_loss_days,last_trade",...rows.map(r=>[r.s.name,r.s.email,r.s.telegram,(r.s.created_at||"").slice(0,10),r.c.n,r.c.net.toFixed(2),isFinite(r.c.wr)?(r.c.wr*100).toFixed(1):"",isFinite(r.c.pf)?r.c.pf.toFixed(2):"",r.brk,r.mlb,r.last].map(q).join(","))].join("\n"),"text/csv")};
 }
+
+/* ============ languages ============ */
+$("#langAuth").innerHTML=I18N.picker();$("#langTop").innerHTML=I18N.picker();
+window.onLangChange=()=>{if(S.me&&!$("#app").classList.contains("hidden"))render()};
+I18N.start();
 
 /* ============ boot ============ */
 (async function boot(){

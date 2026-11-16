@@ -6,6 +6,12 @@ Files:
 - `index.html`: the whole website
 - `schema.sql`: the database (logins, trades, plans, security)
 - `notifications.sql`: Telegram messages to you on new sign-ups and new trades
+- `approval.sql`: new students must be approved by the admin before they can use the journal
+- `i18n.js`: English / Français / العربية translations (edit a translation there)
+- `raven.svg`, `favicon.svg`: the raven logo and browser-tab icon
+
+## Approving students
+New sign-ups appear in **Admin dashboard → 🔔 Pending requests** (and you get a Telegram message). Click **✔ Approve** to let them in, or **✖ Reject**. Until then they only see a "Waiting for approval" screen, and the database refuses to show or save their data. Rejected requests can still be approved later from the "Rejected requests" list.
 
 Without the setup below, the site runs in **demo mode**: example students, data saved only in the browser.
 
