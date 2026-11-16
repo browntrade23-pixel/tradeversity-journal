@@ -348,6 +348,7 @@ const T={
 // about us
 "ℹ️ About us":["ℹ️ À propos","ℹ️ من نحن"],
 "About Tradeversity":["À propos de Tradeversity","عن Tradeversity"],
+"Nearly":["Près de","قرابة"],
 "years in the markets":["ans sur les marchés","سنوات في الأسواق"],
 "students with Tradeversity":["élèves avec Tradeversity","طالب مع Tradeversity"],
 "students":["élèves","طالب"],

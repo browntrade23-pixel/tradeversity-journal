@@ -308,6 +308,8 @@ html[lang=ar] .about-t{letter-spacing:0}
 .astat{padding:12px 8px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
 .astat b{font-size:24px;font-weight:900;color:var(--gold);font-family:"JetBrains Mono",monospace}
 .astat span{font-size:11px;color:var(--muted);line-height:1.3}
+.astat .apre{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2);font-weight:700;margin-bottom:-4px}
+html[lang=ar] .astat .apre{letter-spacing:0}
 .about-hero{display:flex;gap:18px;align-items:center;margin-bottom:14px}
 @media(max-width:560px){.about-hero{flex-direction:column;text-align:center}.astat b{font-size:20px}}
 .rstrip{overflow:hidden;margin-top:12px;border-radius:10px;-webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
@@ -1299,10 +1301,10 @@ $("#socGate").innerHTML=socialHTML(["results","telegram"]);
 
 /* ============ About us ============
    Change the numbers here. Put result screenshots in the "results" folder and list their file names in RESULTS. */
-const ABOUT={years:"6+",students:"300+",channel:"https://t.me/tradeversity_feedbackresult"};
+const ABOUT={years:"7",yearsPrefix:"Nearly",students:"350+",channel:"https://t.me/tradeversity_feedbackresult"};
 const RESULTS=["result-09.jpg","result-48.jpg","result-01.jpg","result-08.jpg","result-50.jpg","result-36.jpg","result-12.jpg","result-51.jpg","result-20.jpg","result-02.jpg","result-55.jpg","result-10.jpg","result-24.jpg","result-38.jpg","result-14.jpg","result-19.jpg","result-49.jpg","result-03.jpg","result-16.jpg","result-41.jpg","result-28.jpg","result-17.jpg","result-52.jpg","result-21.jpg","result-04.jpg","result-39.jpg","result-33.jpg","result-11.jpg","result-47.jpg","result-25.jpg","result-13.jpg","result-42.jpg","result-32.jpg","result-05.jpg","result-53.jpg","result-18.jpg","result-26.jpg","result-40.jpg","result-15.jpg","result-23.jpg","result-57.jpg","result-06.jpg","result-34.jpg","result-43.jpg","result-27.jpg","result-22.jpg","result-54.jpg","result-29.jpg","result-07.jpg","result-44.jpg","result-35.jpg","result-30.jpg","result-45.jpg","result-31.jpg","result-56.jpg","result-37.jpg","result-46.jpg"];   // files in results/ (from the Telegram results channel)
 function aboutStatsHTML(){return `<div class="astats">
-  <div class="astat"><b data-notr>${ABOUT.years}</b><span>years in the markets</span></div>
+  <div class="astat">${ABOUT.yearsPrefix?`<small class="apre">${ABOUT.yearsPrefix}</small>`:""}<b data-notr>${ABOUT.years}</b><span>years in the markets</span></div>
   <div class="astat"><b data-notr>${ABOUT.students}</b><span>students with Tradeversity</span></div>
   <div class="astat"><b>✔</b><span>real results, shared with full transparency</span></div></div>`}
 function resultsStripHTML(mod){if(!RESULTS.length)return "";const list=String(mod||"").includes("rev")?[...RESULTS].reverse():RESULTS;
@@ -1321,7 +1323,7 @@ function vAbout(el){
    </div>
    ${RESULTS.length?`<div class="card"><h3>Student results</h3>${resultsStripHTML("big")}${resultsStripHTML("big rev")}<p class="mut" style="font-size:12px;margin:10px 0 0">Click a result to enlarge it.</p></div>`:""}`;
 }
-function fillAbout(){$$("[data-about-mini]").forEach(e=>e.innerHTML=`<span><b data-notr>${ABOUT.years}</b> <span>years in the markets</span></span><span class="sep">·</span><span><b data-notr>${ABOUT.students}</b> <span>students</span></span><span class="sep">·</span><span>real results</span>`);
+function fillAbout(){$$("[data-about-mini]").forEach(e=>e.innerHTML=`<span>${ABOUT.yearsPrefix?`<span>${ABOUT.yearsPrefix}</span> `:""}<b data-notr>${ABOUT.years}</b> <span>years in the markets</span></span><span class="sep">·</span><span><b data-notr>${ABOUT.students}</b> <span>students</span></span><span class="sep">·</span><span>real results</span>`);
   $$("[data-gate-results]").forEach(e=>e.innerHTML=resultsStripHTML());
   $$("[data-about-auth]").forEach(e=>e.innerHTML=`<div class="about-t">Who we are</div><p>Tradeversity is a trading mentorship founded by <b>Brown Algo</b> and <b>ZNtrading</b>: disciplined, rule-based futures trading.</p>${aboutStatsHTML()}${resultsStripHTML()}<div style="display:flex;justify-content:center;margin-top:10px">${resultsBtn()}</div>`)}
 fillAbout();
