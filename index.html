@@ -54,6 +54,7 @@ nav.tabs button.on .tico .ico :is(rect,circle,path[d$="z"]):not([fill="currentCo
 .t-news{--c1:#ff6b5e;--c2:#d6382f}
 .t-plan{--c1:#5b9bff;--c2:#2b62d9}
 .t-risk{--c1:#b38cff;--c2:#7046d6}
+.t-propfirms{--c1:#2ec5c9;--c2:#12868a}
 .t-consistency{--c1:#2fd3c8;--c2:#0d8a85}
 .t-about{--c1:#b9c4d6;--c2:#5d6b84}
 .t-admin{--c1:#ffd27a;--c2:#b07a1c}
@@ -439,6 +440,45 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .fc-net{display:flex;align-items:baseline;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap}.fc-net b{font-size:24px;font-weight:900}
 .kind-b{display:inline-block;margin-inline-start:6px;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:800;vertical-align:middle}
 .kind-b.fut{background:rgba(245,185,66,.15);color:var(--gold)}.kind-b.cfd{background:rgba(76,141,255,.16);color:var(--blue)}
+/* prop firm tracker */
+.pf-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}.pf-tools .i{flex:1;min-width:200px;max-width:360px}
+.pf-dz{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 12px;border-radius:10px;border:1px solid var(--line2);background:var(--panel)}
+.pf-dz:has(input:checked){border-color:var(--green);background:color-mix(in srgb,var(--green) 10%,var(--panel))}.pf-dz input{accent-color:var(--green)}
+.pf-legend{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.pf-list{padding:6px}
+.pf-letter{font-size:12px;font-weight:900;color:var(--gold);letter-spacing:1px;padding:12px 10px 4px;border-bottom:1px solid var(--line)}
+.pf-row{display:flex;align-items:center;gap:12px;width:100%;padding:10px;border:0;background:none;color:var(--text);font:inherit;text-align:start;cursor:pointer;border-radius:12px;transition:background .2s,transform .15s}
+.pf-row:hover{background:color-mix(in srgb,var(--gold) 7%,transparent);transform:translateX(3px)}
+[dir=rtl] .pf-row:hover{transform:translateX(-3px)}
+.pf-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.pf-tx small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-go{color:var(--muted);font-size:20px}
+.pf-logo{--s:40px;position:relative;width:var(--s);height:var(--s);flex:none;border-radius:12px;display:grid;place-items:center;overflow:hidden;
+  background:linear-gradient(135deg,#1e2a40,#111827);border:1px solid var(--line2);font-weight:900;font-size:calc(var(--s)*.45);color:var(--gold)}
+.pf-logo::before{content:attr(data-l)}
+.pf-logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:calc(var(--s)*.14);background:#fff}
+.dz-b{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;white-space:nowrap;flex:none}
+.dz-b.yes{background:rgba(39,194,108,.14);color:var(--green)}.dz-b.no{background:rgba(239,83,80,.14);color:var(--red)}
+.dz-b.likely{background:rgba(245,185,66,.14);color:var(--gold)}.dz-b.check{background:rgba(140,150,170,.16);color:var(--muted)}
+@media(max-width:600px){.pf-row .dz-b>span{display:none}.pf-row .dz-b{padding:4px 7px;font-size:14px}}
+.pf-common{margin-top:12px}.pfc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.pfc{display:flex;gap:10px;padding:10px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}.pfc-ic{font-size:20px}.pfc b{font-size:13px}.pfc p{margin:3px 0 0;font-size:12px;color:var(--muted);line-height:1.5}
+.pf-disc{font-size:12px;margin:12px 0 0}
+.pf-hero{display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;margin-bottom:12px;border:1px solid rgba(245,185,66,.35);background:radial-gradient(110% 90% at 0% 0%,rgba(245,185,66,.14),transparent 60%),var(--panel)}
+.pf-hero.cfd{border-color:rgba(76,141,255,.4);background:radial-gradient(110% 90% at 0% 0%,rgba(76,141,255,.16),transparent 60%),var(--panel)}
+.pf-hero h1{margin:0 0 4px}.pf-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+.dz-box{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;margin-bottom:12px;border:1px solid}
+.dz-box p{margin:4px 0 0;font-size:13px;color:var(--muted)}.dz-flag{font-size:28px;line-height:1}
+.dz-box.yes{border-color:rgba(39,194,108,.45);background:rgba(39,194,108,.08)}.dz-box.yes b{color:var(--green)}
+.dz-box.no{border-color:rgba(239,83,80,.45);background:rgba(239,83,80,.08)}.dz-box.no b{color:var(--red)}
+.dz-box.likely{border-color:rgba(245,185,66,.45);background:rgba(245,185,66,.08)}.dz-box.likely b{color:var(--gold)}
+.dz-box.check{border-color:var(--line2);background:var(--panel2)}
+.pf-sizes{display:flex;gap:8px;flex-wrap:wrap}
+.pf-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}@media(max-width:760px){.pf-cols{grid-template-columns:1fr}}
+.pf-sec h3{margin-top:0}.pf-sec ul{margin:0;padding-inline-start:18px;display:grid;gap:7px}.pf-sec li{font-size:14px;line-height:1.5}
+.pf-sec.hid{border-color:rgba(245,150,40,.4);background:radial-gradient(110% 80% at 0% 0%,rgba(245,150,40,.08),transparent 60%),var(--panel)}
+.pf-sec.hid li::marker{color:#f59e2a}
+.pf-sec.pay{border-color:rgba(39,194,108,.4);background:radial-gradient(110% 80% at 0% 0%,rgba(39,194,108,.08),transparent 60%),var(--panel)}
+.pf-sec.pay li::marker{color:var(--green)}
 #bnav{display:none}
 @media(max-width:760px){
   #bnav{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;padding:6px 4px calc(6px + env(safe-area-inset-bottom));
@@ -902,6 +942,7 @@ html[data-theme=light] .logo{animation:none;filter:drop-shadow(0 2px 6px rgba(16
 
 <script src="i18n.js"></script>
 <script src="news-info.js"></script>
+<script src="propfirms.js"></script>
 <script>
 /* =====================================================================
    CONFIG — your Supabase project (the anon key is public by design;
@@ -1117,6 +1158,7 @@ const ICON={
   plan:'<circle cx="12" cy="12" r="9"/><path d="m15.8 8.2-2.3 5.3-5.3 2.3 2.3-5.3z"/><circle cx="12" cy="12" r=".6" fill="currentColor"/>',
   risk:'<path d="M12 3 19.5 6v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="m9.3 14.7 5.4-5.4"/><circle cx="9.6" cy="9.6" r="1"/><circle cx="14.4" cy="14.4" r="1"/>',
   consistency:'<path d="M12 4v16M7.5 20.5h9M5 7h14"/><circle cx="12" cy="4" r="1"/><path d="M5 7 2.5 13a2.5 2.5 0 0 0 5 0z"/><path d="M19 7l-2.5 6a2.5 2.5 0 0 0 5 0z"/>',
+  propfirms:'<path d="M4 20.5V9.5L12 4l8 5.5v11"/><path d="M8 20.5v-6h8v6" fill="currentColor" fill-opacity=".18"/><path d="M2.5 20.5h19M9.5 10h5"/>',
   about:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".7" fill="currentColor"/>',
   admin:'<path d="M3.5 8.5 8 12l4-6.5 4 6.5 4.5-3.5-1.8 10H5.3z"/><path d="M6 21.5h12"/>',
   student:'<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/>',
@@ -1124,7 +1166,7 @@ const ICON={
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
   system:'<rect x="3" y="4" width="18" height="12.5" rx="2"/><path d="M8.5 20.5h7M12 16.5v4"/>'};
 const ico=(k,cls)=>`<svg class="ico ${cls||""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
-const VIEWS=[["journal","Journal"],["stats","Statistics"],["news","News"],["plan","Tomorrow's plan"],["risk","Risk calculator"],["consistency","Consistency rule"],["about","About us"]];
+const VIEWS=[["journal","Journal"],["stats","Statistics"],["news","News"],["plan","Tomorrow's plan"],["risk","Risk calculator"],["consistency","Consistency rule"],["propfirms","Prop firm tracker"],["about","About us"]];
 function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button data-v="${k}" class="${c||""} ${S.view===k?"on":""}"><span class="tico t-${k}">${ico(k)}</span><span>${l}</span></button>`;
   if(S.me.role==="admin")h+=tab("admin","Admin dashboard","admin");
   if(S.readonly)h+=tab("student","Student file","admin");
@@ -1157,11 +1199,11 @@ document.addEventListener("click",e=>{const s=$("#bnSheet");if(s&&!s.classList.c
 })();
 function go(v){if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
-  S.view=v;S.page=null;S.dayPage=null;S._fromDay=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
+  S.view=v;S.page=null;S.dayPage=null;S._fromDay=null;S._pfId=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
 function render(){renderTabs();const v=$("#view");
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
-  const fn={journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
+  const fn={journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
   v.innerHTML=h+'<div id="vb"></div>';fn($("#vb"));
   if(S.readonly)$("#backAdmin").onclick=()=>go("admin");}
 
@@ -2146,6 +2188,52 @@ function vConsistency(el){const c=S._cons||(S._cons=calcLoad("cons")||{size:5000
     const ds=Object.keys(by).sort();if(!ds.length){toast("No trades in your journal yet");return}
     c.days=ds.map(d=>String(+by[d].toFixed(2)));c.checked=true;render();toast("Filled from journal")};
 }
+
+/* ============ PROP FIRM TRACKER ============ */
+const PFDZ={yes:["✅","Available in Algeria","yes"],no:["⛔","Not available in Algeria","no"],likely:["🟡","Probably available in Algeria","likely"],check:["❔","Algeria: ask support","check"]};
+const pfLogo=(f,sz)=>`<span class="pf-logo" style="--s:${sz||40}px" data-l="${esc(f.name.replace(/^The /,"").charAt(0))}"><img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(f.site)}&sz=128" alt="" loading="lazy" onerror="this.remove()"></span>`;
+const dzBadge=(f,big)=>{const d=PFDZ[f.dz]||PFDZ.check;return `<span class="dz-b ${d[2]}${big?" big":""}">${d[0]} <span>${d[1]}</span></span>`};
+function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class="card empty">Loading…</div>';return}
+  if(S._pfId){const f=P.firms.find(x=>x.id===S._pfId);if(f)return vPropFirm(el,f);S._pfId=null}
+  const type=S._pfType||"futures",q=(S._pfQ||"").trim().toLowerCase(),dzOnly=!!S._pfDz;
+  const list=P.firms.filter(f=>f.type===type&&(!q||f.name.toLowerCase().includes(q))&&(!dzOnly||f.dz==="yes"||f.dz==="likely"));
+  const cnt=t=>P.firms.filter(f=>f.type===t).length,cntDz=t=>P.firms.filter(f=>f.type===t&&f.dz==="yes").length;
+  let letter="";
+  el.innerHTML=`<h1>Prop firm tracker</h1><p class="sub">Rules, hidden rules, payouts and Algeria availability of ${P.firms.length} prop firms. Tap a firm to see everything.</p>
+   <div class="rtabs" role="tablist">
+    <button type="button" data-pft="futures" class="${type==="futures"?"on":""}"><span class="rt-ic">📈</span><span class="rt-tx"><b>Futures prop firms</b><small>${cnt("futures")} <span>firms</span> · ${cntDz("futures")} 🇩🇿</small></span></button>
+    <button type="button" data-pft="cfd" class="${type==="cfd"?"on":""}"><span class="rt-ic">💹</span><span class="rt-tx"><b>CFD prop firms</b><small>${cnt("cfd")} <span>firms</span> · ${cntDz("cfd")} 🇩🇿</small></span></button></div>
+   <div class="pf-tools"><input class="i" id="pfQ" placeholder="Search a prop firm…" value="${esc(S._pfQ||"")}" data-noswipe>
+    <label class="pf-dz"><input type="checkbox" id="pfDz" ${dzOnly?"checked":""}> <span>🇩🇿 Only firms open to Algeria</span></label></div>
+   <div class="pf-legend">${Object.values(PFDZ).map(d=>`<span class="dz-b ${d[2]}">${d[0]} <span>${d[1]}</span></span>`).join("")}</div>
+   <div class="card pf-list">${list.length?list.map(f=>{const L=f.name.replace(/^The /,"").charAt(0).toUpperCase();const h=L!==letter?(letter=L,`<div class="pf-letter">${L}</div>`):"";
+     return `${h}<button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b><small data-notr>${esc(f.sizes.join(" · "))}</small></span>${dzBadge(f)}<span class="pf-go">›</span></button>`}).join("")
+     :`<div class="empty">No prop firm found.</div>`}</div>
+   <div class="card pf-common"><h3>🕵️ Rules that hide in almost every prop firm</h3><p class="mut" style="font-size:13px;margin-top:-4px">Read the FAQ and terms for these before you pay. They break more accounts than the profit target.</p>
+    <div class="pfc-grid">${P.common.map(([ic,t,d])=>`<div class="pfc"><span class="pfc-ic">${ic}</span><div><b>${t}</b><p>${d}</p></div></div>`).join("")}</div></div>
+   <p class="mut pf-disc">ℹ️ <span>Rules checked in November 2026 from public sources. Prop firms change rules often: always confirm on the firm's official website before buying. Algeria availability comes from published restricted-country lists; ✅ means accepted, ⛔ means restricted.</span></p>`;
+  $$("[data-pft]",el).forEach(b=>b.onclick=()=>{S._pfType=b.dataset.pft;render()});
+  $$("[data-pf]",el).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.pf;render();window.scrollTo(0,0)});
+  const qi=$("#pfQ",el);qi.oninput=()=>{S._pfQ=qi.value;const p=qi.selectionStart;render();const n=$("#pfQ");n.focus();n.setSelectionRange(p,p)};
+  $("#pfDz",el).onchange=e=>{S._pfDz=e.target.checked;render()}}
+function vPropFirm(el,f){const d=PFDZ[f.dz]||PFDZ.check;
+  const sec=(ic,t,items,cl)=>items&&items.length?`<div class="card pf-sec ${cl||""}"><h3>${ic} ${t}</h3><ul>${items.map(x=>`<li data-notr>${esc(x)}</li>`).join("")}</ul></div>`:"";
+  el.innerHTML=`<div class="page pf-page">
+   <div class="row" style="justify-content:space-between;margin-bottom:14px"><button class="btn sm" id="pfBack">← <span>All prop firms</span></button>
+    <a class="btn sm" href="https://${f.site}" target="_blank" rel="noopener nofollow">↗ <span>Official website</span></a></div>
+   <div class="pf-hero ${f.type}">${pfLogo(f,64)}<div><h1 data-notr>${esc(f.name)}</h1><div class="pf-meta"><span class="kind-b ${f.type==="cfd"?"cfd":"fut"}">${f.type==="cfd"?"💹 CFD":"📈 Futures"}</span> <span class="mut" data-notr>${esc(f.site)}</span></div></div></div>
+   <div class="dz-box ${d[2]}"><span class="dz-flag">🇩🇿</span><div><b>${d[0]} ${d[1]}</b>${f.dzNote?`<p data-notr>${esc(f.dzNote)}</p>`:f.dz==="yes"?`<p>Algeria is not on this firm's restricted list.</p>`:f.dz==="no"?`<p>Algeria is on this firm's restricted-country list. A payout can be refused even after you pass.</p>`:`<p>Not confirmed. Ask the firm's support before paying.</p>`}</div></div>
+   <div class="card pf-sec"><h3>💰 Account sizes</h3><div class="pf-sizes">${f.sizes.map(s=>`<span class="cchip min"><b class="mono">${s}</b></span>`).join("")}</div><p class="mut" style="font-size:13px;margin:10px 0 0" data-notr>${esc(f.plans||"")}</p></div>
+   <div class="pf-cols">
+    ${sec("📝","Evaluation phase: rules",f.eval)}
+    ${sec("🕵️","Evaluation phase: hidden rules",f.evalH,"hid")}
+    ${sec("🏦","Funded phase: rules",f.funded)}
+    ${sec("🕵️","Funded phase: hidden rules",f.fundedH,"hid")}
+   </div>
+   ${sec("💸","Withdrawal conditions",f.payout,"pay")}
+   <p class="mut pf-disc">ℹ️ <span>Checked in November 2026. Rules change often and can differ between plans. Confirm everything on the official website before buying.</span></p>
+  </div>`;
+  $("#pfBack").onclick=()=>{S._pfId=null;render();window.scrollTo(0,0)}}
 
 /* ============ IMPORT ============ */
 const FIELDS=[["date","Date / time"],["time","Time"],["symbol","Symbol"],["side","Side / direction"],["qty","Quantity"],["entry","Entry price"],["exit","Exit price"],["stop","Stop loss"],["target","Take profit"],["pnl","P&L"],["fees","Fees / commission"],["swap","Swap"],["boughtTs","Bought timestamp"],["soldTs","Sold timestamp"],["buyPrice","Buy price"],["sellPrice","Sell price"]];
