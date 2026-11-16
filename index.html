@@ -484,6 +484,16 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 .sh-item{margin-bottom:10px}
 .sh-qr{text-align:center;margin-top:12px}.sh-qr img{width:min(300px,100%);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 #share main{max-width:1100px}
+.cal .c.cday{cursor:pointer;transition:transform .15s,box-shadow .2s,outline-color .2s;outline:1px solid transparent}
+.cal .c.cday:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 6px 18px -8px rgba(0,0,0,.6);outline-color:var(--gold);z-index:1;position:relative}
+.dp-hero{text-align:center;padding:20px 16px;border-radius:18px;margin-bottom:12px;border:1px solid var(--line2);background:var(--panel)}
+.dp-hero.up{border-color:rgba(39,194,108,.4);background:radial-gradient(600px 200px at 50% 0,rgba(39,194,108,.16),transparent 70%),var(--panel)}
+.dp-hero.down{border-color:rgba(239,83,80,.4);background:radial-gradient(600px 200px at 50% 0,rgba(239,83,80,.16),transparent 70%),var(--panel)}
+.dp-net{font-size:40px;font-weight:900;margin:6px 0 10px}
+.dp-chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.dp-rules{display:grid;gap:6px;font-size:14px}.dp-rules .no{color:var(--muted)}
+.dp-trade{margin-bottom:12px}.dp-trade .td-h{margin:0 0 4px;font-size:20px}
+.dp-n{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--gold)}
 #share{overflow-x:hidden}
 #share .tw{overflow-x:auto}
 @media(max-width:760px){
@@ -952,7 +962,7 @@ function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button da
   t.innerHTML=h;$$("button",t).forEach(b=>b.onclick=()=>go(b.dataset.v));}
 function go(v){if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
-  S.view=v;S.page=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
+  S.view=v;S.page=null;S.dayPage=null;S._fromDay=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
 function render(){renderTabs();const v=$("#view");
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
@@ -1291,11 +1301,16 @@ function tcard(t){const n=tradeNet(t),R=tradeR(t),res=resultOf(t);
     <div class="tpnl ${cls(n)}">${smoney(n)}<div class="mut" style="font-size:11px;font-weight:600">${isFinite(R)?R.toFixed(2)+"R":""}</div></div></div>`}
 
 function vTradePage(el,id){const t=S.trades.find(x=>x.id===id);if(!t){S.page=null;return vJournal(el)}
-  const n=tradeNet(t),R=tradeR(t),risk=tradeRisk(t),m=MK[rootOf(t.symbol)];
   el.innerHTML=`<div class="page">
-   <div class="row" style="justify-content:space-between;margin-bottom:14px"><button class="btn sm" id="back">← Journal</button>
+   <div class="row" style="justify-content:space-between;margin-bottom:14px"><button class="btn sm" id="back">${S._fromDay?"← Day":"← Journal"}</button>
    ${S.readonly?"":`<div class="row"><button class="btn sm" id="edit">Edit</button><button class="btn sm danger" id="del">Delete</button></div>`}</div>
-   <h1><span class="mono">${esc(t.symbol)}</span> ${t.side==="Long"?'<span class="pos">▲ Long</span>':'<span class="neg">▼ Short</span>'} · <span class="${cls(n)} mono">${smoney(n)}</span></h1>
+   ${tradeDetail(t)}
+  </div>`;
+  $("#back").onclick=()=>{S.page=null;if(S._fromDay){S.dayPage=S._fromDay;S._fromDay=null;S.view="stats";try{history.replaceState(null,"","#stats")}catch(e){}}render();window.scrollTo(0,0)};
+  if($("#edit")){$("#edit").onclick=()=>editTrade(t);$("#del").onclick=()=>confirmBox("Delete this trade? This can't be undone.",async()=>{try{await API.deleteTrade(t);S.trades=S.trades.filter(x=>x.id!==t.id);S.page=null;render();toast("Trade deleted")}catch(e){toast(e.message)}})}
+}
+function tradeDetail(t,h="h1"){const n=tradeNet(t),R=tradeR(t),risk=tradeRisk(t),m=MK[rootOf(t.symbol)];
+  return `<${h} class="td-h"><span class="mono">${esc(t.symbol)}</span> ${t.side==="Long"?'<span class="pos">▲ Long</span>':'<span class="neg">▼ Short</span>'} · <span class="${cls(n)} mono">${smoney(n)}</span></${h}>
    <p class="sub">${fmtDate(t.date)} ${esc(t.time||"")} · ${esc(t.account||"No account")}</p>
    ${(t.shots||[]).map((s,i)=>`<img class="cover" src="${s}" alt="Trade screenshot ${i+1}" style="margin-top:${i?10:0}px">`).join("")||`<div class="card empty">No screenshot</div>`}
    ${t.remark?`<div class="remark">📝 ${esc(t.remark)}</div>`:""}
@@ -1313,11 +1328,25 @@ function vTradePage(el,id){const t=S.trades.find(x=>x.id===id);if(!t){S.page=nul
      <div>Emotions</div><div class="pills">${(t.emotions||[]).map(e=>`<span class="tag ${EMO_BAD.includes(e)?"bad":"good"}">${esc(e)}</span>`).join("")||"—"}</div>
    </div>
    ${t.feeling?`<h3>How I felt</h3><div class="card notes" style="margin-bottom:12px">${esc(t.feeling)}</div>`:""}
-   ${t.notes?`<h3>Journal & lessons</h3><div class="card notes">${esc(t.notes)}</div>`:""}
+   ${t.notes?`<h3>Journal & lessons</h3><div class="card notes">${esc(t.notes)}</div>`:""}`}
+
+/* day page: click a day's amount on the Statistics calendar */
+function vDayPage(el,d){const ts=filtered().filter(t=>t.date===d).sort(byDT);
+  const net=ts.reduce((a,t)=>a+tradeNet(t),0),w=ts.filter(t=>resultOf(t)==="Win").length,l=ts.filter(t=>resultOf(t)==="Loss").length;
+  const days=[...new Set(filtered().map(t=>t.date))].sort(),i=days.indexOf(d),pv=i>0?days[i-1]:null,nx=i>=0&&i<days.length-1?days[i+1]:null;
+  const plan=S.plans.find(p=>p.date===d),rules=Object.entries((plan&&plan.rules)||{});
+  el.innerHTML=`<div class="page dpage">
+   <div class="row" style="justify-content:space-between;margin-bottom:14px"><button class="btn sm" id="dBack">← Statistics</button>
+    <div class="row"><button class="btn sm" id="dPrev" ${pv?"":"disabled"}>‹ <span>Previous day</span></button><button class="btn sm" id="dNext" ${nx?"":"disabled"}><span>Next day</span> ›</button></div></div>
+   <div class="dp-hero ${net>0?"up":net<0?"down":""}"><div class="mut">${fmtDate(d)}</div><div class="dp-net mono ${cls(net)}">${smoney(net)}</div>
+    <div class="dp-chips"><span class="chip">${ts.length} trade${ts.length===1?"":"s"}</span><span class="chip pos">${w} W</span><span class="chip neg">${l} L</span>${S.acct!=="all"?`<span class="chip" data-notr>${esc(S.acct)}</span>`:""}</div></div>
+   ${rules.length?`<div class="card" style="margin-bottom:12px"><h3>Pre-trade checklist</h3><div class="dp-rules">${rules.map(([r,v])=>`<div class="${v?"ok":"no"}">${v?"✅":"⬜"} <span>${esc(r)}</span></div>`).join("")}</div></div>`:""}
+   ${ts.length?ts.map((t,k)=>`<div class="card dp-trade"><div class="row" style="justify-content:space-between;margin-bottom:8px"><span class="dp-n">Trade ${k+1} / ${ts.length}</span><button class="btn sm" data-open="${t.id}">Open trade ›</button></div>${tradeDetail(t,"h2")}</div>`).join("")
+    :`<div class="card empty">No trades on this day.</div>`}
   </div>`;
-  $("#back").onclick=()=>{S.page=null;render()};
-  if($("#edit")){$("#edit").onclick=()=>editTrade(t);$("#del").onclick=()=>confirmBox("Delete this trade? This can't be undone.",async()=>{try{await API.deleteTrade(t);S.trades=S.trades.filter(x=>x.id!==t.id);S.page=null;render();toast("Trade deleted")}catch(e){toast(e.message)}})}
-}
+  const to=x=>{S.dayPage=x;render();window.scrollTo(0,0)};
+  $("#dBack").onclick=()=>to(null);if(pv)$("#dPrev").onclick=()=>to(pv);if(nx)$("#dNext").onclick=()=>to(nx);
+  $$("[data-open]",el).forEach(b=>b.onclick=()=>{S._fromDay=d;S.dayPage=null;S.view="journal";S.page=b.dataset.open;try{history.replaceState(null,"","#journal")}catch(e){}render();window.scrollTo(0,0)})}
 
 /* ============ modal ============ */
 function openModal(h){$("#mbox").innerHTML=h;$("#modal").classList.remove("hidden");document.body.style.overflow="hidden"}
@@ -1426,11 +1455,11 @@ function dailyBars(days){const ent=Object.entries(days).sort((a,b)=>a[0].localeC
     g+=`<rect class="hit" x="${L+i*bw}" y="${T}" width="${bw}" height="${H-T-B}" data-tip="${esc(fmtDate(d)+"\n"+smoney(v))}"/>`;
     if(i%Math.max(1,Math.ceil(ent.length/6))===0)g+=`<text x="${x+w/2}" y="${H-8}" text-anchor="middle">${d.slice(5)}</text>`});
   return `<svg class="ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily P&L">${g}</svg>`}
-function calendar(days){const keys=Object.keys(days).sort();const ref=S.calMonth||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7));
+function calendar(days,click){const keys=Object.keys(days).sort();const ref=S.calMonth||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7));
   const [y,m]=ref.split("-").map(Number);const first=new Date(y,m-1,1),dim=new Date(y,m,0).getDate();const mx=Math.max(1,...Object.values(days).map(Math.abs));
   let h=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div class="h">${d}</div>`).join("");for(let i=0;i<first.getDay();i++)h+='<div class="c e"></div>';
   let mt=0;for(let d=1;d<=dim;d++){const k=`${y}-${pad(m)}-${pad(d)}`,v=days[k];if(v!=null)mt+=v;const a=v==null?0:.12+.5*Math.abs(v)/mx;
-    h+=`<div class="c" style="${v!=null?`background:${v>=0?`rgba(39,194,108,${a})`:`rgba(239,83,80,${a})`}`:""}" ${v!=null?`data-tip="${esc(fmtDate(k)+"\n"+smoney(v))}"`:""}><span class="d">${d}</span>${v!=null?`<span class="p">${kfmt(v)}</span>`:""}</div>`}
+    h+=`<div class="c${click&&v!=null?" cday":""}" ${click&&v!=null?`data-day="${k}"`:""} style="${v!=null?`background:${v>=0?`rgba(39,194,108,${a})`:`rgba(239,83,80,${a})`}`:""}" ${v!=null?`data-tip="${esc(fmtDate(k)+"\n"+smoney(v))}"`:""}><span class="d">${d}</span>${v!=null?`<span class="p">${kfmt(v)}</span>`:""}</div>`}
   return `<div class="row" style="justify-content:space-between;margin-bottom:8px"><button class="btn sm" id="calP">‹</button><b>${first.toLocaleDateString(I18N.locale(),{month:"long",year:"numeric"})} · <span class="${cls(mt)} mono">${smoney(mt)}</span></b><button class="btn sm" id="calN">›</button></div><div class="cal">${h}</div>`}
 document.addEventListener("mouseover",e=>{const el=e.target.closest&&e.target.closest("[data-tip]");const tp=$("#tip");if(!el){tp.style.display="none";return}tp.textContent=el.dataset.tip;tp.style.display="block"});
 document.addEventListener("mousemove",e=>{const tp=$("#tip");if(tp.style.display==="block"){const x=Math.min(e.clientX+14,innerWidth-tp.offsetWidth-8);tp.style.left=x+"px";tp.style.top=(e.clientY+14)+"px"}});
@@ -1448,7 +1477,7 @@ function insights(ts){const out=[];if(ts.length<3)return out;
   const su=groupBy(ts,t=>t.setup);if(su.length&&su[0].net>0)out.push(["✅",`Best setup: <b>${esc(su[0].k)}</b> — ${smoney(su[0].net,0)} over ${su[0].n} trades.`]);
   const wd=groupBy(ts,t=>{const[a,b,c]=t.date.split("-").map(Number);return WD[new Date(a,b-1,c).getDay()]});const bw=wd[wd.length-1];if(bw&&bw.net<0)out.push(["📅",`<b>${bw.k}</b> is your weakest day: ${smoney(bw.net,0)}.`]);
   return out}
-function vStats(el){const ts=filtered();const st=calc(ts);
+function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered();const st=calc(ts);
   const meta=S.acct!=="all"?S.trades.find(t=>t.account===S.acct&&(t.firm||t.platform||t.acctSize)):null;const aSize=meta&&num(meta.acctSize)>0?num(meta.acctSize):null;
   el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px"><div><h1>Statistics</h1><p class="sub">${S.acct==="all"?"All accounts":esc(S.acct)} · ${ts.length} trades</p>
    ${meta?`<div class="det-line">${meta.firm?`<span class="chip">🏦 <span data-notr>${esc(meta.firm)}</span></span>`:""}${aSize?`<span class="chip">💰 ${money(aSize,0)}</span>`:""}${meta.platform?`<span class="chip">🖥 <span data-notr>${esc(meta.platform)}</span></span>`:""}</div>`:""}</div>${S.readonly?"":`<button class="btn pri share-btn" id="shareBtn">🔗 Share my results</button>`}</div>
@@ -1466,7 +1495,7 @@ function vStats(el){const ts=filtered();const st=calc(ts);
   </div>
   ${insights(ts).length?`<div class="card" style="margin-bottom:12px"><h3>What your journal says</h3>${insights(ts).map(([i,t])=>`<div class="insight"><span class="ic">${i}</span><span>${t}</span></div>`).join("")}</div>`:""}
   <div class="card" style="margin-bottom:12px"><h3>Equity curve</h3>${equityChart(st.curve)}</div>
-  <div class="grid g2" style="margin-bottom:12px"><div class="card"><h3>Daily P&L</h3>${dailyBars(st.days)}</div><div class="card"><h3>Calendar</h3>${calendar(st.days)}</div></div>
+  <div class="grid g2" style="margin-bottom:12px"><div class="card"><h3>Daily P&L</h3>${dailyBars(st.days)}</div><div class="card"><h3>Calendar</h3>${calendar(st.days,true)}<p class="mut" style="font-size:12px;margin:8px 0 0">👆 <span>Click a day to see its trades, screenshots and journal.</span></p></div></div>
   <div class="grid g2">
    ${bdTable("By emotion",groupBy(ts,t=>t.emotions||[]))}
    ${bdTable("By setup",groupBy(ts,t=>t.setup))}
@@ -1480,6 +1509,7 @@ function vStats(el){const ts=filtered();const st=calc(ts);
   bindFilters();if($("#impBody"))vImport($("#impBody"),true);if($("#shareBtn"))$("#shareBtn").onclick=openShare;
   const shift=d=>{const keys=Object.keys(st.days).sort();const ref=S.calMonth||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7));const[y,m]=ref.split("-").map(Number);const n=new Date(y,m-1+d,1);S.calMonth=`${n.getFullYear()}-${pad(n.getMonth()+1)}`;render()};
   $("#calP").onclick=()=>shift(-1);$("#calN").onclick=()=>shift(1);
+  $$(".cal .c[data-day]",el).forEach(c=>c.onclick=()=>{$("#tip").style.display="none";S.dayPage=c.dataset.day;render();window.scrollTo(0,0)});
 }
 
 /* ============ SHARE (public view-only link + QR code) ============ */
