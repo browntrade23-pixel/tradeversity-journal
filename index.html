@@ -1307,7 +1307,9 @@ function aboutStatsHTML(){return `<div class="astats">
   <div class="astat"><b>✔</b><span>real results, shared with full transparency</span></div></div>`}
 function resultsStripHTML(mod){if(!RESULTS.length)return "";const list=String(mod||"").includes("rev")?[...RESULTS].reverse():RESULTS;
   const imgs=list.map(f=>`<img src="results/thumbs/${encodeURI(f)}" alt="Student result" loading="lazy" decoding="async" data-res="${esc(f)}">`).join("");
-  return `<div class="rstrip ${mod||""}"><div class="rtrack">${imgs}${imgs}</div></div>`}
+  /* speed is per image, so adding results never makes the strips faster. About rows: 6 s per image (slow), small strips: 2.5 s per image */
+  const secs=Math.round(list.length*(String(mod||"").includes("big")?6:2.5));
+  return `<div class="rstrip ${mod||""}"><div class="rtrack" style="animation-duration:${secs}s">${imgs}${imgs}</div></div>`}
 function resultsBtn(){return `<a class="tg-link res" href="${ABOUT.channel}" target="_blank" rel="noopener">${SOCIAL[0].icon}<span>See all results on Telegram</span></a>`}
 function vAbout(el){
   el.innerHTML=`<div class="about-hero"><div class="logo lg" role="img" aria-label="Tradeversity"></div><div><h1>About <span data-notr>TRADEVERSITY</span></h1>
