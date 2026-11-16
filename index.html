@@ -572,7 +572,12 @@ html[lang=ar] .tp-ex span{letter-spacing:0}
 .nx{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .45s cubic-bezier(.2,.8,.2,1),opacity .35s}
 .nx.show{grid-template-rows:1fr;opacity:1}
 .nx-wrap{overflow:hidden;min-height:0}
-.nx-in{margin:6px 0 12px;padding:14px;border-radius:12px;border:1px solid var(--line2);border-inline-start:3px solid var(--gold);background:color-mix(in srgb,var(--panel2) 75%,transparent)}
+.nx-in{margin:6px 0 12px;padding:14px;border-radius:12px;border:1px solid rgba(245,185,66,.22);border-inline-start:3px solid var(--gold);
+  background:radial-gradient(120% 90% at 0% 0%,rgba(245,185,66,.10),transparent 60%),#16130e}
+.nx-in .ni-sec{background:rgba(255,240,210,.04);border-color:rgba(245,185,66,.14)}
+.nrow.open{background:rgba(245,185,66,.06)!important}
+html[data-theme=light] .nx-in{background:radial-gradient(120% 90% at 0% 0%,rgba(245,185,66,.16),transparent 60%),#fbf6ec;border-color:rgba(183,121,31,.25)}
+html[data-theme=light] .nx-in .ni-sec{background:#fffdf8;border-color:rgba(183,121,31,.18)}
 .nx-in.is-red{border-inline-start-color:var(--red)}.nx-in.is-org{border-inline-start-color:#f59e2a}.nx-in.is-hol{border-inline-start-color:var(--blue)}
 .nx-h{font-size:15px;margin-bottom:8px}.nx-h .ni-orig{display:inline}
 .nx.show .nx-in>*{animation:nxIn .6s cubic-bezier(.2,.8,.2,1) both}
