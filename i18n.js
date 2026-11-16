@@ -316,6 +316,20 @@ const T={
 "Only the admin can do this":["Seul l'admin peut faire cela","المشرف فقط يمكنه فعل ذلك"],
 // brand
 "Founder":["Fondateur","المؤسس"],
+"Founder ·":["Fondateur ·","المؤسس ·"],
+// gate
+"Not everyone gets in.":["Tout le monde n'entre pas.","ليس الجميع يدخل."],
+"Only the disciplined see what's behind this door.":["Seuls les disciplinés voient ce qui se cache derrière cette porte.","وحدهم المنضبطون يرون ما وراء هذا الباب."],
+"Enter":["Entrer","ادخل"],
+// social
+"Students' results":["Résultats des élèves","نتائج الطلاب"],
+"Brown Algo channel":["Chaîne Brown Algo","قناة Brown Algo"],
+// Earn2Trade promo
+"Partner offer":["Offre partenaire","عرض شريك"],
+"Use code":["Code promo","استخدم الكود"],
+"Copy code":["Copier le code","نسخ الكود"],
+"Get 60% off":["Obtenir -60%","احصل على خصم 60%"],
+"Code BROWN23 copied":["Code BROWN23 copié","تم نسخ الكود BROWN23"],
 // language picker
 "Language":["Langue","اللغة"]
 };

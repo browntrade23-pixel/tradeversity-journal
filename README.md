@@ -11,6 +11,11 @@ Files:
 - `i18n.js`: English / Français / العربية translations (edit a translation there)
 - `raven.svg`, `favicon.svg`: the raven logo and browser-tab icon
 
+## Links, social media and the Earn2Trade offer
+Edit them in `index.html`, near the end of the script:
+- `SOCIAL` — Students' results channel, Brown Algo Telegram channel, YouTube, Instagram, TikTok, Kick (shown top and bottom of the login screen and of the journal).
+- `PROMO` — Earn2Trade partner link and coupon code (`BROWN23`, 60% off).
+
 ## Approving students
 New sign-ups appear in **Admin dashboard → 🔔 Pending requests** (and you get a Telegram message). Click **✔ Approve** to let them in, or **✖ Reject**. Until then they only see a "Waiting for approval" screen, and the database refuses to show or save their data. Rejected requests can still be approved later from the "Rejected requests" list.
 
