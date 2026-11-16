@@ -259,6 +259,19 @@ html[lang=ar] .promo-tag,html[lang=ar] .promo-code{letter-spacing:0}
 .foot{text-align:center;color:var(--dim);font-size:12px;padding:20px}
 .check{display:flex;gap:8px;align-items:flex-start;padding:6px 0}
 .check input{margin-top:3px;accent-color:var(--gold)}
+.ck-bar{height:6px;border-radius:6px;background:var(--line);overflow:hidden;margin:10px 0 6px}
+.ck-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#3ecf8e);border-radius:6px;transition:width .35s ease}
+.ck-n{font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.check.ck{align-items:center;padding:8px 6px;border-radius:8px;cursor:pointer;transition:background .2s}
+.check.ck:hover{background:color-mix(in srgb,var(--gold) 6%,transparent)}
+.check.ck input{margin:0;width:17px;height:17px;flex:none}
+.ck-i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none;background:var(--line);color:var(--muted)}
+.check.ck:has(input:checked) .ck-i{background:var(--gold);color:#111}
+.check.ck:has(input:checked)>span:last-child{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--gold) 60%,transparent)}
+.ck-go{display:none;margin-top:10px;padding:10px;border-radius:8px;font-weight:700;text-align:center;background:color-mix(in srgb,#3ecf8e 14%,transparent);color:#3ecf8e;border:1px solid color-mix(in srgb,#3ecf8e 40%,transparent)}
+.ck-go.on{display:block;animation:ckPop .35s ease}
+html[data-theme=light] .ck-go{color:#14804a}
+@keyframes ckPop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
 hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
 /* USD news box */
 .newsbox{border:1px solid var(--line2);border-radius:12px;padding:10px 12px;background:var(--panel2);display:flex;flex-direction:column;gap:6px;color:var(--text);font-weight:500}
@@ -1485,7 +1498,8 @@ function vPlan(el){
   const p=S.plans.find(x=>x.date===cur)||{user_id:S.subject.id,date:cur,maxLoss:"",target:"",maxTrades:2,riskPerTrade:"",bias:{},htf:"",levels:"",news:"",session:"NY AM",model:"",noTrade:"",rules:{},mindset:"",followed:"",review:""};
   const dayTrades=S.trades.filter(t=>t.date===cur),dn=dayTrades.reduce((a,t)=>a+tradeNet(t),0);
   const ro=S.readonly?"disabled":"";
-  const RULES=["Daily bias defined","1H imbalance marked","15m entry confirmation only","Stop loss before entry","Max loss respected","No trading during red news"];
+  const RULES=["Daily direction defined","1H imbalance or 15m confirmation","Sell stops taken / buy stops taken","Judas swing at a specific time into the HTF imbalance","Using a macro imbalance entry","Not a no-trade day (no red news / holiday)"];
+  const nCk=RULES.filter(r=>(p.rules||{})[r]).length;
   const breach=num(p.maxLoss)>0&&dn<=-num(p.maxLoss),overT=num(p.maxTrades)>0&&dayTrades.length>num(p.maxTrades);
   el.innerHTML=`<div class="row" style="justify-content:space-between"><div><h1>Trading plan</h1><p class="sub">Plan tomorrow tonight. Execute it tomorrow, then review it.</p></div>
    <div class="row"><input class="i" type="date" id="pDate" value="${cur}" style="width:auto">${dates.length?`<select class="i" id="pHist" style="width:auto"><option value="">Past plans…</option>${dates.map(d=>`<option value="${d}">${d}</option>`).join("")}</select>`:""}</div></div>
@@ -1508,7 +1522,10 @@ function vPlan(el){
     <div class="grid"><label class="f">Session<select class="i" name="session" ${ro}>${SESSIONS.map(s=>`<option ${p.session===s?"selected":""}>${s}</option>`).join("")}</select></label>
      <label class="f">Mindset / goal for the day<input class="i" name="mindset" value="${esc(p.mindset)}" ${ro}></label></div>
    </div>
-   <div class="card"><h3>Pre-trade checklist</h3>${RULES.map(r=>`<label class="check"><input type="checkbox" data-r="${esc(r)}" ${(p.rules||{})[r]?"checked":""} ${ro}><span>${esc(r)}</span></label>`).join("")}</div>
+   <div class="card ck-card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Pre-trade checklist</h3><span class="ck-n" id="ckN">${nCk} / ${RULES.length}</span></div>
+    <div class="ck-bar"><i id="ckBar" style="width:${nCk/RULES.length*100}%"></i></div>
+    ${RULES.map((r,i)=>`<label class="check ck"><input type="checkbox" data-r="${esc(r)}" ${(p.rules||{})[r]?"checked":""} ${ro}><span class="ck-i">${i+1}</span><span>${esc(r)}</span></label>`).join("")}
+    <div class="ck-go ${nCk===RULES.length?"on":""}" id="ckGo">✅ <span>All checks done: you can take the trade</span></div></div>
    <div class="card"><h3>End-of-day review</h3>
     <div class="grid g3" style="margin-bottom:12px">
      ${kpi("Day P&L (journal)",`<span class="${cls(dn)}">${smoney(dn)}</span>`,`${dayTrades.length} trade${dayTrades.length===1?"":"s"} logged`)}
@@ -1520,6 +1537,8 @@ function vPlan(el){
   </form>`;
   bindNewsIns(cur);if($("#pHist"))$("#pHist").onchange=e=>{if(e.target.value){S._planDate=e.target.value;render()}};
   if(S.readonly)return;
+  const ckUpd=()=>{const n=$$(".ck-card [data-r]").filter(c=>c.checked).length;$("#ckN").textContent=`${n} / ${RULES.length}`;$("#ckBar").style.width=n/RULES.length*100+"%";$("#ckGo").classList.toggle("on",n===RULES.length)};
+  $$(".ck-card [data-r]").forEach(c=>c.onchange=ckUpd);
   const bias={...(p.bias||{})};
   $$(".seg[data-g]").forEach(sg=>$$("button",sg).forEach(b=>b.onclick=()=>{const g=sg.dataset.g,v=b.dataset.b;bias[g]=bias[g]===v?"":v;$$("button",sg).forEach(x=>{x.className=bias[g]===x.dataset.b?"on "+(v==="Bullish"?"bull":v==="Bearish"?"bear":""):""})}));
   $("#pf").onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const rules={};$$("[data-r]").forEach(c=>rules[c.dataset.r]=c.checked);
