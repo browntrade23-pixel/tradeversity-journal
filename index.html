@@ -445,10 +445,36 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .pf-dz{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:8px 12px;border-radius:10px;border:1px solid var(--line2);background:var(--panel)}
 .pf-dz:has(input:checked){border-color:var(--green);background:color-mix(in srgb,var(--green) 10%,var(--panel))}.pf-dz input{accent-color:var(--green)}
 .pf-legend{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
-.pf-list{padding:6px}
-.pf-letter{font-size:12px;font-weight:900;color:var(--gold);letter-spacing:1px;padding:12px 10px 4px;border-bottom:1px solid var(--line)}
+.pf-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 6px;font-size:13px}
+.pf-list{display:grid;gap:12px}
+.pf-letter{display:flex;align-items:center;gap:10px;margin-top:6px}
+.pf-letter span{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;font-weight:900;font-size:16px;color:#04161a;background:linear-gradient(135deg,#5ef0e6,#2ec5c9 55%,#12868a);box-shadow:0 0 16px rgba(46,197,201,.45)}
+.pf-letter::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(46,197,201,.5),transparent)}
+[dir=rtl] .pf-letter::after{background:linear-gradient(-90deg,rgba(46,197,201,.5),transparent)}
+.pf-item{--pc:#2ec5c9;--pc2:#12868a;border-radius:18px;padding:6px;border:1px solid color-mix(in srgb,var(--pc) 40%,transparent);
+  background:radial-gradient(120% 70% at 0% 0%,color-mix(in srgb,var(--pc) 13%,transparent),transparent 55%),var(--panel);box-shadow:0 8px 26px -14px color-mix(in srgb,var(--pc) 60%,transparent)}
+.pf-item.cfd{--pc:#a07bff;--pc2:#6a45d8}
+.pf-item .pf-logo{box-shadow:0 0 0 2px color-mix(in srgb,var(--pc) 55%,transparent)}
 .pf-row{display:flex;align-items:center;gap:12px;width:100%;padding:10px;border:0;background:none;color:var(--text);font:inherit;text-align:start;cursor:pointer;border-radius:12px;transition:background .2s,transform .15s}
-.pf-row:hover{background:color-mix(in srgb,var(--gold) 7%,transparent);transform:translateX(3px)}
+.pf-row b{font-size:15px}
+.pf-row:hover{background:color-mix(in srgb,var(--pc,var(--gold)) 10%,transparent);transform:translateX(3px)}
+.pf-row:hover .pf-go{color:var(--pc)}
+.pf-rules{padding:0 8px 8px}
+.pf-rules summary{cursor:pointer;list-style:none;font-size:12px;font-weight:800;color:var(--pc);padding:4px 4px 8px;display:flex;align-items:center;gap:6px;user-select:none}
+.pf-rules summary::-webkit-details-marker{display:none}
+.pf-rules summary::before{content:"▸";transition:transform .2s}.pf-rules[open] summary::before{transform:rotate(90deg)}
+[dir=rtl] .pf-rules summary::before{content:"◂"}[dir=rtl] .pf-rules[open] summary::before{transform:rotate(-90deg)}
+.pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}@media(max-width:760px){.pf-grid{grid-template-columns:1fr}}
+.pf-mini{--mc:#2ec5c9;border-radius:12px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--mc) 35%,transparent);background:color-mix(in srgb,var(--mc) 7%,var(--panel2));border-inline-start:3px solid var(--mc)}
+.pf-mini.f{--mc:#4fa3ff}.pf-mini.h{--mc:#ff5fa8}.pf-mini.p{--mc:#3ddc84}
+.pf-mini h4{margin:0 0 6px;font-size:12.5px;color:var(--mc);letter-spacing:.2px}
+.pf-mini ul{margin:0;padding-inline-start:16px;display:grid;gap:4px}.pf-mini li{font-size:13px;line-height:1.45}.pf-mini li::marker{color:var(--mc)}
+/* moving tab name */
+@keyframes pfShine{0%{background-position:200% 50%}100%{background-position:-200% 50%}}
+@keyframes pfBob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-2px) rotate(-6deg)}}
+#tabs button[data-v=propfirms]>span:last-child,.bn-sheet button[data-v=propfirms]>span:last-child{background:linear-gradient(90deg,#2ec5c9,#a07bff,#ff5fa8,#f5b942,#2ec5c9);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800;animation:pfShine 4s linear infinite}
+#tabs button[data-v=propfirms] .tico,.bn-sheet button[data-v=propfirms] .bn-ic{animation:pfBob 2.4s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){#tabs button[data-v=propfirms] *,.bn-sheet button[data-v=propfirms] *{animation:none!important}}
 [dir=rtl] .pf-row:hover{transform:translateX(-3px)}
 .pf-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.pf-tx small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pf-go{color:var(--muted);font-size:20px}
@@ -463,8 +489,8 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .pf-common{margin-top:12px}.pfc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
 .pfc{display:flex;gap:10px;padding:10px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}.pfc-ic{font-size:20px}.pfc b{font-size:13px}.pfc p{margin:3px 0 0;font-size:12px;color:var(--muted);line-height:1.5}
 .pf-disc{font-size:12px;margin:12px 0 0}
-.pf-hero{display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;margin-bottom:12px;border:1px solid rgba(245,185,66,.35);background:radial-gradient(110% 90% at 0% 0%,rgba(245,185,66,.14),transparent 60%),var(--panel)}
-.pf-hero.cfd{border-color:rgba(76,141,255,.4);background:radial-gradient(110% 90% at 0% 0%,rgba(76,141,255,.16),transparent 60%),var(--panel)}
+.pf-hero{display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;margin-bottom:12px;border:1px solid rgba(46,197,201,.4);background:radial-gradient(110% 90% at 0% 0%,rgba(46,197,201,.16),transparent 60%),var(--panel)}
+.pf-hero.cfd{border-color:rgba(160,123,255,.45);background:radial-gradient(110% 90% at 0% 0%,rgba(160,123,255,.17),transparent 60%),var(--panel)}
 .pf-hero h1{margin:0 0 4px}.pf-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
 .dz-box{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;margin-bottom:12px;border:1px solid}
 .dz-box p{margin:4px 0 0;font-size:13px;color:var(--muted)}.dz-flag{font-size:28px;line-height:1}
@@ -475,8 +501,8 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .pf-sizes{display:flex;gap:8px;flex-wrap:wrap}
 .pf-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}@media(max-width:760px){.pf-cols{grid-template-columns:1fr}}
 .pf-sec h3{margin-top:0}.pf-sec ul{margin:0;padding-inline-start:18px;display:grid;gap:7px}.pf-sec li{font-size:14px;line-height:1.5}
-.pf-sec.hid{border-color:rgba(245,150,40,.4);background:radial-gradient(110% 80% at 0% 0%,rgba(245,150,40,.08),transparent 60%),var(--panel)}
-.pf-sec.hid li::marker{color:#f59e2a}
+.pf-sec.hid{border-color:rgba(255,95,168,.4);background:radial-gradient(110% 80% at 0% 0%,rgba(255,95,168,.09),transparent 60%),var(--panel)}
+.pf-sec.hid li::marker,.pf-sec.hid h3{color:#ff5fa8}
 .pf-sec.pay{border-color:rgba(39,194,108,.4);background:radial-gradient(110% 80% at 0% 0%,rgba(39,194,108,.08),transparent 60%),var(--panel)}
 .pf-sec.pay li::marker{color:var(--green)}
 #bnav{display:none}
@@ -2206,16 +2232,22 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
    <div class="pf-tools"><input class="i" id="pfQ" placeholder="Search a prop firm…" value="${esc(S._pfQ||"")}" data-noswipe>
     <label class="pf-dz"><input type="checkbox" id="pfDz" ${dzOnly?"checked":""}> <span>🇩🇿 Only firms open to Algeria</span></label></div>
    <div class="pf-legend">${Object.values(PFDZ).map(d=>`<span class="dz-b ${d[2]}">${d[0]} <span>${d[1]}</span></span>`).join("")}</div>
-   <div class="card pf-list">${list.length?list.map(f=>{const L=f.name.replace(/^The /,"").charAt(0).toUpperCase();const h=L!==letter?(letter=L,`<div class="pf-letter">${L}</div>`):"";
-     return `${h}<button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b><small data-notr>${esc(f.sizes.join(" · "))}</small></span>${dzBadge(f)}<span class="pf-go">›</span></button>`}).join("")
-     :`<div class="empty">No prop firm found.</div>`}</div>
+   <div class="pf-bar"><span class="mut">${list.length} <span>firms</span></span><button type="button" class="btn sm" id="pfAll">${S._pfShut?"▾ <span>Show all rules</span>":"▴ <span>Hide all rules</span>"}</button></div>
+   <div class="pf-list">${list.length?list.map(f=>{const L=f.name.replace(/^The /,"").charAt(0).toUpperCase();const h=L!==letter?(letter=L,`<div class="pf-letter"><span>${L}</span></div>`):"";
+     const mini=(ic,t,items,cl)=>items&&items.length?`<div class="pf-mini ${cl}"><h4>${ic} <span>${t}</span></h4><ul>${items.map(x=>`<li data-notr>${esc(x)}</li>`).join("")}</ul></div>`:"";
+     return `${h}<div class="pf-item ${f.type}"><button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b><small data-notr>${esc(f.sizes.join(" · "))}</small></span>${dzBadge(f)}<span class="pf-go">›</span></button>
+      <details class="pf-rules"${S._pfShut?"":" open"}><summary><span>Rules &amp; hidden rules</span></summary>
+       <div class="pf-grid">${mini("📝","Evaluation: rules",f.eval,"r")}${mini("🕵️","Evaluation: hidden rules",f.evalH,"h")}${mini("🏦","Funded: rules",f.funded,"r f")}${mini("🕵️","Funded: hidden rules",f.fundedH,"h")}</div>
+       ${mini("💸","Withdrawal conditions",f.payout,"p")}</details></div>`}).join("")
+     :`<div class="card empty">No prop firm found.</div>`}</div>
    <div class="card pf-common"><h3>🕵️ Rules that hide in almost every prop firm</h3><p class="mut" style="font-size:13px;margin-top:-4px">Read the FAQ and terms for these before you pay. They break more accounts than the profit target.</p>
     <div class="pfc-grid">${P.common.map(([ic,t,d])=>`<div class="pfc"><span class="pfc-ic">${ic}</span><div><b>${t}</b><p>${d}</p></div></div>`).join("")}</div></div>
    <p class="mut pf-disc">ℹ️ <span>Rules checked in November 2026 from public sources. Prop firms change rules often: always confirm on the firm's official website before buying. Algeria availability comes from published restricted-country lists; ✅ means accepted, ⛔ means restricted.</span></p>`;
   $$("[data-pft]",el).forEach(b=>b.onclick=()=>{S._pfType=b.dataset.pft;render()});
   $$("[data-pf]",el).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.pf;render();window.scrollTo(0,0)});
   const qi=$("#pfQ",el);qi.oninput=()=>{S._pfQ=qi.value;const p=qi.selectionStart;render();const n=$("#pfQ");n.focus();n.setSelectionRange(p,p)};
-  $("#pfDz",el).onchange=e=>{S._pfDz=e.target.checked;render()}}
+  $("#pfDz",el).onchange=e=>{S._pfDz=e.target.checked;render()};
+  $("#pfAll",el).onclick=()=>{S._pfShut=!S._pfShut;render()}}
 function vPropFirm(el,f){const d=PFDZ[f.dz]||PFDZ.check;
   const sec=(ic,t,items,cl)=>items&&items.length?`<div class="card pf-sec ${cl||""}"><h3>${ic} ${t}</h3><ul>${items.map(x=>`<li data-notr>${esc(x)}</li>`).join("")}</ul></div>`:"";
   el.innerHTML=`<div class="page pf-page">
