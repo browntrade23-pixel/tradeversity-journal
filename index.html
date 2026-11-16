@@ -292,6 +292,12 @@ html[lang=ar] .gate-name,html[lang=ar] .gate-hint{letter-spacing:0}
 .promo-s{font-size:12px;color:var(--muted);margin-top:2px}
 .promo-code{font-family:"JetBrains Mono",monospace;font-weight:700;color:var(--gold2);letter-spacing:.12em;border:1px solid rgba(245,185,66,.4);border-radius:6px;padding:1px 6px}
 .promo-r{display:flex;gap:6px;flex-wrap:wrap}
+.promo-gw{display:flex;align-items:center;gap:6px;margin-top:7px;padding:4px 9px 4px 6px;border-radius:99px;font-size:11.5px;font-weight:700;color:#ffd77a;width:fit-content;max-width:100%;
+  background:linear-gradient(90deg,rgba(245,185,66,.18),rgba(255,95,168,.14));border:1px solid rgba(245,185,66,.35)}
+.gw-ic{display:inline-block;animation:gwPop 1.8s ease-in-out infinite}
+@keyframes gwPop{0%,100%{transform:scale(1) rotate(0)}20%{transform:scale(1.25) rotate(-12deg)}40%{transform:scale(1) rotate(8deg)}60%{transform:rotate(0)}}
+html[data-theme=light] .promo-gw{color:#9a6200}
+@media(prefers-reduced-motion:reduce){.gw-ic{animation:none}}
 .promo-r .btn{text-decoration:none}
 .gate-promo{width:100%;max-width:440px;opacity:0;animation:up .9s ease 3.7s forwards}
 html[lang=ar] .promo-tag,html[lang=ar] .promo-code{letter-spacing:0}
@@ -469,6 +475,14 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .pf-mini.f{--mc:#4fa3ff}.pf-mini.h{--mc:#ff5fa8}.pf-mini.p{--mc:#3ddc84}
 .pf-mini h4{margin:0 0 6px;font-size:12.5px;color:var(--mc);letter-spacing:.2px}
 .pf-mini ul{margin:0;padding-inline-start:16px;display:grid;gap:4px}.pf-mini li{font-size:13px;line-height:1.45}.pf-mini li::marker{color:var(--mc)}
+/* labeled rule lines: "Label | value" */
+.pf-mini ul,.pf-sec ul{list-style:none;padding:0!important;gap:0!important}
+.pf-mini li,.pf-sec li{display:grid;grid-template-columns:minmax(96px,34%) 1fr;gap:10px;align-items:baseline;padding:6px 0;border-top:1px dashed color-mix(in srgb,var(--mc,var(--line2)) 30%,transparent)}
+.pf-mini li:first-child,.pf-sec li:first-child{border-top:0}
+.pf-lb{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--mc,var(--gold));opacity:.95}
+html[lang=ar] .pf-lb{text-transform:none;letter-spacing:0;font-size:12px}
+.pf-sec{--mc:#2ec5c9}.pf-sec.hid{--mc:#ff5fa8}.pf-sec.pay{--mc:#3ddc84}
+@media(max-width:480px){.pf-mini li,.pf-sec li{grid-template-columns:1fr;gap:2px}}
 /* moving tab name */
 @keyframes pfShine{0%{background-position:200% 50%}100%{background-position:-200% 50%}}
 @keyframes pfBob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-2px) rotate(-6deg)}}
@@ -593,6 +607,9 @@ html[lang=ar] .about-t{letter-spacing:0}
 .astat .apre{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2);font-weight:700;margin-bottom:-4px}
 html[lang=ar] .astat .apre{letter-spacing:0}
 .about-hero{display:flex;gap:18px;align-items:center;margin-bottom:14px}
+@keyframes aboutFloat{0%,100%{transform:translateY(0) rotate(0) scale(1);filter:drop-shadow(0 6px 14px rgba(245,185,66,.25))}50%{transform:translateY(-7px) rotate(-3deg) scale(1.03);filter:drop-shadow(0 14px 24px rgba(245,185,66,.5))}}
+.about-hero .logo.lg{animation:aboutFloat 3.6s ease-in-out infinite;flex:none}
+@media(prefers-reduced-motion:reduce){.about-hero .logo.lg{animation:none}}
 @media(max-width:560px){.about-hero{flex-direction:column;text-align:center}.astat b{font-size:20px}}
 .rstrip{overflow:hidden;margin-top:12px;border-radius:10px;-webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
 .rtrack{display:flex;gap:8px;width:max-content;animation:marquee 40s linear infinite}
@@ -968,7 +985,7 @@ html[data-theme=light] .logo{animation:none;filter:drop-shadow(0 2px 6px rgba(16
 
 <script src="i18n.js"></script>
 <script src="news-info.js"></script>
-<script src="propfirms.js"></script>
+<script src="propfirms.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
 <script>
 /* =====================================================================
    CONFIG — your Supabase project (the anon key is public by design;
@@ -2219,6 +2236,12 @@ function vConsistency(el){const c=S._cons||(S._cons=calcLoad("cons")||{size:5000
 const PFDZ={yes:["✅","Available in Algeria","yes"],no:["⛔","Not available in Algeria","no"],likely:["🟡","Probably available in Algeria","likely"],check:["❔","Algeria: ask support","check"]};
 const pfLogo=(f,sz)=>`<span class="pf-logo" style="--s:${sz||40}px" data-l="${esc(f.name.replace(/^The /,"").charAt(0))}"><img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(f.site)}&sz=128" alt="" loading="lazy" onerror="this.remove()"></span>`;
 const dzBadge=(f,big)=>{const d=PFDZ[f.dz]||PFDZ.check;return `<span class="dz-b ${d[2]}${big?" big":""}">${d[0]} <span>${d[1]}</span></span>`};
+/* localized firm text: lines become [label, text]; falls back to English per line */
+function pfLoc(f){const P=window.PropFirms,L=(window.PropFirmsI18n||{})[window.I18N?I18N.lang:"en"],tf=L&&L.firms[f.id]||{},lab=Object.assign({},P.labels,L&&L.labels);
+  const o={plans:tf.plans||f.plans,dzNote:tf.dzNote||f.dzNote};
+  ["eval","evalH","funded","fundedH","payout"].forEach(k=>{o[k]=(f[k]||[]).map(([key,txt],i)=>[lab[key]||key,(tf[k]&&tf[k][i])||txt])});return o}
+function pfCommon(){const P=window.PropFirms,L=(window.PropFirmsI18n||{})[window.I18N?I18N.lang:"en"];return P.common.map((c,i)=>L&&L.common[i]?[c[0],L.common[i][0],L.common[i][1]]:c)}
+const pfLi=([lb,tx])=>`<li data-notr><b class="pf-lb">${esc(lb)}</b><span>${esc(tx)}</span></li>`;
 function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class="card empty">Loading…</div>';return}
   if(S._pfId){const f=P.firms.find(x=>x.id===S._pfId);if(f)return vPropFirm(el,f);S._pfId=null}
   const type=S._pfType||"futures",q=(S._pfQ||"").trim().toLowerCase(),dzOnly=!!S._pfDz;
@@ -2234,22 +2257,23 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
    <div class="pf-legend">${Object.values(PFDZ).map(d=>`<span class="dz-b ${d[2]}">${d[0]} <span>${d[1]}</span></span>`).join("")}</div>
    <div class="pf-bar"><span class="mut">${list.length} <span>firms</span></span><button type="button" class="btn sm" id="pfAll">${S._pfShut?"▾ <span>Show all rules</span>":"▴ <span>Hide all rules</span>"}</button></div>
    <div class="pf-list">${list.length?list.map(f=>{const L=f.name.replace(/^The /,"").charAt(0).toUpperCase();const h=L!==letter?(letter=L,`<div class="pf-letter"><span>${L}</span></div>`):"";
-     const mini=(ic,t,items,cl)=>items&&items.length?`<div class="pf-mini ${cl}"><h4>${ic} <span>${t}</span></h4><ul>${items.map(x=>`<li data-notr>${esc(x)}</li>`).join("")}</ul></div>`:"";
+     const mini=(ic,t,items,cl)=>items&&items.length?`<div class="pf-mini ${cl}"><h4>${ic} <span>${t}</span></h4><ul>${items.map(pfLi).join("")}</ul></div>`:"";
+     f=Object.assign({},f,pfLoc(f));
      return `${h}<div class="pf-item ${f.type}"><button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b><small data-notr>${esc(f.sizes.join(" · "))}</small></span>${dzBadge(f)}<span class="pf-go">›</span></button>
       <details class="pf-rules"${S._pfShut?"":" open"}><summary><span>Rules &amp; hidden rules</span></summary>
        <div class="pf-grid">${mini("📝","Evaluation: rules",f.eval,"r")}${mini("🕵️","Evaluation: hidden rules",f.evalH,"h")}${mini("🏦","Funded: rules",f.funded,"r f")}${mini("🕵️","Funded: hidden rules",f.fundedH,"h")}</div>
        ${mini("💸","Withdrawal conditions",f.payout,"p")}</details></div>`}).join("")
      :`<div class="card empty">No prop firm found.</div>`}</div>
    <div class="card pf-common"><h3>🕵️ Rules that hide in almost every prop firm</h3><p class="mut" style="font-size:13px;margin-top:-4px">Read the FAQ and terms for these before you pay. They break more accounts than the profit target.</p>
-    <div class="pfc-grid">${P.common.map(([ic,t,d])=>`<div class="pfc"><span class="pfc-ic">${ic}</span><div><b>${t}</b><p>${d}</p></div></div>`).join("")}</div></div>
+    <div class="pfc-grid">${pfCommon().map(([ic,t,d])=>`<div class="pfc" data-notr><span class="pfc-ic">${ic}</span><div><b>${esc(t)}</b><p>${esc(d)}</p></div></div>`).join("")}</div></div>
    <p class="mut pf-disc">ℹ️ <span>Rules checked in November 2026 from public sources. Prop firms change rules often: always confirm on the firm's official website before buying. Algeria availability comes from published restricted-country lists; ✅ means accepted, ⛔ means restricted.</span></p>`;
   $$("[data-pft]",el).forEach(b=>b.onclick=()=>{S._pfType=b.dataset.pft;render()});
   $$("[data-pf]",el).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.pf;render();window.scrollTo(0,0)});
   const qi=$("#pfQ",el);qi.oninput=()=>{S._pfQ=qi.value;const p=qi.selectionStart;render();const n=$("#pfQ");n.focus();n.setSelectionRange(p,p)};
   $("#pfDz",el).onchange=e=>{S._pfDz=e.target.checked;render()};
   $("#pfAll",el).onclick=()=>{S._pfShut=!S._pfShut;render()}}
-function vPropFirm(el,f){const d=PFDZ[f.dz]||PFDZ.check;
-  const sec=(ic,t,items,cl)=>items&&items.length?`<div class="card pf-sec ${cl||""}"><h3>${ic} ${t}</h3><ul>${items.map(x=>`<li data-notr>${esc(x)}</li>`).join("")}</ul></div>`:"";
+function vPropFirm(el,f){const d=PFDZ[f.dz]||PFDZ.check;f=Object.assign({},f,pfLoc(f));
+  const sec=(ic,t,items,cl)=>items&&items.length?`<div class="card pf-sec ${cl||""}"><h3>${ic} ${t}</h3><ul>${items.map(pfLi).join("")}</ul></div>`:"";
   el.innerHTML=`<div class="page pf-page">
    <div class="row" style="justify-content:space-between;margin-bottom:14px"><button class="btn sm" id="pfBack">← <span>All prop firms</span></button>
     <a class="btn sm" href="https://${f.site}" target="_blank" rel="noopener nofollow">↗ <span>Official website</span></a></div>
@@ -2585,7 +2609,8 @@ document.addEventListener("click",e=>{const im=e.target.closest&&e.target.closes
 const PROMO={url:"https://www.earn2trade.com/?a_pid=BROWN23",code:"BROWN23",pct:60};
 function promoHTML(){return `<div class="promo"><div class="promo-l"><div class="promo-tag">Partner offer</div>
   <div class="promo-t"><b>Earn2Trade</b> <span class="promo-pct">-${PROMO.pct}%</span></div>
-  <div class="promo-s">Use code <span class="promo-code" data-notr>${PROMO.code}</span></div></div>
+  <div class="promo-s">Use code <span class="promo-code" data-notr>${PROMO.code}</span></div>
+  <div class="promo-gw"><span class="gw-ic">🎁</span><span>Buy an account with this code and you enter the giveaway draw</span></div></div>
   <div class="promo-r"><button type="button" class="btn sm promo-copy">Copy code</button>
   <a class="btn sm pri" href="${PROMO.url}" target="_blank" rel="sponsored noopener">Get 60% off</a></div></div>`}
 $$("[data-promo]").forEach(el=>el.innerHTML=promoHTML());
