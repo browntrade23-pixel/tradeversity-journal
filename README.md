@@ -9,7 +9,12 @@ Files:
 - `notifications.sql`: Telegram messages to you on new sign-ups and new trades
 - `approval.sql`: new students must be approved by the admin before they can use the journal
 - `i18n.js`: English / Français / العربية translations (edit a translation there)
-- `raven.svg`, `favicon.svg`: the raven logo and browser-tab icon
+- `brand/`: the gold portrait logo (`logo-4k.png` for social media/print, smaller sizes for the site and browser tab)
+- `scene/`: the night scene on the login page (moon and tree)
+
+### Photo credits (public domain, free to use)
+- Moon: NASA / GSFC / Arizona State University, Lunar Reconnaissance Orbiter — Wikimedia Commons "Moon nearside LRO.jpg"
+- Tree: User:ShadowShift — Wikimedia Commons "Dead Tree Silhouette with Sunset.JPG"
 
 ## Links, social media and the Earn2Trade offer
 Edit them in `index.html`, near the end of the script:
