@@ -196,6 +196,7 @@ const T={
 "No trading during red news":["Pas de trading pendant les news rouges","لا تداول أثناء الأخبار الحمراء"],
 "Click a day to see its trades, screenshots and journal.":["Cliquez sur un jour pour voir ses trades, captures et journal.","انقر على يوم لرؤية صفقاته ولقطات الشاشة واليومية."],
 "📈 Trading day":["📈 Jour de trading","📈 يوم تداول"],"I'm trading this day. I follow my plan and my pre-trade checklist.":["Je trade ce jour-là. Je suis mon plan et ma checklist avant trade.","سأتداول في هذا اليوم. ألتزم بخطتي وقائمة التحقق قبل التداول."],
+"⬆ Import CSV":["⬆ Importer un CSV","⬆ استيراد CSV"],"Add your broker export: the trades appear below in your journal, ready for screenshots and notes":["Ajoutez l'export de votre courtier : les trades apparaissent ci-dessous dans votre journal, prêts pour les captures et les notes","أضف ملف التصدير من الوسيط: تظهر الصفقات أدناه في يوميتك، جاهزة للقطات الشاشة والملاحظات"],
 "Previous day":["Jour précédent","اليوم السابق"],"Next day":["Jour suivant","اليوم التالي"],"← Statistics":["← Statistiques","← الإحصائيات"],"← Day":["← Jour","← اليوم"],
 "Open trade ›":["Ouvrir le trade ›","فتح الصفقة ›"],"No trades on this day.":["Aucun trade ce jour-là.","لا توجد صفقات في هذا اليوم."],
 "Daily direction defined":["Direction journalière définie","تم تحديد الاتجاه اليومي"],

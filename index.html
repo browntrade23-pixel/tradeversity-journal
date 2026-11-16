@@ -1308,7 +1308,8 @@ function vJournal(el){
   const ts=filtered().sort((a,b)=>byDT(b,a));const st=calc(ts);
   const byDay={};ts.forEach(t=>(byDay[t.date]=byDay[t.date]||[]).push(t));
   el.innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:6px"><div><h1>Trading journal</h1><p class="sub">${S.readonly?"Student's":"Your"} trades, screenshots, feelings and lessons.</p></div>
-   <div class="row">${S.readonly?"":`<button class="btn pri" id="addT">+ New trade</button>`}<button class="btn" id="expCsv">Export CSV</button></div></div>
+   <div class="row">${S.readonly?"":`<button class="btn pri" id="addT">+ New trade</button><button class="btn" id="impT">⬆ Import CSV</button>`}<button class="btn" id="expCsv">Export CSV</button></div></div>
+   ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export: the trades appear below in your journal, ready for screenshots and notes</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
    ${coachCard()}
    ${filterBar()}
    <div class="grid g4" style="margin-bottom:16px">
@@ -1321,6 +1322,8 @@ function vJournal(el){
      return `<div class="day"><div class="dayh"><span>${fmtDate(d)}</span><span class="mono ${cls(dn)}">${smoney(dn)}</span></div>${byDay[d].map(tcard).join("")}</div>`}).join("")
    :`<div class="card empty">No trades yet. ${S.readonly?"":"Add your first trade or import a CSV from your broker."}</div>`}`;
   bindFilters();bindCoach();if($("#addT"))$("#addT").onclick=()=>editTrade(null);
+  if($("#impBody"))vImport($("#impBody"),true);
+  if($("#impT"))$("#impT").onclick=()=>{const b=$("#impBox");b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
   $("#expCsv").onclick=exportCSV;
   $$(".tcard",el).forEach(c=>c.onclick=()=>{S.page=c.dataset.id;render();window.scrollTo(0,0)});
 }
