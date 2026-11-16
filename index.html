@@ -439,6 +439,30 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 .det-chip small{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);font-weight:700}
 .det-chip b{font-size:13px;color:var(--muted)}.det-chip.ok{border-color:rgba(39,194,108,.4)}.det-chip.ok b{color:var(--text,#e8edf6)}
 .det-line{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 8px}
+/* trading words + explanation bubble */
+.term{background:none;border:0;padding:0;font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:4px;
+  border-bottom:1px dashed color-mix(in srgb,var(--gold) 70%,transparent);transition:transform .22s cubic-bezier(.2,.8,.2,1),color .22s}
+.term:hover,.term.on{transform:translateY(-2px);color:var(--gold)}
+.term .ti{font-style:normal;font-size:9px;font-weight:800;width:14px;height:14px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--gold) 22%,transparent);color:var(--gold);transition:transform .3s}
+.term:hover .ti,.term.on .ti{transform:rotate(360deg) scale(1.1)}
+.term.badge{border:0;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700}
+.term.badge.min{background:rgba(245,185,66,.15);color:var(--gold)}.term.badge.mic{background:rgba(76,141,255,.15);color:var(--blue)}
+table.specs th,table.specs td{white-space:nowrap}
+.tpop{position:fixed;z-index:120;padding:14px 15px;border-radius:14px;background:var(--panel);border:1px solid var(--line2);color:var(--text);
+  box-shadow:0 18px 40px rgba(0,0,0,.45),0 0 0 1px rgba(245,185,66,.12);opacity:0;pointer-events:none;
+  transform:translateY(-8px) scale(.9);transform-origin:var(--ax,50%) top;transition:opacity .25s,transform .35s cubic-bezier(.2,1.3,.4,1)}
+.tpop.up{transform-origin:var(--ax,50%) bottom;transform:translateY(8px) scale(.9)}
+.tpop.show{opacity:1;transform:none;pointer-events:auto}
+.tpop::before{content:"";position:absolute;left:calc(var(--ax,50%) - 7px);top:-7px;width:12px;height:12px;background:var(--panel);border-left:1px solid var(--line2);border-top:1px solid var(--line2);transform:rotate(45deg)}
+.tpop.up::before{top:auto;bottom:-7px;transform:rotate(225deg)}
+.tp-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.tp-h b{font-size:15px;color:var(--gold)}.tp-h .x{font-size:20px;line-height:1}
+.tp-t{margin:0 0 10px;line-height:1.6;font-size:13px}
+.tp-ex{display:flex;flex-direction:column;gap:3px;padding:9px 11px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-size:12px}
+.tp-ex span{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.tpop.show .tp-t{animation:nxWipe .9s cubic-bezier(.3,.7,.2,1) .1s both}.tpop.show .tp-ex{animation:nxIn .5s cubic-bezier(.2,.8,.2,1) .35s both}
+[dir=rtl] .tpop.show .tp-t{animation-name:nxWipeR}
+html[lang=ar] .tp-ex span{letter-spacing:0}
+@media(prefers-reduced-motion:reduce){.tpop,.tpop.show .tp-t,.tpop.show .tp-ex,.term,.term .ti{transition:none;animation:none!important}}
 /* rest day toggle in the plan */
 .rest-card{display:flex;align-items:center;gap:12px;cursor:pointer;border-style:dashed}
 .rest-card input{width:18px;height:18px;accent-color:var(--gold);flex:none}
@@ -508,7 +532,7 @@ html[lang=ar] .ni-l{letter-spacing:0}
 @media(max-width:700px){.theme-sw button{width:26px}}
 
 /* ============ LIGHT THEME (inside the platform, popups and shared page; the login night scene stays dark) ============ */
-html[data-theme=light] :is(#app,#share,.modal,#tip,#toast){
+html[data-theme=light] :is(#app,#share,.modal,#tip,#toast,.tpop){
   --bg:#eef1f6;--panel:#ffffff;--panel2:#f4f6fa;--line:#e2e7ef;--line2:#cfd7e3;
   --text:#111a2c;--muted:#56627a;--dim:#8a94a8;
   --gold:#b07a1c;--gold2:#c48d2a;--green:#13914c;--red:#d6382f;--blue:#2f6fe0;--purple:#7650dd;
@@ -902,6 +926,23 @@ function coachNewsHTML(){const today=todayStr(),nd=nextTradingDay(),now=new Date
   if(up.length)h+=`<div class="rem ${up.some(n=>n.impact==="High")?"bad":"warn"}"><span>📰</span><span><b>Today</b> <span data-notr>${up.slice(0,3).map(n=>esc(newsLine(n))).join("<br>")}</span></span></div>`;
   if(next.length)h+=`<div class="rem warn"><span>🗓️</span><span><b>Next session</b> <span data-notr>(${esc(fmtDate(nd))})</span><br><span data-notr>${next.slice(0,4).map(n=>esc(newsLine(n))).join("<br>")}</span><br><span>Put it in your plan.</span></span></div>`;
   return hh+h}
+
+/* clickable trading words → animated explanation bubble (Glossary in news-info.js) */
+function term(k,label,cls){return `<button type="button" class="term ${cls||""}" data-term="${k}">${label}<i class="ti" aria-hidden="true">?</i></button>`}
+function closeTerm(){const p=$("#termPop");if(p){p.classList.remove("show");$$(".term.on").forEach(t=>t.classList.remove("on"))}}
+function openTerm(el){const g=window.Glossary&&Glossary.get(el.dataset.term);if(!g)return;
+  let p=$("#termPop");if(!p){p=document.createElement("div");p.id="termPop";p.className="tpop";p.setAttribute("role","dialog");document.body.appendChild(p)}
+  const same=el.classList.contains("on")&&p.classList.contains("show");closeTerm();if(same)return;
+  p.classList.remove("show");void p.offsetWidth;
+  p.innerHTML=`<div data-notr><div class="tp-h"><b>${esc(g.title)}</b><button type="button" class="x" aria-label="Close">×</button></div><p class="tp-t">${esc(g.text)}</p><div class="tp-ex"><span>${esc(g.exLabel)}</span><b class="mono">${esc(g.ex)}</b></div></div>`;
+  const r=el.getBoundingClientRect(),W=Math.min(330,innerWidth-16);p.style.width=W+"px";
+  const left=Math.max(8,Math.min(innerWidth-W-8,r.left+r.width/2-W/2));p.style.left=left+"px";
+  const below=r.bottom+10+260<innerHeight||r.top<280;p.style.top=below?(r.bottom+10)+"px":"";p.style.bottom=below?"":(innerHeight-r.top+10)+"px";
+  p.classList.toggle("up",!below);p.style.setProperty("--ax",(r.left+r.width/2-left)+"px");
+  el.classList.add("on");$(".x",p).onclick=closeTerm;requestAnimationFrame(()=>p.classList.add("show"))}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest(".term");if(t){e.preventDefault();openTerm(t);return}if(!(e.target.closest&&e.target.closest("#termPop")))closeTerm()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeTerm()});
+addEventListener("scroll",closeTerm,{passive:true});
 
 /* live countdown for every news event */
 function cdText(ms){const s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60),x=s%60;
@@ -1504,8 +1545,10 @@ function vRisk(el){const st=S._risk||(S._risk={grp:"Nasdaq",bal:50000,mode:"$",r
    </div>
    <div id="rOut"></div>
   </div>
-  <div class="card" style="margin-top:12px"><h3>Contract specs</h3><div class="tw"><table class="t"><tr><th>Symbol</th><th>Contract</th><th>$ / point</th><th>Tick</th><th>$ / tick</th><th>10 micros =</th></tr>
-   ${Object.entries(MK).map(([k,m])=>`<tr><td class="mono"><b>${k}</b></td><td>${m.name}</td><td class="mono">$${m.pv}</td><td class="mono">${m.tick}</td><td class="mono">$${(m.pv*m.tick).toFixed(2)}</td><td class="mut">${m.type==="Micro"?"1 mini":""}</td></tr>`).join("")}</table></div>
+  <div class="card" style="margin-top:12px"><h3>Contract specs</h3>
+   <p class="mut" style="font-size:12px;margin:-2px 0 10px">👆 <span>Tap a word with a ? to see what it means.</span></p>
+   <div class="tw"><table class="t specs"><tr><th>Symbol</th><th>Contract</th><th>Type</th><th>${term("dpp","$ / point")}</th><th>${term("tick","Tick")}</th><th>${term("dpt","$ / tick")}</th><th>Ticks per ${term("point","point")}</th><th>${term("pip","Pip")}</th><th>$ / pip</th><th>10 ${term("micro","micros")} =</th></tr>
+   ${Object.entries(MK).map(([k,m])=>{const gold=m.grp==="Gold";return `<tr><td class="mono"><b>${k}</b></td><td>${m.name}</td><td>${term(m.type==="Micro"?"micro":"mini",m.type,"badge "+(m.type==="Micro"?"mic":"min"))}</td><td class="mono">$${m.pv}</td><td class="mono">${m.tick}</td><td class="mono">$${(m.pv*m.tick).toFixed(2)}</td><td class="mono">${Math.round(1/m.tick)}</td><td class="mono">${gold?"0.10":`<span class="mut">—</span>`}</td><td class="mono">${gold?`$${(m.pv*0.1).toFixed(2)}`:`<span class="mut">—</span>`}</td><td class="mut">${m.type==="Micro"?`1 ${term("mini","mini")}`:""}</td></tr>`}).join("")}</table></div>
    <p class="mut" style="font-size:12px;margin:8px 0 0">Specs are the CME standard contracts. Check your prop firm's contract limits and fees.</p></div>`;
   const out=()=>{const g=GROUPS[st.grp],mini=MK[g[0]],micro=MK[g[1]];
     const riskUsd=st.mode==="%"?num(st.bal)*num(st.risk)/100:num(st.risk);

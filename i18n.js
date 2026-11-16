@@ -562,6 +562,8 @@ const T={
 "No trades on a holiday, a red news day, the day before red news, or a planned rest day = counts too.":["Pas de trade un jour férié, un jour de news rouge, la veille d'une news rouge ou un jour de repos prévu = compte aussi.","عدم التداول في عطلة أو يوم خبر أحمر أو اليوم الذي يسبق خبراً أحمر أو يوم راحة مخطط = يُحتسب أيضاً."],
 "😴 Rest day":["😴 Jour de repos","😴 يوم راحة"],
 "I'm not trading this day. A planned rest day counts for the discipline streak.":["Je ne trade pas ce jour-là. Un jour de repos prévu compte pour la série de discipline.","لن أتداول في هذا اليوم. يوم الراحة المخطط يُحتسب في سلسلة الانضباط."],
+"Tap a word with a ? to see what it means.":["Touchez un mot avec un ? pour voir ce qu'il veut dire.","اضغط على أي كلمة عليها ? لترى معناها."],
+"Type":["Type","النوع"],"Tick":["Tick","التيك"],"Ticks per":["Ticks par","تيكات لكل"],"point":["point","نقطة"],"Pip":["Pip","البيب"],"$ / pip":["$ / pip","$ / بيب"],"$ / point":["$ / point","$ / نقطة"],"$ / tick":["$ / tick","$ / تيك"],"micros":["micros","ميكرو"],"mini":["mini","ميني"],"Mini":["Mini","ميني"],"Micro":["Micro","ميكرو"],
 "1D":["1J","يوم"],"7D":["7J","7 أيام"],"30D":["30J","30 يوماً"],"90D":["90J","90 يوماً"]
 };
 
