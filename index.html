@@ -808,7 +808,6 @@ function vStudent(el){const u=S.subject,ts=[...S.trades].sort((a,b)=>byDT(b,a)),
    <div class="grid g4" style="margin:12px 0">
      ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,`${st.n} trades`)}
      ${kpi("Win rate",pct(st.wr),`${st.w}W · ${st.l}L · ${st.be}BE`)}
-     ${kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):"—","gross win ÷ gross loss")}
      ${kpi("Discipline streak",`${Math.min(d.streak,DISC.goal)} / ${DISC.goal}`,d.best?`<span>Best streak:</span> ${d.best}`:"")}
      ${kpi("Journaling days",days,"days with at least one trade")}
      ${kpi("Plans written",plans.length,plans[0]?fmtDate(plans[0].date):"")}
@@ -908,7 +907,7 @@ function vJournal(el){
    <div class="grid g4" style="margin-bottom:16px">
      ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,`${st.n} trades`)}
      ${kpi("Win rate",pct(st.wr),`${st.w}W · ${st.l}L · ${st.be}BE`)}
-     ${kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):st.pf===Infinity?"∞":"—","gross win ÷ gross loss")}
+     ${S.readonly?"":kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):st.pf===Infinity?"∞":"—","gross win ÷ gross loss")}
      ${kpi("Avg R",isFinite(st.avgR)?st.avgR.toFixed(2)+"R":"—","from trades with a stop")}
    </div>
    ${ts.length?Object.keys(byDay).sort().reverse().map(d=>{const dn=byDay[d].reduce((a,t)=>a+tradeNet(t),0);
@@ -1093,7 +1092,7 @@ function vStats(el){const ts=filtered();const st=calc(ts);
   <div class="grid g4" style="margin-bottom:12px">
    ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,aSize?`${(st.net>0?"+":"")+pct(st.net/aSize,2)} of the account · ${st.nDays} trading days`:`${st.nDays} trading days`)}
    ${kpi("Win rate",pct(st.wr),`${st.w} wins · ${st.l} losses`)}
-   ${kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):"—","above 1.5 is solid")}
+   ${S.readonly?"":kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):"—","above 1.5 is solid")}
    ${kpi("Expectancy",`<span class="${cls(st.exp)}">${money(st.exp)}</span>`,"average per trade")}
    ${kpi("Avg win / loss",`<span class="pos">${money(st.avgW,0)}</span> <span class="mut">/</span> <span class="neg">${money(st.avgL,0)}</span>`,isFinite(st.avgW/st.avgL)?`ratio ${Math.abs(st.avgW/st.avgL).toFixed(2)}`:"")}
    ${kpi("Max drawdown",`<span class="neg">${money(-st.mdd,0)}</span>`,"peak to trough")}
@@ -1528,7 +1527,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
     S.view=v;render();window.scrollTo(0,0)});
   $("#aq").oninput=e=>{const q=e.target.value.toLowerCase();$$("#aT tr[data-q]").forEach(tr=>tr.classList.toggle("hidden",!tr.dataset.q.includes(q)))};
   $$("#aT tr[data-id]").forEach(tr=>tr.onclick=async()=>{const s=students.find(x=>x.id===tr.dataset.id);await loadSubject(s,true);S.view="student";render();window.scrollTo(0,0)});
-  $("#aExp").onclick=()=>{const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;saveFile(`tradeversity-students-${todayStr()}.csv`,["name,email,telegram,joined,trades,net_pnl,win_rate,profit_factor,broke_plan,max_loss_days,last_trade",...rows.map(r=>[r.s.name,r.s.email,r.s.telegram,(r.s.created_at||"").slice(0,10),r.c.n,r.c.net.toFixed(2),isFinite(r.c.wr)?(r.c.wr*100).toFixed(1):"",isFinite(r.c.pf)?r.c.pf.toFixed(2):"",r.brk,r.mlb,r.last].map(q).join(","))].join("\n"),"text/csv")};
+  $("#aExp").onclick=()=>{const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;saveFile(`tradeversity-students-${todayStr()}.csv`,["name,email,telegram,joined,trades,broke_plan,journaled_today,plan_today,plan_tomorrow,last_trade",...rows.map(r=>[r.s.name,r.s.email,r.s.telegram,(r.s.created_at||"").slice(0,10),r.c.n,r.brk,r.jT?"yes":"no",r.pT?"yes":"no",r.pN?"yes":"no",r.last].map(q).join(","))].join("\n"),"text/csv")};
 }
 
 /* ============ social links ============ */
