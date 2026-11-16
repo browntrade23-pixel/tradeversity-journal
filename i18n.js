@@ -239,6 +239,7 @@ const T={
 "Enter your risk and stop size.":["Saisissez votre risque et la taille du stop.","أدخل المخاطرة وحجم الوقف."],
 "Max risk":["Risque max","أقصى مخاطرة"],
 "Stop:":["Stop :","الوقف:"],
+"contracts":["contrats","عقود"],"contract":["contrat","عقد"],"Risk each":["Risque par contrat","المخاطرة لكل عقد"],"Total risk":["Risque total","إجمالي المخاطرة"],
 "Best mix (closest to your risk)":["Meilleur mix (le plus proche de votre risque)","أفضل مزيج (الأقرب لمخاطرتك)"],
 // consistency
 "Consistency rule calculator":["Calculateur de règle de consistance","حاسبة قاعدة الثبات"],
@@ -606,6 +607,7 @@ const P=[
 [/^(.+) risk each$/,"$1 de risque chacun","$1 مخاطرة لكل عقد"],
 [/^Total risk (.+)$/,"Risque total $1","إجمالي المخاطرة $1"],
 [/^Target \((.+)R\) (.+)$/,"Objectif ($1R) $2","الهدف ($1R) $2"],
+[/^Target \((.+)R\)$/,"Objectif ($1R)","الهدف ($1R)"],
 [/^Risk (.+) · (.+) of your max · Take profit at$/,"Risque $1 · $2 de votre max · Take profit à","المخاطرة $1 · $2 من حدك الأقصى · جني الربح عند"],
 [/^Risk (.+) · (.+) of your max$/,"Risque $1 · $2 de votre max","المخاطرة $1 · $2 من حدك الأقصى"],
 [/^· (.+) of account$/,"· $1 du compte","· $1 من الحساب"],

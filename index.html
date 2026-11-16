@@ -150,7 +150,33 @@ svg.ch text{fill:var(--dim);font-size:11px;font-family:Inter,sans-serif}
 /* calculators */
 .big{font-size:30px;font-weight:800;font-family:"JetBrains Mono",monospace}
 .res{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px}
-.res .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+.res .l,.cmix .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+.ctile{--cc:var(--blue);position:relative;overflow:hidden;border-radius:16px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--cc) 40%,transparent);
+  background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--cc) 18%,transparent),transparent 70%),var(--panel2);transition:transform .2s,box-shadow .2s}
+.ctile.min{--cc:var(--gold)}
+.ctile:hover{transform:translateY(-2px);box-shadow:0 8px 28px -10px color-mix(in srgb,var(--cc) 60%,transparent)}
+.ctile.zero{filter:saturate(.3);opacity:.7}
+.ct-h{display:flex;justify-content:space-between;align-items:center}
+.ct-ty{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--cc) 18%,transparent);color:var(--cc)}
+.ct-sym{font-weight:800;font-size:15px}
+.ct-n{display:flex;flex-direction:column;align-items:center;margin:10px 0 12px}
+.ct-n b{font-size:54px;line-height:1;font-weight:900;color:var(--cc);text-shadow:0 0 24px color-mix(in srgb,var(--cc) 55%,transparent)}
+.ct-n b.bump{animation:ctBump .35s ease}
+.ct-n span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-weight:700}
+.ct-rows{display:grid;gap:5px;border-top:1px dashed color-mix(in srgb,var(--cc) 30%,var(--line));padding-top:10px;font-size:12.5px}
+.ct-rows div{display:flex;justify-content:space-between;gap:8px}.ct-rows span{color:var(--muted)}.ct-rows b.up{color:var(--green)}
+@keyframes ctBump{0%{transform:scale(.7);opacity:.4}60%{transform:scale(1.12)}100%{transform:none;opacity:1}}
+.cmix{border-radius:16px;padding:14px 16px;border:1px solid transparent;
+  background:linear-gradient(var(--panel2),var(--panel2)) padding-box,linear-gradient(90deg,var(--gold),var(--blue)) border-box}
+.cm-chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}
+.cchip{display:inline-flex;align-items:baseline;gap:6px;padding:6px 14px;border-radius:12px;font-weight:700;font-size:15px}
+.cchip b{font-size:22px;font-weight:900}
+.cchip.min{background:rgba(245,185,66,.14);color:var(--gold);border:1px solid rgba(245,185,66,.4)}
+.cchip.mic{background:rgba(76,141,255,.14);color:var(--blue);border:1px solid rgba(76,141,255,.4)}
+.cm-plus{font-size:20px;font-weight:800;color:var(--muted)}
+.cm-bar{height:6px;border-radius:6px;background:var(--line);overflow:hidden;margin-bottom:8px}
+.cm-bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--gold),var(--blue));transition:width .3s}
+html[data-theme=light] .ctile.min{--cc:#b7791f}html[data-theme=light] .cchip.min{color:#9a6512}
 .ok{color:var(--green)}.warn{color:var(--gold)}
 .status{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;font-weight:700}
 .status.good{background:rgba(39,194,108,.12);color:var(--green)}.status.badd{background:rgba(239,83,80,.12);color:var(--red)}.status.mid{background:rgba(245,185,66,.12);color:var(--gold)}
@@ -1569,6 +1595,7 @@ function vRisk(el){const st=S._risk||(S._risk={grp:"Nasdaq",bal:50000,mode:"$",r
    <div class="tw"><table class="t specs"><tr><th>Symbol</th><th>Contract</th><th>Type</th><th>${term("dpp","$ / point")}</th><th>${term("tick","Tick")}</th><th>${term("dpt","$ / tick")}</th><th>Ticks per ${term("point","point")}</th><th>${term("pip","Pip")}</th><th>$ / pip</th><th>10 ${term("micro","micros")} =</th></tr>
    ${Object.entries(MK).map(([k,m])=>{const gold=m.grp==="Gold";return `<tr><td class="mono"><b>${k}</b></td><td>${m.name}</td><td>${term(m.type==="Micro"?"micro":"mini",m.type,"badge "+(m.type==="Micro"?"mic":"min"))}</td><td class="mono">$${m.pv}</td><td class="mono">${m.tick}</td><td class="mono">$${(m.pv*m.tick).toFixed(2)}</td><td class="mono">${Math.round(1/m.tick)}</td><td class="mono">${gold?"0.10":`<span class="mut">—</span>`}</td><td class="mono">${gold?`$${(m.pv*0.1).toFixed(2)}`:`<span class="mut">—</span>`}</td><td class="mut">${m.type==="Micro"?`1 ${term("mini","mini")}`:""}</td></tr>`}).join("")}</table></div>
    <p class="mut" style="font-size:12px;margin:8px 0 0">Specs are the CME standard contracts. Check your prop firm's contract limits and fees.</p></div>`;
+  const prev={};
   const out=()=>{const g=GROUPS[st.grp],mini=MK[g[0]],micro=MK[g[1]];
     const riskUsd=st.mode==="%"?num(st.bal)*num(st.risk)/100:num(st.risk);
     let pts=st.stopMode==="pts"?num(st.stop):st.stopMode==="ticks"?num(st.stop)*mini.tick:Math.abs(num(st.entry)-num(st.stopPx));
@@ -1584,11 +1611,15 @@ function vRisk(el){const st=S._risk||(S._risk={grp:"Nasdaq",bal:50000,mode:"$",r
     $("#rOut").innerHTML=`<div class="card grid">
       <div class="row" style="justify-content:space-between"><span class="mut">Max risk</span><span class="big">${money(riskUsd,0)}</span></div>
       <div class="mut" style="font-size:13px">Stop: <b class="mono">${+pts.toFixed(4)} pts</b> = <b class="mono">${+ticks.toFixed(1)} ticks</b>${st.mode==="%"?` · ${st.risk}% of ${money(num(st.bal),0)}`:` · ${pct(riskUsd/num(st.bal),2)} of account`}</div>
-      <div class="grid g2">
-       <div class="res"><div class="l">${g[1]} · micro</div><div class="big">${nMicro}</div><div class="mut" style="font-size:12px">${money(perMicro)} risk each<br>Total risk ${money(nMicro*perMicro)}<br>Target (${rr}R) ${money(nMicro*(pts*micro.pv*rr-fee))}</div></div>
-       <div class="res"><div class="l">${g[0]} · mini</div><div class="big">${nMini}</div><div class="mut" style="font-size:12px">${money(perMini)} risk each<br>Total risk ${money(nMini*perMini)}<br>Target (${rr}R) ${money(nMini*(pts*mini.pv*rr-fee))}</div></div>
+      <div class="grid g2">${[["mic","Micro",g[1],nMicro,perMicro,micro],["min","Mini",g[0],nMini,perMini,mini]].map(([c,ty,sym,n,per,mk])=>{const bump=prev[c]!==n;prev[c]=n;return `
+       <div class="ctile ${c} ${n?"":"zero"}"><div class="ct-h"><span class="ct-ty">${ty}</span><span class="ct-sym mono" data-notr>${sym}</span></div>
+        <div class="ct-n"><b class="mono ${bump?"bump":""}">${n}</b><span>contract${n===1?"":"s"}</span></div>
+        <div class="ct-rows"><div><span>Risk each</span><b class="mono">${money(per)}</b></div><div><span>Total risk</span><b class="mono">${money(n*per)}</b></div><div><span>Target (${rr}R)</span><b class="mono up">${money(n*(pts*mk.pv*rr-fee))}</b></div></div></div>`}).join("")}
       </div>
-      <div class="res"><div class="l">Best mix (closest to your risk)</div><div style="font-size:18px;font-weight:800;margin-top:4px">${mixMini} ${g[0]} + ${mixMicro} ${g[1]}</div><div class="mut" style="font-size:12px">Risk ${money(mixRisk)} · ${pct(mixRisk/riskUsd,0)} of your max${tgtPx!=null?` · Take profit at <b class="mono">${+tgtPx.toFixed(2)}</b>`:""}</div></div>
+      <div class="cmix"><div class="l">Best mix (closest to your risk)</div>
+       <div class="cm-chips">${mixMini?`<span class="cchip min"><b class="mono">${mixMini}</b> × <span data-notr>${g[0]}</span></span>`:""}${mixMini&&mixMicro?`<span class="cm-plus">+</span>`:""}${mixMicro||!mixMini?`<span class="cchip mic"><b class="mono">${mixMicro}</b> × <span data-notr>${g[1]}</span></span>`:""}</div>
+       <div class="cm-bar"><i style="width:${Math.min(100,mixRisk/riskUsd*100)}%"></i></div>
+       <div class="mut" style="font-size:12px">Risk ${money(mixRisk)} · ${pct(mixRisk/riskUsd,0)} of your max${tgtPx!=null?` · Take profit at <b class="mono">${+tgtPx.toFixed(2)}</b>`:""}</div></div>
       ${nMicro===0?`<div class="status badd">✖ Stop is too wide: even 1 ${g[1]} risks ${money(perMicro)}. Tighten the stop or skip the trade.</div>`:""}
     </div>`};
   out();
