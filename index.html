@@ -439,6 +439,23 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .fc-net{display:flex;align-items:baseline;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap}.fc-net b{font-size:24px;font-weight:900}
 .kind-b{display:inline-block;margin-inline-start:6px;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:800;vertical-align:middle}
 .kind-b.fut{background:rgba(245,185,66,.15);color:var(--gold)}.kind-b.cfd{background:rgba(76,141,255,.16);color:var(--blue)}
+.otp-head{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;font-size:13px}
+.otp-ic{font-size:34px;animation:ipBob 1.6s ease-in-out infinite}.otp-head>b:first-of-type{font-size:17px}
+.otp-mail{color:var(--gold);word-break:break-all}
+.otp-in{text-align:center;font-size:26px!important;letter-spacing:10px;font-weight:800;height:56px}
+#otpResend.off{pointer-events:none;opacity:.5}
+.rules-card{margin-bottom:12px;border-color:rgba(245,185,66,.3);background:radial-gradient(110% 80% at 0% 0%,rgba(245,185,66,.1),transparent 60%),var(--panel)}
+.rm-head{margin:8px 0 4px;font-size:13px}.rm-head b{font-size:16px}
+.rm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+@media(max-width:760px){.rm-grid{grid-template-columns:1fr}}
+.rm{--rc:var(--green);padding:12px;border-radius:12px;background:var(--panel2);border:1px solid color-mix(in srgb,var(--rc) 35%,var(--line))}
+.rm.warn{--rc:#f59e2a}.rm.bad{--rc:var(--red)}.rm.goal{--rc:var(--gold)}
+.rm-top{display:flex;justify-content:space-between;gap:8px;font-size:13px}.rm-top b.mono{color:var(--rc)}
+.rm-bar{height:8px;border-radius:8px;background:var(--line);overflow:hidden;margin:9px 0 6px}
+.rm-bar i{display:block;height:100%;border-radius:8px;background:var(--rc);box-shadow:0 0 10px color-mix(in srgb,var(--rc) 60%,transparent);transition:width .5s ease}
+.rm-sub{font-size:12px;color:var(--muted)}
+.rm.bad .rm-bar i{animation:rmPulse 1.2s ease-in-out infinite}
+@keyframes rmPulse{50%{opacity:.55}}
 .dup-bar{margin:4px 0 10px;padding:9px 12px;border-radius:10px;font-size:13px;border:1px solid}
 .dup-bar.none{background:rgba(39,194,108,.1);border-color:rgba(39,194,108,.35);color:var(--green)}
 .dup-bar.some{background:rgba(245,185,66,.1);border-color:rgba(245,185,66,.35);color:var(--gold)}
@@ -816,6 +833,13 @@ html[data-theme=light] .logo{animation:none;filter:drop-shadow(0 2px 6px rgba(16
         <label class="f">Confirm password<input class="i" name="password2" type="password" minlength="8" required autocomplete="new-password"></label>
         <button class="btn pri" type="submit">Create my free account</button>
       </form>
+      <form id="otpForm" class="grid hidden" autocomplete="off">
+        <div class="otp-head"><div class="otp-ic">✉️</div><b>Check your email</b><span class="mut">We sent a verification code to</span><b class="otp-mail mono" id="otpMail" data-notr></b></div>
+        <label class="f">Verification code<input class="i otp-in mono" id="otpCode" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="••••••" required></label>
+        <button class="btn pri" type="submit">Verify my account</button>
+        <div class="row" style="justify-content:space-between;font-size:12px"><a href="#" id="otpResend">Send a new code</a><a href="#" id="otpBack">← Change email</a></div>
+        <p class="mut" style="font-size:11px;margin:0">Can't find it? Check your Spam / Promotions folder. The code expires after 1 hour.</p>
+      </form>
       <div id="authMsg" class="mut" style="margin-top:10px;font-size:13px"></div>
     </div>
 
@@ -959,6 +983,8 @@ const Cloud={
   async signIn(email,password){const{data,error}=await this.sb.auth.signInWithPassword({email,password});if(error)throw error;return this.profile(data.user.id)},
   async signUp({email,password,name,telegram}){const{data,error}=await this.sb.auth.signUp({email,password,options:{data:{full_name:name,telegram},emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
     if(!data.session)return {needsConfirm:true};return {user:await this.profile(data.user.id),needsConfirm:false}},
+  async verifyCode(email,token){const{data,error}=await this.sb.auth.verifyOtp({email,token,type:"signup"});if(error)throw error;return await this.profile(data.user.id)},
+  async resendCode(email){const{error}=await this.sb.auth.resend({type:"signup",email,options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error},
   async signOut(){await this.sb.auth.signOut()},
   fromRow(r){return {...(r.data||{}),id:r.id,user_id:r.user_id,shots:r.shots||[]}},
   toRow(t){const{shots,...rest}=t;return {id:t.id,user_id:t.user_id,trade_date:t.date,symbol:t.symbol,account:t.account||null,pnl:tradeNet(t),data:rest,shots:shots||[]}},
@@ -1009,15 +1035,35 @@ function authErr(err){const m=String((err&&err.message)||err||"");
     /network|failed to fetch|load failed/i.test(m)?"No connection. Check your internet and try again.":"";
   return `<span class="neg">${esc(k?I18N.t(k):m)}</span>`}
 $("#loginForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);$("#authMsg").textContent="Logging in…";
-  try{const u=await API.signIn(f.get("email").trim(),f.get("password"));await enter(u)}catch(err){$("#authMsg").innerHTML=authErr(err)}};
+  try{const u=await API.signIn(f.get("email").trim(),f.get("password"));await enter(u)}
+  catch(err){if(/email not confirmed/i.test(String(err.message||err))){const em=f.get("email").trim();showOtp(em,false);
+      $("#authMsg").innerHTML=`<span class="mut">${esc(I18N.t("Your email isn't verified yet. Enter the code we sent you, or send a new one."))}</span>`;return}
+    $("#authMsg").innerHTML=authErr(err)}};
 $("#signupForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);
   if(f.get("password")!==f.get("password2")){$("#authMsg").innerHTML='<span class="neg">Passwords don\'t match.</span>';return}
   let tg=f.get("telegram").trim().replace(/^https?:\/\/t\.me\//i,"");if(tg&&!tg.startsWith("@"))tg="@"+tg;
   if(!/^@[A-Za-z0-9_]{5,32}$/.test(tg)){$("#authMsg").innerHTML=`<span class="neg">${esc(I18N.t("Your Telegram username is required to join (e.g. @brown_algo). Open Telegram > Settings to see it."))}</span>`;return}
   $("#authMsg").textContent="Creating your account…";
   try{const r=await API.signUp({email:f.get("email").trim(),password:f.get("password"),name:f.get("name").trim(),telegram:tg});
-    if(r.needsConfirm){$("#authMsg").innerHTML='<span class="ok">Account created. Check your email to confirm it, then log in.</span>';$("#tabLogin").click();$("#authMsg").innerHTML='<span class="ok">Account created. Check your email to confirm it, then log in.</span>'}
+    if(r.needsConfirm)showOtp(f.get("email").trim(),true);
     else await enter(r.user)}catch(err){$("#authMsg").innerHTML=authErr(err)}};
+/* ---- email verification code (6-digit code sent by email) ---- */
+let _otpMail="",_otpCool=0;
+function showOtp(email,justSent){_otpMail=email;["loginForm","signupForm"].forEach(id=>$("#"+id).classList.add("hidden"));$("#authCard .seg").classList.add("hidden");
+  $("#otpForm").classList.remove("hidden");$("#otpMail").textContent=email;$("#otpCode").value="";setTimeout(()=>$("#otpCode").focus(),50);
+  $("#authMsg").innerHTML=justSent?`<span class="ok">${esc(I18N.t("Account created. Enter the code we sent to your email."))}</span>`:"";if(justSent)otpCooldown()}
+function hideOtp(){$("#otpForm").classList.add("hidden");$("#authCard .seg").classList.remove("hidden");$("#tabLogin").click()}
+function otpCooldown(){_otpCool=Date.now()+60000;const a=$("#otpResend");const t=()=>{const s=Math.ceil((_otpCool-Date.now())/1000);
+  if(s>0){a.textContent=`${I18N.t("Send a new code")} (${s}s)`;a.classList.add("off");setTimeout(t,1000)}else{a.textContent=I18N.t("Send a new code");a.classList.remove("off")}};t()}
+$("#otpCode").oninput=e=>{const v=e.target.value.replace(/\D/g,"").slice(0,8);e.target.value=v;if(v.length===6||v.length===8)setTimeout(()=>{if($("#otpCode").value===v)$("#otpForm").requestSubmit()},250)};
+$("#otpForm").onsubmit=async e=>{e.preventDefault();const code=$("#otpCode").value.trim();if(code.length<6){$("#authMsg").innerHTML=`<span class="neg">${esc(I18N.t("Enter the code from the email."))}</span>`;return}
+  const b=$("#otpForm button[type=submit]");b.disabled=true;$("#authMsg").textContent=I18N.t("Checking your code…");
+  try{const u=await API.verifyCode(_otpMail,code);$("#authMsg").innerHTML=`<span class="ok">✔ ${esc(I18N.t("Account verified!"))}</span>`;hideOtp();await enter(u)}
+  catch(err){const m=String(err.message||err);$("#authMsg").innerHTML=/expired|invalid|token/i.test(m)?`<span class="neg">${esc(I18N.t("This code is wrong or has expired. Check the latest email, or send a new code."))}</span>`:authErr(err)}
+  b.disabled=false};
+$("#otpResend").onclick=async e=>{e.preventDefault();if(Date.now()<_otpCool)return;$("#authMsg").textContent=I18N.t("Sending a new code…");
+  try{await API.resendCode(_otpMail);otpCooldown();$("#authMsg").innerHTML=`<span class="ok">${esc(I18N.t("New code sent. Check your email."))}</span>`}catch(err){$("#authMsg").innerHTML=authErr(err)}};
+$("#otpBack").onclick=e=>{e.preventDefault();hideOtp();$("#tabSignup").click()};
 $("#forgot").onclick=async e=>{e.preventDefault();const em=$("#loginForm [name=email]").value.trim();if(!em){$("#authMsg").textContent="Type your email above first.";return}
   try{await API.resetPassword(em);$("#authMsg").innerHTML='<span class="ok">Reset link sent — check your email.</span>'}catch(err){$("#authMsg").innerHTML=authErr(err)}};
 $("#logout").onclick=async()=>{await API.signOut();S.me=null;S.subject=null;try{history.replaceState(null,"",location.pathname)}catch(e){}showAuth()};
@@ -1592,12 +1638,56 @@ function insights(ts){const out=[];if(ts.length<3)return out;
   const su=groupBy(ts,t=>t.setup);if(su.length&&su[0].net>0)out.push(["✅",`Best setup: <b>${esc(su[0].k)}</b> — ${smoney(su[0].net,0)} over ${su[0].n} trades.`]);
   const wd=groupBy(ts,t=>{const[a,b,c]=t.date.split("-").map(Number);return WD[new Date(a,b-1,c).getDay()]});const bw=wd[wd.length-1];if(bw&&bw.net<0)out.push(["📅",`<b>${bw.k}</b> is your weakest day: ${smoney(bw.net,0)}.`]);
   return out}
+/* ===== Prop firm rules tracker (per account, saved on this device) ===== */
+const rulesKey=()=>`tv_rules_${(S.me&&S.me.id)||"x"}`;
+function rulesAll(){try{return JSON.parse(localStorage.getItem(rulesKey()))||{}}catch(e){return {}}}
+function rulesSave(acct,r){const a=rulesAll();if(r)a[acct]=r;else delete a[acct];try{localStorage.setItem(rulesKey(),JSON.stringify(a))}catch(e){}}
+function rulesStatus(acct,R){const ts=S.trades.filter(t=>t.account===acct),start=num(R.start)||0;
+  const byDay={};ts.forEach(t=>byDay[t.date]=(byDay[t.date]||0)+tradeNet(t));const days=Object.keys(byDay).sort();
+  let bal=start,peak=start,floorMin=Infinity,broke=null;
+  days.forEach(d=>{bal+=byDay[d];peak=Math.max(peak,bal);const fl=R.ddType==="trailing"?Math.min(peak-num(R.maxDD),start):start-num(R.maxDD);
+    if(num(R.maxDD)>0&&bal<=fl&&!broke)broke=d;if(num(R.daily)>0&&byDay[d]<=-num(R.daily)&&!broke)broke=d});
+  const floor=R.ddType==="trailing"?Math.min(peak-num(R.maxDD),start):start-num(R.maxDD);
+  const today=todayStr(),tNet=byDay[today]||0,net=bal-start;
+  return {bal,peak,floor,net,tNet,buffer:bal-floor,broke,days:days.length}}
+function meter(lab,ic,used,main,sub,inv){/* used 0..1 of the limit; inv = progress toward a goal (green as it fills) */
+  const u=Math.max(0,Math.min(1,used)),c=inv?(u>=1?"ok":"goal"):(u>=1?"bad":u>=.8?"bad":u>=.5?"warn":"ok");
+  return `<div class="rm ${c}"><div class="rm-top"><span>${ic} <b>${lab}</b></span><b class="mono">${main}</b></div><div class="rm-bar"><i style="width:${u*100}%"></i></div><div class="rm-sub">${sub}</div></div>`}
+function rulesCard(acct,aSize){const R=rulesAll()[acct];
+  if(!R||S._rulesEdit===acct){const r=R||{start:aSize||"",target:"",daily:"",maxDD:"",ddType:"static"};
+    return `<div class="card rules-card" id="rulesCard"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🏦 Prop firm rules</h3>${R?"":`<span class="mut" style="font-size:12px">Optional</span>`}</div>
+     ${R||S._rulesEdit===acct?`<p class="mut" style="font-size:12px;margin:6px 0 10px">Enter the rules of your evaluation or funded account. They are saved on this device.</p>
+     <div class="grid g4"><label class="f">Starting balance $<input class="i" id="rStart" type="number" step="any" value="${esc(r.start)}" placeholder="e.g. 50000"></label>
+      <label class="f">Profit target $<input class="i" id="rTarget" type="number" step="any" value="${esc(r.target)}" placeholder="e.g. 3000"></label>
+      <label class="f">Daily loss limit $<input class="i" id="rDaily" type="number" step="any" value="${esc(r.daily)}" placeholder="e.g. 1000"></label>
+      <label class="f">Max drawdown $<input class="i" id="rDD" type="number" step="any" value="${esc(r.maxDD)}" placeholder="e.g. 2500"></label></div>
+     <div class="row" style="justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:8px"><div class="seg" id="rDDT"><button type="button" data-t="static" class="${r.ddType!=="trailing"?"on":""}">Static drawdown</button><button type="button" data-t="trailing" class="${r.ddType==="trailing"?"on":""}">Trailing drawdown</button></div>
+      <div class="row">${R?`<button class="btn sm danger" type="button" id="rDel">Remove</button>`:""}<button class="btn sm" type="button" id="rCancel">Cancel</button><button class="btn sm pri" type="button" id="rSave">Save rules</button></div></div>`
+     :`<div class="row" style="justify-content:space-between;margin-top:6px;flex-wrap:wrap;gap:8px"><span class="mut" style="font-size:13px">Track your daily loss limit, max drawdown and profit target for <b data-notr>${esc(acct)}</b>.</span><button class="btn sm pri" type="button" id="rSet">Set my rules</button></div>`}</div>`}
+  const s=rulesStatus(acct,R),T=num(R.target),D=num(R.daily),M=num(R.maxDD);
+  return `<div class="card rules-card" id="rulesCard"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🏦 Prop firm rules</h3><button class="btn sm" type="button" id="rEdit">✎ <span>Edit</span></button></div>
+   <div class="rm-head"><span class="mut">Balance</span> <b class="mono">${money(s.bal,0)}</b> <span class="mut">· <span>start</span> ${money(num(R.start),0)} · ${R.ddType==="trailing"?"<span>Trailing drawdown</span>":"<span>Static drawdown</span>"}</span></div>
+   ${s.broke?`<div class="status badd" style="margin:8px 0">✖ <span>A rule was broken on</span> ${fmtDate(s.broke)}</div>`:""}
+   <div class="rm-grid">
+    ${T>0?meter("Profit target","🎯",s.net/T,`${smoney(s.net,0)} / ${money(T,0)}`,s.net>=T?`<span class="pos">✔ Target reached</span>`:`${money(T-s.net,0)} <span>to go</span>`,true):""}
+    ${D>0?meter("Daily loss limit","📉",Math.max(0,-s.tNet)/D,`${smoney(s.tNet,0)} <span class="mut">today</span>`,`${money(Math.max(0,D+s.tNet),0)} <span>left today</span>`):""}
+    ${M>0?meter("Max drawdown","🛡",1-s.buffer/M,`${money(Math.max(0,s.buffer),0)} <span class="mut">left</span>`,`<span>Limit at</span> ${money(s.floor,0)}`):""}
+   </div></div>`}
+function bindRules(acct,aSize){const c=$("#rulesCard");if(!c)return;
+  const set=$("#rSet",c);if(set)set.onclick=()=>{S._rulesEdit=acct;render()};
+  const ed=$("#rEdit",c);if(ed)ed.onclick=()=>{S._rulesEdit=acct;render()};
+  let ddt=(rulesAll()[acct]||{}).ddType||"static";$$("#rDDT button",c).forEach(b=>b.onclick=()=>{ddt=b.dataset.t;$$("#rDDT button",c).forEach(x=>x.classList.toggle("on",x===b))});
+  const cc=$("#rCancel",c);if(cc)cc.onclick=()=>{S._rulesEdit=null;render()};
+  const dl=$("#rDel",c);if(dl)dl.onclick=()=>{rulesSave(acct,null);S._rulesEdit=null;render()};
+  const sv=$("#rSave",c);if(sv)sv.onclick=()=>{const r={start:$("#rStart").value,target:$("#rTarget").value,daily:$("#rDaily").value,maxDD:$("#rDD").value,ddType:ddt};
+    if(!(num(r.start)>0)){toast("Enter the starting balance");return}rulesSave(acct,r);S._rulesEdit=null;toast("Rules saved");render()}}
 function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered();const st=calc(ts);
   const meta=S.acct!=="all"?S.trades.find(t=>t.account===S.acct&&(t.firm||t.platform||t.acctSize)):null;const aSize=meta&&num(meta.acctSize)>0?num(meta.acctSize):null;
   el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px"><div><h1>Statistics</h1><p class="sub">${S.acct==="all"?"All accounts":esc(S.acct)} · ${ts.length} trades</p>
    ${meta?`<div class="det-line">${meta.firm?`<span class="chip">🏦 <span data-notr>${esc(meta.firm)}</span></span>`:""}${aSize?`<span class="chip">💰 ${money(aSize,0)}</span>`:""}${meta.platform?`<span class="chip">🖥 <span data-notr>${esc(meta.platform)}</span></span>`:""}</div>`:""}</div>${S.readonly?"":`<button class="btn pri share-btn" id="shareBtn">🔗 Share my results</button>`}</div>
   ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||S._impDone||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export and see that account's stats and equity curve</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
   ${filterBar()}
+  ${S.acct!=="all"&&!S.readonly?rulesCard(S.acct,aSize):""}
   <div class="grid g4" style="margin-bottom:12px">
    ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,aSize?`${(st.net>0?"+":"")+pct(st.net/aSize,2)} of the account · ${st.nDays} trading days`:`${st.nDays} trading days`)}
    ${kpi("Win rate",pct(st.wr),`${st.w} wins · ${st.l} losses`)}
@@ -1621,7 +1711,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
    ${bdTable("By account",groupBy(ts,t=>t.account))}
    ${bdTable("Long vs short",groupBy(ts,t=>t.side))}
   </div>`;
-  bindFilters();if($("#impBody"))vImport($("#impBody"),true);if($("#shareBtn"))$("#shareBtn").onclick=openShare;
+  bindFilters();if($("#impBody"))vImport($("#impBody"),true);if($("#shareBtn"))$("#shareBtn").onclick=openShare;bindRules(S.acct,aSize);
   const shift=d=>{const keys=Object.keys(st.days).sort();const ref=S.calMonth||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7));const[y,m]=ref.split("-").map(Number);const n=new Date(y,m-1+d,1);S.calMonth=`${n.getFullYear()}-${pad(n.getMonth()+1)}`;render()};
   $("#calP").onclick=()=>shift(-1);$("#calN").onclick=()=>shift(1);
   $$(".cal .c[data-day]",el).forEach(c=>c.onclick=()=>{$("#tip").style.display="none";S.dayPage=c.dataset.day;render();window.scrollTo(0,0)});
@@ -1786,8 +1876,13 @@ function vPlan(el){
 const riskTabs=()=>`<div class="rtabs" role="tablist">
   <button type="button" role="tab" data-rt="fut" class="${S._rtab!=="cfd"?"on":""}"><span class="rt-ic">📈</span><span class="rt-tx"><b>Futures</b><small>Contracts · NQ, ES, YM, GC</small></span></button>
   <button type="button" role="tab" data-rt="cfd" class="${S._rtab==="cfd"?"on":""}"><span class="rt-ic">💹</span><span class="rt-tx"><b>CFDs</b><small>Lots · Gold, indices, forex</small></span></button></div>`;
+/* calculators remember their last settings on this device (per user) */
+const calcKey=k=>`tv_calc_${k}_${(S.me&&S.me.id)||"x"}`;
+function calcLoad(k){try{return JSON.parse(localStorage.getItem(calcKey(k)))}catch(e){return null}}
+function calcSaveAll(){try{[["risk",S._risk],["cfd",S._cfd],["cons",S._cons],["rtab",S._rtab]].forEach(([k,v])=>{if(v!=null)localStorage.setItem(calcKey(k),JSON.stringify(v))})}catch(e){}}
+let _calcT=0;["input","change","click"].forEach(ev=>document.addEventListener(ev,()=>{if(!S.me||!["risk","consistency"].includes(S.view))return;clearTimeout(_calcT);_calcT=setTimeout(calcSaveAll,400)},true));
 const bindRiskTabs=()=>$$(".rtabs [data-rt]").forEach(b=>b.onclick=()=>{S._rtab=b.dataset.rt;render()});
-function vRisk(el){if(S._rtab==="cfd")return vRiskCfd(el);const st=S._risk||(S._risk={grp:"Nasdaq",bal:50000,mode:"$",risk:250,stopMode:"pts",stop:20,entry:"",stopPx:"",rr:2,fees:""});
+function vRisk(el){if(S._rtab==null)S._rtab=calcLoad("rtab")||"fut";if(S._rtab==="cfd")return vRiskCfd(el);const st=S._risk||(S._risk=calcLoad("risk")||{grp:"Nasdaq",bal:50000,mode:"$",risk:250,stopMode:"pts",stop:20,entry:"",stopPx:"",rr:2,fees:""});
   el.innerHTML=`<h1>Risk calculator</h1>${riskTabs()}<p class="sub">How many contracts can I take for this stop? Every market is different, so the calculator uses each one's dollar value per point.</p>
   <div class="grid g2">
    <div class="card grid">
@@ -1855,7 +1950,7 @@ const CFD={
   EURUSD:{name:"Euro / Dollar",grp:"Forex",size:"100,000 EUR",pip:0.0001,pv:10,dg:5},
   GBPUSD:{name:"Pound / Dollar",grp:"Forex",size:"100,000 GBP",pip:0.0001,pv:10,dg:5},
   BTCUSD:{name:"Bitcoin",grp:"Crypto",size:"1 BTC",pip:1,pv:1,dg:1}};
-function vRiskCfd(el){const st=S._cfd||(S._cfd={sym:"XAUUSD",bal:10000,mode:"%",risk:1,stopMode:"pips",stop:50,entry:"",stopPx:"",rr:2,comm:"",pv:{}});
+function vRiskCfd(el){const st=S._cfd||(S._cfd=calcLoad("cfd")||{sym:"XAUUSD",bal:10000,mode:"%",risk:1,stopMode:"pips",stop:50,entry:"",stopPx:"",rr:2,comm:"",pv:{}});
   const m=CFD[st.sym],pv=num(st.pv[st.sym])>0?num(st.pv[st.sym]):m.pv;
   el.innerHTML=`<h1>Risk calculator</h1>${riskTabs()}<p class="sub">How many lots can I take for this stop? The calculator uses the dollar value of one pip for 1.00 lot on each market.</p>
   <div class="grid g2">
@@ -1917,7 +2012,7 @@ function vRiskCfd(el){const st=S._cfd||(S._cfd={sym:"XAUUSD",bal:10000,mode:"%",
 }
 
 /* ============ CONSISTENCY ============ */
-function vConsistency(el){const c=S._cons||(S._cons={size:50000,target:3000,pct:30,acct:"all",days:["",""],checked:false});
+function vConsistency(el){const c=S._cons||(S._cons=calcLoad("cons")||{size:50000,target:3000,pct:30,acct:"all",days:["",""],checked:false});
   if(!Array.isArray(c.days))c.days=["",""];
   const SIZES_C=[25000,50000,75000,100000,150000,200000];
   const kTxt=v=>num(v)>=1000?`$${+(num(v)/1000).toFixed(1)}K`:money(num(v),0);
