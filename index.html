@@ -1300,13 +1300,13 @@ $("#socGate").innerHTML=socialHTML(["results","telegram"]);
 /* ============ About us ============
    Change the numbers here. Put result screenshots in the "results" folder and list their file names in RESULTS. */
 const ABOUT={years:"6+",students:"300+",channel:"https://t.me/tradeversity_feedbackresult"};
-const RESULTS=["result-09.jpg","result-01.jpg","result-08.jpg","result-12.jpg","result-02.jpg","result-10.jpg","result-14.jpg","result-03.jpg","result-16.jpg","result-17.jpg","result-04.jpg","result-11.jpg","result-13.jpg","result-05.jpg","result-15.jpg","result-06.jpg","result-07.jpg"];   // files in results/ (from the Telegram results channel)
+const RESULTS=["result-09.jpg","result-01.jpg","result-08.jpg","result-36.jpg","result-12.jpg","result-20.jpg","result-02.jpg","result-10.jpg","result-24.jpg","result-14.jpg","result-19.jpg","result-03.jpg","result-16.jpg","result-28.jpg","result-17.jpg","result-21.jpg","result-04.jpg","result-33.jpg","result-11.jpg","result-25.jpg","result-13.jpg","result-32.jpg","result-05.jpg","result-18.jpg","result-26.jpg","result-15.jpg","result-23.jpg","result-06.jpg","result-34.jpg","result-27.jpg","result-22.jpg","result-29.jpg","result-07.jpg","result-35.jpg","result-30.jpg","result-31.jpg","result-37.jpg"];   // files in results/ (from the Telegram results channel)
 function aboutStatsHTML(){return `<div class="astats">
   <div class="astat"><b data-notr>${ABOUT.years}</b><span>years in the markets</span></div>
   <div class="astat"><b data-notr>${ABOUT.students}</b><span>students with Tradeversity</span></div>
   <div class="astat"><b>✔</b><span>real results, shared with full transparency</span></div></div>`}
 function resultsStripHTML(mod){if(!RESULTS.length)return "";const list=String(mod||"").includes("rev")?[...RESULTS].reverse():RESULTS;
-  const imgs=list.map(f=>`<img src="results/${encodeURI(f)}" alt="Student result" loading="lazy" data-res="${esc(f)}">`).join("");
+  const imgs=list.map(f=>`<img src="results/thumbs/${encodeURI(f)}" alt="Student result" loading="lazy" decoding="async" data-res="${esc(f)}">`).join("");
   return `<div class="rstrip ${mod||""}"><div class="rtrack">${imgs}${imgs}</div></div>`}
 function resultsBtn(){return `<a class="tg-link res" href="${ABOUT.channel}" target="_blank" rel="noopener">${SOCIAL[0].icon}<span>See all results on Telegram</span></a>`}
 function vAbout(el){
@@ -1323,7 +1323,7 @@ function fillAbout(){$$("[data-about-mini]").forEach(e=>e.innerHTML=`<span><b da
   $$("[data-gate-results]").forEach(e=>e.innerHTML=resultsStripHTML());
   $$("[data-about-auth]").forEach(e=>e.innerHTML=`<div class="about-t">Who we are</div><p>Tradeversity is a trading mentorship founded by <b>Brown Algo</b> and <b>ZNtrading</b>: disciplined, rule-based futures trading.</p>${aboutStatsHTML()}${resultsStripHTML()}<div style="display:flex;justify-content:center;margin-top:10px">${resultsBtn()}</div>`)}
 fillAbout();
-document.addEventListener("click",e=>{const im=e.target.closest&&e.target.closest("img[data-res]");if(!im)return;openModal(`<div class="mhead"><h2>Student result</h2><button class="x" id="mx">×</button></div><img src="${im.src}" alt="Student result" style="width:100%;border-radius:10px;border:1px solid var(--line)">`);$("#mx").onclick=closeModal});
+document.addEventListener("click",e=>{const im=e.target.closest&&e.target.closest("img[data-res]");if(!im)return;openModal(`<div class="mhead"><h2>Student result</h2><button class="x" id="mx">×</button></div><img src="results/${encodeURI(im.dataset.res)}" alt="Student result" style="width:100%;border-radius:10px;border:1px solid var(--line)">`);$("#mx").onclick=closeModal});
 
 /* ============ Earn2Trade partner promo ============ */
 const PROMO={url:"https://www.earn2trade.com/?a_pid=BROWN23",code:"BROWN23",pct:60};
