@@ -1674,7 +1674,7 @@ function vRisk(el){const st=S._risk||(S._risk={grp:"Nasdaq",bal:50000,mode:"$",r
 /* ============ CONSISTENCY ============ */
 function vConsistency(el){const c=S._cons||(S._cons={size:50000,target:3000,pct:30,acct:"all",days:["",""],checked:false});
   if(!Array.isArray(c.days))c.days=["",""];
-  const SIZES_C=[25000,50000,75000,100000,150000];
+  const SIZES_C=[25000,50000,75000,100000,150000,200000];
   const kTxt=v=>num(v)>=1000?`$${+(num(v)/1000).toFixed(1)}K`:money(num(v),0);
   el.innerHTML=`<h1>Consistency rule calculator</h1><p class="sub">Most prop firms say your best day can't be more than <b>X%</b> of your total profit. Enter your daily P/L and check if you pass.</p>
   <div class="cons-wrap">
