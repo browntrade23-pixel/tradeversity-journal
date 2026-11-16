@@ -290,6 +290,21 @@ html[lang=ar] .ne-l{letter-spacing:0}
 .quote .qby{font-style:normal;font-size:10px;letter-spacing:.2em;color:var(--gold);white-space:nowrap}
 html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .tag.over{background:rgba(239,83,80,.15);color:var(--red)}
+/* admin: student file */
+.lnk{color:var(--gold2);text-decoration:none}.lnk:hover{text-decoration:underline}
+.sf-head{display:flex;gap:16px;align-items:center;border-color:rgba(245,185,66,.3)}
+.sf-av{width:64px;height:64px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:28px;font-weight:900;color:#1b1305;background:linear-gradient(135deg,var(--gold2),#b8791a)}
+.sf-links{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font-size:14px}
+.plan-item{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:var(--panel2)}
+.plan-item summary{cursor:pointer;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;list-style:none}
+.plan-item summary::-webkit-details-marker{display:none}
+.plan-item summary::before{content:"▸";color:var(--gold);transition:transform .2s}
+.plan-item[open] summary::before{transform:rotate(90deg)}
+.plan-body{padding:4px 14px 14px}
+.pf{display:grid;grid-template-columns:220px 1fr;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+.pl{font-size:12px;color:var(--muted);font-weight:600}
+.pv{font-size:13px}
+@media(max-width:640px){.pf{grid-template-columns:1fr;gap:4px}.sf-head{flex-direction:column;text-align:center}.sf-links{justify-content:center}}
 /* admin: today's discipline */
 .dyes,.dno{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
 .dyes{background:rgba(39,194,108,.12);color:var(--green)}
@@ -616,15 +631,16 @@ async function loadSubject(u,readonly){
 const VIEWS=[["journal","📓 Journal"],["stats","📊 Statistics"],["news","📰 News"],["plan","🧭 Tomorrow's plan"],["risk","🎯 Risk calculator"],["consistency","⚖️ Consistency rule"],["import","⬆️ Import CSV"],["about","ℹ️ About us"]];
 function renderTabs(){const t=$("#tabs");let h="";
   if(S.me.role==="admin")h+=`<button data-v="admin" class="admin ${S.view==="admin"?"on":""}">👑 Admin dashboard</button>`;
+  if(S.readonly)h+=`<button data-v="student" class="admin ${S.view==="student"?"on":""}">👤 Student file</button>`;
   VIEWS.forEach(([k,l])=>{if(S.readonly&&k==="import")return;h+=`<button data-v="${k}" class="${S.view===k?"on":""}">${l}</button>`});
   t.innerHTML=h;$$("button",t).forEach(b=>b.onclick=()=>go(b.dataset.v));}
-function go(v){if(![...VIEWS.map(x=>x[0]),"admin"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";
+function go(v){if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
   S.view=v;S.page=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
 function render(){renderTabs();const v=$("#view");
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
-  const fn={journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,import:vImport,about:vAbout,admin:vAdmin}[S.view];
+  const fn={journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
   v.innerHTML=h+'<div id="vb"></div>';fn($("#vb"));
   if(S.readonly)$("#backAdmin").onclick=()=>go("admin");}
 
@@ -722,6 +738,51 @@ function vNews(el){
   el.innerHTML=`<h1>📰 USD news</h1><p class="sub">Red and orange folder USD events from Forex Factory, in New York and Algeria (DZ) time. Plan around them.</p>${newsPanel()}
    <div class="card"><h3>🏦 Upcoming US holidays</h3>${uh.map(x=>`<div class="nrow hol ${x.kind}"><span class="hol-ic">🏦</span><span class="mono nt" data-notr>${esc(fmtDate(x.date))}</span><b class="ntitle" data-notr>${esc(x.title)}</b><span class="hol-note">${HOL_NOTE[x.kind]}</span><span class="hol-in"><span>in</span> <b class="mono" data-notr>${daysUntil(x.date)}</b> <span>days</span></span></div>`).join("")||`<div class="mut nb-e">No holidays listed.</div>`}</div>`;
   bindNewsPanel();if(!S.newsLoaded)loadNews();
+}
+
+/* ============ student file (admin, read-only) ============ */
+function vStudent(el){const u=S.subject,ts=[...S.trades].sort((a,b)=>byDT(b,a)),st=calc(ts),d=discStreak(S.trades);
+  const tg=(u.telegram||"").replace(/^@/,"").replace(/^https?:\/\/t\.me\//,"").trim();
+  const days=new Set(ts.map(t=>t.date)).size,plans=[...S.plans].sort((a,b)=>b.date.localeCompare(a.date));
+  const field=(l,v)=>v&&String(v).trim()?`<div class="pf"><div class="pl">${l}</div><div class="pv notes" data-notr>${esc(v)}</div></div>`:"";
+  const planCard=p=>{const bias=Object.entries(p.bias||{}).filter(([,v])=>v);const rules=Object.entries(p.rules||{});const dt=S.trades.filter(t=>t.date===p.date),dn=dt.reduce((a,t)=>a+tradeNet(t),0);
+    return `<details class="plan-item"><summary><b data-notr>${esc(fmtDate(p.date))}</b>
+      ${bias.length?`<span class="mut" data-notr>${bias.map(([k,v])=>`${esc(k)} ${v==="Bullish"?"▲":v==="Bearish"?"▼":"•"}`).join(" · ")}</span>`:""}
+      ${p.maxLoss?`<span class="tag"><span>Max loss</span> <span data-notr>$${esc(p.maxLoss)}</span></span>`:""}${p.maxTrades?`<span class="tag"><span>Max trades</span> <span data-notr>${esc(p.maxTrades)}</span></span>`:""}
+      ${p.followed?`<span class="tag ${p.followed==="Yes"?"win":p.followed==="No"?"loss":""}"><span>Followed:</span> <span>${esc(p.followed)}</span></span>`:""}
+      ${dt.length?`<span class="mono ${cls(dn)}" data-notr>${dt.length} · ${smoney(dn,0)}</span>`:""}</summary>
+      <div class="plan-body">
+        <div class="grid g4" style="margin-bottom:10px">${kpi("Max daily loss $",p.maxLoss?`$${esc(p.maxLoss)}`:"—")}${kpi("Daily profit target $",p.target?`$${esc(p.target)}`:"—")}${kpi("Max number of trades",esc(p.maxTrades||"—"))}${kpi("Risk per trade $",p.riskPerTrade?`$${esc(p.riskPerTrade)}`:"—")}</div>
+        ${bias.length?`<div class="pf"><div class="pl">Directional bias</div><div class="pv" data-notr>${bias.map(([k,v])=>`<span class="tag ${v==="Bullish"?"long":v==="Bearish"?"short":""}">${esc(k)}: ${esc(v)}</span>`).join(" ")}</div></div>`:""}
+        ${field("HTF narrative (Daily / 1H) & draw on liquidity",p.htf)}${field("Key levels (PDH, PDL, FVGs, opens…)",p.levels)}${field("News & events",p.news)}
+        ${field("Entry model / A+ setup I'm waiting for",p.model)}${field("I will NOT trade if…",p.noTrade)}${field("Session",p.session)}${field("Mindset / goal for the day",p.mindset)}
+        ${rules.length?`<div class="pf"><div class="pl">Pre-trade checklist</div><div class="pv">${rules.map(([r,v])=>`<div>${v?"✅":"⬜"} <span>${esc(r)}</span></div>`).join("")}</div></div>`:""}
+        ${field("Review note",p.review)}
+      </div></details>`};
+  el.innerHTML=`<div class="card sf-head">
+     <div class="sf-av">${esc((u.name||"?").trim().charAt(0).toUpperCase())}</div>
+     <div class="sf-id"><h1 style="margin:0" data-notr>${esc(u.name||"—")}</h1>
+       <div class="sf-links"><a class="lnk" href="mailto:${esc(u.email||"")}" data-notr>✉️ ${esc(u.email||"—")}</a>${tg?`<a class="lnk" href="https://t.me/${encodeURIComponent(tg)}" target="_blank" rel="noopener" data-notr>✈️ @${esc(tg)}</a>`:""}</div>
+       <div class="mut" style="font-size:12px;margin-top:4px">${u.created_at?`<span>Joined</span> <span data-notr>${esc(fmtDate(u.created_at.slice(0,10)))}</span>`:""}${u.status?` · <span class="tag ${u.status==="approved"?"win":u.status==="rejected"?"loss":""}">${esc(u.status)}</span>`:""}</div></div>
+   </div>
+   <div class="grid g4" style="margin:12px 0">
+     ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,`${st.n} trades`)}
+     ${kpi("Win rate",pct(st.wr),`${st.w}W · ${st.l}L · ${st.be}BE`)}
+     ${kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):"—","gross win ÷ gross loss")}
+     ${kpi("Discipline streak",`${Math.min(d.streak,DISC.goal)} / ${DISC.goal}`,d.best?`<span>Best streak:</span> ${d.best}`:"")}
+     ${kpi("Journaling days",days,"days with at least one trade")}
+     ${kpi("Plans written",plans.length,plans[0]?fmtDate(plans[0].date):"")}
+     ${kpi("Max drawdown",`<span class="neg">${money(-st.mdd,0)}</span>`,"peak to trough")}
+     ${kpi("Avg R",isFinite(st.avgR)?st.avgR.toFixed(2)+"R":"—","from trades with a stop")}
+   </div>
+   <div class="row" style="margin-bottom:12px"><button class="btn" data-goto="journal">📓 Full journal</button><button class="btn" data-goto="stats">📊 All statistics</button><button class="btn" data-goto="plan">🧭 Plan page</button></div>
+   <div class="card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0">Latest trades</h3><span class="mut" style="font-size:12px">Click a trade to see every detail</span></div>
+     ${ts.length?ts.slice(0,10).map(tcard).join(""):`<div class="empty">No trades yet.</div>`}
+     ${ts.length>10?`<button class="btn sm" data-goto="journal">See all trades</button>`:""}</div>
+   <div class="card"><h3>All plans <span class="mut" style="text-transform:none;letter-spacing:0">(${plans.length})</span></h3>
+     ${plans.length?plans.map(planCard).join(""):`<div class="empty">No plans written yet.</div>`}</div>`;
+  $$("[data-goto]",el).forEach(b=>b.onclick=()=>go(b.dataset.goto));
+  $$(".tcard",el).forEach(c=>c.onclick=()=>{S.view="journal";S.page=c.dataset.id;render();window.scrollTo(0,0)});
 }
 
 /* ============ discipline coach ============
@@ -1254,15 +1315,12 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    </div>`:""}
    <div class="grid g4" style="margin-bottom:12px">
     ${kpi("Students",students.length,`${rows.filter(r=>r.active).length} active this week`)}
-    ${kpi("Trades logged",all.n,"all students")}
-    ${kpi("Combined net",`<span class="${cls(all.net)}">${money(all.net,0)}</span>`,`win rate ${pct(all.wr,0)}`)}
-    ${kpi("Plans for next session",rows.filter(r=>r.hasNext).length+" / "+students.length,fmtDate(nd))}
    </div>
    ${emoAll.length?`<div class="card" style="margin-bottom:12px"><h3>Group weak spots</h3>${emoAll.map(r=>`<div class="insight"><span class="ic">⚠️</span><span><b>${esc(r.k)}</b> trades across students: <b class="neg">${money(r.net,0)}</b> over ${r.n} trades (${pct(r.wr,0)} win). Good topic for the next live.</span></div>`).join("")}</div>`:""}
    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">Students</h3><div class="row"><input class="i" id="aq" placeholder="Search name, email, Telegram" style="width:240px"><button class="btn sm" id="aExp">Export CSV</button></div></div>
-   <div class="tw"><table class="t" id="aT"><tr><th>Student</th><th>Telegram</th><th>Trades</th><th>Net P&L</th><th>Win %</th><th>PF</th><th>Broke plan</th><th>Max-loss days</th><th>Weak spot</th><th>Last trade</th><th>Plan</th></tr>
-   ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b>${esc(r.s.name)}</b><div class="mut" style="font-size:11px">${esc(r.s.email)}</div></td><td class="mono">${esc(r.s.telegram||"")}</td><td class="mono">${r.c.n}</td><td class="mono ${cls(r.c.net)}">${smoney(r.c.net,0)}</td><td class="mono">${pct(r.c.wr,0)}</td><td class="mono">${isFinite(r.c.pf)?r.c.pf.toFixed(2):"—"}</td>
-     <td class="mono ${r.brk?"neg":""}">${r.brk}</td><td class="mono ${r.mlb?"neg":""}">${r.mlb}</td><td>${r.worstEmo?`<span class="tag bad">${esc(r.worstEmo.k)}</span>`:"—"}</td><td>${r.last?r.last.slice(5):"—"} ${r.active?"":'<span class="tag">idle</span>'}</td><td>${r.hasNext?'<span class="ok">✔</span>':'<span class="mut">—</span>'}</td></tr>`).join("")||`<tr><td colspan="11" class="empty">No students yet. Share the website link — they sign up for free.</td></tr>`}</table></div></div>
+   <div class="tw"><table class="t" id="aT"><tr><th>Name (username)</th><th>Email</th><th>Telegram username</th><th>Trades</th><th>Net P&L</th><th>Win %</th><th>PF</th><th>Broke plan</th><th>Max-loss days</th><th>Weak spot</th><th>Plan</th></tr>
+   ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b data-notr>${esc(r.s.name||"—")}</b> <span class="tag">👤 Open</span></td><td data-notr><a class="lnk" href="mailto:${esc(r.s.email||"")}" onclick="event.stopPropagation()">${esc(r.s.email||"—")}</a></td><td class="mono" data-notr>${tgUser(r.s)?`<a class="lnk" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">@${esc(tgUser(r.s))}</a>`:"—"}</td><td class="mono">${r.c.n}</td><td class="mono ${cls(r.c.net)}">${smoney(r.c.net,0)}</td><td class="mono">${pct(r.c.wr,0)}</td><td class="mono">${isFinite(r.c.pf)?r.c.pf.toFixed(2):"—"}</td>
+     <td class="mono ${r.brk?"neg":""}">${r.brk}</td><td class="mono ${r.mlb?"neg":""}">${r.mlb}</td><td>${r.worstEmo?`<span class="tag bad">${esc(r.worstEmo.k)}</span>`:"—"}</td><td>${r.hasNext?'<span class="ok">✔</span>':'<span class="mut">—</span>'}</td></tr>`).join("")||`<tr><td colspan="11" class="empty">No students yet. Share the website link — they sign up for free.</td></tr>`}</table></div></div>
    ${rejected.length?`<details class="card" style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:600">Rejected requests (${rejected.length})</summary><div class="tw" style="margin-top:8px"><table class="t" id="rejT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${rejected.map(p=>reqRow(p,true)).join("")}</table></div></details>`:""}`;
   $$("tr[data-pid] button[data-act]",el).forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const id=b.closest("tr").dataset.pid,act=b.dataset.act;const p=profs.find(x=>x.id===id);
     const go_=async()=>{b.disabled=true;try{await API.setStatus(id,act);toast(act==="approved"?"Student approved":"Request rejected");vAdmin(el)}catch(e){b.disabled=false;toast(e.message||String(e))}};
@@ -1275,7 +1333,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
     if(v==="plan")S._planDate=r&&r.pNext?nd:today;
     S.view=v;render();window.scrollTo(0,0)});
   $("#aq").oninput=e=>{const q=e.target.value.toLowerCase();$$("#aT tr[data-q]").forEach(tr=>tr.classList.toggle("hidden",!tr.dataset.q.includes(q)))};
-  $$("#aT tr[data-id]").forEach(tr=>tr.onclick=async()=>{const s=students.find(x=>x.id===tr.dataset.id);await loadSubject(s,true);S.view="journal";render();window.scrollTo(0,0)});
+  $$("#aT tr[data-id]").forEach(tr=>tr.onclick=async()=>{const s=students.find(x=>x.id===tr.dataset.id);await loadSubject(s,true);S.view="student";render();window.scrollTo(0,0)});
   $("#aExp").onclick=()=>{const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;saveFile(`tradeversity-students-${todayStr()}.csv`,["name,email,telegram,joined,trades,net_pnl,win_rate,profit_factor,broke_plan,max_loss_days,last_trade",...rows.map(r=>[r.s.name,r.s.email,r.s.telegram,(r.s.created_at||"").slice(0,10),r.c.n,r.c.net.toFixed(2),isFinite(r.c.wr)?(r.c.wr*100).toFixed(1):"",isFinite(r.c.pf)?r.c.pf.toFixed(2):"",r.brk,r.mlb,r.last].map(q).join(","))].join("\n"),"text/csv")};
 }
 
