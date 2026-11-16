@@ -439,6 +439,16 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .fc-net{display:flex;align-items:baseline;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap}.fc-net b{font-size:24px;font-weight:900}
 .kind-b{display:inline-block;margin-inline-start:6px;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:800;vertical-align:middle}
 .kind-b.fut{background:rgba(245,185,66,.15);color:var(--gold)}.kind-b.cfd{background:rgba(76,141,255,.16);color:var(--blue)}
+.dup-bar{margin:4px 0 10px;padding:9px 12px;border-radius:10px;font-size:13px;border:1px solid}
+.dup-bar.none{background:rgba(39,194,108,.1);border-color:rgba(39,194,108,.35);color:var(--green)}
+.dup-bar.some{background:rgba(245,185,66,.1);border-color:rgba(245,185,66,.35);color:var(--gold)}
+.dup-bar.all{background:rgba(76,141,255,.1);border-color:rgba(76,141,255,.35);color:var(--blue)}
+tr.dup td{opacity:.45}
+.dup-tag,.new-tag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;white-space:nowrap}
+.dup-tag{background:rgba(76,141,255,.15);color:var(--blue)}.new-tag{background:rgba(39,194,108,.15);color:var(--green)}
+.undo-b{display:inline-flex;align-items:center;gap:8px;border-color:rgba(239,83,80,.45)!important;color:var(--red)}
+.un-ring{--p:100%;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--red) var(--p),var(--line) 0)}
+.un-s{width:16px;height:16px;border-radius:50%;background:var(--panel);display:grid;place-items:center;font-size:9px;font-weight:800}
 /* admin: student file */
 .lnk{color:var(--gold2);text-decoration:none}.lnk:hover{text-decoration:underline}
 .sf-head{display:flex;gap:16px;align-items:center;border-color:rgba(245,185,66,.3)}
@@ -956,6 +966,7 @@ const Cloud={
   async saveTrade(t){const{error}=await this.sb.from("trades").upsert(this.toRow(t));if(error)throw error},
   async saveTrades(ts){for(let i=0;i<ts.length;i+=200){const{error}=await this.sb.from("trades").insert(ts.slice(i,i+200).map(t=>this.toRow(t)));if(error)throw error}},
   async deleteTrade(t){const{error}=await this.sb.from("trades").delete().eq("id",t.id);if(error)throw error},
+  async deleteTrades(ids){for(let i=0;i<ids.length;i+=200){const{error}=await this.sb.from("trades").delete().in("id",ids.slice(i,i+200));if(error)throw error}},
   async listPlans(uid_){const{data,error}=await this.sb.from("plans").select("*").eq("user_id",uid_).order("plan_date",{ascending:false});if(error)throw error;return data.map(r=>({...(r.data||{}),user_id:r.user_id,date:r.plan_date}))},
   async savePlan(p){const{error}=await this.sb.from("plans").upsert({user_id:p.user_id,plan_date:p.date,data:p},{onConflict:"user_id,plan_date"});if(error)throw error},
   async listProfiles(){const{data,error}=await this.sb.from("profiles").select("*").order("created_at");if(error)throw error;return data.map(d=>({id:d.id,name:d.full_name,telegram:d.telegram,email:d.email,role:d.role,status:d.status,created_at:d.created_at}))},
@@ -987,8 +998,18 @@ $("#waitCheck").onclick=async()=>{try{const u=await API.session();if(u)await ent
 const isApproved=u=>u.role==="admin"||!u.status||u.status==="approved";
 $("#tabLogin").onclick=()=>{$("#tabLogin").classList.add("on");$("#tabSignup").classList.remove("on");$("#loginForm").classList.remove("hidden");$("#signupForm").classList.add("hidden");$("#authMsg").textContent=""};
 $("#tabSignup").onclick=()=>{$("#tabSignup").classList.add("on");$("#tabLogin").classList.remove("on");$("#signupForm").classList.remove("hidden");$("#loginForm").classList.add("hidden");$("#authMsg").textContent=""};
+/* Supabase errors in plain words (translated by i18n) */
+function authErr(err){const m=String((err&&err.message)||err||"");
+  const k=/rate limit|too many|over_email_send_rate|429/i.test(m)?"Too many attempts right now. Please wait a few minutes and try again.":
+    /already registered|already exists|already been registered/i.test(m)?"This email already has an account. Log in instead, or use Forgot password.":
+    /invalid login credentials/i.test(m)?"Wrong email or password.":
+    /email not confirmed/i.test(m)?"Your email isn't confirmed yet. Contact us on Telegram and we'll activate your account.":
+    /password should be at least|weak password|password.*characters/i.test(m)?"Your password must be at least 6 characters.":
+    /invalid.*email|unable to validate email|email address.*invalid/i.test(m)?"This email address isn't valid. Check it and try again.":
+    /network|failed to fetch|load failed/i.test(m)?"No connection. Check your internet and try again.":"";
+  return `<span class="neg">${esc(k?I18N.t(k):m)}</span>`}
 $("#loginForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);$("#authMsg").textContent="Logging in…";
-  try{const u=await API.signIn(f.get("email").trim(),f.get("password"));await enter(u)}catch(err){$("#authMsg").innerHTML=`<span class="neg">${esc(err.message||err)}</span>`}};
+  try{const u=await API.signIn(f.get("email").trim(),f.get("password"));await enter(u)}catch(err){$("#authMsg").innerHTML=authErr(err)}};
 $("#signupForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);
   if(f.get("password")!==f.get("password2")){$("#authMsg").innerHTML='<span class="neg">Passwords don\'t match.</span>';return}
   let tg=f.get("telegram").trim().replace(/^https?:\/\/t\.me\//i,"");if(tg&&!tg.startsWith("@"))tg="@"+tg;
@@ -996,9 +1017,9 @@ $("#signupForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.ta
   $("#authMsg").textContent="Creating your account…";
   try{const r=await API.signUp({email:f.get("email").trim(),password:f.get("password"),name:f.get("name").trim(),telegram:tg});
     if(r.needsConfirm){$("#authMsg").innerHTML='<span class="ok">Account created. Check your email to confirm it, then log in.</span>';$("#tabLogin").click();$("#authMsg").innerHTML='<span class="ok">Account created. Check your email to confirm it, then log in.</span>'}
-    else await enter(r.user)}catch(err){$("#authMsg").innerHTML=`<span class="neg">${esc(err.message||err)}</span>`}};
+    else await enter(r.user)}catch(err){$("#authMsg").innerHTML=authErr(err)}};
 $("#forgot").onclick=async e=>{e.preventDefault();const em=$("#loginForm [name=email]").value.trim();if(!em){$("#authMsg").textContent="Type your email above first.";return}
-  try{await API.resetPassword(em);$("#authMsg").innerHTML='<span class="ok">Reset link sent — check your email.</span>'}catch(err){$("#authMsg").innerHTML=`<span class="neg">${esc(err.message)}</span>`}};
+  try{await API.resetPassword(em);$("#authMsg").innerHTML='<span class="ok">Reset link sent — check your email.</span>'}catch(err){$("#authMsg").innerHTML=authErr(err)}};
 $("#logout").onclick=async()=>{await API.signOut();S.me=null;S.subject=null;try{history.replaceState(null,"",location.pathname)}catch(e){}showAuth()};
 function openNewPassword(){openModal(`<div class="mhead"><h2>Set a new password</h2></div><form id="npf" class="grid"><input class="i" type="password" minlength="8" name="p" placeholder="New password" required><button class="btn pri">Save password</button></form>`);
   $("#npf").onsubmit=async e=>{e.preventDefault();const{error}=await Cloud.sb.auth.updateUser({password:new FormData(e.target).get("p")});if(error)toast(error.message);else{toast("Password updated");closeModal()}}}
@@ -2047,7 +2068,7 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
     const f=t=>{const k=Math.min(1,(t-t0)/ms),p=a+(b-a)*(1-Math.pow(1-k,2));const bar=$("#ipBar"),pc=$("#ipPct");if(bar)bar.style.width=p+"%";if(pc)pc.textContent=Math.round(p)+"%";k<1?requestAnimationFrame(f):res()};
     requestAnimationFrame(f);setTimeout(res,ms+400)});
   const kb=n=>n>1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";
-  const load=async file=>{S._impDone=null;const sm=$(".imp-done");if(sm)sm.remove();prog("📄",file.name,kb(file.size));
+  const load=async file=>{if(!(S._impDone&&S._impDone.until>Date.now())){S._impDone=null;const sm=$(".imp-done");if(sm)sm.remove()}prog("📄",file.name,kb(file.size));
     const text=await Promise.all([new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result));r.onerror=rej;r.readAsText(file)}),anim(0,55,700,"Uploading file…")]).then(x=>x[0]).catch(()=>null);
     if(text==null){$("#cMap").innerHTML="";toast("Couldn't read that file");return}
     await anim(55,82,450,"Reading trades…");const rows=parseCSV(text);
@@ -2079,6 +2100,7 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
         setup:"",session:"",emotions:[],feeling:"",followed:"",rating:0,shots:[],remark:"",notes:"",imported:true})});return out};
   const draw=()=>{if(!I.rows){$("#cMap").innerHTML="";return}const hd=I.rows[0];const prev=build();
     const D=I.det||{accts:[]};const nAc=D.accts.length;const fs=fileStats(prev);
+    const have=new Set(S.trades.map(tradeKey)),fresh=prev.filter(t=>!have.has(tradeKey(t))),dup=prev.length-fresh.length;
     $("#cMap").innerHTML=`${prev.length?fileCard(fs,D):""}<div class="card det" style="margin-top:12px"><h3>🔍 Detected from your file</h3>
      <div class="det-chips"><span class="det-chip ${fs.kind?"ok":""}"><small>Account type</small><b>${fs.kind==="CFD"?"💹 CFD":fs.kind==="Futures"?"📈 Futures":"Not sure"}</b></span><span class="det-chip ${D.platform?"ok":""}"><small>Platform</small><b>${D.platform?`<span data-notr>${esc(D.platform)}</span>`:"Not recognised"}</b></span>
       <span class="det-chip ${D.firm?"ok":""}"><small>Prop firm</small><b>${D.firm?`<span data-notr>${esc(D.firm)}</span>`:"Not found"}</b></span>
@@ -2090,26 +2112,40 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
       <label class="f">Account size<select class="i" id="dSize"><option value="">—</option>${SIZES.map(s=>`<option value="${s}" ${D.size===s?"selected":""}>${money(s,0)}</option>`).join("")}</select></label></div>
      <p class="mut" style="font-size:12px;margin:8px 0 0">${nAc>1?`<span>${nAc} accounts found: each trade keeps its own account.</span> `:""}<span>Detected automatically from the column names, account number and file name. Fix anything that's wrong.</span></p></div>
     <div class="card" style="margin-top:12px"><h3>Match columns</h3><div class="grid g4">${FIELDS.map(([k,l])=>`<label class="f">${l}<select class="i" data-f="${k}"><option value="">— none —</option>${hd.map((h,i)=>`<option value="${i}" ${I.map[k]===i?"selected":""}>${esc(h)}</option>`).join("")}</select></label>`).join("")}</div></div>
-    <div class="card" style="margin-top:12px"><h3>Preview — ${prev.length} trades</h3><div class="tw"><table class="t"><tr><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th><th>Net P&L</th></tr>
-     ${prev.slice(0,8).map(t=>`<tr><td>${t.date} ${t.time}</td><td class="mono">${esc(t.symbol)}</td><td>${t.side}</td><td>${t.qty}</td><td class="mono">${t.entry}</td><td class="mono">${t.exit}</td><td class="mono ${cls(tradeNet(t))}">${smoney(tradeNet(t))}</td></tr>`).join("")}</table></div>
-     <p class="mut" style="font-size:12px">Total: <b class="${cls(prev.reduce((a,t)=>a+tradeNet(t),0))}">${smoney(prev.reduce((a,t)=>a+tradeNet(t),0))}</b>. After importing, open any trade to add the screenshot, emotions and notes.</p>
-     <div class="row" style="justify-content:flex-end"><button class="btn" id="cClear">Cancel</button><button class="btn pri" id="cGo" ${prev.length?"":"disabled"}>Import ${prev.length} trades</button></div></div>`;
+    <div class="card" style="margin-top:12px"><h3>Preview — ${prev.length} trades</h3>
+     ${prev.length?`<div class="dup-bar ${fresh.length?dup?"some":"none":"all"}">${fresh.length?dup?`🛡 <b>${fresh.length}</b> <span>new</span> · <b>${dup}</b> <span>already in your journal (they will be skipped)</span>`:`✅ <b>${fresh.length}</b> <span>new trades · no duplicates</span>`:`🛡 <span>All the trades in this file are already in your journal. Nothing new to import.</span>`}</div>`:""}
+     <div class="tw"><table class="t"><tr><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th><th>Net P&L</th><th></th></tr>
+     ${prev.slice(0,8).map(t=>{const d=have.has(tradeKey(t));return `<tr class="${d?"dup":""}"><td>${t.date} ${t.time}</td><td class="mono">${esc(t.symbol)}</td><td>${t.side}</td><td>${t.qty}</td><td class="mono">${t.entry}</td><td class="mono">${t.exit}</td><td class="mono ${cls(tradeNet(t))}">${smoney(tradeNet(t))}</td><td>${d?`<span class="dup-tag">Already imported</span>`:`<span class="new-tag">New</span>`}</td></tr>`}).join("")}</table></div>
+     <p class="mut" style="font-size:12px">Total: <b class="${cls(fresh.reduce((a,t)=>a+tradeNet(t),0))}">${smoney(fresh.reduce((a,t)=>a+tradeNet(t),0))}</b>. After importing, open any trade to add the screenshot, emotions and notes.</p>
+     <div class="row" style="justify-content:flex-end"><button class="btn" id="cClear">Cancel</button><button class="btn pri" id="cGo" ${fresh.length?"":"disabled"}>Import ${fresh.length} trades</button></div></div>`;
     $$("[data-f]").forEach(s=>s.onchange=()=>{const v=s.value;if(v==="")delete I.map[s.dataset.f];else I.map[s.dataset.f]=Number(v);draw()});
     $("#cClear").onclick=()=>{S._imp=null;render()};
     const upd=(k,v)=>{I.det=I.det||{accts:[],per:{},ai:-1};I.det[k]=v;Object.values(I.det.per||{}).forEach(p=>{if(k==="firm")p.firm=v||p.firm;if(k==="size")p.size=v||p.size});autoName();draw()};
     $("#dPlat").onchange=e=>upd("platform",e.target.value.trim()||null);$("#dFirm").onchange=e=>upd("firm",e.target.value.trim()||null);$("#dSize").onchange=e=>upd("size",Number(e.target.value)||null);
-    $("#cGo").onclick=async()=>{const ts=build();if(!ts.length)return;const keep=$("#cMap").innerHTML;
+    $("#cGo").onclick=async()=>{const hv=new Set(S.trades.map(tradeKey)),ts=build().filter(t=>!hv.has(tradeKey(t)));if(!ts.length)return;const keep=$("#cMap").innerHTML;
       prog("⬆️",I.fileName||"CSV",`${ts.length} trades`);
       try{await Promise.all([API.saveTrades(ts),anim(0,92,900,"Saving trades to your journal…")]);await anim(92,100,300,"Calculating your statistics…");$(".imp-prog").classList.add("done");
         S.trades.push(...ts);const ua=[...new Set(ts.map(t=>t.account))];const acct=ua.length===1?ua[0]:"all";
-        S._impDone=impSummary(ts,I.det,I.fileName);S._imp=null;toast(`Imported ${ts.length} trades`);await new Promise(r=>setTimeout(r,350));
+        S._impDone=impSummary(ts,I.det,I.fileName);S._impDone.ids=ts.map(t=>t.id);S._impDone.until=Date.now()+UNDO_MS;S._impDone.prevAcct=S.acct;S._imp=null;toast(`Imported ${ts.length} trades`);await new Promise(r=>setTimeout(r,350));
         if(embedded){S.acct=acct;S.range="all";S.calMonth=null;render();const b=$("#impBox");if(b){b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"})}}else go("journal")}
       catch(e){$("#cMap").innerHTML=keep;draw();toast("Import failed: "+(e.message||e))}}};
   if(S._impDone)el.insertAdjacentHTML("afterbegin",impDoneHTML(S._impDone));
   $$("[data-impgo]",el).forEach(b=>b.onclick=()=>{const v=b.dataset.impgo;S._impDone=null;go(v)});
   const x=$(".imp-done .x",el);if(x)x.onclick=()=>{S._impDone=null;$(".imp-done",el).remove()};
+  bindUndo(el);
   if(I.rows)draw();
 }
+/* Undo an import: for a short time after importing, remove exactly those trades */
+const UNDO_MS=15000;
+function bindUndo(el){const b=$("#impUndo",el);if(!b)return;const s=S._impDone;
+  const tick=()=>{const left=Math.ceil((s.until-Date.now())/1000);if(!document.body.contains(b))return;if(left<=0||S._impDone!==s){b.remove();return}
+    $(".un-s",b).textContent=left;$(".un-ring",b).style.setProperty("--p",(left*1000/UNDO_MS*100)+"%");setTimeout(tick,250)};tick();
+  b.onclick=async()=>{if(b.disabled)return;b.disabled=true;$(".un-l",b).textContent=I18N.t("Removing…");
+    try{await API.deleteTrades(s.ids);const ids=new Set(s.ids);S.trades=S.trades.filter(t=>!ids.has(t.id));S._impDone=null;S.acct=s.prevAcct&&s.prevAcct!=="all"&&S.trades.some(t=>t.account===s.prevAcct)?s.prevAcct:"all";
+      toast(I18N.t("Import undone")+` · ${s.ids.length} `+I18N.t("trades removed"));render()}catch(e){b.disabled=false;$(".un-l",b).textContent=I18N.t("Undo import");toast("Couldn't undo: "+(e.message||e))}}}
+/* a trade's fingerprint, to skip trades that are already in the journal when a file is imported again */
+const r4=v=>{const n=num(v);return isFinite(n)?Math.round(n*1e4)/1e4:""};
+const tradeKey=t=>[t.date,String(t.time||"").slice(0,5),String(t.symbol||"").toUpperCase(),t.side,r4(t.qty),r4(t.entry),r4(t.exit),Math.round(tradeNet(t)*100)].join("|");
 /* simple facts about a list of trades: account type (Futures / CFD), instruments, volume, period */
 function fileStats(ts){const k={};ts.forEach(t=>{if(t.market)k[t.market]=(k[t.market]||0)+1});
   const kind=Object.keys(k).sort((a,b)=>k[b]-k[a])[0]||"",mixed=Object.keys(k).length>1;
@@ -2146,7 +2182,8 @@ function impDoneHTML(s){return `<div class="imp-done"><button class="x" type="bu
    <div><small>Trading days</small><b class="mono">${s.days}</b><span class="mut" data-notr>${s.syms.map(esc).join(" · ")}</span></div>
    <div><small>Best trade</small><b class="mono pos">${smoney(s.best)}</b></div>
    <div><small>Worst trade</small><b class="mono neg">${smoney(s.worst)}</b></div></div>
-  <div class="row" style="justify-content:center;gap:8px;margin-top:12px"><button class="btn pri" type="button" data-impgo="stats">📊 <span>Open Statistics</span></button><button class="btn" type="button" data-impgo="journal">📒 <span>View in Journal</span></button></div></div>`}
+  <div class="row" style="justify-content:center;gap:8px;margin-top:12px"><button class="btn pri" type="button" data-impgo="stats">📊 <span>Open Statistics</span></button><button class="btn" type="button" data-impgo="journal">📒 <span>View in Journal</span></button>
+   ${s.ids&&s.until>Date.now()&&!S.readonly?`<button class="btn undo-b" type="button" id="impUndo"><span class="un-ring"><span class="un-s"></span></span><span class="un-l">Undo import</span></button>`:""}</div></div>`}
 
 /* ============ ADMIN ============ */
 async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</div>';
