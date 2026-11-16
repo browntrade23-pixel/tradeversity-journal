@@ -376,6 +376,34 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 [dir=rtl] .tpnl{text-align:left}
 [dir=rtl] input[type=number],[dir=rtl] input[type=email],[dir=rtl] input[type=date],[dir=rtl] input[type=time]{direction:ltr;text-align:right}
 [dir=rtl] .props{direction:rtl}
+/* share */
+.share-btn{white-space:nowrap;box-shadow:0 0 18px rgba(245,185,66,.25)}
+.sh-priv{font-size:13px;padding:10px 12px;border-radius:10px;background:rgba(39,194,108,.08);border:1px solid rgba(39,194,108,.25);color:#bfe9cf}
+.sh-item{margin-bottom:10px}
+.sh-qr{text-align:center;margin-top:12px}.sh-qr img{width:min(300px,100%);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+#share main{max-width:1100px}
+.sh-hero{text-align:center;padding:26px 16px 22px;border-radius:18px;border:1px solid rgba(245,185,66,.25);background:radial-gradient(700px 240px at 50% 0,rgba(245,185,66,.14),transparent 70%),var(--panel)}
+.sh-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 12px;border-radius:99px;border:1px solid var(--line2);color:var(--muted)}
+.sh-live{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:shp 1.6s infinite}
+@keyframes shp{50%{opacity:.3}}
+.sh-net{font-size:44px;font-weight:800;margin-top:12px;letter-spacing:-1px}
+.sh-cta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-color:rgba(245,185,66,.3)}
+.sh-dead{text-align:center;max-width:460px;margin:40px auto}
+[dir=rtl] .sh-net{direction:ltr;unicode-bidi:isolate}
+/* About: boxes lift a little under the mouse */
+.about-v .astat,.about-v .card,.about-v .insight,.about-v .tg-link{transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s,border-color .28s}
+.about-v .astat:hover,.about-v .card:hover{transform:translateY(-5px);box-shadow:0 14px 30px rgba(0,0,0,.45),0 0 22px rgba(245,185,66,.14);border-color:rgba(245,185,66,.4)}
+.about-v .insight:hover{transform:translateX(5px);border-color:rgba(245,185,66,.35)}
+[dir=rtl] .about-v .insight:hover{transform:translateX(-5px)}
+.about-v .tg-link:hover{transform:translateY(-2px)}
+@media(prefers-reduced-motion:reduce){.about-v .astat:hover,.about-v .card:hover,.about-v .insight:hover,.about-v .tg-link:hover{transform:none}}
+/* csv detection */
+.det{border-color:rgba(76,141,255,.35)}
+.det-chips{display:flex;flex-wrap:wrap;gap:8px}
+.det-chip{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);min-width:120px}
+.det-chip small{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);font-weight:700}
+.det-chip b{font-size:13px;color:var(--muted)}.det-chip.ok{border-color:rgba(39,194,108,.4)}.det-chip.ok b{color:var(--text,#e8edf6)}
+.det-line{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 8px}
 @media(max-width:560px){[dir=rtl] .tpnl{text-align:right}}
 </style>
 </head>
@@ -586,6 +614,10 @@ const Cloud={
   async allTradesLite(){const{data,error}=await this.sb.from("trades").select("id,user_id,trade_date,symbol,account,pnl,data").limit(20000);if(error)throw error;return data.map(r=>({...(r.data||{}),id:r.id,user_id:r.user_id,shots:[]}))},
   async allPlans(){const{data,error}=await this.sb.from("plans").select("*");if(error)throw error;return data.map(r=>({...(r.data||{}),user_id:r.user_id,date:r.plan_date}))},
   async news(fromISO,toISO){const{data,error}=await this.sb.from("econ_news").select("title,impact,starts_at,forecast,previous").gte("starts_at",fromISO).lte("starts_at",toISO).order("starts_at");if(error)throw error;return data||[]},
+  async listShares(){const{data,error}=await this.sb.from("shares").select("*").eq("user_id",S.me.id).eq("revoked",false).order("created_at",{ascending:false});if(error)throw error;return data||[]},
+  async createShare(o){const{data,error}=await this.sb.from("shares").insert(o).select().single();if(error)throw error;return data},
+  async revokeShare(token){const{error}=await this.sb.from("shares").update({revoked:true}).eq("token",token);if(error)throw error},
+  async getShare(t){const{data,error}=await this.sb.rpc("get_share",{t});if(error)throw error;return data},
   async resetPassword(email){const{error}=await this.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error}
 };
 
@@ -655,11 +687,11 @@ function render(){renderTabs();const v=$("#view");
 /* ============ filters ============ */
 function accounts(){return [...new Set(S.trades.map(t=>t.account).filter(Boolean))].sort()}
 function filtered(){let ts=S.trades;if(S.acct!=="all")ts=ts.filter(t=>t.account===S.acct);
-  if(S.range!=="all"){const d=new Date();d.setDate(d.getDate()-Number(S.range));const c=ymd(d);ts=ts.filter(t=>t.date>=c)}return ts}
+  if(S.range!=="all"){const d=new Date();d.setDate(d.getDate()-Number(S.range)+1);const c=ymd(d);ts=ts.filter(t=>t.date>=c)}return ts}
 function filterBar(){const ac=accounts();
   return `<div class="row" style="margin-bottom:14px">
   <select class="i" id="fAcct" style="width:auto"><option value="all">All accounts</option>${ac.map(a=>`<option ${S.acct===a?"selected":""}>${esc(a)}</option>`).join("")}</select>
-  <div class="seg" id="fRange">${[["7","7D"],["30","30D"],["90","90D"],["all","All"]].map(([k,l])=>`<button data-r="${k}" class="${S.range===k?"on":""}">${l}</button>`).join("")}</div></div>`}
+  <div class="seg" id="fRange">${[["1","1D"],["7","7D"],["30","30D"],["90","90D"],["all","All"]].map(([k,l])=>`<button data-r="${k}" class="${S.range===k?"on":""}">${l}</button>`).join("")}</div></div>`}
 function bindFilters(){const a=$("#fAcct");if(a)a.onchange=()=>{S.acct=a.value;render()};$$("#fRange button").forEach(b=>b.onclick=()=>{S.range=b.dataset.r;render()})}
 
 /* ============ JOURNAL ============ */
@@ -1018,7 +1050,7 @@ function equityChart(curve){if(!curve.length)return '<div class="empty">No data<
   g+=`<polygon points="${L},${Y(0)} ${pts} ${X(curve.length-1)},${Y(0)}" fill="${col}" opacity=".08"/><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`;
   const step=Math.max(1,Math.ceil(curve.length/6));curve.forEach((c,i)=>{if(i%step===0)g+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle">${c.t.date.slice(5)}</text>`});
   const w=(W-L-Rp)/Math.max(1,curve.length);
-  curve.forEach((c,i)=>{const n=tradeNet(c.t);g+=`<g><rect class="hit" x="${X(i)-w/2}" y="${T}" width="${w}" height="${H-T-B}" data-tip="${esc(`${fmtDate(c.t.date)} ${c.t.time||""}\n${c.t.symbol} ${c.t.side}: ${smoney(n)}\nEquity: ${money(c.eq)}`)}"/></g>`});
+  curve.forEach((c,i)=>{const n=tradeNet(c.t);g+=`<g><rect class="hit" x="${X(i)-w/2}" y="${T}" width="${w}" height="${H-T-B}" data-tip="${esc(c.tip||`${fmtDate(c.t.date)} ${c.t.time||""}\n${c.t.symbol} ${c.t.side}: ${smoney(n)}\nEquity: ${money(c.eq)}`)}"/></g>`});
   g+=`<circle cx="${X(curve.length-1)}" cy="${Y(last)}" r="4" fill="${col}" stroke="#111827" stroke-width="2"/>`;
   return `<svg class="ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="Equity curve">${g}</svg>`}
 function dailyBars(days){const ent=Object.entries(days).sort((a,b)=>a[0].localeCompare(b[0])).slice(-40);if(!ent.length)return '<div class="empty">No data</div>';
@@ -1053,11 +1085,13 @@ function insights(ts){const out=[];if(ts.length<3)return out;
   const wd=groupBy(ts,t=>{const[a,b,c]=t.date.split("-").map(Number);return WD[new Date(a,b-1,c).getDay()]});const bw=wd[wd.length-1];if(bw&&bw.net<0)out.push(["📅",`<b>${bw.k}</b> is your weakest day: ${smoney(bw.net,0)}.`]);
   return out}
 function vStats(el){const ts=filtered();const st=calc(ts);
-  el.innerHTML=`<h1>Statistics</h1><p class="sub">${S.acct==="all"?"All accounts":esc(S.acct)} · ${ts.length} trades</p>
+  const meta=S.acct!=="all"?S.trades.find(t=>t.account===S.acct&&(t.firm||t.platform||t.acctSize)):null;const aSize=meta&&num(meta.acctSize)>0?num(meta.acctSize):null;
+  el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px"><div><h1>Statistics</h1><p class="sub">${S.acct==="all"?"All accounts":esc(S.acct)} · ${ts.length} trades</p>
+   ${meta?`<div class="det-line">${meta.firm?`<span class="chip">🏦 <span data-notr>${esc(meta.firm)}</span></span>`:""}${aSize?`<span class="chip">💰 ${money(aSize,0)}</span>`:""}${meta.platform?`<span class="chip">🖥 <span data-notr>${esc(meta.platform)}</span></span>`:""}</div>`:""}</div>${S.readonly?"":`<button class="btn pri share-btn" id="shareBtn">🔗 Share my results</button>`}</div>
   ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export and see that account's stats and equity curve</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
   ${filterBar()}
   <div class="grid g4" style="margin-bottom:12px">
-   ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,`${st.nDays} trading days`)}
+   ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,aSize?`${(st.net>0?"+":"")+pct(st.net/aSize,2)} of the account · ${st.nDays} trading days`:`${st.nDays} trading days`)}
    ${kpi("Win rate",pct(st.wr),`${st.w} wins · ${st.l} losses`)}
    ${kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):"—","above 1.5 is solid")}
    ${kpi("Expectancy",`<span class="${cls(st.exp)}">${money(st.exp)}</span>`,"average per trade")}
@@ -1079,10 +1113,106 @@ function vStats(el){const ts=filtered();const st=calc(ts);
    ${bdTable("By account",groupBy(ts,t=>t.account))}
    ${bdTable("Long vs short",groupBy(ts,t=>t.side))}
   </div>`;
-  bindFilters();if($("#impBody"))vImport($("#impBody"),true);
+  bindFilters();if($("#impBody"))vImport($("#impBody"),true);if($("#shareBtn"))$("#shareBtn").onclick=openShare;
   const shift=d=>{const keys=Object.keys(st.days).sort();const ref=S.calMonth||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7));const[y,m]=ref.split("-").map(Number);const n=new Date(y,m-1+d,1);S.calMonth=`${n.getFullYear()}-${pad(n.getMonth()+1)}`;render()};
   $("#calP").onclick=()=>shift(-1);$("#calN").onclick=()=>shift(1);
 }
+
+/* ============ SHARE (public view-only link + QR code) ============ */
+const shareURL=tok=>`${location.origin}${location.pathname}?share=${tok}`;
+let _qrLib=null;
+function loadQR(){return _qrLib||(_qrLib=new Promise((res,rej)=>{if(window.qrcode)return res(window.qrcode);const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js";s.onload=()=>res(window.qrcode);s.onerror=()=>{_qrLib=null;rej(new Error("QR library didn't load"))};document.head.appendChild(s)}))}
+// Branded QR card (PNG-ready canvas): logo in the middle, high error correction so it still scans
+async function qrCard(url,label){const qrcode=await loadQR();const q=qrcode(0,"H");q.addData(url);q.make();
+  const n=q.getModuleCount(),cs=Math.max(8,Math.floor(360/n)),m=3,qs=(n+2*m)*cs,P=44,W=qs+P*2,H=qs+P+170;
+  const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  const bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#121826");bg.addColorStop(1,"#05070b");x.fillStyle=bg;x.fillRect(0,0,W,H);
+  x.strokeStyle="rgba(245,185,66,.55)";x.lineWidth=3;x.strokeRect(8,8,W-16,H-16);
+  x.textAlign="center";x.fillStyle="#f5b942";x.font="800 26px Inter,Arial,sans-serif";x.fillText("THE EFFECTIVE JOURNAL",W/2,52);
+  x.fillStyle="#ffd27a";x.font="600 12px Inter,Arial,sans-serif";x.fillText("BY TRADEVERSITY",W/2,72);
+  const ox=P,oy=96;x.fillStyle="#fff";x.fillRect(ox,oy,qs,qs);x.fillStyle="#05070b";
+  for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))x.fillRect(ox+(k+m)*cs,oy+(r+m)*cs,cs,cs);
+  try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src="brand/logo-192.png"});
+    const ls=Math.round(qs*.2),lx=ox+(qs-ls)/2,ly=oy+(qs-ls)/2;x.fillStyle="#fff";x.fillRect(lx-6,ly-6,ls+12,ls+12);x.drawImage(im,lx,ly,ls,ls)}catch(e){}
+  x.fillStyle="#fff";x.font="700 20px Inter,Arial,sans-serif";x.fillText(String(label||I18N.t("My trading results")).slice(0,40),W/2,oy+qs+44);
+  x.fillStyle="#9aa6bd";x.font="500 14px Inter,Arial,sans-serif";x.fillText(I18N.t("Scan to see my P&L calendar · view only"),W/2,oy+qs+72);
+  x.fillStyle="#6b7891";x.font="500 12px Inter,Arial,sans-serif";x.fillText("Founder · BROWN ALGO",W/2,oy+qs+104);
+  return c}
+function downloadCanvas(c,name){c.toBlob(b=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)},"image/png")}
+async function copyText(t){try{await navigator.clipboard.writeText(t);toast("Link copied")}catch(e){const i=document.createElement("textarea");i.value=t;document.body.appendChild(i);i.select();try{document.execCommand("copy");toast("Link copied")}catch(_){toast("Copy failed — select the link and copy it")}i.remove()}}
+async function openShare(){const ac=accounts();
+  openModal(`<div class="mhead"><h2 style="margin:0">🔗 Share my results</h2><button class="x" id="shX" aria-label="Close">×</button></div>
+   <p class="mut" style="margin-top:0">Send a link or a QR code. Whoever opens it sees your P&L calendar, equity curve and monthly results, <b>view only</b>. It updates live as you journal.</p>
+   <div class="sh-priv">🔒 They only see daily profit and loss totals. No trade details, notes, screenshots, email or Telegram. You can stop sharing at any time.</div>
+   <div class="card" style="margin:12px 0"><div class="grid g3">
+    <label class="f">Account<select class="i" id="shAcct"><option value="">All accounts</option>${ac.map(a=>`<option value="${esc(a)}" ${S.acct===a?"selected":""}>${esc(a)}</option>`).join("")}</select></label>
+    <label class="f">Title (optional)<input class="i" id="shTitle" maxlength="60" placeholder="e.g. November challenge"></label>
+    <label class="f">Show my name<select class="i" id="shName"><option value="1">Yes, show my name</option><option value="0">No, keep it anonymous</option></select></label></div>
+    <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn pri" id="shGo">Create link + QR code</button></div></div>
+   <div id="shList"><div class="empty">Loading…</div></div>`);
+  $("#shX").onclick=closeModal;
+  const list=async(openTok)=>{let rows;try{rows=await API.listShares()}catch(e){$("#shList").innerHTML=`<div class="card empty">Couldn't load: ${esc(e.message||e)}</div>`;return}
+    $("#shList").innerHTML=rows.length?`<h3 style="margin:4px 0 8px">Your active links</h3>`+rows.map(r=>`<div class="card sh-item" data-tok="${r.token}">
+      <div class="row" style="justify-content:space-between;gap:8px"><div><b data-notr>${esc(r.title||"")}</b>${r.title?" · ":""}<span class="mut">${r.account?`<span data-notr>${esc(r.account)}</span>`:"<span>All accounts</span>"} · <span>${r.show_name?"Name shown":"Anonymous"}</span></span><div class="mut" style="font-size:12px">Created ${fmtDate(String(r.created_at).slice(0,10))}</div></div>
+       <button class="btn sm sh-stop" data-a="stop">Stop sharing</button></div>
+      <div class="row" style="margin-top:10px;gap:8px"><input class="i mono sh-url" readonly value="${shareURL(r.token)}" data-notr style="flex:1;min-width:200px">
+       <button class="btn sm" data-a="copy">📋 Copy link</button><a class="btn sm" href="${shareURL(r.token)}" target="_blank" rel="noopener">↗ Open</a>${navigator.share?`<button class="btn sm" data-a="native">📤 Send</button>`:""}<button class="btn sm" data-a="qr">▦ QR code</button></div>
+      <div class="sh-qr hidden"></div></div>`).join(""):`<div class="mut" style="text-align:center;font-size:13px">No active links yet.</div>`;
+    $$(".sh-item").forEach(card=>{const tok=card.dataset.tok,r=rows.find(x=>x.token===tok),url=shareURL(tok),lab=r.title||(r.show_name&&S.me.name)||I18N.t("My trading results");
+      const showQR=async()=>{const box=$(".sh-qr",card);if(!box.classList.contains("hidden")&&box.innerHTML){box.classList.add("hidden");return}box.classList.remove("hidden");box.innerHTML='<div class="empty">Making QR code…</div>';
+        try{const c=await qrCard(url,lab);box.innerHTML=`<img alt="QR code" src="${c.toDataURL("image/png")}"><div class="row" style="justify-content:center;margin-top:8px"><button class="btn sm pri" data-dl>⬇ Download QR image</button></div>`;$("[data-dl]",box).onclick=()=>downloadCanvas(c,`effective-journal-share-${tok.slice(0,6)}.png`)}catch(e){box.innerHTML=`<div class="empty">${esc(e.message||e)}</div>`}};
+      card.querySelector('[data-a="copy"]').onclick=()=>copyText(url);
+      card.querySelector('[data-a="qr"]').onclick=showQR;
+      const nb=card.querySelector('[data-a="native"]');if(nb)nb.onclick=()=>navigator.share({title:"The Effective Journal",text:lab,url}).catch(()=>{});
+      card.querySelector('[data-a="stop"]').onclick=async()=>{if(!confirm(I18N.t("Stop sharing? This link and its QR code will stop working right away.")))return;try{await API.revokeShare(tok);toast("Link stopped");list()}catch(e){toast("Couldn't stop: "+(e.message||e))}};
+      if(tok===openTok)showQR()})};
+  $("#shGo").onclick=async()=>{const b=$("#shGo");b.disabled=true;try{const r=await API.createShare({account:$("#shAcct").value||null,title:$("#shTitle").value.trim()||null,show_name:$("#shName").value==="1"});
+    toast("Link created");$("#shTitle").value="";await list(r.token);copyText(shareURL(r.token))}catch(e){toast("Couldn't create: "+(e.message||e))}b.disabled=false};
+  list()}
+
+/* public viewer: ?share=TOKEN (no login, view only) */
+const SH={tok:null,data:undefined,month:null};
+function shareDays(){const d={},n={};(SH.data.days||[]).forEach(x=>{d[x.date]=Number(x.pnl)||0;n[x.date]=x.n||0});return {d,n}}
+function drawShare(){const el=$("#shMain");const D=SH.data;
+  if(!D){el.innerHTML=`<div class="card sh-dead"><div style="font-size:44px">🔒</div><h2>This link is no longer active</h2><p class="mut">The owner stopped sharing it, or the link is wrong.</p><a class="btn pri" href="${location.pathname}">Visit The Effective Journal</a></div>`;return}
+  const {d:days,n:cnt}=shareDays();const keys=Object.keys(days).sort();const vals=keys.map(k=>days[k]);
+  const net=vals.reduce((a,b)=>a+b,0),green=vals.filter(v=>v>0).length,red=vals.filter(v=>v<0).length,dec=green+red;
+  let eq=0,peak=0,mdd=0;const curve=keys.map(k=>{eq+=days[k];peak=Math.max(peak,eq);mdd=Math.max(mdd,peak-eq);return {t:{date:k},eq,tip:`${fmtDate(k)}\n${I18N.t("Day")}: ${smoney(days[k])}\n${I18N.t("Total")}: ${money(eq)}`}});
+  const best=keys.length?keys.reduce((a,k)=>days[k]>days[a]?k:a):null,worst=keys.length?keys.reduce((a,k)=>days[k]<days[a]?k:a):null;
+  const mon={};keys.forEach(k=>{const m=k.slice(0,7);const o=mon[m]||(mon[m]={net:0,g:0,r:0,n:0,t:0});o.net+=days[k];o.n++;o.t+=cnt[k];if(days[k]>0)o.g++;else if(days[k]<0)o.r++});
+  const months=Object.entries(mon).sort((a,b)=>b[0].localeCompare(a[0]));const mx=Math.max(1,...months.map(([,o])=>Math.abs(o.net)));
+  const gwin=vals.filter(v=>v>0).reduce((a,b)=>a+b,0),glos=-vals.filter(v=>v<0).reduce((a,b)=>a+b,0);
+  S.calMonth=SH.month||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7));
+  const mName=k=>{const[y,m]=k.split("-").map(Number);return new Date(y,m-1,1).toLocaleDateString(I18N.locale(),{month:"long",year:"numeric"})};
+  el.innerHTML=`<div class="sh-hero">
+     <div class="sh-badge"><span>👁 View only</span> · <span class="sh-live"></span> <span>Live</span></div>
+     <h1 style="margin:8px 0 2px">${D.name?`<span data-notr>${esc(D.name)}</span>`:"A Tradeversity student"}</h1>
+     <div class="mut">${D.title?`<b data-notr style="color:var(--gold2)">${esc(D.title)}</b> · `:""}${D.account?`<span data-notr>${esc(D.account)}</span>`:"<span>All accounts</span>"} · <span>${keys.length} trading days</span></div>
+     <div class="sh-net ${cls(net)} mono">${smoney(net)}</div><div class="mut" style="font-size:12px">Total P&L</div></div>
+   <div class="grid g4" style="margin:14px 0 12px">
+    ${kpi("Green days",`<span class="pos">${green}</span> <span class="mut">/</span> <span class="neg">${red}</span>`,`${pct(dec?green/dec:NaN,0)} day win rate`)}
+    ${kpi("Best day",`<span class="pos">${best?smoney(days[best],0):"—"}</span>`,best?fmtDate(best):"")}
+    ${kpi("Worst day",`<span class="neg">${worst?smoney(days[worst],0):"—"}</span>`,worst?fmtDate(worst):"")}
+    ${kpi("Profit factor",glos?(gwin/glos).toFixed(2):(gwin?"∞":"—"),`max drawdown ${money(-mdd,0)}`)}
+   </div>
+   <div class="card" style="margin-bottom:12px"><h3>P&L calendar</h3>${calendar(days)}</div>
+   <div class="grid g2" style="margin-bottom:12px"><div class="card"><h3>Equity curve</h3>${equityChart(curve)}</div><div class="card"><h3>Daily P&L</h3>${dailyBars(days)}</div></div>
+   <div class="card" style="margin-bottom:12px"><h3>Month by month</h3>${months.length?`<div class="tw"><table class="t"><tr><th>Month</th><th>Days</th><th>Green / red</th><th>Net P&L</th><th></th></tr>${months.map(([k,o])=>`<tr class="click" data-m="${k}"><td>${mName(k)}</td><td class="mono">${o.n}</td><td class="mono"><span class="pos">${o.g}</span> / <span class="neg">${o.r}</span></td><td class="mono ${cls(o.net)}">${smoney(o.net)}</td><td style="width:30%"><div class="bar"><i style="width:${Math.abs(o.net)/mx*100}%;background:${o.net>=0?"var(--green)":"var(--red)"}"></i></div></td></tr>`).join("")}</table></div>`:'<div class="empty">No trades yet</div>'}</div>
+   <div class="card sh-cta"><div><b>Trade with discipline. Journal every trade.</b><div class="mut" style="font-size:13px">These results are tracked in The Effective Journal by Tradeversity.</div></div><a class="btn pri" href="${location.pathname}">Join Tradeversity</a></div>`;
+  const shift=k=>{const[y,m]=S.calMonth.split("-").map(Number);const n=new Date(y,m-1+k,1);SH.month=`${n.getFullYear()}-${pad(n.getMonth()+1)}`;drawShare()};
+  $("#calP").onclick=()=>shift(-1);$("#calN").onclick=()=>shift(1);
+  $$("tr[data-m]").forEach(r=>r.onclick=()=>{SH.month=r.dataset.m;drawShare();$(".cal").scrollIntoView({behavior:"smooth",block:"center"})})}
+async function bootShare(tok){SH.tok=tok;$("#auth").classList.add("hidden");$("#app").classList.add("hidden");
+  const sec=document.createElement("section");sec.id="share";
+  sec.innerHTML=`<header class="top"><div class="topin"><a class="brand" href="${location.pathname}" style="color:inherit;text-decoration:none"><div class="logo" role="img" aria-label="The Effective Journal by Tradeversity"></div><div>The Effective Journal<small>BY TRADEVERSITY</small></div></a><div class="spacer"></div><span class="soc icons" id="socShare"></span><span id="langShare"></span></div></header>
+   <main id="shMain"><div class="empty">Loading results…</div></main>
+   <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div class="soc" id="socShare2"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>`;
+  document.body.insertBefore(sec,$("#modal"));
+  $("#langShare").innerHTML=I18N.picker();$("#socShare").innerHTML=socialHTML();$("#socShare2").innerHTML=socialHTML();$$("[data-promo]",sec).forEach(e=>e.innerHTML=promoHTML());
+  window.onLangChange=()=>{if(SH.data!==undefined)drawShare()};
+  const load=async()=>{try{SH.data=await Cloud.getShare(tok);drawShare()}catch(e){$("#shMain").innerHTML=`<div class="card empty">Couldn't load: ${esc(e.message||e)}</div>`}};
+  await Cloud.init();API=Cloud;await load();
+  setInterval(()=>{if(!document.hidden)load()},90000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)load()})}
 
 /* ============ PLAN ============ */
 function vPlan(el){
@@ -1238,6 +1368,38 @@ function pDT(s){if(!s)return null;s=String(s).trim();let m=s.match(/^(\d{1,2})\/
   if(m){let y=+m[3];if(y<100)y+=2000;return {date:`${y}-${pad(m[1])}-${pad(m[2])}`,time:m[4]?`${pad(m[4])}:${m[5]||"00"}`:"",ts:new Date(y,m[1]-1,m[2],m[4]||0,m[5]||0).getTime()}}
   m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);if(m)return {date:`${m[1]}-${m[2]}-${m[3]}`,time:m[4]?`${m[4]}:${m[5]}`:"",ts:new Date(+m[1],m[2]-1,+m[3],+(m[4]||0),+(m[5]||0)).getTime()};
   const d=new Date(s);if(!isNaN(d))return {date:ymd(d),time:`${pad(d.getHours())}:${pad(d.getMinutes())}`,ts:d.getTime()};return null}
+/* ---- CSV source detection: trading platform, prop firm, account size, account number ---- */
+const PLATFORMS=[ // [name, header signature: every word must be in the header row]
+  ["Tradovate",["boughttimestamp","soldtimestamp"]],["Tradovate",["buyfillid","sellfillid"]],["Tradovate",["b/s","contract","fill time"]],
+  ["TopstepX / ProjectX",["contractname","enteredat","exitedat"]],["TopstepX / ProjectX",["tradeday","tradeduration"]],
+  ["NinjaTrader",["market pos.","entry name"]],["NinjaTrader",["trade number","cum. net profit"]],["NinjaTrader",["mae","mfe","etd"]],
+  ["Rithmic R|Trader Pro",["avg fill price","buy/sell"]],["Rithmic R|Trader Pro",["qty to fill"]],["Rithmic R|Trader Pro",["closed profit/loss"]],
+  ["Quantower",["position id","gross p/l"]],["Quantower",["net p/l","trade id","fee"]],
+  ["TradingView",["trade #","signal","cum. profit"]],["TradingView",["placing time","closing time","order id"]],["TradingView",["run-up","drawdown","profit usd"]],
+  ["Sierra Chart",["entry datetime","exit datetime","trade quantity"]],["MetaTrader",["ticket","s / l","t / p"]],["MetaTrader",["swap","open time","close time","ticket"]],
+  ["Tradesea",["tradesea"]],["Volumetrica",["volumetrica"]],["ATAS",["atas"]],["Bookmap",["bookmap"]]];
+const FIRMS=[ // [name, regex on account number / file name / platform]
+  ["Apex Trader Funding",/\bAPEX|^PA-?APEX|APEX-/i],["Topstep",/TOPSTEP|\d{2,3}KTC|\bTC-?V\d|EXPRESS-?V\d|\bXFA\b/i],["Earn2Trade",/E2T|EARN2TRADE|GAUNTLET|\bELTC?\d|\bTCP\d/i],
+  ["Take Profit Trader",/\bTPT|TAKEPROFIT/i],["Tradeify",/TRADEIFY|\bTDFY/i],["MyFundedFutures",/\bMFFU?|MYFUNDED/i],["Bulenox",/BULENOX|\bBLN\d|\bBX\d/i],
+  ["Alpha Futures",/ALPHA\s?FUTURES|\bAFF\d/i],["Lucid Trading",/LUCID/i],["FundedNext Futures",/FUNDEDNEXT|\bFNF\d/i],["Elite Trader Funding",/ELITE\s?TRADER|\bETF-?\d/i],
+  ["TradeDay",/TRADEDAY/i],["Leeloo",/LEELOO/i],["Funded Futures Network",/\bFFN\d|FUNDED\s?FUTURES\s?NETWORK/i],["The Trading Pit",/TRADING\s?PIT|\bTTP\d/i],["Phidias",/PHIDIAS/i],["DayTraders",/DAYTRADERS/i],["Top One Futures",/TOP\s?ONE/i]];
+const SIZES=[10000,25000,50000,75000,100000,150000,200000,250000,300000];
+const kSize=v=>v>=1000?`$${(v/1000).toFixed(v%1000?1:0)}K`:money(v,0);
+function detectSource(rows,fileName){const hd=rows[0].map(h=>h.trim().toLowerCase()),H=hd.join("|"),fn=String(fileName||"");
+  let platform=null;for(const[n,sig]of PLATFORMS)if(sig.every(w=>hd.includes(w)||H.includes(w))){platform=n;break}
+  if(!platform){const p=PLATFORMS.find(([n])=>new RegExp(n.split(/[ /|]/)[0],"i").test(fn));if(p)platform=p[0]}
+  const ai=hd.findIndex(h=>/^(account|account name|account id|accountname|accountid|acct|account #|account number)$/.test(h));
+  const accts=ai>=0?[...new Set(rows.slice(1).map(r=>String(r[ai]||"").trim()).filter(Boolean))]:[];
+  const findFirm=s=>{const f=FIRMS.find(([,re])=>re.test(s));return f?f[0]:null};
+  const findSize=s=>{const m=String(s).match(/(?:^|[^0-9])(10|25|50|75|100|150|200|250|300)\s?K(?=TC|[^A-Z]|$)/i)||String(s).match(/(?:^|[^0-9])(10|25|50|75|100|150|200|250|300)[,.]?000(?![0-9])/);return m?Number(m[1])*1000:null};
+  let firm=findFirm(accts.join(" ")+" "+fn)||(platform==="TopstepX / ProjectX"?"Topstep (ProjectX)":null);
+  let size=findSize(accts.join(" "))||findSize(fn);
+  if(!size){const bi=hd.findIndex(h=>/^(balance|account balance|cash balance|net liq|net liquidation|starting balance|start balance|equity)$/.test(h));
+    if(bi>=0){const v=rows.slice(1).map(r=>pNum(r[bi])).filter(isFinite);if(v.length){const near=SIZES.reduce((a,s)=>Math.abs(s-v[0])<Math.abs(a-v[0])?s:a);if(Math.abs(near-v[0])/near<.12)size=near}}}
+  const per={};accts.forEach(a=>per[a]={firm:findFirm(a)||firm,size:findSize(a)||size});
+  return {platform,firm,size,accts,ai,per}}
+const acctLabel=(id,f,sz)=>[f&&f.replace(/ (Trader Funding|Futures|Trading)$/,""),sz&&kSize(sz),id].filter(Boolean).join(" · ");
+
 function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""});
   el.innerHTML=`${embedded?`<p class="mut" style="margin:0 0 10px;font-size:13px">Works with Tradovate, NinjaTrader, Rithmic/R|Trader, TradingView and most broker exports. Columns are matched automatically — fix anything below before importing.</p>`:`<h1>Import trades from CSV</h1><p class="sub">Works with Tradovate, NinjaTrader, Rithmic/R|Trader, TradingView and most broker exports. Columns are matched automatically — fix anything below before importing.</p>`}
    <div class="${embedded?"":"card "}grid"><div class="drop" id="cDrop">📄 Choose a CSV file (or drop it here)</div><input type="file" id="cFile" accept=".csv,.txt,text/csv" class="hidden">
@@ -1245,10 +1407,14 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
    <div id="cMap"></div>`;
   const load=file=>{const r=new FileReader();r.onload=()=>{const rows=parseCSV(String(r.result));if(rows.length<2){toast("No rows found");return}I.rows=rows;const hd=rows[0].map(h=>h.trim().toLowerCase());I.map={};
     FIELDS.forEach(([k])=>{const i=hd.findIndex(h=>SYN[k].includes(h));if(i>=0)I.map[k]=i});
-    if(I.map.boughtTs!=null&&I.map.date===I.map.boughtTs)delete I.map.date;draw()};r.readAsText(file)};
+    if(I.map.boughtTs!=null&&I.map.date===I.map.boughtTs)delete I.map.date;
+    I.det=detectSource(rows,file.name);I.fileName=file.name;autoName();draw()};r.readAsText(file)};
+  // suggested account name from what we detected (only if the student hasn't typed one)
+  const autoName=()=>{const D=I.det;if(!D||(I.acct&&!I.acctAuto))return;
+    I.acct=D.accts.length>1?"":(D.accts.length===1||D.firm||D.size)?acctLabel(D.accts[0],D.firm,D.size):"";I.acctAuto=true;const f=$("#cAcctName");if(f)f.value=I.acct};
   $("#cDrop").onclick=()=>$("#cFile").click();$("#cFile").onchange=e=>e.target.files[0]&&load(e.target.files[0]);
   $("#cDrop").ondragover=e=>{e.preventDefault()};$("#cDrop").ondrop=e=>{e.preventDefault();e.dataTransfer.files[0]&&load(e.dataTransfer.files[0])};
-  $("#cAcctName").oninput=e=>I.acct=e.target.value;
+  $("#cAcctName").oninput=e=>{I.acct=e.target.value;I.acctAuto=false};
   const build=()=>{const hd=I.rows[0],M=I.map,g=(r,k)=>M[k]!=null?r[M[k]]:"";const out=[];
     I.rows.slice(1).forEach(r=>{let dt=pDT(g(r,"date"));let side=String(g(r,"side")).toLowerCase();side=/sell|short|^s$/.test(side)?"Short":/buy|long|^b$/.test(side)?"Long":"";
       let entry=pNum(g(r,"entry")),exit=pNum(g(r,"exit"));
@@ -1256,18 +1422,34 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
         const bp=pNum(g(r,"buyPrice")),sp=pNum(g(r,"sellPrice"));if(isFinite(bp)&&isFinite(sp)){entry=side==="Long"?bp:sp;exit=side==="Long"?sp:bp}}}
       if(!dt)return;if(M.time!=null&&g(r,"time")&&!dt.time)dt.time=String(g(r,"time")).slice(0,5);
       const sym=rootOf(g(r,"symbol"))||"?";const pnl=pNum(g(r,"pnl"));
-      out.push({id:uuid(),user_id:S.subject.id,date:dt.date,time:dt.time,account:I.acct||"Imported",symbol:sym,side:side||"Long",qty:Math.abs(pNum(g(r,"qty")))||1,
+      const D=I.det||{per:{},accts:[]},ra=D.ai>=0?String(r[D.ai]||"").trim():"",pr=D.per[ra]||{};
+      const firm=D.accts.length>1?(pr.firm||D.firm):D.firm,size=D.accts.length>1?(pr.size||D.size):D.size;
+      const account=I.acct||(ra?acctLabel(ra,firm,size):"Imported");
+      out.push({id:uuid(),user_id:S.subject.id,date:dt.date,time:dt.time,account,platform:D.platform||"",firm:firm||"",acctSize:size||"",symbol:sym,side:side||"Long",qty:Math.abs(pNum(g(r,"qty")))||1,
         entry:isFinite(entry)?entry:"",exit:isFinite(exit)?exit:"",stop:"",target:"",pnl:isFinite(pnl)?pnl:"",fees:isFinite(pNum(g(r,"fees")))?Math.abs(pNum(g(r,"fees"))):"",
         setup:"",session:"",emotions:[],feeling:"",followed:"",rating:0,shots:[],remark:"",notes:"",imported:true})});return out};
   const draw=()=>{if(!I.rows){$("#cMap").innerHTML="";return}const hd=I.rows[0];const prev=build();
-    $("#cMap").innerHTML=`<div class="card" style="margin-top:12px"><h3>Match columns</h3><div class="grid g4">${FIELDS.map(([k,l])=>`<label class="f">${l}<select class="i" data-f="${k}"><option value="">— none —</option>${hd.map((h,i)=>`<option value="${i}" ${I.map[k]===i?"selected":""}>${esc(h)}</option>`).join("")}</select></label>`).join("")}</div></div>
+    const D=I.det||{accts:[]};const nAc=D.accts.length;
+    $("#cMap").innerHTML=`<div class="card det" style="margin-top:12px"><h3>🔍 Detected from your file</h3>
+     <div class="det-chips"><span class="det-chip ${D.platform?"ok":""}"><small>Platform</small><b>${D.platform?`<span data-notr>${esc(D.platform)}</span>`:"Not recognised"}</b></span>
+      <span class="det-chip ${D.firm?"ok":""}"><small>Prop firm</small><b>${D.firm?`<span data-notr>${esc(D.firm)}</span>`:"Not found"}</b></span>
+      <span class="det-chip ${D.size?"ok":""}"><small>Account size</small><b class="mono">${D.size?money(D.size,0):"Not found"}</b></span>
+      <span class="det-chip ${nAc?"ok":""}"><small>${nAc>1?"Accounts in file":"Account"}</small><b>${nAc>1?nAc:nAc?`<span data-notr class="mono">${esc(D.accts[0])}</span>`:"Not in file"}</b></span></div>
+     <div class="grid g3" style="margin-top:10px">
+      <label class="f">Platform<input class="i" id="dPlat" list="dlPlat" value="${esc(D.platform||"")}" placeholder="e.g. Tradovate"></label><datalist id="dlPlat">${[...new Set(PLATFORMS.map(p=>p[0]))].map(p=>`<option>${esc(p)}</option>`).join("")}</datalist>
+      <label class="f">Prop firm<input class="i" id="dFirm" list="dlFirm" value="${esc(D.firm||"")}" placeholder="e.g. Apex Trader Funding"></label><datalist id="dlFirm">${FIRMS.map(f=>`<option>${esc(f[0])}</option>`).join("")}<option>Personal account</option></datalist>
+      <label class="f">Account size<select class="i" id="dSize"><option value="">—</option>${SIZES.map(s=>`<option value="${s}" ${D.size===s?"selected":""}>${money(s,0)}</option>`).join("")}</select></label></div>
+     <p class="mut" style="font-size:12px;margin:8px 0 0">${nAc>1?`<span>${nAc} accounts found: each trade keeps its own account.</span> `:""}<span>Detected automatically from the column names, account number and file name. Fix anything that's wrong.</span></p></div>
+    <div class="card" style="margin-top:12px"><h3>Match columns</h3><div class="grid g4">${FIELDS.map(([k,l])=>`<label class="f">${l}<select class="i" data-f="${k}"><option value="">— none —</option>${hd.map((h,i)=>`<option value="${i}" ${I.map[k]===i?"selected":""}>${esc(h)}</option>`).join("")}</select></label>`).join("")}</div></div>
     <div class="card" style="margin-top:12px"><h3>Preview — ${prev.length} trades</h3><div class="tw"><table class="t"><tr><th>Date</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Exit</th><th>Net P&L</th></tr>
      ${prev.slice(0,8).map(t=>`<tr><td>${t.date} ${t.time}</td><td class="mono">${esc(t.symbol)}</td><td>${t.side}</td><td>${t.qty}</td><td class="mono">${t.entry}</td><td class="mono">${t.exit}</td><td class="mono ${cls(tradeNet(t))}">${smoney(tradeNet(t))}</td></tr>`).join("")}</table></div>
      <p class="mut" style="font-size:12px">Total: <b class="${cls(prev.reduce((a,t)=>a+tradeNet(t),0))}">${smoney(prev.reduce((a,t)=>a+tradeNet(t),0))}</b>. After importing, open any trade to add the screenshot, emotions and notes.</p>
      <div class="row" style="justify-content:flex-end"><button class="btn" id="cClear">Cancel</button><button class="btn pri" id="cGo" ${prev.length?"":"disabled"}>Import ${prev.length} trades</button></div></div>`;
     $$("[data-f]").forEach(s=>s.onchange=()=>{const v=s.value;if(v==="")delete I.map[s.dataset.f];else I.map[s.dataset.f]=Number(v);draw()});
     $("#cClear").onclick=()=>{S._imp=null;render()};
-    $("#cGo").onclick=async()=>{const ts=build();$("#cGo").disabled=true;try{await API.saveTrades(ts);S.trades.push(...ts);const acct=I.acct||"Imported";S._imp=null;toast(`Imported ${ts.length} trades`);
+    const upd=(k,v)=>{I.det=I.det||{accts:[],per:{},ai:-1};I.det[k]=v;Object.values(I.det.per||{}).forEach(p=>{if(k==="firm")p.firm=v||p.firm;if(k==="size")p.size=v||p.size});autoName();draw()};
+    $("#dPlat").onchange=e=>upd("platform",e.target.value.trim()||null);$("#dFirm").onchange=e=>upd("firm",e.target.value.trim()||null);$("#dSize").onchange=e=>upd("size",Number(e.target.value)||null);
+    $("#cGo").onclick=async()=>{const ts=build();$("#cGo").disabled=true;try{await API.saveTrades(ts);S.trades.push(...ts);const ua=[...new Set(ts.map(t=>t.account))];const acct=ua.length===1?ua[0]:"all";S._imp=null;toast(`Imported ${ts.length} trades`);
       if(embedded){S.acct=acct;S.range="all";S.calMonth=null;render();window.scrollTo({top:0,behavior:"smooth"})}else go("journal")}catch(e){$("#cGo").disabled=false;toast("Import failed: "+(e.message||e))}}};
   draw();
 }
@@ -1283,7 +1465,8 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
     const pl=plans.filter(p=>p.user_id===s.id);const brk=ts.filter(t=>t.followed==="No").length;
     let mlb=0;pl.forEach(p=>{const dn=ts.filter(t=>t.date===p.date).reduce((a,t)=>a+tradeNet(t),0);if(num(p.maxLoss)>0&&dn<=-num(p.maxLoss))mlb++});
     const em=groupBy(ts,t=>(t.emotions||[]).filter(e=>EMO_BAD.includes(e)));
-    return {s,c,last,active:last>=wkS,plans:pl.length,hasNext:pl.some(p=>p.date>=todayStr()),brk,mlb,worstEmo:em.filter(r=>r.net<0).sort((a,b)=>a.net-b.net)[0]}}).sort((a,b)=>b.c.net-a.c.net);
+    const td=todayStr(),pT=pl.find(p=>p.date===td),jT=ts.some(t=>t.date===td)||!!(pT&&((pT.review||"").trim()||pT.followed));
+    return {s,c,last,active:last>=wkS,plans:pl.length,hasNext:pl.some(p=>p.date>=todayStr()),jT,pT:!!pT,pN:pl.some(p=>p.date===nd),brk,mlb,worstEmo:em.filter(r=>r.net<0).sort((a,b)=>a.net-b.net)[0]}}).sort((a,b)=>b.c.net-a.c.net);
   const all=calc(trades.filter(t=>students.some(s=>s.id===t.user_id)));
   const emoAll=groupBy(trades,t=>(t.emotions||[]).filter(e=>EMO_BAD.includes(e))).filter(r=>r.net<0).sort((a,b)=>a.net-b.net).slice(0,3);
   /* today's discipline: journaled today? plan for today? plan for tomorrow? */
@@ -1329,9 +1512,9 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    </div>
    ${emoAll.length?`<div class="card" style="margin-bottom:12px"><h3>Group weak spots</h3>${emoAll.map(r=>`<div class="insight"><span class="ic">⚠️</span><span><b>${esc(r.k)}</b> trades across students: <b class="neg">${money(r.net,0)}</b> over ${r.n} trades (${pct(r.wr,0)} win). Good topic for the next live.</span></div>`).join("")}</div>`:""}
    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">Students</h3><div class="row"><input class="i" id="aq" placeholder="Search name, email, Telegram" style="width:240px"><button class="btn sm" id="aExp">Export CSV</button></div></div>
-   <div class="tw"><table class="t" id="aT"><tr><th>Name (username)</th><th>Email</th><th>Telegram username</th><th>Trades</th><th>Net P&L</th><th>Win %</th><th>PF</th><th>Broke plan</th><th>Max-loss days</th><th>Weak spot</th><th>Plan</th></tr>
-   ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b data-notr>${esc(r.s.name||"—")}</b> <span class="tag">👤 Open</span></td><td data-notr><a class="lnk" href="mailto:${esc(r.s.email||"")}" onclick="event.stopPropagation()">${esc(r.s.email||"—")}</a></td><td class="mono" data-notr>${tgUser(r.s)?`<a class="lnk" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">@${esc(tgUser(r.s))}</a>`:"—"}</td><td class="mono">${r.c.n}</td><td class="mono ${cls(r.c.net)}">${smoney(r.c.net,0)}</td><td class="mono">${pct(r.c.wr,0)}</td><td class="mono">${isFinite(r.c.pf)?r.c.pf.toFixed(2):"—"}</td>
-     <td class="mono ${r.brk?"neg":""}">${r.brk}</td><td class="mono ${r.mlb?"neg":""}">${r.mlb}</td><td>${r.worstEmo?`<span class="tag bad">${esc(r.worstEmo.k)}</span>`:"—"}</td><td>${r.hasNext?'<span class="ok">✔</span>':'<span class="mut">—</span>'}</td></tr>`).join("")||`<tr><td colspan="11" class="empty">No students yet. Share the website link — they sign up for free.</td></tr>`}</table></div></div>
+   <div class="tw"><table class="t" id="aT"><tr><th>Name (username)</th><th>Email</th><th>Telegram username</th><th>Trades</th><th>PF</th><th>Broke plan</th><th>Weak spot</th><th>Journaled today</th><th>Plan today</th><th>Plan tomorrow</th></tr>
+   ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b data-notr>${esc(r.s.name||"—")}</b> <span class="tag">👤 Open</span></td><td data-notr><a class="lnk" href="mailto:${esc(r.s.email||"")}" onclick="event.stopPropagation()">${esc(r.s.email||"—")}</a></td><td class="mono" data-notr>${tgUser(r.s)?`<a class="lnk" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">@${esc(tgUser(r.s))}</a>`:"—"}</td><td class="mono">${r.c.n}</td><td class="mono">${isFinite(r.c.pf)?r.c.pf.toFixed(2):"—"}</td>
+     <td class="mono ${r.brk?"neg":""}">${r.brk}</td><td>${r.worstEmo?`<span class="tag bad">${esc(r.worstEmo.k)}</span>`:"—"}</td>${[r.jT,r.pT,r.pN].map(v=>`<td>${v?'<span class="dyes">✔ Yes</span>':'<span class="dno">✖ No</span>'}</td>`).join("")}</tr>`).join("")||`<tr><td colspan="10" class="empty">No students yet. Share the website link — they sign up for free.</td></tr>`}</table></div></div>
    ${rejected.length?`<details class="card" style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:600">Rejected requests (${rejected.length})</summary><div class="tw" style="margin-top:8px"><table class="t" id="rejT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${rejected.map(p=>reqRow(p,true)).join("")}</table></div></details>`:""}`;
   $$("tr[data-pid] button[data-act]",el).forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const id=b.closest("tr").dataset.pid,act=b.dataset.act;const p=profs.find(x=>x.id===id);
     const go_=async()=>{b.disabled=true;try{await API.setStatus(id,act);toast(act==="approved"?"Student approved":"Request rejected");vAdmin(el)}catch(e){b.disabled=false;toast(e.message||String(e))}};
@@ -1382,7 +1565,7 @@ function resultsStripHTML(mod){if(!RESULTS.length)return "";const list=String(mo
   const secs=Math.round(list.length*(String(mod||"").includes("big")?6:2.5));
   return `<div class="rstrip ${mod||""}"><div class="rtrack" style="animation-duration:${secs}s">${imgs}${imgs}</div></div>`}
 function resultsBtn(){return `<a class="tg-link res" href="${ABOUT.channel}" target="_blank" rel="noopener">${SOCIAL[0].icon}<span>See all results on Telegram</span></a>`}
-function vAbout(el){
+function vAbout(el){el.classList.add("about-v");
   el.innerHTML=`<div class="about-hero"><div class="logo lg" role="img" aria-label="Tradeversity"></div><div><h1>About <span data-notr>TRADEVERSITY</span></h1>
     <p class="sub" style="max-width:640px">Tradeversity is a trading mentorship and bootcamp not like the standard simple trading courses we see everyday and community founded by <b>Brown Algo</b> and <b>ZNtrading</b>. We teach a precise scalping trading system with clean entries and confirmations using our experience and advanced technicals at the charts, of course with rule-based way to trade having and preparing a clear daily bias, a written plan, strict risk, and an honest journal.</p></div></div>
    ${aboutStatsHTML()}
@@ -1440,6 +1623,8 @@ I18N.start();
 
 /* ============ boot ============ */
 (async function boot(){
+  const shareTok=new URLSearchParams(location.search).get("share");
+  if(shareTok&&/^[a-f0-9]{16,64}$/i.test(shareTok)){try{await bootShare(shareTok)}catch(e){console.error(e);$("#shMain").innerHTML=`<div class="card empty">Couldn't reach the server: ${esc(e.message||e)}</div>`}return}
   try{
     await Cloud.init();API=Cloud;
     const u=await API.session();if(u)await enter(u);else showAuth();
