@@ -848,7 +848,7 @@ function newsBox(date,canInsert){const ev=newsFor(date),ho=holidaysFor(date),lat
   return `<div class="newsbox" id="newsBox" data-date="${date}" data-ins="${canInsert?1:0}">
     <div class="nb-h"><b>📰 USD news</b> <span class="mut">· Forex Factory</span><span class="nb-lg"><i class="fold red"></i><span>Red folder</span><i class="fold org"></i><span>Orange folder</span></span></div>
     ${holRows(ho)}${!S.newsLoaded?`<div class="mut nb-e">Loading news…</div>`:ev.length?rows:ho.length?"":later?`<div class="mut nb-e"><span>Next week's calendar isn't published yet.</span> <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">Forex Factory</a></div>`:`<div class="mut nb-e">No red or orange USD news this day.</div>`}
-    ${ev.some(n=>n.impact==="High")?`<div class="nb-w">⚠️ Red folder: no new trades 5 min before and after. Expect volatility.</div>`:""}
+    ${ev.some(n=>n.impact==="High")?`<div class="nb-w">⚠️ Red folder: expect volatility.</div>`:""}
     ${canInsert&&ev.length?`<button type="button" class="btn sm" id="newsIns">➕ Add to my plan</button>`:""}
   </div>`}
 function coachNewsHTML(){const today=todayStr(),nd=nextTradingDay(),now=new Date().toISOString();let hh="";
@@ -897,7 +897,7 @@ function newsPanelBody(tab){if(!S.newsLoaded)return `<div class="mut nb-e">Loadi
     return html||`<div class="mut nb-e">No red or orange USD news this week.</div>`}
   const d=tab==="yday"?prevTradingDay():tab==="tmrw"?nextTradingDay():todayStr();const ev=newsFor(d),ho=holidaysFor(d);
   return `<div class="nday"><span data-notr>${esc(fmtDate(d))}</span></div>`+holRows(ho)+(ev.length?newsRows(ev):ho.length?"":d>newsWeekEnd()?`<div class="mut nb-e"><span>Next week's calendar isn't published yet.</span> <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">Forex Factory</a></div>`:`<div class="mut nb-e">No red or orange USD news this day.</div>`)+
-    (ev.some(n=>n.impact==="High")?`<div class="nb-w">⚠️ Red folder: no new trades 5 min before and after. Expect volatility.</div>`:"")}
+    (ev.some(n=>n.impact==="High")?`<div class="nb-w">⚠️ Red folder: expect volatility.</div>`:"")}
 function newsPanel(){const tab=S._newsTab||"today";const tabs=[["yday","Yesterday"],["today","Today"],["tmrw","Tomorrow"],["week","This week"]];
   return `<div class="card newspanel" id="newsPanel" style="margin-bottom:14px">
     <div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">📰 USD news <span class="mut" style="text-transform:none;letter-spacing:0;font-weight:500">· Forex Factory</span></h3>

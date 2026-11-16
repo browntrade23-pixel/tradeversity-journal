@@ -321,7 +321,7 @@ const T={
 "Loading news…":["Chargement des news…","جارٍ تحميل الأخبار…"],
 "Next week's calendar isn't published yet.":["Le calendrier de la semaine prochaine n'est pas encore publié.","لم يُنشر تقويم الأسبوع القادم بعد."],
 "No red or orange USD news this day.":["Aucune news USD rouge ou orange ce jour-là.","لا توجد أخبار دولار حمراء أو برتقالية في هذا اليوم."],
-"⚠️ Red folder: no new trades 5 min before and after. Expect volatility.":["⚠️ Dossier rouge : pas de nouveau trade 5 min avant et après. Attendez-vous à de la volatilité.","⚠️ الملف الأحمر: لا صفقات جديدة قبل وبعد 5 دقائق. توقّع تقلبات."],
+"⚠️ Red folder: expect volatility.":["⚠️ Dossier rouge : attendez-vous à de la volatilité.","⚠️ الملف الأحمر: توقّع تقلبات."],
 "➕ Add to my plan":["➕ Ajouter à mon plan","➕ أضف إلى خطتي"],
 "News added to your plan":["News ajoutées à votre plan","تمت إضافة الأخبار إلى خطتك"],
 "Today":["Aujourd'hui","اليوم"],
