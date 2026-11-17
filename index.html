@@ -293,15 +293,17 @@ html[lang=ar] .gate-name,html[lang=ar] .gate-hint{letter-spacing:0}
 .tg-link svg{width:16px;height:16px;flex:none}
 .tg-link.res{border-color:rgba(39,194,108,.45)}.tg-link.res:hover{border-color:var(--green);box-shadow:0 0 18px rgba(39,194,108,.3)}
 /* Earn2Trade promo ticket */
-.promo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;text-align:start;padding:12px 14px;border-radius:14px;position:relative;
+.promo{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px 14px;text-align:start;padding:12px 14px;border-radius:14px;position:relative;
   background:linear-gradient(135deg,rgba(245,185,66,.14),rgba(14,19,31,.85) 60%);border:1px dashed rgba(245,185,66,.55);backdrop-filter:blur(6px)}
 .promo-tag{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
 .promo-t{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px}
 .promo-pct{background:var(--gold);color:#1b1305;border-radius:6px;padding:1px 7px;font-size:13px;font-weight:900}
 .promo-s{font-size:12px;color:var(--muted);margin-top:2px}
 .promo-code{font-family:"JetBrains Mono",monospace;font-weight:700;color:var(--gold2);letter-spacing:.12em;border:1px solid rgba(245,185,66,.4);border-radius:6px;padding:1px 6px}
-.promo-r{display:flex;gap:6px;flex-wrap:wrap}
-.promo-gw{display:flex;align-items:center;gap:6px;margin-top:7px;padding:4px 9px 4px 6px;border-radius:99px;font-size:11.5px;font-weight:700;color:#ffd77a;width:fit-content;max-width:100%;
+.promo-r{display:flex;gap:6px;justify-content:flex-end}
+.promo-r .btn{white-space:nowrap}
+@media(max-width:430px){.promo{grid-template-columns:1fr}.promo-r .btn{flex:1;justify-content:center;text-align:center}}
+.promo-gw{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:7px;padding:6px 10px;border-radius:9px;font-size:12px;font-weight:700;color:#ffd77a;text-align:center;line-height:1.35;
   background:linear-gradient(90deg,rgba(245,185,66,.18),rgba(255,95,168,.14));border:1px solid rgba(245,185,66,.35)}
 .gw-ic{display:inline-block;animation:gwPop 1.8s ease-in-out infinite}
 @keyframes gwPop{0%,100%{transform:scale(1) rotate(0)}20%{transform:scale(1.25) rotate(-12deg)}40%{transform:scale(1) rotate(8deg)}60%{transform:rotate(0)}}
@@ -2655,10 +2657,10 @@ document.addEventListener("click",e=>{const im=e.target.closest&&e.target.closes
 const PROMO={url:"https://www.earn2trade.com/?a_pid=BROWN23",code:"BROWN23",pct:60};
 function promoHTML(){return `<div class="promo"><div class="promo-l"><div class="promo-tag">Partner offer</div>
   <div class="promo-t"><b>Earn2Trade</b> <span class="promo-pct">-${PROMO.pct}%</span></div>
-  <div class="promo-s">Use code <span class="promo-code" data-notr>${PROMO.code}</span></div>
-  <div class="promo-gw"><span class="gw-ic">🎁</span><span>Buy an account with this code and you enter the giveaway draw</span></div></div>
+  <div class="promo-s">Use code <span class="promo-code" data-notr>${PROMO.code}</span></div></div>
   <div class="promo-r"><button type="button" class="btn sm promo-copy">Copy code</button>
-  <a class="btn sm pri" href="${PROMO.url}" target="_blank" rel="sponsored noopener">Get 60% off</a></div></div>`}
+  <a class="btn sm pri" href="${PROMO.url}" target="_blank" rel="sponsored noopener">Get 60% off</a></div>
+  <div class="promo-gw"><span class="gw-ic">🎁</span><span>Buy an account with this code and you enter the giveaway draw</span></div></div>`}
 $$("[data-promo]").forEach(el=>el.innerHTML=promoHTML());
 document.addEventListener("click",async e=>{const b=e.target.closest&&e.target.closest(".promo-copy");if(!b)return;
   try{await navigator.clipboard.writeText(PROMO.code)}catch(err){const t=document.createElement("textarea");t.value=PROMO.code;document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(_){}t.remove()}
