@@ -1641,7 +1641,12 @@ $("#signupForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.ta
   $("#authMsg").textContent="Creating your account…";
   try{const r=await API.signUp({email:f.get("email").trim(),password:f.get("password"),name:f.get("name").trim(),telegram:tg});
     if(r.needsConfirm)showOtp(f.get("email").trim(),true);
-    else await enter(r.user)}catch(err){$("#authMsg").innerHTML=authErr(err)}};
+    else await enter(r.user)}catch(err){const m=String(err&&err.message||err),em=f.get("email").trim();
+      /* "email rate limit exceeded" / "already registered": most of the time the account already exists → offer to log in */
+      if(/rate limit|over_email_send_rate|429|already registered|already exists|already been registered/i.test(m)){
+        $("#authMsg").innerHTML=`<span class="neg">${esc(I18N.t(/rate limit|over_email|429/i.test(m)?"Too many sign-ups right now, we can't send the email code.":"This email already has an account."))}</span><br><span class="mut">${esc(I18N.t("If you already created your account before, just log in with your email and password."))}</span><br><button type="button" class="btn sm pri" id="suToLogin" style="margin-top:8px">${esc(I18N.t("Log in instead"))}</button>`;
+        $("#suToLogin").onclick=()=>{$("#tabLogin").click();const le=$("#loginForm [name=email]");if(le)le.value=em;const lp=$("#loginForm [name=password]");if(lp)lp.focus()}}
+      else $("#authMsg").innerHTML=authErr(err)}};
 /* ---- email verification code (6-digit code sent by email) ---- */
 let _otpMail="",_otpCool=0;
 function showOtp(email,justSent){_otpMail=email;["loginForm","signupForm"].forEach(id=>$("#"+id).classList.add("hidden"));$("#authCard .seg").classList.add("hidden");
