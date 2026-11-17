@@ -132,6 +132,10 @@ textarea.i{min-height:80px;resize:vertical}
 .tmeta .t2{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tpnl{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:16px;text-align:right}
 .rpk-auto{font-size:12px;align-self:center}
+.ntf-card{margin:0 0 12px}.ntf-card>summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none}.ntf-card>summary::-webkit-details-marker{display:none}
+.ntf-hic{font-size:22px}.ntf-card>summary>span:last-child{display:flex;flex-direction:column}.ntf-sub{font-size:12px}
+.ntf-list{display:grid;gap:6px}.ntf-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);cursor:pointer}
+.ntf-row input{width:18px;height:18px;accent-color:var(--gold,#f5b942);flex:none}.ntf-ic{font-size:18px}.ntf-tx{display:flex;flex-direction:column;gap:2px}.ntf-tx small{font-size:12px}
 .rpk-rules{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:10px;border:1px dashed var(--line2);background:var(--panel)}
 .rpk-dd{display:flex;gap:6px;flex-wrap:wrap}.rpk-dd .chip.warn{border-color:rgba(245,185,66,.5)}.rpk-dd .chip.ok{border-color:rgba(34,197,94,.45)}
 .rpk-ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
@@ -1647,7 +1651,7 @@ window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me
 function render(){renderTabs();const v=$("#view");
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
   const fn={journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
-  v.innerHTML=h+'<div id="vb"></div>';fn($("#vb"));
+  v.innerHTML=h+'<div id="vb"></div>';Promise.resolve(fn($("#vb"))).then(()=>bindNotify(v)).catch(()=>{});
   if(S.readonly)$("#backAdmin").onclick=()=>go("admin");}
 
 /* ============ filters ============ */
@@ -2253,8 +2257,30 @@ function rulesSave(acct,r){const a=rulesAll();if(r)a[acct]=r;else delete a[acct]
    This device keeps a copy; on login the account copy wins, and an old device-only copy is uploaded once. */
 function settingsPush(){if(!API||!API.saveSettings||!S.me)return;clearTimeout(settingsPush._t);
   settingsPush._t=setTimeout(()=>{let comm={};try{comm=JSON.parse(localStorage.getItem(calcKey("comm")))||{}}catch(e){}
-    API.saveSettings({rules:rulesAll(),comm}).catch(()=>toast(I18N.t("Couldn't save your settings online. They are kept on this device.")))},600)}
+    API.saveSettings({rules:rulesAll(),comm,notify:notifyGet(),lang:(window.I18N&&I18N.lang)||"en"}).catch(()=>toast(I18N.t("Couldn't save your settings online. They are kept on this device.")))},600)}
+/* ---------- Telegram reminders (sent by the bot, see supabase/functions/tg-reminders) ---------- */
+const NOTIFY_DEF={news:true,plan:true,loss:true};
+const notifyGet=()=>Object.assign({},NOTIFY_DEF,S._notify||{});
+async function tgFn(q){const{data}=await Cloud.sb.auth.getSession();const tok=data&&data.session&&data.session.access_token;
+  const r=await fetch(CONFIG.SUPABASE_URL+"/functions/v1/tg-reminders?"+q,{headers:{Authorization:"Bearer "+tok,apikey:CONFIG.SUPABASE_ANON_KEY}});return r.json()}
+function notifyCard(admin){if(S.readonly||!S.me||!CONFIG.TG_BOT)return "";const n=notifyGet(),ok=!!S.me.tgOk,bot="@"+CONFIG.TG_BOT;
+  const row=(k,ic,t,s)=>`<label class="ntf-row"><input type="checkbox" data-ntf="${k}" ${n[k]?"checked":""}><span class="ntf-ic">${ic}</span><span class="ntf-tx"><b>${esc(I18N.t(t))}</b><small class="mut">${esc(I18N.t(s))}</small></span></label>`;
+  return `<details class="card ntf-card" id="ntfBox" ${S._ntfOpen?"open":""}><summary><span class="ntf-hic">🔔</span><span><b>${esc(I18N.t(admin?"Your weekly summary on Telegram":"Telegram reminders"))}</b><span class="mut ntf-sub">${ok?`${esc(I18N.t("Sent by"))} <span data-notr>${bot}</span>`:esc(I18N.t("Connect your Telegram to get them"))}</span></span></summary>
+   <div style="margin-top:10px">
+   ${!ok?`<div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><span class="mut" style="font-size:13px">${esc(I18N.t("Verify your Telegram once so the bot can write to you."))}</span><button class="btn sm pri" type="button" id="ntfConnect">✈️ <span>Connect Telegram</span></button></div>`:
+   admin?`<p class="mut" style="font-size:13px;margin:0 0 10px">${esc(I18N.t("Every Sunday at 20:00 (Algiers time): top students, broken plans, inactive students, requests waiting and affiliate clicks."))}</p>
+     <div class="row" style="justify-content:flex-end"><button class="btn sm pri" type="button" data-ntftest="weekly">📊 <span>Send me this week's summary now</span></button></div>`:
+   `<div class="ntf-list">${row("news","🔴","Red news","15 minutes and 5 minutes before each red (high impact) news")}${row("plan","🧭","Plan tomorrow","21:30 (Algiers time), Sunday to Thursday, if tomorrow has no plan yet")}${row("loss","🛑","Daily loss limit","At 80% of your limit and when it is reached (prop firm rules or your plan's max loss)")}</div>
+     <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:10px"><small class="mut">${esc(I18N.t("Keep the bot chat open: if you block the bot, reminders can't reach you."))}</small><button class="btn sm" type="button" data-ntftest="1">📨 <span>Send me a test message</span></button></div>`}
+   </div></details>`}
+function bindNotify(el){const box=$("#ntfBox",el);if(!box)return;box.ontoggle=()=>{S._ntfOpen=box.open};
+  $$("[data-ntf]",box).forEach(c=>c.onchange=()=>{S._notify=Object.assign(notifyGet(),{[c.dataset.ntf]:c.checked});settingsPush();toast(I18N.t(c.checked?"Reminder on":"Reminder off"))});
+  const cn=$("#ntfConnect",box);if(cn)cn.onclick=()=>showTg(S.me);
+  $$("[data-ntftest]",box).forEach(b=>b.onclick=async()=>{b.disabled=true;try{const r=await tgFn("test="+b.dataset.ntftest);
+    toast(r&&r.ok?I18N.t("Sent. Check your Telegram."):I18N.t(r&&r.error==="no_telegram"?"Connect your Telegram first.":"Couldn't send. Press Start in the bot, then try again."))}catch(e){toast(I18N.t("Couldn't send. Press Start in the bot, then try again."))}b.disabled=false})}
 async function settingsPull(){if(!API||!API.getSettings||!S.me)return;try{const d=await API.getSettings();
+  if(d&&d.notify)S._notify=d.notify;const nb=$("#ntfBox");if(nb){const v=nb.closest("#view")||document;nb.outerHTML=notifyCard(S.me.role==="admin");bindNotify(v)}
+  if(!d||d.lang!==((window.I18N&&I18N.lang)||"en"))setTimeout(settingsPush,1500);   /* the bot writes in the student's language */
   const hasCloud=d&&(Object.keys(d.rules||{}).length||Object.keys(d.comm||{}).length);
   if(hasCloud){localStorage.setItem(rulesKey(),JSON.stringify(d.rules||{}));localStorage.setItem(calcKey("comm"),JSON.stringify(d.comm||{}));S._commR=null;if(S.view==="stats")render()}
   else if(Object.keys(rulesAll()).length||localStorage.getItem(calcKey("comm")))settingsPush()}catch(e){}}
@@ -2565,7 +2591,7 @@ function vPlan(el){
   const nCk=RULES.filter(r=>(p.rules||{})[r]).length;
   el.innerHTML=`<div class="row" style="justify-content:space-between"><div><h1>Trading plan</h1><p class="sub">Plan tomorrow tonight. Execute it tomorrow, then review it.</p></div>
    <div class="row"><input class="i" type="date" id="pDate" value="${cur}" style="width:auto">${dates.length?`<select class="i" id="pHist" style="width:auto"><option value="">Past plans…</option>${dates.map(d=>`<option value="${d}">${d}</option>`).join("")}</select>`:""}</div></div>
-  ${redAlert(cur,"plan")}
+  ${redAlert(cur,"plan")}${notifyCard()}
   <form id="pf" class="grid">
    <div class="grid g2 daytype">
     <label class="card rest-card trade-card"><input type="radio" name="dayType" value="trade" ${!p.rest&&p.dayType==="trade"?"checked":""} ${ro}><span><b>📈 Trading day</b><span class="mut">I'm trading this day. I follow my plan and my pre-trade checklist.</span></span></label>
@@ -3325,6 +3351,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
      <td><div class="row" style="justify-content:flex-end">${rej?"":`<button class="btn sm danger" data-act="rejected">✖ Reject</button>`}${(()=>{const ok=p.tgOk&&p.emailOk!==false;
        return `<button class="btn sm pri" data-act="approved" ${ok?"":`disabled title="${esc(I18N.t("Can be approved after the student verifies Telegram and email"))}"`}>${ok?"✔ <span>Approve</span>":"🔒 <span>Waiting for verification</span>"}</button>`})()}</div></td></tr>`;
   el.innerHTML=`<h1>👑 Admin dashboard</h1><p class="sub">All your Tradeversity students in one place. Click a student to open their journal, stats and plans (read-only).</p>
+   ${notifyCard(true)}
    ${pending.length?`<div class="card" style="margin-bottom:12px;border-color:var(--gold)"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0;color:var(--gold)">🔔 Pending requests</h3><span class="tag" style="background:rgba(245,185,66,.15);color:var(--gold)">${pending.length}</span></div>
      <p class="mut" style="margin:0 0 8px;font-size:12px">These people signed up and are waiting for you. They can't use the journal until you approve them.</p>
      <div class="tw"><table class="t" id="reqT"><tr><th>Student</th><th>Telegram check</th><th>Requested</th><th></th></tr>${pending.map(p=>reqRow(p,false)).join("")}</table></div></div>`:""}
@@ -3350,6 +3377,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b data-notr>${esc(r.s.name||"—")}</b> <span class="tag">👤 Open</span></td><td data-notr><a class="lnk" href="mailto:${esc(r.s.email||"")}" onclick="event.stopPropagation()">${esc(r.s.email||"—")}</a></td><td class="mono" data-notr>${tgUser(r.s)?`${r.s.tgOk?"✅":"⚠️"} <a class="lnk" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">@${esc(tgUser(r.s))}</a>`:"—"}</td><td class="mono">${r.c.n}</td>
      <td class="mono ${r.brk?"neg":""}">${r.brk}</td><td>${r.worstEmo?`<span class="tag bad">${esc(r.worstEmo.k)}</span>`:"—"}</td>${[r.jT,r.pT,r.pN].map(v=>`<td>${v?'<span class="dyes">✔ Yes</span>':'<span class="dno">✖ No</span>'}</td>`).join("")}</tr>`).join("")||`<tr><td colspan="9" class="empty">No students yet. Share the website link — they sign up for free.</td></tr>`}</table></div></div>
    ${rejected.length?`<details class="card" style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:600">Rejected requests (${rejected.length})</summary><div class="tw" style="margin-top:8px"><table class="t" id="rejT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${rejected.map(p=>reqRow(p,true)).join("")}</table></div></details>`:""}`;
+  bindNotify(el);
   $$("tr[data-pid] button[data-act]",el).forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const id=b.closest("tr").dataset.pid,act=b.dataset.act;const p=profs.find(x=>x.id===id);
     const go_=async()=>{b.disabled=true;try{await API.setStatus(id,act);toast(act==="approved"?"Student approved":"Request rejected");vAdmin(el)}catch(e){b.disabled=false;const m=String(e.message||e);
       toast(/not_verified_telegram/.test(m)?I18N.t("This student hasn't verified Telegram yet."):/not_verified_email/.test(m)?I18N.t("This student hasn't verified the email yet."):m)}};
