@@ -26,7 +26,7 @@ const F=[
  fundedH:[["buf","Balance must be above drawdown + $100 before the first payouts"],["cons","Breaking it does not fail you, but blocks the payout"],["note","Each funded account allows 6 payouts, then it ends"]],
  payout:[["days","5 qualifying days (not in a row)"],["min","$500"],["split","100%"],["cap","Grows with each payout (50K: $1,500 → $3,000)"]]},
 {id:"bulenox",name:"Bulenox",type:"futures",site:"bulenox.com",dz:"yes",
- sizes:["$25K","$50K","$100K","$150K","$250K"],plans:"Legacy, Momentum, Fast Track",
+ sizes:["$25K","$50K","$100K","$150K"],plans:"Qualification (Option 1 trailing / Option 2 end of day), Fast Track, Momentum",
  eval:[["t","Yes"],["dd","Trailing or end-of-day"],["cons","None in the evaluation"]],
  evalH:[["fee","Activation fee to get the Master (funded) account"],["note","Evaluation profits are not carried to the Master account"]],
  funded:[["cons","Best day ≤ 40% of profit at every payout"],["buf","Safety reserve stays in the account (50K: about $2,600)"]],

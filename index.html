@@ -1100,6 +1100,7 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
 .pf-szp{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .pf-sz{display:inline-flex;align-items:baseline;gap:5px;padding:2px 8px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);font-size:11.5px;white-space:nowrap}
 .pf-sz b{font-family:"JetBrains Mono",monospace;font-weight:800;color:var(--text)}.pf-sz i{font-style:normal;color:var(--gold);font-weight:700}
+.pf-sz.cp{border-color:rgba(39,194,108,.45);background:rgba(39,194,108,.08)}.pf-sz.cp s{color:var(--muted);font-weight:600}.pf-sz.cp i{color:var(--green);font-weight:800}
 .pf-cp{display:inline-flex;align-items:center;gap:4px;margin-top:4px;width:fit-content;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700;background:rgba(39,194,108,.14);color:var(--green);border:1px solid rgba(39,194,108,.4)}
 .pf-row .pf-tx{gap:3px}
 /* size buttons show their price */
@@ -2645,7 +2646,7 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
    <div class="pf-list">${list.length?list.map(f=>{const L=f.name.replace(/^The /,"").charAt(0).toUpperCase();const h=L!==letter?(letter=L,`<div class="pf-letter"><span>${L}</span></div>`):"";
      const mini=(ic,t,items,cl)=>items&&items.length?`<div class="pf-mini ${cl}"><h4>${ic} <span>${t}</span></h4><ul>${items.map(pfLi).join("")}</ul></div>`:"";
      f=Object.assign({},f,pfLoc(f));
-     return `${h}<div class="pf-item ${f.type}"><button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b>${cpBadge(f.id)}<span class="pf-szp" data-notr>${f.sizes.map(s=>{const p=sizePrice(f.id,s);return `<span class="pf-sz"><b>${esc(s)}</b>${p!=null?`<i>${esc(priceTxt(p))}</i>`:""}</span>`}).join("")}</span></span>${dzBadge(f)}<span class="pf-go">›</span></button>
+     return `${h}<div class="pf-item ${f.type}"><button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b>${cpBadge(f.id)}<span class="pf-szp" data-notr>${f.sizes.map(s=>sizeChip(f,s)).join("")}</span></span>${dzBadge(f)}<span class="pf-go">›</span></button>
       <details class="pf-rules"${S._pfShut?"":" open"}><summary><span>Rules &amp; hidden rules</span></summary>
        <div class="pf-grid">${mini("📝","Evaluation: rules",f.eval,"r")}${mini("🕵️","Evaluation: hidden rules",f.evalH,"h")}${mini("🏦","Funded: rules",f.funded,"r f")}${mini("🕵️","Funded: hidden rules",f.fundedH,"h")}</div>
        ${mini("💸","Withdrawal conditions",f.payout,"p")}</details></div>`}).join("")
@@ -2687,6 +2688,13 @@ const progHas=(P,s)=>!!(P&&(P.pct||(P.rows&&P.rows[s])));
 /* price of one size: from a given plan, or the cheapest plan that has it */
 function sizePrice(id,s,pi){const D=(window.PF_SIZES||{})[id];if(!D)return null;const ps=pi!=null?[D.progs[pi]]:D.progs;let best=null,bv=null;
   ps.forEach(P=>{if(!P)return;const raw=(P.rows&&P.rows[s]&&P.rows[s].price)??(P.prices&&P.prices[s]);if(raw==null)return;const v=firstNum(raw);if(best==null||(v!=null&&(bv==null||v<bv))){best=raw;bv=v}});return best}
+/* one size in the list: firms with my coupon show the official price crossed out and the coupon price,
+   taken from the plan the code works on (e.g. Bulenox Option 1) */
+function sizeChip(f,s){const k=Object.keys(COUPONS).find(c=>COUPONS[c][f.id]),d=k&&COUPONS[k][f.id],D=(window.PF_SIZES||{})[f.id];
+  if(d&&D){const pi=d.prog?D.progs.findIndex(p=>p.name.startsWith(d.prog)):null,p=sizePrice(f.id,s,pi!=null&&pi>=0?pi:null),v=firstNum(p);
+    if(v!=null){const mo=/\/mo/.test(String(p)),a=v*(1-d.pct/100),m=x=>money(x,x%1?2:0)+(mo?"/"+I18N.t("mo"):"");
+      return `<span class="pf-sz cp"><b>${esc(s)}</b><s>${m(v)}</s><i>${m(a)}</i></span>`}}
+  const p=sizePrice(f.id,s);return `<span class="pf-sz"><b>${esc(s)}</b>${p!=null?`<i>${esc(priceTxt(p))}</i>`:""}</span>`}
 /* badge in the list for firms that have one of my coupon codes */
 function cpBadge(id){const k=Object.keys(COUPONS).find(c=>COUPONS[c][id]);if(!k)return "";const d=COUPONS[k][id];
   return `<span class="pf-cp">🏷️ <b data-notr>-${d.pct}%</b> <span>with</span> <b data-notr>${esc(k)}</b>${d.prog?` <span class="mut" data-notr>(${esc(d.prog)})</span>`:""}</span>`}
