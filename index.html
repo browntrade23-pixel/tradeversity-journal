@@ -1100,6 +1100,10 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
 .pf-szp{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .pf-sz{display:inline-flex;align-items:baseline;gap:5px;padding:2px 8px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);font-size:11.5px;white-space:nowrap}
 .pf-sz b{font-family:"JetBrains Mono",monospace;font-weight:800;color:var(--text)}.pf-sz i{font-style:normal;color:var(--gold);font-weight:700}
+.pfu-list{display:grid;gap:6px;max-height:320px;overflow:auto}
+.pfu-row{display:flex;gap:10px;padding:8px 10px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}.pfu-row.new{border-color:color-mix(in srgb,var(--gold) 50%,transparent)}
+.pfu-row p{margin:2px 0 0;font-size:13px;line-height:1.45}.pfu-ic{font-size:17px}
+.pfu-new{font-size:12px;font-weight:800;padding:2px 10px;border-radius:99px;background:var(--gold);color:#1b1305}
 .pf-sz.cp{border-color:rgba(39,194,108,.45);background:rgba(39,194,108,.08)}.pf-sz.cp s{color:var(--muted);font-weight:600}.pf-sz.cp i{color:var(--green);font-weight:800}
 .pf-cp{display:inline-flex;align-items:center;gap:4px;margin-top:4px;width:fit-content;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700;background:rgba(39,194,108,.14);color:var(--green);border:1px solid rgba(39,194,108,.4)}
 .pf-row .pf-tx{gap:3px}
@@ -1244,7 +1248,7 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
 
 <script src="i18n.js"></script>
 <script src="news-info.js"></script>
-<script src="indicator-video.js"></script><script src="propfirms.js"></script><script src="propfirms-sizes.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
+<script src="indicator-video.js"></script><script src="propfirms.js"></script><script src="propfirms-sizes.js"></script><script src="propfirms-coupons.js"></script><script src="propfirms-updates.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
 <script>
 /* =====================================================================
    CONFIG — your Supabase project (the anon key is public by design;
@@ -2742,10 +2746,9 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
 /* ---------- partner coupon codes: which firm each code works on, the discount and the offer link ----------
    To add a code for another firm: COUPONS.CODE = { firmId:{pct:XX, url:"https://..."} } */
 /* partner affiliate links: used by the firm's "Official website" button */
-const PF_AFF={bulenox:"https://bulenox.com/member/aff/go/brown_trader",earn2trade:"https://www.earn2trade.com/?a_pid=BROWN23"};
+const PF_AFF=window.PF_AFF_LINKS||{};  /* from propfirms-coupons.js */
 /* prog = the code only works on plans whose name starts with this text */
-const COUPONS={BROWN23:{earn2trade:{pct:60,url:"https://www.earn2trade.com/?a_pid=BROWN23"},
-  bulenox:{pct:89,url:"https://bulenox.com/member/aff/go/brown_trader",prog:"Option 1"}}};
+const COUPONS=window.PF_COUPONS||{};  /* from propfirms-coupons.js (updated by the twice-monthly check) */
 const dealFor=(code,fid,P)=>{const d=COUPONS[code]&&COUPONS[code][fid];return d&&(!d.prog||(P&&P.name.startsWith(d.prog)))?d:null};
 /* the coupon box only shows on firms that have one of my codes, already filled in */
 const firmCode=fid=>Object.keys(COUPONS).find(k=>COUPONS[k][fid]);
@@ -2973,6 +2976,14 @@ function impDoneHTML(s){return `<div class="imp-done"><button class="x" type="bu
    ${s.ids&&s.until>Date.now()&&!S.readonly?`<button class="btn undo-b" type="button" id="impUndo"><span class="un-ring"><span class="un-s"></span></span><span class="un-l">Undo import</span></button>`:""}</div></div>`}
 
 /* ============ ADMIN ============ */
+/* admin: changes made to the prop firm tracker (prices, discounts, rules, new firms) from propfirms-updates.js */
+function pfUpdatesCard(){const U=(window.PF_UPDATES||[]).slice(0,12);if(!U.length)return "";
+  const seenKey="tv_pfupd_seen",last=(()=>{try{return localStorage.getItem(seenKey)||""}catch(e){return ""}})(),newest=U[0].date;
+  const IC={price:"💲",discount:"🏷️",rule:"📝",firm:"🏦",algeria:"🇩🇿"};
+  setTimeout(()=>{try{localStorage.setItem(seenKey,newest)}catch(e){}},1500);
+  return `<div class="card pfu-card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">🔔 <span>Prop firm updates</span></h3>
+     ${newest>last?`<span class="pfu-new">${U.filter(u=>u.date>last).length} <span>new</span></span>`:`<span class="mut" style="font-size:12px"><span>Checked automatically on the 1st and 15th</span></span>`}</div>
+   <div class="pfu-list">${U.map(u=>`<div class="pfu-row ${u.date>last?"new":""}"><span class="pfu-ic">${IC[u.kind]||"•"}</span><div><b data-notr>${esc(u.firm)}</b> <span class="mut mono" style="font-size:11px" data-notr>${esc(fmtDate(u.date))}</span><p data-notr>${esc(u.text)}</p></div></div>`).join("")}</div></div>`}
 async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</div>';
   let profs,trades,plans;try{[profs,trades,plans]=await Promise.all([API.listProfiles(),API.allTradesLite(),API.allPlans()])}catch(e){el.innerHTML=`<div class="card empty">Couldn't load: ${esc(e.message||e)}</div>`;return}
   const stOf=p=>p.status||"approved";
@@ -3032,6 +3043,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    ${pending.length?`<div class="card" style="margin-bottom:12px;border-color:var(--gold)"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0;color:var(--gold)">🔔 Pending requests</h3><span class="tag" style="background:rgba(245,185,66,.15);color:var(--gold)">${pending.length}</span></div>
      <p class="mut" style="margin:0 0 8px;font-size:12px">These people signed up and are waiting for you. They can't use the journal until you approve them.</p>
      <div class="tw"><table class="t" id="reqT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${pending.map(p=>reqRow(p,false)).join("")}</table></div></div>`:""}
+   ${pfUpdatesCard()}
    ${weekCard}
    ${students.length?`<div class="card" style="margin-bottom:12px" id="discCard">
      <div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">📅 Today's discipline — <span data-notr>${esc(fmtDate(today))}</span></h3>
