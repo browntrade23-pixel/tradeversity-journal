@@ -1243,6 +1243,18 @@ html:not([data-theme=light]) table.t :is(th,td){border-color:rgba(255,255,255,.0
 /* light theme: same shapes, light surfaces */
 html[data-theme=light] .seg button.on:not(.bull):not(.bear):not(.nt){background:linear-gradient(180deg,#6e7cf5,#4655e6);color:#fff}
 html[data-theme=light] .card>h3:first-child,html[data-theme=light] .card>.row:first-child>h3{color:#3a48c8}
+/* ---- ▶ platform tour button ---- */
+.tour-btn{display:inline-flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:999px;border:1px solid rgba(110,124,245,.55);background:linear-gradient(180deg,rgba(110,124,245,.22),rgba(58,72,224,.12));color:var(--text,#f5f7fa);font:inherit;cursor:pointer;text-align:start;box-shadow:0 0 22px -8px rgba(58,72,224,.8);transition:transform .15s,box-shadow .2s}
+.tour-btn:hover{transform:translateY(-1px);box-shadow:0 0 28px -6px rgba(58,72,224,.95)}
+.tour-btn .tour-play{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:linear-gradient(180deg,#6e7cf5,#4655e6);color:#fff;font-size:13px;padding-inline-start:2px;animation:tourPulse 2s ease-in-out infinite}
+.tour-btn b{display:block;font-size:13.5px}.tour-btn small{display:block;font-size:11px;opacity:.75}
+@keyframes tourPulse{0%,100%{box-shadow:0 0 0 0 rgba(91,108,240,.6)}50%{box-shadow:0 0 0 8px rgba(91,108,240,0)}}
+/* ---- demo mode (phone tour) ---- */
+html.demo :is(#logout,#instBtn,#shareBtn,.start-card,.inst-btn){display:none!important}
+html.demo .tour-tap{position:fixed;z-index:9999;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,255,255,.55) 0 30%,rgba(91,108,240,.45) 31% 60%,transparent 61%);box-shadow:0 0 0 2px rgba(255,255,255,.8),0 0 24px rgba(91,108,240,.9);animation:tourTap .9s ease-out forwards}
+@keyframes tourTap{0%{transform:scale(.3);opacity:0}25%{transform:scale(1);opacity:1}100%{transform:scale(1.5);opacity:0}}
+html.demo .tour-hl{outline:3px solid rgba(110,124,245,.95)!important;outline-offset:3px;border-radius:14px;box-shadow:0 0 0 9999px rgba(3,4,8,.45),0 0 30px rgba(91,108,240,.7)!important;position:relative;z-index:5;transition:outline-color .3s}
 /* ---- no-trade day ---- */
 .ntd-card{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
 .ntd-card.on{border-color:rgba(160,166,184,.35)!important}
@@ -1438,7 +1450,7 @@ html:not([data-theme=light]) :is(.mk-chip.on,.st-tab.on){border-color:rgba(110,1
 
 <script src="i18n.js"></script>
 <script src="news-info.js"></script>
-<script src="indicator-video.js"></script><script src="propfirms.js"></script><script src="propfirms-sizes.js"></script><script src="propfirms-coupons.js"></script><script src="propfirms-updates.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
+<script src="indicator-video.js"></script><script src="tour.js?v=4"></script><script src="propfirms.js"></script><script src="propfirms-sizes.js"></script><script src="propfirms-coupons.js"></script><script src="propfirms-updates.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
 <script>
 /* =====================================================================
    CONFIG — your Supabase project (the anon key is public by design;
@@ -3659,10 +3671,14 @@ function resultsStripHTML(mod){if(!RESULTS.length)return "";const list=String(mo
   const secs=Math.round(list.length*(String(mod||"").includes("big")?6:2.5));
   return `<div class="rstrip ${mod||""}"><div class="rtrack" style="animation-duration:${secs}s">${imgs}${imgs}</div></div>`}
 function resultsBtn(){return `<a class="tg-link res" href="${ABOUT.channel}" target="_blank" rel="noopener">${SOCIAL[0].icon}<span>See all results on Telegram</span></a>`}
+/* ▶ phone tour video of the platform (tour.js) */
+function tourBtn(){return `<button type="button" class="tour-btn" data-tour><span class="tour-play">▶</span><span><b>Watch the platform tour</b><small>1 minute · on a phone</small></span></button>`}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tour]");if(b&&window.Tour){e.preventDefault();Tour.open()}});
 function vAbout(el){el.classList.add("about-v");
   el.innerHTML=`<div class="about-hero"><div class="logo lg" role="img" aria-label="Tradeversity"></div><div><h1>About <span data-notr>TRADEVERSITY</span></h1>
     <p class="sub" style="max-width:640px">Tradeversity is a trading mentorship and bootcamp not like the standard simple trading courses we see everyday and community founded by <b>Brown Algo</b> and <b>ZNtrading</b>. We teach a precise scalping trading system with clean entries and confirmations using our experience and advanced technicals at the charts, of course with rule-based way to trade having and preparing a clear daily bias, a written plan, strict risk, and an honest journal.</p></div></div>
    ${aboutStatsHTML()}
+   <div style="display:flex;justify-content:center;margin:14px 0 0">${tourBtn()}</div>
    <div class="grid g2" style="margin:14px 0">
      <div class="card"><h3>What we believe</h3><div class="insight"><span class="ic">🎯</span><span>Discipline over excitement: 2 trades max per day, only A+ setups.</span></div><div class="insight"><span class="ic">🛡️</span><span>Protect the account first. A respected loss is part of the job.</span></div><div class="insight"><span class="ic">📓</span><span>Every trade is journaled, every day is planned and reviewed.</span></div></div>
      <div class="card"><h3>Results</h3><p class="mut" style="margin-top:0">Results made by us and our students are shared on our Telegram channel, with full transparency.</p>${resultsBtn()}</div>
@@ -3671,7 +3687,7 @@ function vAbout(el){el.classList.add("about-v");
 }
 function fillAbout(){$$("[data-about-mini]").forEach(e=>e.innerHTML=`<span>${ABOUT.yearsPrefix?`<span>${ABOUT.yearsPrefix}</span> `:""}<b data-notr>${ABOUT.years}</b> <span>years in the markets</span></span><span class="sep">·</span><span><b data-notr>${ABOUT.students}</b> <span>students</span></span><span class="sep">·</span><span>real results</span>`);
   $$("[data-gate-results]").forEach(e=>e.innerHTML=resultsStripHTML());
-  $$("[data-about-auth]").forEach(e=>e.innerHTML=`<div class="about-t">Who we are</div><p>Tradeversity is a trading mentorship founded by <b>Brown Algo</b> and <b>ZNtrading</b>: disciplined, rule-based futures trading.</p>${aboutStatsHTML()}${resultsStripHTML()}<div style="display:flex;justify-content:center;margin-top:10px">${resultsBtn()}</div>`)}
+  $$("[data-about-auth]").forEach(e=>e.innerHTML=`<div class="about-t">Who we are</div><p>Tradeversity is a trading mentorship founded by <b>Brown Algo</b> and <b>ZNtrading</b>: disciplined, rule-based futures trading.</p>${aboutStatsHTML()}${resultsStripHTML()}<div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px">${tourBtn()}${resultsBtn()}</div>`)}
 fillAbout();
 document.addEventListener("click",e=>{const im=e.target.closest&&e.target.closest("img[data-res]");if(!im)return;openModal(`<div class="mhead"><h2>Student result</h2><button class="x" id="mx">×</button></div><img src="results/${encodeURI(im.dataset.res)}" alt="Student result" style="width:100%;border-radius:10px;border:1px solid var(--line)">`);$("#mx").onclick=closeModal});
 
@@ -3786,8 +3802,46 @@ $("#langAuth").innerHTML=I18N.picker();$("#langTop").innerHTML=I18N.picker();
 window.onLangChange=()=>{if(S.me&&!$("#app").classList.contains("hidden"))render()};
 I18N.start();
 
+/* ============ DEMO MODE (?demo=1): the platform with made-up data, used by the phone tour video.
+   Nothing is read from or written to the database: every save stays in memory and is lost on reload. ============ */
+function demoData(){const day=n=>{const d=new Date();d.setDate(d.getDate()-n);while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()-1);return ymd(d)};
+  const A="Apex 50K",base={user_id:"demo",account:A,firm:"Apex Trader Funding",platform:"Tradovate",acctSize:50000,market:"Futures",fees:"",shots:[],remark:"",feeling:""};
+  const chart=(up)=>"data:image/svg+xml;utf8,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><rect width="320" height="180" fill="#f7f8fa"/>${Array.from({length:22},(_,i)=>{const o=90+Math.sin(i/2.3)*22+(up?-i*2.2:i*2.2),c=o+(i%3?-9:8)*(up?1:-1),hi=Math.min(o,c)-7,lo=Math.max(o,c)+7,x=10+i*14,g=c<o;return `<line x1="${x+4}" x2="${x+4}" y1="${hi}" y2="${lo}" stroke="${g?"#089981":"#131722"}"/><rect x="${x}" y="${Math.min(o,c)}" width="8" height="${Math.max(2,Math.abs(c-o))}" fill="${g?"#089981":"#131722"}"/>`}).join("")}<rect x="150" y="${up?70:60}" width="170" height="16" fill="rgba(91,108,240,.18)"/><text x="154" y="${up?82:72}" font-size="10" font-family="Arial" fill="#3a48e0">15m FVG</text></svg>`);
+  const T=[[1,"09:42","NQ","Long",1,410,"Daily bias + 1H + 15m FVG","NY AM",["Calm","Disciplined"],"Yes",5,"Waited for the sweep of PDL, then the 15m FVG. Clean."],
+    [1,"10:20","MNQ","Short",3,-96,"Liquidity sweep + MSS","NY AM",["Impatient"],"No",2,"Entered before confirmation. Second trade should have been skipped."],
+    [2,"09:51","NQ","Long",1,385,"Silver Bullet","NY AM",["Focused"],"Yes",4,"Silver Bullet in the 10–11 window. Target at PDH."],
+    [3,"10:05","NQ","Short",1,-210,"Order block","NY AM",["FOMO"],"No",2,"Chased the move. Lesson: no entry without my model."],
+    [4,"09:38","MNQ","Long",4,236,"Daily bias + 1H + 15m FVG","NY AM",["Calm"],"Yes",4,""],
+    [5,"09:47","NQ","Long",1,520,"IFVG","NY AM",["Confident","Patient"],"Yes",5,"Best trade of the week: patience paid."],
+    [6,"10:12","NQ","Short",1,-180,"Breaker block","NY AM",["Hesitant"],"Yes",3,"Followed the plan, the market didn't. Loss accepted."],
+    [7,"09:55","MNQ","Long",3,198,"Silver Bullet","NY AM",["Focused"],"Yes",4,""],
+    [8,"09:40","NQ","Long",1,305,"Liquidity sweep + MSS","NY AM",["Calm"],"Yes",4,""],
+    [9,"10:30","NQ","Short",1,-160,"Order block","NY Lunch",["Bored"],"No",2,"Traded lunch. My plan says no lunch trades."]];
+  const trades=T.map((t,i)=>({...base,id:"demo-t"+i,date:day(t[0]),time:t[1],symbol:t[2],side:t[3],qty:t[4],pnl:t[5],setup:t[6],session:t[7],emotions:t[8],followed:t[9],rating:t[10],notes:t[11],
+    shots:i===0||i===5?[chart(true)]:i===3?[chart(false)]:[],imported:i>=6,importFile:i>=6?"apex-november.csv":undefined,importedAt:i>=6?new Date(Date.now()-5*864e5).toISOString():undefined,commIncl:"no",acctType:"prop"}));
+  const plans=[{user_id:"demo",date:day(1),maxLoss:500,target:600,maxTrades:2,riskPerTrade:150,dayType:"trade",markets:["Nasdaq"],bias:{Nasdaq:"Bullish"},rules:{},followed:"Partly",review:"Good first trade, second one was impatience."},
+    {user_id:"demo",date:nextTradingDay(),maxLoss:500,target:600,maxTrades:2,riskPerTrade:150,dayType:"trade",markets:["Nasdaq","Gold"],bias:{Nasdaq:"Bullish",Gold:"No trade"},rules:{},narrative:"HTF bullish, draw on liquidity = PDH. Wait for a sweep of the Asia low.",levels:"PDH 21 480 · PDL 21 210 · 1H FVG 21 300"}];
+  const now=Date.now(),iso=m=>new Date(now+m*60000).toISOString();
+  const news=[{title:"CPI m/m",impact:"High",starts_at:iso(4),forecast:"0.3%",previous:"0.4%"},{title:"Core CPI m/m",impact:"High",starts_at:iso(4),forecast:"0.3%",previous:"0.3%"},{title:"Unemployment Claims",impact:"Medium",starts_at:iso(95),forecast:"221K",previous:"218K"}];
+  const rules={[A]:{start:50000,target:3000,daily:1000,maxDD:2000,ddType:"trailing",kind:"prop",mkt:"futures",firmId:"apex",firm:"Apex Trader Funding",pi:0,plan:"",size:"$50K",phase:"eval",ddText:"Trailing (end of day or intraday, you choose)"}};
+  return {trades,plans,news,rules}}
+async function bootDemo(){const D=demoData();S._demo=true;
+  const mem={trades:D.trades,plans:D.plans,settings:{rules:D.rules,comm:{},notify:{news:true,plan:true,loss:true},lang:(window.I18N&&I18N.lang)||"en"}};
+  const ok=async()=>{};
+  API={...Cloud,sb:null,
+    listTrades:async()=>mem.trades,loadTrades:async()=>mem.trades,listPlans:async()=>mem.plans,getPlan:async()=>null,
+    saveTrade:async t=>{const i=mem.trades.findIndex(x=>x.id===t.id);if(i>=0)mem.trades[i]=t;else mem.trades.push(t)},saveTrades:async ts=>{mem.trades.push(...ts)},
+    deleteTrade:async t=>{mem.trades=mem.trades.filter(x=>x.id!==t.id)},deleteTrades:async ids=>{const s=new Set(ids);mem.trades=mem.trades.filter(x=>!s.has(x.id))},
+    savePlan:ok,news:async()=>D.news,getSettings:async()=>mem.settings,saveSettings:ok,track:()=>{},affClicks:async()=>[],
+    listShares:async()=>[],createShare:async()=>{throw new Error("Not available in the demo")},signOut:async()=>{location.href=location.pathname}};
+  document.documentElement.classList.add("demo");
+  await enter({id:"demo",email:"demo@tradeversity",role:"student",name:"Demo Trader",telegram:"@demo_trader",status:"approved",tgOk:true,emailOk:true});
+  try{const g=$("#gate");if(g)g.classList.add("gone")}catch(e){}
+  window.__demoReady=true}
+
 /* ============ boot ============ */
 (async function boot(){
+  if(new URLSearchParams(location.search).get("demo")==="1"){try{await bootDemo()}catch(e){console.error(e)}return}
   const shareTok=new URLSearchParams(location.search).get("share");
   if(shareTok&&/^[a-f0-9]{16,64}$/i.test(shareTok)){try{await bootShare(shareTok)}catch(e){console.error(e);$("#shMain").innerHTML=`<div class="card empty">Couldn't reach the server: ${esc(e.message||e)}</div>`}return}
   try{
