@@ -119,6 +119,15 @@ textarea.i{min-height:80px;resize:vertical}
 .shot{position:relative;aspect-ratio:16/10;border-radius:8px;border:1px solid var(--line2);background:var(--panel2) center/cover no-repeat}
 .shot button{position:absolute;top:4px;right:4px;border:0;background:rgba(0,0,0,.7);border-radius:6px;width:24px;height:24px;cursor:pointer;color:#fff}
 .drop{border:1.5px dashed var(--line2);border-radius:10px;padding:14px;text-align:center;color:var(--muted);cursor:pointer}
+.pcharts{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.pcharts:not(:empty)+.pdrop{margin-top:10px}
+.pchart{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line2);background:var(--panel2)}
+.pchart img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;cursor:zoom-in}
+.pchart.big{grid-column:1/-1}.pchart.big img{aspect-ratio:auto;object-fit:contain;cursor:zoom-out}
+.pchart button{position:absolute;top:6px;right:6px;border:0;background:rgba(0,0,0,.7);border-radius:7px;width:28px;height:28px;cursor:pointer;color:#fff;font-size:16px}
+[dir=rtl] .pchart button{right:auto;left:6px}
+.pdrop{padding:20px;border-color:rgba(46,197,201,.45);transition:background .2s,border-color .2s}
+.pdrop:hover,.pdrop.over{background:rgba(46,197,201,.08);border-color:#2ec5c9;color:var(--text)}
 .drop:hover{border-color:var(--gold);color:var(--gold)}
 /* modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:24px 12px}
@@ -1987,6 +1996,10 @@ function vPlan(el){
     <div class="grid"><label class="f">Session<select class="i" name="session" ${ro}>${SESSIONS.map(s=>`<option ${p.session===s?"selected":""}>${s}</option>`).join("")}</select></label>
      <label class="f">Mindset / goal for the day<input class="i" name="mindset" value="${esc(p.mindset)}" ${ro}></label></div>
    </div>
+   <div class="card pchart-card"><h3>📈 Chart of my plan</h3>
+    ${S.readonly?"":`<p class="mut" style="font-size:13px;margin:-4px 0 10px">Add up to 3 screenshots of your chart with your levels and the move you expect. You can also paste an image (Ctrl+V).</p>`}
+    <div class="pcharts" id="pCharts"></div>
+    ${S.readonly?"":`<div class="drop pdrop" id="pDrop">📷 <span>Add chart screenshot</span></div><input type="file" id="pFile" accept="image/*" multiple class="hidden">`}</div>
    <div class="card ck-card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Pre-trade checklist</h3><span class="ck-n" id="ckN">${nCk} / ${RULES.length}</span></div>
     <div class="ck-bar"><i id="ckBar" style="width:${nCk/RULES.length*100}%"></i></div>
     ${RULES.map((r,i)=>`<label class="check ck"><input type="checkbox" data-r="${esc(r)}" ${(p.rules||{})[r]?"checked":""} ${ro}><span class="ck-i">${i+1}</span><span>${esc(r)}</span></label>`).join("")}
@@ -2001,14 +2014,26 @@ function vPlan(el){
    ${S.readonly?"":`<div class="row" style="justify-content:flex-end"><button class="btn pri" type="submit">Save plan</button></div>`}
   </form>`;
   bindNewsIns(cur);if($("#pHist"))$("#pHist").onchange=e=>{if(e.target.value){S._planDate=e.target.value;render()}};
+  const charts=[...(p.charts||[])];
+  const drawCharts=()=>{const box=$("#pCharts");
+    box.innerHTML=charts.length?charts.map((s,i)=>`<div class="pchart"><img src="${s}" alt="Plan chart ${i+1}" data-z="${i}">${S.readonly?"":`<button type="button" data-i="${i}" aria-label="Remove">×</button>`}</div>`).join(""):(S.readonly?`<div class="empty mut">No chart image</div>`:"");
+    $$("button[data-i]",box).forEach(b=>b.onclick=()=>{charts.splice(Number(b.dataset.i),1);drawCharts()});
+    $$("img[data-z]",box).forEach(im=>im.onclick=()=>im.parentElement.classList.toggle("big"));
+    if($("#pDrop"))$("#pDrop").classList.toggle("hidden",charts.length>=3)};
+  drawCharts();
   if(S.readonly)return;
+  const addCharts=async files=>{for(const fl of files){if(!fl.type.startsWith("image/"))continue;if(charts.length>=3){toast("Maximum 3 images");break}try{charts.push(await compress(fl))}catch(e){toast("Couldn't read that image")}}drawCharts()};
+  const pd=$("#pDrop");pd.onclick=()=>$("#pFile").click();$("#pFile").onchange=e=>{addCharts([...e.target.files]);e.target.value=""};
+  pd.ondragover=e=>{e.preventDefault();pd.classList.add("over")};pd.ondragleave=()=>pd.classList.remove("over");
+  pd.ondrop=e=>{e.preventDefault();pd.classList.remove("over");addCharts([...e.dataTransfer.files])};
+  document.onpaste=e=>{if(!$("#pCharts")||$(".modal:not(.hidden)"))return;const fs=[...((e.clipboardData||{}).files||[])];if(fs.length){e.preventDefault();addCharts(fs)}};
   const ckUpd=()=>{const n=$$(".ck-card [data-r]").filter(c=>c.checked).length;$("#ckN").textContent=`${n} / ${RULES.length}`;$("#ckBar").style.width=n/RULES.length*100+"%";$("#ckGo").classList.toggle("on",n===RULES.length)};
   $$(".ck-card [data-r]").forEach(c=>c.onchange=ckUpd);
   $$('.daytype input[name="dayType"]').forEach(r=>{r.onpointerdown=()=>{r._was=r.checked};r.onclick=()=>{if(r._was){r.checked=false;r._was=false}}});
   const bias={...(p.bias||{})};
   $$(".seg[data-g]").forEach(sg=>$$("button",sg).forEach(b=>b.onclick=()=>{const g=sg.dataset.g,v=b.dataset.b;bias[g]=bias[g]===v?"":v;$$("button",sg).forEach(x=>{x.className=bias[g]===x.dataset.b?"on "+(v==="Bullish"?"bull":v==="Bearish"?"bear":""):""})}));
   $("#pf").onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const rules={};$$("[data-r]").forEach(c=>rules[c.dataset.r]=c.checked);
-    const dt=d.dayType||"";const np={...p,...d,bias,rules,dayType:dt,rest:dt==="rest",date:cur,user_id:S.subject.id};
+    const dt=d.dayType||"";const np={...p,...d,bias,rules,charts,dayType:dt,rest:dt==="rest",date:cur,user_id:S.subject.id};
     try{await API.savePlan(np);const i=S.plans.findIndex(x=>x.date===cur);if(i>=0)S.plans[i]=np;else S.plans.push(np);toast("Plan saved");render()}catch(err){toast("Couldn't save: "+(err.message||err))}};
 }
 
