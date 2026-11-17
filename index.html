@@ -1188,6 +1188,61 @@ html[lang=ar] .imf-s small{text-transform:none;letter-spacing:0}
 .inst-btn{border-color:color-mix(in srgb,var(--gold) 45%,transparent);color:var(--gold)}
 .inst-steps{margin:0 0 16px;padding-inline-start:20px;display:grid;gap:10px;font-size:14px}.inst-steps li::marker{color:var(--gold);font-weight:800}
 @media(max-width:760px){.inst-btn{padding:6px 9px}.inst-btn span{display:none}}
+/* ================= "CARBON" THEME (Nov 2026, inspired by modern prop-firm sites) =================
+   Only colors, surfaces, corners and glows change: the layout and every page stay the same.
+   Near-black background + faint grid, carbon cards with hairline borders, pill buttons and tabs,
+   gold stays the brand color, a soft indigo light in the background. The login night scene is not touched. */
+html:not([data-theme=light]) :is(#app,#share,.modal,#tip,#toast,.tpop){
+  --bg:#050608;--panel:#0b0d15;--panel2:#11141f;--line:rgba(255,255,255,.075);--line2:rgba(255,255,255,.13);
+  --text:#f5f7fa;--muted:#a0a6b8;--dim:#6b7185;--indigo:#5b6cf0;--grid:#141824;--grid0:#2a3042}
+:root{--r:18px}
+html:not([data-theme=light]) #app::before,html:not([data-theme=light]) #share::before{
+  background:
+    radial-gradient(900px 420px at 50% -140px,rgba(91,108,240,.16),transparent 70%),
+    radial-gradient(700px 380px at 100% 0%,rgba(245,185,66,.06),transparent 70%),
+    linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px) 0 0/56px 56px,
+    linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px) 0 0/56px 56px,
+    #050608}
+html:not([data-theme=light]) #app header.top,html:not([data-theme=light]) #share header.top{background:rgba(5,6,8,.72);backdrop-filter:blur(14px) saturate(140%);border-bottom-color:rgba(255,255,255,.07)}
+/* cards: carbon surface, hairline border, soft top light */
+html:not([data-theme=light]) :is(.card,.kpi){background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008)) ,#0b0d15!important;border-color:rgba(255,255,255,.075)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 40px -28px rgba(0,0,0,.9)}
+html:not([data-theme=light]) :is(.card,.kpi):hover{border-color:rgba(255,255,255,.12)!important}
+.card,.kpi{border-radius:var(--r)}
+.kpi .l{font-size:11px;letter-spacing:1.2px}
+/* titles: section labels in small spaced capitals, like "— THE PATH —" */
+h1{font-size:26px;font-weight:800;letter-spacing:-.6px}
+h3{font-size:12px;letter-spacing:1.4px;font-weight:700}
+html:not([data-theme=light]) .card>h3:first-child,html:not([data-theme=light]) .card>.row:first-child>h3{color:#c9cdfa}
+/* buttons: pills, main button in gold with a soft glow */
+.btn{border-radius:999px;padding:9px 16px;transition:border-color .2s,background .2s,box-shadow .2s,transform .15s}
+.btn.sm{padding:6px 12px}
+.btn.pri{background:linear-gradient(180deg,#ffd27a,var(--gold));border-color:transparent;box-shadow:0 8px 22px -10px rgba(245,185,66,.75),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn.pri:hover{transform:translateY(-1px);box-shadow:0 12px 26px -10px rgba(245,185,66,.9),inset 0 1px 0 rgba(255,255,255,.35)}
+html:not([data-theme=light]) .btn:not(.pri){background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
+html:not([data-theme=light]) .btn:not(.pri):hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2)}
+/* segmented choices: a pill track with a glowing selected pill */
+.seg{border-radius:999px;padding:4px}
+.seg button{border-radius:999px;padding:7px 14px;transition:background .2s,color .2s,box-shadow .2s}
+html:not([data-theme=light]) .seg{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.09)}
+.seg button.on:not(.bull):not(.bear):not(.nt){background:linear-gradient(180deg,#6e7cf5,#4655e6);color:#fff;box-shadow:0 6px 18px -6px rgba(91,108,240,.7)}
+/* top tabs: pills, the selected one lit in gold */
+nav.tabs button{border-radius:999px}
+html:not([data-theme=light]) nav.tabs button.on{background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(245,185,66,.45),0 0 18px -6px rgba(245,185,66,.45)}
+/* inputs: dark glass, gold focus ring */
+input.i,select.i,textarea.i{border-radius:12px;transition:border-color .2s,box-shadow .2s}
+html:not([data-theme=light]) :is(input.i,select.i,textarea.i){background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.12)}
+input.i:focus,select.i:focus,textarea.i:focus{box-shadow:0 0 0 3px rgba(245,185,66,.16)}
+/* chips, tags and small boxes follow the carbon look */
+html:not([data-theme=light]) :is(.chip,.det-chip,.sc-step,.wk-box,.ntf-row,.ws,.rm,.imf-s,.rpk,.comm-chk,.sz-b){background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.09)}
+.sz-b,.sc-step,.ntf-row,.comm-chk,.rm{border-radius:14px}
+.sz-b.on{background:linear-gradient(180deg,#ffd27a,var(--gold))!important;color:#1b1305;box-shadow:0 8px 20px -10px rgba(245,185,66,.8)}
+/* tables: quieter grid */
+html:not([data-theme=light]) table.t th{color:var(--dim);letter-spacing:1px}
+html:not([data-theme=light]) table.t :is(th,td){border-color:rgba(255,255,255,.06)}
+/* light theme: same shapes, light surfaces */
+html[data-theme=light] .seg button.on:not(.bull):not(.bear):not(.nt){background:linear-gradient(180deg,#6e7cf5,#4655e6);color:#fff}
+html[data-theme=light] .card>h3:first-child,html[data-theme=light] .card>.row:first-child>h3{color:#3a48c8}
 </style>
 </head>
 <body>
