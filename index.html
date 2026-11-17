@@ -1243,6 +1243,13 @@ html:not([data-theme=light]) table.t :is(th,td){border-color:rgba(255,255,255,.0
 /* light theme: same shapes, light surfaces */
 html[data-theme=light] .seg button.on:not(.bull):not(.bear):not(.nt){background:linear-gradient(180deg,#6e7cf5,#4655e6);color:#fff}
 html[data-theme=light] .card>h3:first-child,html[data-theme=light] .card>.row:first-child>h3{color:#3a48c8}
+/* ---- no-trade day ---- */
+.ntd-card{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.ntd-card.on{border-color:rgba(160,166,184,.35)!important}
+.ntd-ic{font-size:24px}.ntd-tx{display:flex;flex-direction:column;gap:2px;flex:1;min-width:200px}.ntd-tx small{font-size:12px}
+.ntd-row{padding:10px 12px;border-radius:12px;border:1px dashed var(--line2);color:var(--muted);font-size:13px;margin-bottom:8px}
+.cal .c.nt{background:repeating-linear-gradient(135deg,rgba(160,166,184,.10) 0 6px,rgba(160,166,184,.04) 6px 12px);outline:1px dashed rgba(160,166,184,.35);outline-offset:-1px}
+.cal .c.nt .p{color:var(--muted)}
 /* ---- admin requests: Ready to approve / Waiting for verification ---- */
 .rq-grp{margin-top:6px;padding:10px 12px;border-radius:14px;border:1px solid var(--line2)}
 .rq-grp.ready{border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.06)}
@@ -1801,7 +1808,7 @@ function ntfItems(){const out=[];if(!S.me)return out;const now=Date.now(),me=S.m
     /* 3) journal: every trading day, after the New York close (16:00 NY), until a trade or the end-of-day review is saved */
     const nyH=Number(new Date().toLocaleString("en-US",{timeZone:NY,hour:"2-digit",hour12:false}))%24;
     const tradingDay=wd>=1&&wd<=5&&!(pToday&&pToday.rest)&&!(typeof US_HOL!=="undefined"&&US_HOL.some(x=>x[0]===today));
-    const journaled=(S.trades||[]).some(t=>t.date===today)||(pToday&&(pToday.followed||(pToday.review||"").trim()));
+    const journaled=(S.trades||[]).some(t=>t.date===today)||(pToday&&(pToday.noTrade||pToday.followed||(pToday.review||"").trim()));
     if(tradingDay&&nyH>=16&&!journaled)out.push({id:"journal:"+today,ic:"📓",lv:"warn",go:"journal",t:I18N.t("You haven't journaled today"),s:I18N.t("Log your trades or write your end-of-day review. A no-trade day is a decision too.")});
     /* 4) plan: every day, until the next trading day has a plan (Friday and the weekend = Monday's plan) */
     const nd=nextTradingDay(),tm=(()=>{const x=new Date();x.setDate(x.getDate()+1);return ymd(x)})();
@@ -2075,7 +2082,7 @@ function judgeDays(arr,out){const days={};arr.forEach(t=>{const j=out.get(t.id);
    the day before red-folder news, or the student marked it as a rest day in the plan. Otherwise it is skipped. */
 const addWeekday=(d,k)=>{const [y,m,dd]=d.split("-").map(Number);const x=new Date(y,m-1,dd);do{x.setDate(x.getDate()+k)}while(x.getDay()===0||x.getDay()===6);return ymd(x)};
 const redNewsOn=d=>S.news.some(n=>n.impact==="High"&&tzDate(n.starts_at,NY)===d);
-function restReason(d,plans){if((plans||[]).some(p=>p.date===d&&p.rest))return "rest";if(US_HOL.some(h=>h[0]===d))return "holiday";
+function restReason(d,plans){if((plans||[]).some(p=>p.date===d&&(p.rest||p.noTrade)))return "rest";if(US_HOL.some(h=>h[0]===d))return "holiday";
   if(redNewsOn(d))return "news";if(redNewsOn(addWeekday(d,1)))return "prenews";return ""}
 function withRestDays(days,plans,trades){const have=new Set(days.map(d=>d.date));const starts=[...days.map(d=>d.date),...(plans||[]).map(p=>p.date)].sort();if(!starts.length)return days;
   const today=todayStr(),out=[...days];let d=starts[0];const [y,m,dd]=d.split("-").map(Number);if(new Date(y,m-1,dd).getDay()%6===0)d=addWeekday(d,1);
@@ -2160,6 +2167,19 @@ function coachCard(){
 }
 function bindCoach(){const b=$("#qNext");if(b)b.onclick=()=>{const cur=$("#qText").dataset.en||$("#qText").textContent;let q;do{q=QUOTES[Math.floor(Math.random()*QUOTES.length)]}while(q===cur&&QUOTES.length>1);$("#qText").textContent=q;$("#qText").dataset.en=q}}
 
+/* ===== No-trade days: saved on that day's plan (noTrade:true). They count as $0 days in the statistics. ===== */
+function noTradeDates(){let ds=(S.plans||[]).filter(p=>p.noTrade).map(p=>p.date);
+  if(S.range&&S.range!=="all"){const d=new Date();d.setDate(d.getDate()-Number(S.range)+1);const c=ymd(d);ds=ds.filter(x=>x>=c)}return ds}
+/* add the no-trade days (with no trade saved that day) to a calc() result: $0 days on the calendar and the day count */
+function withNoTrade(st){const nd=noTradeDates().filter(d=>st.days[d]==null);nd.forEach(d=>st.days[d]=0);st.ntDays=nd.length;S._ntSet=new Set(noTradeDates());return st}
+function noTradeCard(){if(S.readonly)return "";const d=todayStr(),p=(S.plans||[]).find(x=>x.date===d),hasT=(S.trades||[]).some(t=>t.date===d);
+  if(hasT)return "";
+  return p&&p.noTrade?`<div class="card ntd-card on"><span class="ntd-ic">🚫</span><div class="ntd-tx"><b>${esc(I18N.t("No-trade day saved for today"))}</b><small class="mut">${esc(I18N.t("$0 P&L, counted in your statistics and your discipline streak. Not trading is a decision too."))}</small></div><button class="btn sm" type="button" id="ntdUndo">↩ <span>Undo</span></button></div>`
+   :`<div class="card ntd-card"><span class="ntd-ic">🚫</span><div class="ntd-tx"><b>${esc(I18N.t("Not trading today?"))}</b><small class="mut">${esc(I18N.t("Mark today as a no-trade day: it counts as a $0 day in your statistics."))}</small></div><button class="btn sm pri" type="button" id="ntdSet">🚫 <span>No trades today</span></button></div>`}
+function bindNoTrade(){const save=async on=>{const d=todayStr(),old=S.plans.find(x=>x.date===d);
+    const np={...(old||{user_id:S.subject.id,date:d,maxLoss:"",target:"",maxTrades:"",riskPerTrade:"",bias:{},rules:{}}),noTrade:on,date:d,user_id:S.subject.id};
+    try{await API.savePlan(np);const i=S.plans.findIndex(x=>x.date===d);if(i>=0)S.plans[i]=np;else S.plans.push(np);toast(I18N.t(on?"No-trade day saved":"No-trade day removed"));render()}catch(e){toast("Couldn't save: "+(e.message||e))}};
+  const a=$("#ntdSet");if(a)a.onclick=()=>save(true);const u=$("#ntdUndo");if(u)u.onclick=()=>save(false)}
 function vJournal(el){
   if(S.page)return vTradePage(el,S.page);
   const ts=filtered().sort((a,b)=>byDT(b,a));const st=calc(ts);
@@ -2167,6 +2187,7 @@ function vJournal(el){
   el.innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:6px"><div><h1>Trading journal</h1><p class="sub">${S.readonly?"Student's":"Your"} trades, screenshots, feelings and lessons.</p></div>
    <div class="row">${S.readonly?"":`<button class="btn pri" id="addT">+ New trade</button><button class="btn" id="impT">⬆ Import CSV</button>`}<button class="btn" id="expCsv">Export CSV</button></div></div>
    ${S.readonly?"":redAlert(todayStr(),"today")}
+   ${noTradeCard()}
    ${startCard()}
    ${eodCard()}
    ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||S._impDone||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export: the trades appear below in your journal, ready for screenshots and notes</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}${S.readonly?"":impFilesHTML()}
@@ -2179,10 +2200,12 @@ function vJournal(el){
      ${S.readonly?"":kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):st.pf===Infinity?"∞":"—","gross win ÷ gross loss")}
      ${kpi("Avg R",isFinite(st.avgR)?st.avgR.toFixed(2)+"R":"—","from trades with a stop")}
    </div>
-   ${ts.length?Object.keys(byDay).sort().reverse().map(d=>{const dn=byDay[d].reduce((a,t)=>a+tradeNet(t),0);
+   ${(()=>{noTradeDates().filter(d=>!byDay[d]).forEach(d=>byDay[d]=[]);return ""})()}
+   ${Object.keys(byDay).length?Object.keys(byDay).sort().reverse().map(d=>{const dn=byDay[d].reduce((a,t)=>a+tradeNet(t),0);
+     if(!byDay[d].length)return `<div class="day"><div class="dayh"><span>${fmtDate(d)}</span><span class="mono mut">$0.00</span></div><div class="ntd-row">🚫 <span>No trades this day</span> <small class="mut">· ${esc(I18N.t("counted as a $0 day"))}</small></div></div>`;
      return `<div class="day"><div class="dayh"><span>${fmtDate(d)}</span><span class="mono ${cls(dn)}">${smoney(dn)}</span></div>${byDay[d].map(tcard).join("")}</div>`}).join("")
    :`<div class="card empty">No trades yet. ${S.readonly?"":"Add your first trade or import a CSV from your broker."}</div>`}`;
-  bindFilters();bindCoach();bindEod();bindStart();bindImpFiles(el);if($("#addT"))$("#addT").onclick=()=>editTrade(null);
+  bindFilters();bindCoach();bindEod();bindStart();bindImpFiles(el);bindNoTrade();if($("#addT"))$("#addT").onclick=()=>editTrade(null);
   if($("#impBody"))vImport($("#impBody"),true);
   if($("#impT"))$("#impT").onclick=()=>{const b=$("#impBox");b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
   $("#expCsv").onclick=exportCSV;
@@ -2414,6 +2437,7 @@ function calendar(days,click){const keys=Object.keys(days).sort();const ref=S.ca
   const [y,m]=ref.split("-").map(Number);const first=new Date(y,m-1,1),dim=new Date(y,m,0).getDate();const mx=Math.max(1,...Object.values(days).map(Math.abs));
   let h=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div class="h">${d}</div>`).join("");for(let i=0;i<first.getDay();i++)h+='<div class="c e"></div>';
   let mt=0;for(let d=1;d<=dim;d++){const k=`${y}-${pad(m)}-${pad(d)}`,v=days[k];if(v!=null)mt+=v;const a=v==null?0:.12+.5*Math.abs(v)/mx;
+    if(v===0&&S._ntSet&&S._ntSet.has(k)){h+=`<div class="c nt" data-tip="${esc(fmtDate(k)+"\n"+I18N.t("No-trade day")+" · $0")}"><span class="d">${d}</span><span class="p">🚫 $0</span></div>`;continue}
     h+=`<div class="c${click&&v!=null?" cday":""}" ${click&&v!=null?`data-day="${k}"`:""} style="${v!=null?`background:${v>=0?`rgba(39,194,108,${a})`:`rgba(239,83,80,${a})`}`:""}" ${v!=null?`data-tip="${esc(fmtDate(k)+"\n"+smoney(v))}"`:""}><span class="d">${d}</span>${v!=null?`<span class="p">${kfmt(v)}</span>`:""}</div>`}
   return `<div class="row" style="justify-content:space-between;margin-bottom:8px"><button class="btn sm" id="calP">‹</button><b>${first.toLocaleDateString(I18N.locale(),{month:"long",year:"numeric"})} · <span class="${cls(mt)} mono">${smoney(mt)}</span></b><button class="btn sm" id="calN">›</button></div><div class="cal">${h}</div>`}
 document.addEventListener("mouseover",e=>{const el=e.target.closest&&e.target.closest("[data-tip]");const tp=$("#tip");if(!el){tp.style.display="none";return}tp.textContent=el.dataset.tip;tp.style.display="block"});
@@ -2558,7 +2582,7 @@ function bindRules(acct,aSize){const c=$("#rulesCard");if(!c)return;
     if(st){const f=PFLIST().find(x=>x.id===st.firmId),progs=f?rpProgs(f.id):[],P=progs[st.pi]||progs[0];r.kind=st.kind;
       if(st.kind==="prop"&&f){Object.assign(r,{mkt:st.mkt,firmId:f.id,firm:f.name,pi:st.pi,plan:progs.length>1&&P?P.name:"",size:st.size||"",phase:st.phase||"eval",ddText:rpDD(f,P,st.phase)})}}
     if(!(num(r.start)>0)){toast("Enter the starting balance");return}rulesSave(acct,r);S._rulesEdit=null;S._rp=null;toast("Rules saved");render()}}
-function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered();const st=calc(ts);
+function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered();const st=withNoTrade(calc(ts));
   const meta=S.acct!=="all"?S.trades.find(t=>t.account===S.acct&&(t.firm||t.platform||t.acctSize)):null;const aSize=meta&&num(meta.acctSize)>0?num(meta.acctSize):null;
   el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px"><div><h1>Statistics</h1><p class="sub">${S.acct==="all"?"All accounts":esc(S.acct)} · ${ts.length} trades</p>
    ${meta?`<div class="det-line">${meta.firm?`<span class="chip">🏦 <span data-notr>${esc(meta.firm)}</span></span>`:""}${aSize?`<span class="chip">💰 ${money(aSize,0)}</span>`:""}${meta.platform?`<span class="chip">🖥 <span data-notr>${esc(meta.platform)}</span></span>`:""}</div>`:""}</div>${S.readonly?"":`<button class="btn pri share-btn" id="shareBtn">🔗 Share my results</button>`}</div>
@@ -2567,7 +2591,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   ${filterBar(true)}
   ${S.acct!=="all"&&!S.readonly?rulesCard(S.acct,aSize):""}
   <div class="grid g4" style="margin-bottom:12px">
-   ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,aSize?`${(st.net>0?"+":"")+pct(st.net/aSize,2)} of the account · ${st.nDays} trading days`:`${st.nDays} trading days`)}
+   ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,(aSize?`${(st.net>0?"+":"")+pct(st.net/aSize,2)} of the account · ${st.nDays} trading days`:`${st.nDays} trading days`)+(st.ntDays?` · 🚫 ${st.ntDays} ${I18N.t(st.ntDays===1?"no-trade day":"no-trade days")} ($0)`:""))}
    ${kpi("Win rate",pct(st.wr),`${st.w} wins · ${st.l} losses`)}
    ${S.readonly?"":kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):"—","above 1.5 is solid")}
    ${kpi("Expectancy",`<span class="${cls(st.exp)}">${money(st.exp)}</span>`,"average per trade")}
