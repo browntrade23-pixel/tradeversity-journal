@@ -1243,6 +1243,22 @@ html:not([data-theme=light]) table.t :is(th,td){border-color:rgba(255,255,255,.0
 /* light theme: same shapes, light surfaces */
 html[data-theme=light] .seg button.on:not(.bull):not(.bear):not(.nt){background:linear-gradient(180deg,#6e7cf5,#4655e6);color:#fff}
 html[data-theme=light] .card>h3:first-child,html[data-theme=light] .card>.row:first-child>h3{color:#3a48c8}
+/* ---- 🔔 notification bell + panel ---- */
+.ntf-bell{position:relative;display:inline-grid;place-items:center;width:36px;height:36px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;transition:background .2s,border-color .2s,box-shadow .2s}
+.ntf-bell:hover{border-color:rgba(110,124,245,.6);background:rgba(58,72,224,.14);box-shadow:0 0 16px -6px rgba(58,72,224,.6)}
+.ntf-badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--red);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--bg)}
+.ntf-bell.ring svg{animation:ntfRing 1.6s ease-in-out infinite;transform-origin:50% 10%;color:var(--red)}
+@keyframes ntfRing{0%,60%,100%{transform:rotate(0)}10%{transform:rotate(14deg)}20%{transform:rotate(-12deg)}30%{transform:rotate(9deg)}40%{transform:rotate(-6deg)}50%{transform:rotate(3deg)}}
+.ntf-panel{position:fixed;z-index:60;width:min(360px,calc(100vw - 16px));max-height:70vh;overflow:auto;padding:8px;border-radius:18px;border:1px solid rgba(255,255,255,.1);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01)),#0b0d15;box-shadow:0 24px 60px -20px rgba(0,0,0,.9),0 0 0 1px rgba(58,72,224,.12);color:var(--text)}
+html[data-theme=light] .ntf-panel{background:#fff;border-color:#e2e7ef;box-shadow:0 20px 50px -20px rgba(16,24,40,.35)}
+.ntf-h{display:flex;justify-content:space-between;align-items:center;padding:6px 8px 8px;font-size:13px}
+.ntf-it{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:start;padding:10px;margin-top:6px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:inherit;font:inherit;cursor:pointer;transition:border-color .2s,background .2s}
+.ntf-it:hover{border-color:rgba(110,124,245,.55);background:rgba(58,72,224,.1)}
+.ntf-it.bad{border-color:rgba(239,83,80,.5);background:rgba(239,83,80,.08)}.ntf-it.warn{border-color:rgba(245,185,66,.35)}
+.ntf-i{font-size:20px;line-height:1.1}.ntf-b{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}.ntf-b b{font-size:13.5px}.ntf-b small{font-size:12px;color:var(--muted)}
+.ntf-it.bad .ntf-b b{color:var(--red)}.ntf-go{color:var(--muted);font-size:18px;align-self:center}
+.ntf-empty{padding:16px 10px;font-size:13px;color:var(--muted);text-align:center}
 /* ---- one step closer: indigo for everything you click or select, gold only for main buttons and the brand ---- */
 :root{--ind:#5b6cf0;--ind2:#3a48e0;--ind-glow:rgba(58,72,224,.45);--lnk:#9b8cff}
 html:not([data-theme=light]) #app::before,html:not([data-theme=light]) #share::before{
@@ -1386,6 +1402,7 @@ html:not([data-theme=light]) :is(.mk-chip.on,.st-tab.on){border-color:rgba(110,1
       <span class="chip founder-chip" title="Founder"><span>Founder</span> <b>BROWN ALGO</b></span>
       <span class="chip" id="whoChip" data-notr></span>
       <button class="btn sm inst-btn hidden" id="instBtn" type="button">📲 <span>Install app</span></button>
+      <button class="ntf-bell" id="ntfBell" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="ntf-badge hidden" id="ntfBadge"></span></button>
       <button class="btn sm ghost" id="logout">Log out</button>
     </div>
     <nav class="tabs" id="tabs"></nav>
@@ -1397,6 +1414,7 @@ html:not([data-theme=light]) :is(.mk-chip.on,.st-tab.on){border-color:rgba(110,1
 <div id="modal" class="modal hidden"><div class="box" id="mbox"></div></div>
 <div id="tip"></div>
 <div id="toast"></div>
+<div id="ntfPanel" class="ntf-panel hidden" role="dialog" aria-label="Notifications"></div>
 
 <script src="i18n.js"></script>
 <script src="news-info.js"></script>
@@ -1736,7 +1754,44 @@ function go(v){if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin"
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
   S.view=v;S.page=null;S.dayPage=null;S._fromDay=null;S._pfId=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
-function render(){renderTabs();const v=$("#view");
+/* ============ 🔔 notification bell (top right) ============
+   Red news soon (countdown, urgent at 5 minutes), journal not done today, tomorrow not planned.
+   Rebuilt every 30 seconds and after every change; opening the panel marks them as seen. */
+const ntfSeenKey=()=>"tv_ntf_seen_"+((S.me&&S.me.id)||"x");
+function ntfSeen(){try{return JSON.parse(localStorage.getItem(ntfSeenKey()))||{}}catch(e){return {}}}
+function ntfItems(){const out=[];if(!S.me)return out;const now=Date.now(),me=S.me,student=me.role!=="admin";
+  /* 1) red folder news in the next 30 minutes */
+  (S.news||[]).filter(n=>n.impact==="High").forEach(n=>{const t=new Date(n.starts_at).getTime(),m=Math.round((t-now)/60000);
+    if(t>=now-60000&&m<=30){const urgent=m<=5;out.push({id:"news:"+n.starts_at+":"+n.title,ic:urgent?"🚨":"🔴",lv:urgent?"bad":"warn",go:"news",
+      t:m<=0?I18N.t("Red news now"):urgent?I18N.t("Red news in 5 minutes"):`${I18N.t("Red news in")} ${m} ${I18N.t("min")}`,
+      s:`${esc(n.title)} · ${tzTime(n.starts_at,DZ)} DZ / ${tzTime(n.starts_at,NY)} NY`,sub2:urgent?I18N.t("No new entry around the news. Protect your open trades."):""})}});
+  if(student&&!S.readonly){const today=todayStr(),d=new Date(),wd=d.getDay(),h=d.getHours();
+    const plans=S.plans||[],pToday=plans.find(p=>p.date===today);
+    /* 2) journal: a trading day after the New York close (16:00 NY) with no trade and no review */
+    const nyH=Number(new Date().toLocaleString("en-US",{timeZone:NY,hour:"2-digit",hour12:false}))%24;
+    const tradingDay=wd>=1&&wd<=5&&!(pToday&&pToday.rest)&&!(typeof US_HOL!=="undefined"&&US_HOL.some(x=>x[0]===today));
+    const journaled=(S.trades||[]).some(t=>t.date===today)||(pToday&&(pToday.followed||(pToday.review||"").trim()));
+    if(tradingDay&&nyH>=16&&!journaled)out.push({id:"journal:"+today,ic:"📓",lv:"warn",go:"journal",t:I18N.t("You haven't journaled today"),s:I18N.t("Log your trades or write your end-of-day review. A no-trade day is a decision too.")});
+    /* 3) plan: in the evening (from 18:00), Sunday to Thursday, if the next trading day has no plan */
+    const nd=nextTradingDay();
+    if(h>=18&&wd>=0&&wd<=4&&!plans.some(p=>p.date===nd))out.push({id:"plan:"+nd,ic:"🧭",lv:"info",go:"plan",t:I18N.t("You haven't planned tomorrow"),s:`${esc(fmtDate(nd))} · ${I18N.t("Bias, key levels, max loss and max trades.")}`})}
+  return out}
+function ntfRefresh(){const b=$("#ntfBell");if(!b)return;const items=ntfItems(),seen=ntfSeen(),unread=items.filter(i=>!seen[i.id]).length;
+  b.classList.toggle("hidden",!S.me);const bd=$("#ntfBadge");bd.textContent=unread>9?"9+":unread;bd.classList.toggle("hidden",!unread);
+  b.classList.toggle("ring",items.some(i=>i.lv==="bad"&&!seen[i.id]));
+  const p=$("#ntfPanel");if(p&&!p.classList.contains("hidden"))ntfDraw(items)}
+function ntfDraw(items){const p=$("#ntfPanel");
+  p.innerHTML=`<div class="ntf-h"><b>${esc(I18N.t("Notifications"))}</b><span class="mut">${items.length?items.length:""}</span></div>`+
+    (items.length?items.map(i=>`<button type="button" class="ntf-it ${i.lv}" data-ntfgo="${i.go}"><span class="ntf-i">${i.ic}</span><span class="ntf-b"><b>${esc(i.t)}</b><small data-notr>${i.s}</small>${i.sub2?`<small>${esc(i.sub2)}</small>`:""}</span><span class="ntf-go">›</span></button>`).join(""):
+     `<div class="ntf-empty">✅ <span>${esc(I18N.t("All good. Nothing to do right now."))}</span></div>`);
+  $$("[data-ntfgo]",p).forEach(x=>x.onclick=()=>{p.classList.add("hidden");go(x.dataset.ntfgo)})}
+$("#ntfBell").onclick=e=>{e.stopPropagation();const p=$("#ntfPanel"),open=p.classList.contains("hidden");p.classList.toggle("hidden",!open);
+  if(open){const items=ntfItems(),seen=ntfSeen();items.forEach(i=>seen[i.id]=Date.now());
+    Object.keys(seen).forEach(k=>{if(Date.now()-seen[k]>7*864e5)delete seen[k]});try{localStorage.setItem(ntfSeenKey(),JSON.stringify(seen))}catch(_){}
+    const r=$("#ntfBell").getBoundingClientRect();p.style.top=(r.bottom+8)+"px";const pw=Math.min(360,innerWidth-16);p.style.right=Math.max(8,Math.min(innerWidth-r.right-6,innerWidth-pw-8))+"px";ntfDraw(items);ntfRefresh()}};
+document.addEventListener("click",e=>{const p=$("#ntfPanel");if(p&&!p.classList.contains("hidden")&&!e.target.closest("#ntfPanel,#ntfBell"))p.classList.add("hidden")});
+setInterval(ntfRefresh,30000);
+function render(){renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
   const fn={journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
   v.innerHTML=h+'<div id="vb"></div>';Promise.resolve(fn($("#vb"))).then(()=>bindNotify(v)).catch(()=>{});
@@ -1781,7 +1836,7 @@ function holRows(list){return list.map(h=>`<div class="nrow hol click ${h.kind}"
 const daysUntil=d=>{const [y,m,dd]=d.split("-").map(Number);const a=new Date(y,m-1,dd),b=new Date();b.setHours(0,0,0,0);return Math.round((a-b)/864e5)};
 function newsWeekEnd(){const d=new Date();d.setDate(d.getDate()+(6-d.getDay()));return ymd(d)}  /* the feed covers the current week (to Saturday) */
 async function loadNews(){try{if(!API||!API.news)return;const a=new Date();a.setDate(a.getDate()-45);  /* history for the discipline streak (red news days) */const b=new Date();b.setDate(b.getDate()+10);
-  S.news=await API.news(a.toISOString(),b.toISOString());S.newsLoaded=true;
+  S.news=await API.news(a.toISOString(),b.toISOString());S.newsLoaded=true;setTimeout(ntfRefresh,0);
   const nb=$("#newsBox");if(nb){nb.outerHTML=newsBox(nb.dataset.date,nb.dataset.ins==="1");const ta=$("#pNews");if(ta&&!ta.value.trim()&&!ta.disabled)ta.value=newsText(nb.dataset.date);bindNewsIns(nb.dataset.date)}
   const cn=$("#coachNews");if(cn)cn.innerHTML=coachNewsHTML();refreshNewsPanel();
   const ra=$("#redAlert");if(ra)ra.outerHTML=redAlert(ra.dataset.date,ra.dataset.when);
