@@ -5,7 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Effective Journal — by Tradeversity</title>
 <link rel="icon" type="image/png" href="brand/logo-192.png?v=hq">
-<link rel="apple-touch-icon" href="brand/logo-192.png?v=hq">
+<link rel="apple-touch-icon" href="brand/app-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b0f17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tradeversity">
 <script>/* apply the saved theme before the page paints (no white/dark flash) */
 try{var tm=localStorage.getItem("tv_theme")||"dark";if(tm==="light"||(tm==="system"&&matchMedia("(prefers-color-scheme: light)").matches))document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1000,6 +1006,64 @@ html[data-theme=light] .about-v .astat:hover,html[data-theme=light] .about-v .ca
 html[data-theme=light] :is(#app,#share) .tg-link[data-k=tiktok] svg [fill="#fff"]{fill:#111a2c}
 html[data-theme=light] .logo{animation:none;filter:drop-shadow(0 2px 6px rgba(16,24,40,.25))}
 @media(max-width:560px){[dir=rtl] .tpnl{text-align:right}}
+
+/* ================= DESIGN SYSTEM (Nov 2026) =================
+   Gold  = brand, main buttons, selected item
+   Green / red = profit and loss only
+   Teal  = information and tips
+   Grey  = secondary text, borders, inactive
+   One glow per page at most. The login night scene is not touched. */
+:root{--teal:#2ec5c9;--amber:#e0a23a}
+html:not([data-theme=light]) :is(#app,#share,.modal,#tip,#toast,.tpop){
+  --bg:#0b0f17;--panel:#121722;--panel2:#0e131c;--line:#1c2331;--line2:#273042;
+  --text:#e9edf5;--muted:#8a93a6;--dim:#5d6678;--grid:#18202e;--grid0:#344055}
+html[data-theme=light] :is(#app,#share,.modal,#tip,#toast,.tpop){--teal:#0f8f93;--amber:#b7791f}
+/* calmer background: one soft gold light at the top, no pulsing */
+#app::before,#share::before{animation:none;filter:none;
+  background:radial-gradient(1100px 460px at 50% -160px,rgba(245,185,66,.09),transparent 70%),
+    radial-gradient(900px 600px at 100% 0%,rgba(200,212,232,.035),transparent 70%),
+    linear-gradient(180deg,#0c1019 0%,#0a0d15 60%,#080a10 100%)}
+html[data-theme=light] #app::before,html[data-theme=light] #share::before{
+  background:radial-gradient(1100px 460px at 50% -160px,rgba(245,185,66,.12),transparent 70%),linear-gradient(180deg,#f7f8fb 0%,#f1f3f7 100%)}
+.card,.kpi{background-color:rgba(18,23,34,.92)}
+#app header.top,#share header.top{background:rgba(11,15,23,.78)}
+/* tabs: grey icons, the selected tab in gold */
+.tico{--c1:var(--muted);--c2:var(--muted)}
+nav.tabs button.on .tico,#bnav button.on .bn-ic{--c1:var(--gold);--c2:var(--gold)}
+nav.tabs button.on{box-shadow:inset 0 0 0 1px var(--line2),inset 0 -2px 0 var(--gold)}
+#tabs button[data-v=propfirms]>span:last-child,.bn-sheet button[data-v=propfirms]>span:last-child{background:linear-gradient(90deg,var(--gold),#ffe1a0,var(--teal),var(--gold));background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800;animation:pfShine 5s linear infinite}
+/* cards: flat, no colored gradients */
+:is(.eod-card,.review-card,.rules-card,.impbox,.ind-card,.pf-hero,.pf-hero.cfd,.pf-sec.hid,.pf-sec.pay,.ind-vid,.sh-cta){background:var(--panel)!important;border-color:var(--line)!important}
+.eod-card summary::after{color:var(--gold)}
+.review-card{border-inline-start:3px solid var(--teal)!important}
+.ind-note{background:color-mix(in srgb,var(--teal) 7%,var(--panel));border-color:color-mix(in srgb,var(--teal) 35%,transparent)}
+.ind-note b{color:var(--teal)}
+.risk-st{background:color-mix(in srgb,var(--teal) 12%,transparent);color:var(--teal)}
+.kind-b.cfd{background:color-mix(in srgb,var(--teal) 14%,transparent);color:var(--teal)}
+/* prop firms: neutral cards, teal rules, amber hidden rules, green payouts */
+.pf-item,.pf-item.cfd{--pc:var(--gold);border-color:var(--line);background:var(--panel);box-shadow:none}
+.pf-item:hover{border-color:var(--line2)}
+.pf-item .pf-logo{box-shadow:0 0 0 1px var(--line2)}
+.pf-letter span{background:var(--gold);color:#1b1305;box-shadow:none}
+.pf-letter::after{background:var(--line)}
+.pf-rules summary{color:var(--muted)}
+.pf-mini,.pf-mini.f{--mc:var(--teal)}.pf-mini.h{--mc:var(--amber)}.pf-mini.p{--mc:var(--green)}
+.pf-sec{--mc:var(--teal)}.pf-sec.hid{--mc:var(--amber)}.pf-sec.pay{--mc:var(--green)}
+.pf-sec.hid li::marker,.pf-sec.hid h3{color:var(--amber)}
+/* no extra glows */
+.mk-chip.on{box-shadow:none}
+.st-tab.on{box-shadow:none;background:color-mix(in srgb,var(--gold) 9%,var(--panel))}
+.ind-card:hover{box-shadow:0 14px 30px -14px rgba(0,0,0,.6)}
+/* headline numbers bigger and calmer */
+.kpi .v{font-size:25px;letter-spacing:-.5px}
+.kpi .l{color:var(--muted);letter-spacing:.5px}
+h3{letter-spacing:.5px}
+.st-bin{color:var(--teal);border-color:color-mix(in srgb,var(--teal) 40%,transparent)}
+.bin-list{display:grid;gap:8px}.bin-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line2);border-radius:10px;background:var(--panel2)}
+.bin-row small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.inst-btn{border-color:color-mix(in srgb,var(--gold) 45%,transparent);color:var(--gold)}
+.inst-steps{margin:0 0 16px;padding-inline-start:20px;display:grid;gap:10px;font-size:14px}.inst-steps li::marker{color:var(--gold);font-weight:800}
+@media(max-width:760px){.inst-btn{padding:6px 9px}.inst-btn span{display:none}}
 </style>
 </head>
 <body>
@@ -1095,6 +1159,7 @@ html[data-theme=light] .logo{animation:none;filter:drop-shadow(0 2px 6px rgba(16
       <span id="langTop"></span>
       <span class="chip founder-chip" title="Founder"><span>Founder</span> <b>BROWN ALGO</b></span>
       <span class="chip" id="whoChip" data-notr></span>
+      <button class="btn sm inst-btn hidden" id="instBtn" type="button">📲 <span>Install app</span></button>
       <button class="btn sm ghost" id="logout">Log out</button>
     </div>
     <nav class="tabs" id="tabs"></nav>
@@ -2011,10 +2076,11 @@ function statTabs(){const ac=accounts();if(S.acct!=="all"&&!ac.includes(S.acct))
   const cnt=a=>S.trades.filter(t=>a==="all"||t.account===a).length,net=a=>S.trades.filter(t=>a==="all"||t.account===a).reduce((s,t)=>s+tradeNet(t),0);
   const tab=(a,label,ic)=>{const n=net(a),canDel=a!=="all"&&!S.readonly&&cnt(a)>0;return `<div class="st-tab ${S.acct===a?"on":""}" role="button" tabindex="0" data-st="${esc(a)}"><span class="st-ic">${ic}</span><span class="st-tx"><b ${a==="all"?"":"data-notr"}>${label}</b><small><span class="mono ${cls(n)}">${kfmt(n)}</span> · ${cnt(a)} <span>trades</span></small></span>${canDel?`<button type="button" class="st-x" data-stdel="${esc(a)}" title="Delete these statistics" aria-label="Delete these statistics">🗑</button>`:""}</div>`};
   return `<div class="st-wrap"><div class="st-tabs" data-noswipe>${tab("all","All statistics","📊")}${ac.map(a=>tab(a,esc(a),"💼")).join("")}
-    ${S.readonly?"":`<button type="button" class="st-tab st-add" id="stAdd"><span class="st-ic">＋</span><span class="st-tx"><b>Add another statistics</b><small>New account or challenge</small></span></button>`}</div></div>`}
+    ${S.readonly?"":`<button type="button" class="st-tab st-add" id="stAdd"><span class="st-ic">＋</span><span class="st-tx"><b>Add another statistics</b><small>New account or challenge</small></span></button>`}</div><span id="stBin"></span></div>`}
 function bindStatTabs(){
   $$("[data-st]").forEach(b=>{b.onclick=e=>{if(e.target.closest("[data-stdel]"))return;S.acct=b.dataset.st;S.calMonth=null;render()};b.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();b.click()}}});
   $$("[data-stdel]").forEach(x=>x.onclick=e=>{e.stopPropagation();delStats(x.dataset.stdel)});
+  fillBinChip();
   const add=$("#stAdd");if(add)add.onclick=()=>{
     openModal(`<h3 style="margin-top:0">＋ <span>Add another statistics</span></h3><p class="mut" style="font-size:13px;margin-top:-4px">Each account or challenge gets its own statistics tab.</p>
      <label class="f">Name of the account<input class="i" id="stName" placeholder="e.g. Apex 50K #2, FTMO 100K…" maxlength="40"></label>
@@ -2025,15 +2091,36 @@ function bindStatTabs(){
     $("#stImp").onclick=()=>{closeModal();const b=$("#impBox");if(!b)return;b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
     $("#stMan").onclick=()=>{const n=$("#stName").value.trim();if(!n){$("#stName").focus();toast("Write a name for the account first");return}closeModal();S.acct=n;render();editTrade(null)}};
 }
+/* Recycle bin: deleted statistics are kept 7 days in this browser (IndexedDB, screenshots included) */
+const Bin={DAYS:7,_db:null,
+  db(){return this._db||(this._db=new Promise((res,rej)=>{const r=indexedDB.open("tv_bin",1);r.onupgradeneeded=()=>r.result.createObjectStore("bins",{keyPath:"id"});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))},
+  async tx(mode,fn){const d=await this.db();return new Promise((res,rej)=>{const t=d.transaction("bins",mode),s=t.objectStore("bins");const out=fn(s);t.oncomplete=()=>res(out&&out.result!==undefined?out.result:undefined);t.onerror=()=>rej(t.error)})},
+  async put(acct,trades){try{await this.tx("readwrite",s=>s.put({id:uuid(),user:S.subject.id,acct,at:Date.now(),trades:JSON.parse(JSON.stringify(trades))}))}catch(e){}},
+  async list(){try{const all=await this.tx("readonly",s=>s.getAll())||[];const lim=Date.now()-this.DAYS*864e5,old=all.filter(b=>b.at<lim);
+    if(old.length)await this.tx("readwrite",s=>{old.forEach(b=>s.delete(b.id))});return all.filter(b=>b.at>=lim&&b.user===S.subject.id).sort((a,b)=>b.at-a.at)}catch(e){return[]}},
+  async del(id){try{await this.tx("readwrite",s=>s.delete(id))}catch(e){}}};
+async function fillBinChip(){const el=$("#stBin");if(!el||S.readonly)return;const l=await Bin.list();if(!$("#stBin"))return;
+  el.innerHTML=l.length?`<button type="button" class="btn sm st-bin" id="stBinBtn">♻️ <span>Recently deleted</span> (${l.length})</button>`:"";
+  const b=$("#stBinBtn");if(b)b.onclick=()=>openBin()}
+async function openBin(){const l=await Bin.list();const left=b=>Math.max(1,Math.ceil((b.at+Bin.DAYS*864e5-Date.now())/864e5));
+  openModal(`<h3 style="margin-top:0">♻️ <span>Recently deleted</span></h3><p class="mut" style="font-size:13px;margin-top:-4px">Deleted statistics stay here for 7 days on this device, then they are gone for good.</p>
+   <div class="bin-list">${l.length?l.map(b=>{const n=b.trades.reduce((s,t)=>s+tradeNet(t),0);return `<div class="bin-row"><div><b data-notr>${esc(b.acct)}</b><small>${b.trades.length} <span>trades</span> · <span class="mono ${cls(n)}">${money(n)}</span> · ${left(b)} <span>days left</span></small></div><button class="btn sm pri" data-rest="${b.id}">↩ <span>Restore</span></button></div>`}).join(""):`<div class="mut">Nothing here.</div>`}</div>
+   <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="binX">Close</button></div>`);
+  $("#binX").onclick=closeModal;
+  $$("[data-rest]").forEach(btn=>btn.onclick=async()=>{const b=l.find(x=>x.id===btn.dataset.rest);if(!b)return;btn.disabled=true;btn.textContent="…";
+    const have=new Set(S.trades.map(t=>t.id)),ts=b.trades.filter(t=>!have.has(t.id));
+    try{if(ts.length)await API.saveTrades(ts);S.trades=S.trades.concat(ts);await Bin.del(b.id);S.acct=b.acct;closeModal();render();toast(`${ts.length} trades restored`)}
+    catch(e){btn.disabled=false;btn.textContent="Restore";toast("Couldn't restore: "+(e.message||e))}})}
 function delStats(a){if(!a||a==="all")return;const ids=S.trades.filter(t=>t.account===a).map(t=>t.id),n=S.trades.filter(t=>t.account===a).reduce((s,t)=>s+tradeNet(t),0);
     const word="DELETE";
     openModal(`<h3 style="margin-top:0;color:var(--red)">🗑 <span>Delete these statistics</span></h3>
      <div class="st-delbox"><b data-notr>${esc(a)}</b><span>${ids.length} <span>trades</span> · <span class="mono ${cls(n)}">${money(n)}</span></span></div>
-     <p style="font-size:14px">All trades of this account will be deleted, with their screenshots and notes. Your other accounts stay. <b>This can't be undone.</b></p>
+     <p style="font-size:14px">All trades of this account will be deleted, with their screenshots and notes. Your other accounts stay.</p>
+     <p class="mut" style="font-size:13px">♻️ <span>You can restore it for 7 days from "Recently deleted", on this device.</span></p>
      <label class="f"><span>Type DELETE to confirm</span><input class="i" id="stWord" autocomplete="off" placeholder="DELETE"></label>
      <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" id="stNo">Cancel</button><button class="btn st-danger" id="stYes" disabled>🗑 <span>Delete</span></button></div>`);
     $("#stNo").onclick=closeModal;const w=$("#stWord"),y=$("#stYes");w.oninput=()=>{y.disabled=w.value.trim().toUpperCase()!==word};
-    y.onclick=async()=>{y.disabled=true;y.textContent="…";try{await API.deleteTrades(ids);const s=new Set(ids);S.trades=S.trades.filter(t=>!s.has(t.id));if(S.acct===a)S.acct="all";S.calMonth=null;closeModal();render();toast(`${ids.length} trades deleted`)}catch(e){y.disabled=false;y.textContent="Delete";toast("Couldn't delete: "+(e.message||e))}}}
+    y.onclick=async()=>{y.disabled=true;y.textContent="…";try{await Bin.put(a,S.trades.filter(t=>t.account===a));await API.deleteTrades(ids);const s=new Set(ids);S.trades=S.trades.filter(t=>!s.has(t.id));if(S.acct===a)S.acct="all";S.calMonth=null;closeModal();render();toast(`${ids.length} trades deleted`)}catch(e){y.disabled=false;y.textContent="Delete";toast("Couldn't delete: "+(e.message||e))}}}
 
 /* ============ SHARE (public view-only link + QR code) ============ */
 const shareURL=tok=>`${location.origin}${location.pathname}?share=${tok}`;
@@ -2810,6 +2897,22 @@ function fillAbout(){$$("[data-about-mini]").forEach(e=>e.innerHTML=`<span>${ABO
 fillAbout();
 document.addEventListener("click",e=>{const im=e.target.closest&&e.target.closest("img[data-res]");if(!im)return;openModal(`<div class="mhead"><h2>Student result</h2><button class="x" id="mx">×</button></div><img src="results/${encodeURI(im.dataset.res)}" alt="Student result" style="width:100%;border-radius:10px;border:1px solid var(--line)">`);$("#mx").onclick=closeModal});
 
+/* ============ Install as a phone app (PWA) ============ */
+(function(){
+  const standalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  if("serviceWorker" in navigator&&location.protocol==="https:")addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  let deferred=null;const btn=document.getElementById("instBtn");if(!btn)return;
+  const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;
+  const show=v=>btn.classList.toggle("hidden",!v||standalone());
+  addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;show(true)});
+  addEventListener("appinstalled",()=>{deferred=null;show(false);toast("App installed ✓")});
+  if(isIOS&&!standalone())show(true);
+  btn.onclick=async()=>{
+    if(deferred){deferred.prompt();try{await deferred.userChoice}catch(e){}deferred=null;show(false);return}
+    openModal(`<h3 style="margin-top:0">📲 <span>Install the app</span></h3>
+      <ol class="inst-steps"><li><span>In Safari, tap the Share button</span> <b>⬆︎</b></li><li><span>Choose "Add to Home Screen"</span> <b>＋</b></li><li><span>Tap "Add". The Tradeversity app appears on your home screen.</span></li></ol>
+      <div class="row" style="justify-content:flex-end"><button class="btn pri" id="instOk">OK</button></div>`);
+    $("#instOk").onclick=closeModal}})();
 /* ============ Free ICT indicator (TradingView) ============ */
 const INDICATOR={name:"TRADEVERSITY NQ v1.3: Advanced ICT & Liquidity Engine",url:"",img:"brand/indicator-nq.png"};
 function vIndicator(el){const has=!!INDICATOR.url;
