@@ -270,7 +270,7 @@ const T={
 "Sell stops taken / buy stops taken":["Sell stops pris / buy stops pris","تم أخذ أوامر وقف البيع / وقف الشراء"],
 "Judas swing at a specific time into the HTF imbalance":["Judas swing à une heure précise vers le déséquilibre HTF","حركة جوداس في وقت محدد نحو عدم التوازن على الإطار الأعلى"],
 "Using a macro imbalance entry":["Entrée sur un déséquilibre macro","الدخول على عدم توازن الماكرو"],
-"Not a no-trade day (no red news / holiday)":["Pas un jour sans trading (pas de news rouge / jour férié)","ليس يوم امتناع عن التداول (لا أخبار حمراء / لا عطلة)"],
+"My risk is calculated and respected":["Mon risque est calculé et respecté","مخاطرتي محسوبة ومحترمة"],
 "All checks done: you can take the trade":["Tout est validé : vous pouvez prendre le trade","تم التحقق من كل شيء: يمكنك أخذ الصفقة"],
 "End-of-day review":["Bilan de fin de journée","مراجعة نهاية اليوم"],
 "Day P&L (journal)":["P&L du jour (journal)","ربح/خسارة اليوم (اليومية)"],

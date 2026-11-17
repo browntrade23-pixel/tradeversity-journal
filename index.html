@@ -2021,7 +2021,7 @@ function vPlan(el){
   const prev=saved?null:S.plans.filter(x=>x.date<cur&&(x.maxLoss||x.target||x.riskPerTrade)).sort((a,b)=>a.date<b.date?1:-1)[0];
   const p=saved||{user_id:S.subject.id,date:cur,maxLoss:prev?prev.maxLoss:"",target:prev?prev.target:"",maxTrades:prev&&prev.maxTrades?prev.maxTrades:2,riskPerTrade:prev?prev.riskPerTrade:"",bias:{},htf:"",levels:"",news:"",session:"NY AM",model:"",noTrade:"",rules:{},mindset:"",followed:"",review:""};
   const ro=S.readonly?"disabled":"";
-  const RULES=["Daily direction defined","1H imbalance or 15m confirmation","Sell stops taken / buy stops taken","Judas swing at a specific time into the HTF imbalance","Using a macro imbalance entry","Not a no-trade day (no red news / holiday)"];
+  const RULES=["Daily direction defined","1H imbalance or 15m confirmation","Sell stops taken / buy stops taken","Judas swing at a specific time into the HTF imbalance","Using a macro imbalance entry","My risk is calculated and respected"];
   const nCk=RULES.filter(r=>(p.rules||{})[r]).length;
   el.innerHTML=`<div class="row" style="justify-content:space-between"><div><h1>Trading plan</h1><p class="sub">Plan tomorrow tonight. Execute it tomorrow, then review it.</p></div>
    <div class="row"><input class="i" type="date" id="pDate" value="${cur}" style="width:auto">${dates.length?`<select class="i" id="pHist" style="width:auto"><option value="">Past plans…</option>${dates.map(d=>`<option value="${d}">${d}</option>`).join("")}</select>`:""}</div></div>
