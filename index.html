@@ -89,6 +89,20 @@ textarea.i{min-height:80px;resize:vertical}
 .seg button.on{background:var(--line2);color:var(--text)}
 .seg button.on.bull{background:rgba(39,194,108,.18);color:var(--green)}
 .seg button.on.bear{background:rgba(239,83,80,.18);color:var(--red)}
+.seg button.on.nt{background:rgba(140,150,170,.2);color:var(--text)}
+.bias-step{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;margin:4px 0 10px}
+.bias-step+.mk-chips+.bias-step{margin-top:16px}
+.bs-n{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:900;background:var(--gold);color:#1b1305;flex:none}
+.mk-chips{display:flex;flex-wrap:wrap;gap:8px}
+.mk-chip{padding:8px 14px;border-radius:99px;border:1px solid var(--line2);background:var(--panel2);color:var(--muted);font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.mk-chip:hover:not(:disabled){border-color:var(--gold);color:var(--text)}
+.mk-chip.on{border-color:var(--gold);background:rgba(245,185,66,.14);color:var(--gold2);box-shadow:0 0 14px rgba(245,185,66,.2)}
+.mk-chip:disabled{cursor:default}
+.bias-rows{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:8px}
+.bias-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px 8px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);border-inline-start:3px solid var(--line2)}
+.bias-row.bull{border-inline-start-color:var(--green)}.bias-row.bear{border-inline-start-color:var(--red)}.bias-row.nt{border-inline-start-color:#8c96aa}
+.bias-empty{font-size:13px;padding:10px 0}
+@media(max-width:420px){.bias-rows{grid-template-columns:1fr}.bias-row{flex-direction:column;align-items:stretch}.bias-seg{display:flex}.bias-seg button{flex:1;padding:7px 4px}}
 .pills{display:flex;flex-wrap:wrap;gap:6px}
 .pill{padding:5px 10px;border-radius:99px;border:1px solid var(--line2);background:var(--panel2);cursor:pointer;font-size:12px;color:var(--muted);user-select:none}
 .pill.on{border-color:var(--gold);color:var(--gold);background:rgba(245,185,66,.1)}
@@ -1050,6 +1064,7 @@ const MK={
   MGC:{name:"Micro Gold (10 oz)",pv:10,tick:.1,grp:"Gold",type:"Micro"}
 };
 const GROUPS={"Nasdaq":["NQ","MNQ"],"S&P 500":["ES","MES"],"Dow Jones":["YM","MYM"],"Gold":["GC","MGC"]};
+const PLAN_MKTS=[...Object.keys(GROUPS),"Silver","Crude Oil","EUR/USD","GBP/USD","Bitcoin"];
 function rootOf(sym){
   let s=String(sym||"").toUpperCase().trim().replace(/^\//,"").split(/[\s.:]/)[0];
   if(MK[s])return s;
@@ -1448,13 +1463,13 @@ function vStudent(el){const u=S.subject,ts=[...S.trades].sort((a,b)=>byDT(b,a)),
   const field=(l,v)=>v&&String(v).trim()?`<div class="pf"><div class="pl">${l}</div><div class="pv notes" data-notr>${esc(v)}</div></div>`:"";
   const planCard=p=>{const bias=Object.entries(p.bias||{}).filter(([,v])=>v);const rules=Object.entries(p.rules||{});const dt=S.trades.filter(t=>t.date===p.date),dn=dt.reduce((a,t)=>a+tradeNet(t),0);
     return `<details class="plan-item"><summary><b data-notr>${esc(fmtDate(p.date))}</b>
-      ${bias.length?`<span class="mut" data-notr>${bias.map(([k,v])=>`${esc(k)} ${v==="Bullish"?"▲":v==="Bearish"?"▼":"•"}`).join(" · ")}</span>`:""}
+      ${bias.length?`<span class="mut" data-notr>${bias.map(([k,v])=>`${esc(k)} ${v==="Bullish"?"▲":v==="Bearish"?"▼":v==="No trade"?"⛔":"•"}`).join(" · ")}</span>`:""}
       ${p.maxLoss?`<span class="tag"><span>Max loss</span> <span data-notr>$${esc(p.maxLoss)}</span></span>`:""}${p.maxTrades?`<span class="tag"><span>Max trades</span> <span data-notr>${esc(p.maxTrades)}</span></span>`:""}
       ${p.followed?`<span class="tag ${p.followed==="Yes"?"win":p.followed==="No"?"loss":""}"><span>Followed:</span> <span>${esc(p.followed)}</span></span>`:""}
       ${dt.length?`<span class="mono ${cls(dn)}" data-notr>${dt.length} · ${smoney(dn,0)}</span>`:""}</summary>
       <div class="plan-body">
         <div class="grid g4" style="margin-bottom:10px">${kpi("Max daily loss $",p.maxLoss?`$${esc(p.maxLoss)}`:"—")}${kpi("Daily profit target $",p.target?`$${esc(p.target)}`:"—")}${kpi("Max number of trades",esc(p.maxTrades||"—"))}${kpi("Risk per trade $",p.riskPerTrade?`$${esc(p.riskPerTrade)}`:"—")}</div>
-        ${bias.length?`<div class="pf"><div class="pl">Directional bias</div><div class="pv" data-notr>${bias.map(([k,v])=>`<span class="tag ${v==="Bullish"?"long":v==="Bearish"?"short":""}">${esc(k)}: ${esc(v)}</span>`).join(" ")}</div></div>`:""}
+        ${bias.length?`<div class="pf"><div class="pl">Directional bias</div><div class="pv" data-notr>${bias.map(([k,v])=>`<span class="tag ${v==="Bullish"?"long":v==="Bearish"?"short":""}">${esc(k)}: ${v==="No trade"?"⛔ ":""}${esc(I18N.t(v))}</span>`).join(" ")}</div></div>`:""}
         ${field("HTF narrative (Daily / 1H) & draw on liquidity",p.htf)}${field("Key levels (PDH, PDL, FVGs, opens…)",p.levels)}${field("News & events",p.news)}
         ${field("Entry model / A+ setup I'm waiting for",p.model)}${field("I will NOT trade if…",p.noTrade)}${field("Session",p.session)}${field("Mindset / goal for the day",p.mindset)}
         ${rules.length?`<div class="pf"><div class="pl">Pre-trade checklist</div><div class="pv">${rules.map(([r,v])=>`<div>${v?"✅":"⬜"} <span>${esc(r)}</span></div>`).join("")}</div></div>`:""}
@@ -2022,7 +2037,11 @@ function vPlan(el){
     <label class="f">Max number of trades<input class="i" type="number" name="maxTrades" value="${esc(p.maxTrades)}" ${ro} placeholder="e.g. 3"></label>
     <label class="f">Risk per trade $<input class="i" type="number" step="any" name="riskPerTrade" value="${esc(p.riskPerTrade)}" ${ro} placeholder="e.g. 150"></label></div>
     ${num(p.maxLoss)>0&&num(p.riskPerTrade)>0?`<p class="mut" style="margin:10px 0 0">→ You can take <b>${Math.floor(num(p.maxLoss)/num(p.riskPerTrade))}</b> full losses before you stop for the day.</p>`:""}</div>
-   <div class="card"><h3>Directional bias</h3><div class="grid g2">${Object.keys(GROUPS).map(gk=>{const v=(p.bias||{})[gk]||"";return `<div class="row" style="justify-content:space-between"><b>${gk}</b><div class="seg" data-g="${gk}">${["Bullish","Neutral","Bearish"].map(b=>`<button type="button" ${ro} data-b="${b}" class="${v===b?"on "+(b==="Bullish"?"bull":b==="Bearish"?"bear":""):""}">${b==="Bullish"?"▲ ":b==="Bearish"?"▼ ":""}${b}</button>`).join("")}</div></div>`}).join("")}</div></div>
+   <div class="card bias-card"><h3>Directional bias</h3>
+    <div class="bias-step"><span class="bs-n">1</span><span>Which markets will you trade?</span></div>
+    <div class="mk-chips" id="mkChips"></div>
+    <div class="bias-step"><span class="bs-n">2</span><span>HTF direction for each market</span></div>
+    <div class="bias-rows" id="biasRows"></div></div>
    <div class="card grid g2">
     <label class="f">HTF narrative (Daily / 1H) & draw on liquidity<textarea class="i" name="htf" ${ro}>${esc(p.htf)}</textarea></label>
     <label class="f">Key levels (PDH, PDL, FVGs, opens…)<textarea class="i" name="levels" ${ro}>${esc(p.levels)}</textarea></label>
@@ -2044,6 +2063,18 @@ function vPlan(el){
    ${S.readonly?"":`<div class="row" style="justify-content:flex-end"><button class="btn pri" type="submit">Save plan</button></div>`}
   </form>`;
   bindNewsIns(cur);if($("#pHist"))$("#pHist").onchange=e=>{if(e.target.value){S._planDate=e.target.value;render()}};
+  /* directional bias: 1) pick markets, 2) HTF direction per market */
+  const bias={...(p.bias||{})};
+  let mk=p.markets?[...p.markets]:Object.keys(bias).filter(k=>bias[k]&&bias[k]!=="Neutral");
+  const BDIR=[["Bullish","▲","bull"],["Bearish","▼","bear"],["No trade","⛔","nt"]];
+  const drawBias=()=>{
+    $("#mkChips").innerHTML=PLAN_MKTS.map(m=>`<button type="button" class="mk-chip ${mk.includes(m)?"on":""}" data-mk="${esc(m)}" ${ro}>${mk.includes(m)?"✓ ":""}<span>${esc(m)}</span></button>`).join("");
+    $("#biasRows").innerHTML=mk.length?mk.map(m=>{const v=bias[m]||"";return `<div class="bias-row ${(BDIR.find(b=>b[0]===v)||[])[2]||""}"><b>${esc(m)}</b><div class="seg bias-seg" data-g="${esc(m)}">${BDIR.map(([b,ic,c])=>`<button type="button" ${ro} data-b="${b}" class="${v===b?"on "+c:""}">${ic} <span>${b}</span></button>`).join("")}</div></div>`}).join("")
+      :`<div class="mut bias-empty">👆 <span>Choose at least one market above.</span></div>`;
+    if(S.readonly)return;
+    $$("#mkChips [data-mk]").forEach(b=>b.onclick=()=>{const m=b.dataset.mk;if(mk.includes(m)){mk=mk.filter(x=>x!==m);delete bias[m]}else mk.push(m);mk.sort((a,b)=>PLAN_MKTS.indexOf(a)-PLAN_MKTS.indexOf(b));drawBias()});
+    $$("#biasRows .seg[data-g]").forEach(sg=>$$("button",sg).forEach(b=>b.onclick=()=>{const g=sg.dataset.g;bias[g]=bias[g]===b.dataset.b?"":b.dataset.b;drawBias()}))};
+  drawBias();
   $("#pDate").onchange=e=>{const v=e.target.value;if(v&&v!==cur){S._planDate=v;render()}};
   const charts=[...(p.charts||[])];
   const drawCharts=()=>{const box=$("#pCharts");
@@ -2061,10 +2092,8 @@ function vPlan(el){
   const ckUpd=()=>{const n=$$(".ck-card [data-r]").filter(c=>c.checked).length;$("#ckN").textContent=`${n} / ${RULES.length}`;$("#ckBar").style.width=n/RULES.length*100+"%";$("#ckGo").classList.toggle("on",n===RULES.length)};
   $$(".ck-card [data-r]").forEach(c=>c.onchange=ckUpd);
   $$('.daytype input[name="dayType"]').forEach(r=>{r.onpointerdown=()=>{r._was=r.checked};r.onclick=()=>{if(r._was){r.checked=false;r._was=false}}});
-  const bias={...(p.bias||{})};
-  $$(".seg[data-g]").forEach(sg=>$$("button",sg).forEach(b=>b.onclick=()=>{const g=sg.dataset.g,v=b.dataset.b;bias[g]=bias[g]===v?"":v;$$("button",sg).forEach(x=>{x.className=bias[g]===x.dataset.b?"on "+(v==="Bullish"?"bull":v==="Bearish"?"bear":""):""})}));
   $("#pf").onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const rules={};$$("[data-r]").forEach(c=>rules[c.dataset.r]=c.checked);
-    const dt=d.dayType||"";const np={...p,...d,bias,rules,charts,dayType:dt,rest:dt==="rest",date:cur,user_id:S.subject.id};
+    const dt=d.dayType||"";const bOut={};mk.forEach(m=>{bOut[m]=bias[m]||""});const np={...p,...d,bias:bOut,markets:mk,rules,charts,dayType:dt,rest:dt==="rest",date:cur,user_id:S.subject.id};
     try{await API.savePlan(np);const i=S.plans.findIndex(x=>x.date===cur);if(i>=0)S.plans[i]=np;else S.plans.push(np);toast("Plan saved");render()}catch(err){toast("Couldn't save: "+(err.message||err))}};
 }
 
