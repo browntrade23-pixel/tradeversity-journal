@@ -1077,6 +1077,24 @@ h3{letter-spacing:.5px}
 .sc-step:hover:not(:disabled){border-color:var(--gold)}.sc-step.ok{opacity:.55;cursor:default;text-decoration:line-through}.sc-ic{font-size:17px}.sc-go{margin-inline-start:auto;color:var(--gold);font-size:18px}
 .wk-box{padding:12px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);display:grid;gap:6px;font-size:13px}
 .wk-box.good>b{color:var(--green)}.wk-box.attn>b{color:var(--amber)}
+/* prop firm: rules for the chosen account size */
+.sz-pick{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px}
+.sz-b{padding:10px 18px;border-radius:12px;border:1.5px solid var(--line2);background:var(--panel2);color:var(--text);font:inherit;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:15px;cursor:pointer;transition:all .2s}
+.sz-b:hover{border-color:var(--gold);transform:translateY(-1px)}
+.sz-b.on{background:var(--gold);border-color:var(--gold);color:#1b1305}
+.sz-progs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.sz-p{padding:6px 12px;border-radius:99px;border:1px solid var(--line2);background:none;color:var(--muted);font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.sz-p.on{border-color:var(--teal);color:var(--teal);background:color-mix(in srgb,var(--teal) 10%,transparent)}
+.sz-pn{font-size:12.5px;font-weight:700;margin-bottom:10px}
+.sz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.sz-t{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);animation:tvxPop .4s ease both}
+.sz-t b{font-size:21px;line-height:1.15}.sz-t small{font-size:11.5px;color:var(--muted)}
+.sz-l{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
+.sz-t.good b{color:var(--green)}.sz-t.bad b{color:var(--red)}.sz-t.warn{border-color:color-mix(in srgb,var(--amber) 40%,transparent)}.sz-t.warn b{color:var(--amber)}
+.sz-note{font-size:13px;margin:10px 0 0;color:var(--teal)}
+.sz-none{padding:12px 14px;border-radius:10px;border:1px dashed var(--line2);font-size:13.5px}
+.sz-src{font-size:11.5px;margin:6px 0 0}
 .st-bin{color:var(--teal);border-color:color-mix(in srgb,var(--teal) 40%,transparent)}
 .bin-list{display:grid;gap:8px}.bin-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line2);border-radius:10px;background:var(--panel2)}
 .bin-row small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
@@ -1193,7 +1211,7 @@ h3{letter-spacing:.5px}
 
 <script src="i18n.js"></script>
 <script src="news-info.js"></script>
-<script src="indicator-video.js"></script><script src="propfirms.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
+<script src="indicator-video.js"></script><script src="propfirms.js"></script><script src="propfirms-sizes.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
 <script>
 /* =====================================================================
    CONFIG — your Supabase project (the anon key is public by design;
@@ -2615,7 +2633,7 @@ function vPropFirm(el,f){const d=PFDZ[f.dz]||PFDZ.check;f=Object.assign({},f,pfL
     <a class="btn sm" href="https://${f.site}" target="_blank" rel="noopener nofollow">↗ <span>Official website</span></a></div>
    <div class="pf-hero ${f.type}">${pfLogo(f,64)}<div><h1 data-notr>${esc(f.name)}</h1><div class="pf-meta"><span class="kind-b ${f.type==="cfd"?"cfd":"fut"}">${f.type==="cfd"?"💹 CFD":"📈 Futures"}</span> <span class="mut" data-notr>${esc(f.site)}</span></div></div></div>
    <div class="dz-box ${d[2]}"><span class="dz-flag">🇩🇿</span><div><b>${d[0]} ${d[1]}</b>${f.dzNote?`<p data-notr>${esc(f.dzNote)}</p>`:f.dz==="yes"?`<p>Algeria is not on this firm's restricted list.</p>`:f.dz==="no"?`<p>Algeria is on this firm's restricted-country list. A payout can be refused even after you pass.</p>`:`<p>Not confirmed. Ask the firm's support before paying.</p>`}</div></div>
-   <div class="card pf-sec"><h3>💰 Account sizes</h3><div class="pf-sizes">${f.sizes.map(s=>`<span class="cchip min"><b class="mono">${s}</b></span>`).join("")}</div><p class="mut" style="font-size:13px;margin:10px 0 0" data-notr>${esc(f.plans||"")}</p></div>
+   <div class="card pf-sec sz-card" id="szCard">${sizeCard(f)}</div>
    <div class="pf-cols">
     ${sec("📝","Evaluation phase: rules",f.eval)}
     ${sec("🕵️","Evaluation phase: hidden rules",f.evalH,"hid")}
@@ -2625,7 +2643,40 @@ function vPropFirm(el,f){const d=PFDZ[f.dz]||PFDZ.check;f=Object.assign({},f,pfL
    ${sec("💸","Withdrawal conditions",f.payout,"pay")}
    <p class="mut pf-disc">ℹ️ <span>Checked in November 2026. Rules change often and can differ between plans. Confirm everything on the official website before buying.</span></p>
   </div>`;
-  $("#pfBack").onclick=()=>{S._pfId=null;render();window.scrollTo(0,0)}}
+  $("#pfBack").onclick=()=>{S._pfId=null;render();window.scrollTo(0,0)};bindSizeCard(f)}
+/* ---------- rules for the chosen account size ---------- */
+const szNum=s=>{const m=String(s).match(/([\d.]+)\s*K/i);return m?Number(m[1])*1000:0};
+const usd=v=>v==null||v===""?null:typeof v==="number"?money(v,0):"$"+String(v).replace(/^~/,"≈ ");
+function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
+  if(!S._pfSz||S._pfSz.id!==f.id)S._pfSz={id:f.id,size:f.sizes[Math.min(1,f.sizes.length-1)],p:0};
+  const sel=S._pfSz,pi=Math.min(sel.p,Math.max(0,progs.length-1)),P=progs[pi],size=sel.size,n=szNum(size);
+  let tiles="",cover=true;
+  const tile=(ic,lb,val,sub,cl)=>val==null?"":`<div class="sz-t ${cl||""}"><span class="sz-l">${ic} <span>${lb}</span></span><b class="mono" data-notr>${val}</b>${sub?`<small>${sub}</small>`:""}</div>`;
+  if(P&&P.pct){const q=P.pct,$p=v=>money(n*v/100,0);
+    tiles+=q.t1!=null?tile("🎯",q.t2!=null?"Profit target · phase 1":"Profit target",$p(q.t1),`${q.t1}%`,"good"):"";
+    tiles+=q.t2!=null?tile("🎯","Profit target · phase 2",$p(q.t2),`${q.t2}%`,"good"):"";
+    tiles+=q.dl!=null?tile("📉","Daily loss limit",$p(q.dl),`${q.dl}%`,"bad"):"";
+    tiles+=q.dd!=null?tile("🛑","Max drawdown",$p(q.dd),`${q.dd}% · ${esc(I18N.t(P.ddT||""))}`,"bad"):"";
+    tiles+=q.dd!=null?tile("⚠️","Account fails below",money(n-n*q.dd/100,0),"Starting balance minus max drawdown","warn"):""}
+  else if(P&&P.rows&&P.rows[size]){const r=P.rows[size];
+    tiles+=tile("🎯","Profit target",usd(r.t),r.t&&typeof r.t==="number"?`${+(r.t/n*100).toFixed(1)}%`:"","good");
+    tiles+=tile("🛑","Max drawdown",usd(r.dd),esc(I18N.t(P.ddT||"")),"bad");
+    tiles+=r.dl===0?tile("📉","Daily loss limit",esc(I18N.t("None")),"","good"):typeof r.dl==="string"?tile("📉","Daily loss limit",esc(r.dl),"","bad"):tile("📉","Daily loss limit",usd(r.dl),"","bad");
+    tiles+=tile("📊","Max contracts",r.ct!=null?esc(r.ct):null,"");
+    tiles+=tile("📅","Minimum trading days",r.days!=null?String(r.days):null,"");
+    tiles+=tile("💳","Price",r.price!=null?money(r.price,0):null,"");
+    tiles+=typeof r.dd==="number"?tile("⚠️","Account fails below",money(n-r.dd,0),"At the start, before the drawdown trails","warn"):""}
+  else cover=false;
+  return `<h3>💰 <span>Choose your account size</span></h3>
+   <div class="sz-pick" data-noswipe>${f.sizes.map(s=>`<button type="button" class="sz-b ${s===size?"on":""}" data-sz="${s}">${s}</button>`).join("")}</div>
+   ${progs.length>1?`<div class="sz-progs">${progs.map((p,i)=>`<button type="button" class="sz-p ${i===pi?"on":""}" data-szp="${i}" data-notr>${esc(p.name)}</button>`).join("")}</div>`:P?`<div class="mut sz-pn" data-notr>${esc(P.name)}</div>`:""}
+   ${cover&&tiles?`<div class="sz-grid">${tiles}</div>${P.note?`<p class="sz-note" data-notr>💡 ${esc(P.note)}</p>`:""}`
+     :`<div class="sz-none">ℹ️ <span>${P?"No confirmed numbers for this size yet.":"Exact numbers for each size are not confirmed yet for this firm."}</span> <a href="https://${f.site}" target="_blank" rel="noopener nofollow">↗ <span>Check the official website</span></a></div>`}
+   <p class="mut" style="font-size:12px;margin:10px 0 0" data-notr>${esc(f.plans||"")}</p>
+   <p class="mut sz-src"><span>Figures reported by review sites, checked November 2026. Confirm on the official website before buying.</span></p>`}
+function bindSizeCard(f){const c=$("#szCard");if(!c)return;
+  $$("[data-sz]",c).forEach(b=>b.onclick=()=>{S._pfSz.size=b.dataset.sz;c.innerHTML=sizeCard(f);bindSizeCard(f)});
+  $$("[data-szp]",c).forEach(b=>b.onclick=()=>{S._pfSz.p=Number(b.dataset.szp);c.innerHTML=sizeCard(f);bindSizeCard(f)})}
 
 /* ============ IMPORT ============ */
 const FIELDS=[["date","Date / time"],["time","Time"],["symbol","Symbol"],["side","Side / direction"],["qty","Quantity"],["entry","Entry price"],["exit","Exit price"],["stop","Stop loss"],["target","Take profit"],["pnl","P&L"],["fees","Fees / commission"],["swap","Swap"],["boughtTs","Bought timestamp"],["soldTs","Sold timestamp"],["buyPrice","Buy price"],["sellPrice","Sell price"]];
