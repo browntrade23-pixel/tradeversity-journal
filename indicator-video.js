@@ -7,18 +7,22 @@ const W=1200,H=600,N=64,X0=24,PX=W-132,DX=(PX-X0-70)/N,TOP=24,BOT=H-84;
 /* ---------- fake but realistic NQ price path (seeded so it is always the same) ---------- */
 function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const R=rng(23),C=[];let p=100;
+const gauss=()=>(R()+R()+R()+R()-2)/1.15;
+/* every candle is built from 16 simulated ticks, so bodies and wicks look like a real market */
 for(let i=0;i<N;i++){
-  let drift=0,vol=.45;
-  if(i<16){drift=.02;vol=.35}                       // Asia: tight range
-  else if(i<24){drift=.5;vol=.6}                    // London: run up
-  else if(i<32){drift=-.25;vol=.55}                 // London: pull back
-  else if(i<40){drift=.05;vol=.35}                  // pre-market
-  else if(i===40){p+=2.6}                           // 9:30 open gaps up = RTH gap
-  if(i>=40&&i<44){drift=.1;vol=.6}
-  if(i>=44&&i<47){drift=-1.6;vol=.4}                // displacement down = first FVG
-  if(i>=47&&i<56){drift=-.3;vol=.6}
-  if(i>=56){drift=.55;vol=.6}
-  const o=p,c=o+drift+(R()-.5)*vol*2;const h=Math.max(o,c)+R()*vol,l=Math.min(o,c)-R()*vol;C.push({o,h,l,c});p=c}
+  let drift=0,vol=.45,v0=.35;
+  if(i<16){drift=.02;vol=.32;v0=.25}                // Asia: tight range, low volume
+  else if(i<24){drift=.5;vol=.55;v0=.55}            // London: run up
+  else if(i<32){drift=-.25;vol=.5;v0=.45}           // London: pull back
+  else if(i<40){drift=.05;vol=.32;v0=.3}            // pre-market
+  if(i===40){p+=2.6}                                // 9:30 open gaps up = RTH gap
+  if(i>=40&&i<44){drift=.1;vol=.6;v0=.8}
+  if(i>=44&&i<47){drift=-1.7;vol=.25;v0=1}          // displacement down = first FVG
+  if(i>=47&&i<56){drift=-.3;vol=.55;v0=.6}
+  if(i>=56){drift=.55;vol=.55;v0=.65}
+  const o=p;let h=o,l=o;
+  for(let k=0;k<16;k++){p+=drift/16+gauss()*vol*.32;h=Math.max(h,p);l=Math.min(l,p)}
+  const c=p;C.push({o,h,l,c,v:v0*(.7+R()*.6)+Math.abs(c-o)*.25})}
 const lo=Math.min(...C.map(c=>c.l))-3,hi=Math.max(...C.map(c=>c.h))+3;
 const Y=v=>BOT-(v-lo)/(hi-lo)*(BOT-TOP),XI=i=>X0+i*DX+DX/2,XE=PX;
 const PRICE=v=>(21480+(v-100)*28).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -30,8 +34,15 @@ const day=rangeHL(0,N-1),PDH=day.h+1.4,PDL=day.l-1.2,PWH=hi-.6,PML=lo+.5;
 /* candles build one by one like a live chart (green = bullish, black = bearish), then the drawings appear */
 const CC=32,B=N*CC+300;
 const BULL="#089981",BEAR="#131722";
-const candles=()=>C.map((c,i)=>{const x=XI(i),up=c.c>=c.o,col=up?BULL:BEAR;const yb=Math.min(Y(c.o),Y(c.c)),hb=Math.max(2,Math.abs(Y(c.o)-Y(c.c)));
-  return `<g class="cdl${i===N-1?" live":""}" style="animation-delay:${i*CC}ms"><line x1="${x}" x2="${x}" y1="${Y(c.h)}" y2="${Y(c.l)}" stroke="${col}" stroke-width="2"/><rect x="${x-DX*.36}" y="${yb}" width="${DX*.72}" height="${hb}" fill="${col}" rx="1"/></g>`}).join("");
+const VMAX=Math.max(...C.map(c=>c.v)),VH=62;
+const snap=v=>Math.round(v*2)/2;
+/* crisp candles: wick + body snapped to half pixels, TradingView proportions, volume bars underneath */
+const candles=()=>C.map((c,i)=>{const x=snap(XI(i)),up=c.c>=c.o,col=up?BULL:BEAR,bw=Math.max(4,Math.round(DX*.7));
+  const yt=snap(Math.min(Y(c.o),Y(c.c))),hb=Math.max(1.5,snap(Math.abs(Y(c.o)-Y(c.c)))),vh=Math.max(2,c.v/VMAX*VH);
+  return `<g class="cdl${i===N-1?" live":""}" style="animation-delay:${i*CC}ms">
+   <rect x="${x-bw/2}" y="${BOT-vh}" width="${bw}" height="${vh}" fill="${up?"rgba(8,153,129,.22)":"rgba(19,23,34,.16)"}"/>
+   <line x1="${x}" x2="${x}" y1="${snap(Y(c.h))}" y2="${snap(Y(c.l))}" stroke="${col}" stroke-width="1.6" stroke-linecap="butt"/>
+   <rect x="${x-bw/2}" y="${yt}" width="${bw}" height="${hb}" fill="${col}" stroke="${col}" stroke-width=".8" shape-rendering="crispEdges"/></g>`}).join("");
 /* chart frame: grid, price scale with prices, time axis, live price line */
 const frame=()=>{let g="";const steps=8;for(let k=0;k<=steps;k++){const v=lo+(hi-lo)*k/steps,y=Y(v);g+=`<line x1="${X0}" x2="${PX}" y1="${y}" y2="${y}" stroke="#eef0f4" stroke-width="1"/><text x="${PX+12}" y="${y+6}" class="tx-ax">${PRICE(v)}</text>`}
   TIMES.forEach(([i,t])=>{const x=XI(i);g+=`<line x1="${x}" x2="${x}" y1="${TOP}" y2="${BOT}" stroke="#f1f3f6" stroke-width="1"/><text x="${x}" y="${BOT+26}" class="tx-ax" text-anchor="middle">${t}</text>`});
