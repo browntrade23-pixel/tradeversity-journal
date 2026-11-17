@@ -1078,6 +1078,7 @@ h3{letter-spacing:.5px}
 .wk-box{padding:12px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);display:grid;gap:6px;font-size:13px}
 .wk-box.good>b{color:var(--green)}.wk-box.attn>b{color:var(--amber)}
 /* prop firm: rules for the chosen account size */
+
 .sz-pick{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px}
 .sz-b{padding:10px 18px;border-radius:12px;border:1.5px solid var(--line2);background:var(--panel2);color:var(--text);font:inherit;font-family:"JetBrains Mono",monospace;font-weight:800;font-size:15px;cursor:pointer;transition:all .2s}
 .sz-b:hover{border-color:var(--gold);transform:translateY(-1px)}
@@ -2648,7 +2649,7 @@ function vPropFirm(el,f){const d=PFDZ[f.dz]||PFDZ.check;f=Object.assign({},f,pfL
   const sec=(ic,t,items,cl)=>items&&items.length?`<div class="card pf-sec ${cl||""}"><h3>${ic} ${t}</h3><ul>${items.map(pfLi).join("")}</ul></div>`:"";
   el.innerHTML=`<div class="page pf-page">
    <div class="row" style="justify-content:space-between;margin-bottom:14px"><button class="btn sm" id="pfBack">← <span>All prop firms</span></button>
-    <a class="btn sm" href="https://${f.site}" target="_blank" rel="noopener nofollow">↗ <span>Official website</span></a></div>
+    <a class="btn sm" href="${PF_AFF[f.id]||"https://"+f.site}" target="_blank" rel="${PF_AFF[f.id]?"sponsored noopener":"noopener nofollow"}">↗ <span>Official website</span></a></div>
    <div class="pf-hero ${f.type}">${pfLogo(f,64)}<div><h1 data-notr>${esc(f.name)}</h1><div class="pf-meta"><span class="kind-b ${f.type==="cfd"?"cfd":"fut"}">${f.type==="cfd"?"💹 CFD":"📈 Futures"}</span> <span class="mut" data-notr>${esc(f.site)}</span></div></div></div>
    <div class="dz-box ${d[2]}"><span class="dz-flag">🇩🇿</span><div><b>${d[0]} ${d[1]}</b>${f.dzNote?`<p data-notr>${esc(f.dzNote)}</p>`:f.dz==="yes"?`<p>Algeria is not on this firm's restricted list.</p>`:f.dz==="no"?`<p>Algeria is on this firm's restricted-country list. A payout can be refused even after you pass.</p>`:`<p>Not confirmed. Ask the firm's support before paying.</p>`}</div></div>
    <div class="card pf-sec sz-card" id="szCard">${sizeCard(f)}</div>
@@ -2713,6 +2714,8 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
    <p class="mut sz-src"><span>Figures reported by review sites, checked November 2026. Confirm on the official website before buying.</span></p>`}
 /* ---------- partner coupon codes: which firm each code works on, the discount and the offer link ----------
    To add a code for another firm: COUPONS.CODE = { firmId:{pct:XX, url:"https://..."} } */
+/* partner affiliate links: used by the firm's "Official website" button */
+const PF_AFF={bulenox:"https://bulenox.com/member/aff/go/brown_trader",earn2trade:"https://www.earn2trade.com/?a_pid=BROWN23"};
 /* prog = the code only works on plans whose name starts with this text */
 const COUPONS={BROWN23:{earn2trade:{pct:60,url:"https://www.earn2trade.com/?a_pid=BROWN23"},
   bulenox:{pct:89,url:"https://bulenox.com/member/aff/go/brown_trader",prog:"Option 1"}}};
