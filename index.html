@@ -131,6 +131,10 @@ textarea.i{min-height:80px;resize:vertical}
 .tmeta{min-width:0}.tmeta .t1{font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .tmeta .t2{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tpnl{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:16px;text-align:right}
+.rpk-rules{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:10px;border:1px dashed var(--line2);background:var(--panel)}
+.rpk-dd{display:flex;gap:6px;flex-wrap:wrap}.rpk-dd .chip.warn{border-color:rgba(245,185,66,.5)}.rpk-dd .chip.ok{border-color:rgba(34,197,94,.45)}
+.rpk-ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+.rpk-ul li{display:flex;flex-direction:column;gap:2px;padding:7px 9px;border-radius:8px;background:var(--panel2);font-size:12.5px}
 .wait-steps{display:grid;gap:8px;margin:14px 0 4px;text-align:left}
 .ws{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2)}
 .ws.todo{border-color:rgba(245,185,66,.45)}.ws.ok{border-color:rgba(34,197,94,.35);opacity:.85}
@@ -2247,14 +2251,19 @@ function meter(lab,ic,used,main,sub,inv){/* used 0..1 of the limit; inv = progre
 const PFLIST=()=>((window.PropFirms||{}).firms)||[];
 const rpProgs=id=>(((window.PF_SIZES||{})[id]||{}).progs)||[];
 function rpSizes(f,P){if(!f)return [];const k=P&&P.rows?Object.keys(P.rows):P&&P.prices?Object.keys(P.prices):[];return (k.length?k:(f.sizes||[])).filter(s=>szNum(s)>0)}
-function rpRules(f,P,size){const n=szNum(size),o={start:n||"",target:"",daily:"",maxDD:"",ddType:P&&/trail/i.test(P.ddT||"")?"trailing":"static"};if(!P)return o;
+/* drawdown type of the chosen account: evaluation = the plan's type; funded = the firm's funded drawdown line if it has one */
+function rpDD(f,P,phase){const line=k=>((f&&f[k])||[]).find(x=>x[0]==="dd");const fl=phase==="funded"&&line("funded");
+  return fl?fl[1]:(P&&P.ddT)||((line("eval")||[])[1])||""}
+const rpTrail=t=>!/^\s*static/i.test(t||"")&&/trail|dynamic|end.?of.?day|eod|intraday/i.test(t||"");
+function rpRules(f,P,size,phase){const n=szNum(size),o={start:n||"",target:"",daily:"",maxDD:"",ddType:rpTrail(rpDD(f,P,phase))?"trailing":"static"};if(!P)return o;
   if(P.pct){const q=P.pct;if(q.t1!=null)o.target=Math.round(n*q.t1/100);if(q.dl!=null)o.daily=Math.round(n*q.dl/100);if(q.dd!=null)o.maxDD=Math.round(n*q.dd/100)}
   else if(P.rows&&P.rows[size]){const r=P.rows[size];if(typeof r.t==="number")o.target=r.t;if(typeof r.dd==="number")o.maxDD=r.dd;if(typeof r.dl==="number"&&r.dl>0)o.daily=r.dl}
+  if(phase==="funded")o.target="";   /* a funded account has no profit target to pass */
   return o}
 function rpState(acct,R,aSize){if(S._rp&&S._rp.acct===acct)return S._rp;const L=PFLIST();
   const meta=S.trades.find(t=>t.account===acct&&(t.firm||t.acctType)),mf=meta&&meta.firm;
   const f=R&&R.firmId?L.find(x=>x.id===R.firmId):mf?L.find(x=>x.name===mf)||L.find(x=>mf.startsWith(x.name)||x.name.startsWith(mf)):null;
-  return S._rp={acct,kind:R&&R.kind||(meta&&meta.acctType==="personal"?"personal":"prop"),mkt:R&&R.mkt||(f?f.type:"futures"),firmId:f?f.id:"",pi:R&&R.pi||0,size:R&&R.size||(aSize?kSize(aSize):""),vals:null,filled:false}}
+  return S._rp={acct,kind:R&&R.kind||(meta&&meta.acctType==="personal"?"personal":"prop"),mkt:R&&R.mkt||(f?f.type:"futures"),firmId:f?f.id:"",pi:R&&R.pi||0,size:R&&R.size||(aSize?kSize(aSize):""),phase:R&&R.phase||"eval",vals:null,filled:false}}
 function rpHTML(st){const L=PFLIST(),f=L.find(x=>x.id===st.firmId),progs=f?rpProgs(f.id):[],P=progs[st.pi]||progs[0],sizes=rpSizes(f,P);
   const b=(attr,v,on,lab)=>`<button type="button" ${attr}="${v}" class="${on?"on":""}">${lab}</button>`;
   return `<div class="rpk">
@@ -2263,8 +2272,13 @@ function rpHTML(st){const L=PFLIST(),f=L.find(x=>x.id===st.firmId),progs=f?rpPro
    <div class="rpk-step"><small>2 · <span>Market</span></small><div class="seg">${b("data-rm","futures",st.mkt==="futures",`📈 <span>Futures</span>`)}${b("data-rm","cfd",st.mkt==="cfd",`💹 <span>CFD</span>`)}</div></div>
    <div class="rpk-step"><small>3 · <span>Prop firm</span></small><select class="i" id="rpFirm"><option value="">— ${I18N.t("Choose your prop firm")} —</option>${L.filter(x=>x.type===st.mkt).map(x=>`<option value="${x.id}" ${x.id===st.firmId?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div>
    ${f&&progs.length>1?`<div class="rpk-step"><small><span>Plan</span></small><select class="i" id="rpPlan">${progs.map((p,i)=>`<option value="${i}" ${i===st.pi?"selected":""}>${esc(p.name)}</option>`).join("")}</select></div>`:""}
-   ${f?`<div class="rpk-step rpk-wide"><small>4 · <span>Account size</span></small><div class="seg rpk-sizes">${sizes.map(s=>b("data-rs",s,s===st.size,`<span data-notr>${esc(s)}</span>`)).join("")||`<span class="mut">—</span>`}</div></div>`:""}
-   ${st.filled&&f&&st.size?`<p class="mut rpk-note">✅ <span>Rules filled from</span> <b data-notr>${esc(f.name)}${P&&progs.length>1?" · "+esc(P.name):""} · ${esc(st.size)}</b>. <span>Check them and change anything if your account is different.</span></p>`:""}`}
+   ${f?`<div class="rpk-step"><small>4 · <span>Account stage</span></small><div class="seg">${b("data-rph","eval",st.phase!=="funded",`📝 <span>Evaluation</span>`)}${b("data-rph","funded",st.phase==="funded",`💰 <span>Funded</span>`)}</div></div>
+   <div class="rpk-step rpk-wide"><small>5 · <span>Account size</span></small><div class="seg rpk-sizes">${sizes.map(s=>b("data-rs",s,s===st.size,`<span data-notr>${esc(s)}</span>`)).join("")||`<span class="mut">—</span>`}</div></div>`:""}
+   ${f?(()=>{const lo=pfLoc(f),ph=st.phase==="funded",dd=rpDD(f,P,st.phase),lines=ph?[...lo.funded,...lo.fundedH,...lo.payout]:[...lo.eval,...lo.evalH];
+     return `<div class="rpk-rules rpk-wide"><div class="rpk-dd"><span class="chip ${rpTrail(dd)?"warn":"ok"}">🛑 <span>Drawdown type</span>: <b data-notr>${esc(I18N.t(dd)||"—")}</b></span><span class="chip">${ph?"💰 <span>Funded account rules</span>":"📝 <span>Evaluation rules</span>"}</span></div>
+      ${ph?`<p class="mut rpk-note">💡 <span>Funded account: there is no profit target to pass. Your drawdown and daily loss limit still apply.</span></p>`:""}
+      ${lines.length?`<ul class="pf-ul rpk-ul">${lines.map(pfLi).join("")}</ul>`:""}</div>`})():""}
+   ${st.filled&&f&&st.size?`<p class="mut rpk-note">✅ <span>Rules filled from</span> <b data-notr>${esc(f.name)}${P&&progs.length>1?" · "+esc(P.name):""} · ${esc(I18N.t(st.phase==="funded"?"Funded":"Evaluation"))} · ${esc(st.size)}</b>. <span>Check them and change anything if your account is different.</span></p>`:""}`}
   </div>`}
 function rulesCard(acct,aSize){const R=rulesAll()[acct];
   if(!R||S._rulesEdit===acct){const st=S._rulesEdit===acct?rpState(acct,R,aSize):null;const r=(st&&st.vals)||R||{start:aSize||"",target:"",daily:"",maxDD:"",ddType:"static"};
@@ -2280,7 +2294,7 @@ function rulesCard(acct,aSize){const R=rulesAll()[acct];
   const s=rulesStatus(acct,R),T=num(R.target),D=num(R.daily),M=num(R.maxDD);
   return `<div class="card rules-card" id="rulesCard"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🏦 Prop firm rules</h3><button class="btn sm" type="button" id="rEdit">✎ <span>Edit</span></button></div>
    <div class="rm-head"><span class="mut">Balance</span> <b class="mono">${money(s.bal,0)}</b> <span class="mut">· <span>start</span> ${money(num(R.start),0)} · ${R.ddType==="trailing"?"<span>Trailing drawdown</span>":"<span>Static drawdown</span>"}</span></div>
-   ${R.kind==="personal"?`<div class="det-line"><span class="chip">👤 <span>Personal account</span></span></div>`:R.firm?`<div class="det-line"><span class="chip">${R.mkt==="cfd"?"💹 CFD":"📈 Futures"}</span><span class="chip">🏦 <span data-notr>${esc(R.firm)}</span></span>${R.plan?`<span class="chip" data-notr>${esc(R.plan)}</span>`:""}${R.size?`<span class="chip">💰 <span data-notr>${esc(R.size)}</span></span>`:""}</div>`:""}
+   ${R.kind==="personal"?`<div class="det-line"><span class="chip">👤 <span>Personal account</span></span></div>`:R.firm?`<div class="det-line"><span class="chip">${R.mkt==="cfd"?"💹 CFD":"📈 Futures"}</span><span class="chip">🏦 <span data-notr>${esc(R.firm)}</span></span>${R.plan?`<span class="chip" data-notr>${esc(R.plan)}</span>`:""}${R.size?`<span class="chip">💰 <span data-notr>${esc(R.size)}</span></span>`:""}<span class="chip">${R.phase==="funded"?"💰 <span>Funded</span>":"📝 <span>Evaluation</span>"}</span>${R.ddText?`<span class="chip">🛑 <b data-notr>${esc(I18N.t(R.ddText))}</b></span>`:""}</div>`:""}
    ${s.broke?`<div class="status badd" style="margin:8px 0">✖ <span>A rule was broken on</span> ${fmtDate(s.broke)}</div>`:""}
    <div class="rm-grid">
     ${T>0?meter("Profit target","🎯",s.net/T,`${smoney(s.net,0)} / ${money(T,0)}`,s.net>=T?`<span class="pos">✔ Target reached</span>`:`${money(T-s.net,0)} <span>to go</span>`,true):""}
@@ -2296,7 +2310,7 @@ function bindRules(acct,aSize){const c=$("#rulesCard");if(!c)return;
   /* picker: redraw only this card, keeping what was typed */
   const redraw=()=>{c.outerHTML=rulesCard(acct,aSize);bindRules(acct,aSize)};
   const fill=()=>{const f=PFLIST().find(x=>x.id===st.firmId),progs=f?rpProgs(f.id):[],P=progs[st.pi]||progs[0];
-    if(f&&st.size&&rpSizes(f,P).includes(st.size)){st.vals=rpRules(f,P,st.size);st.filled=true}else{st.vals=vals();st.filled=false}};
+    if(f&&st.size&&rpSizes(f,P).includes(st.size)){st.vals=rpRules(f,P,st.size,st.phase);st.filled=true}else{st.vals=vals();if(f)st.vals.ddType=rpTrail(rpDD(f,P,st.phase))?"trailing":"static";st.filled=false}};
   if(st){
     $$("[data-rk]",c).forEach(b=>b.onclick=()=>{st.vals=vals();st.kind=b.dataset.rk;st.filled=false;redraw()});
     $$("[data-rm]",c).forEach(b=>b.onclick=()=>{st.vals=vals();if(st.mkt!==b.dataset.rm){st.mkt=b.dataset.rm;st.firmId="";st.pi=0;st.filled=false}redraw()});
@@ -2304,12 +2318,13 @@ function bindRules(acct,aSize){const c=$("#rulesCard");if(!c)return;
       if(f&&!rpSizes(f,pr[0]).includes(st.size))st.size="";fill();redraw()};
     const ps=$("#rpPlan",c);if(ps)ps.onchange=()=>{st.pi=Number(ps.value)||0;fill();redraw()};
     $$("[data-rs]",c).forEach(b=>b.onclick=()=>{st.size=b.dataset.rs;fill();redraw()});
+    $$("[data-rph]",c).forEach(b=>b.onclick=()=>{st.phase=b.dataset.rph;fill();redraw()});
   }
   const cc=$("#rCancel",c);if(cc)cc.onclick=()=>{S._rulesEdit=null;S._rp=null;render()};
   const dl=$("#rDel",c);if(dl)dl.onclick=()=>{rulesSave(acct,null);S._rulesEdit=null;S._rp=null;render()};
   const sv=$("#rSave",c);if(sv)sv.onclick=()=>{const r=vals();
     if(st){const f=PFLIST().find(x=>x.id===st.firmId),progs=f?rpProgs(f.id):[],P=progs[st.pi]||progs[0];r.kind=st.kind;
-      if(st.kind==="prop"&&f){Object.assign(r,{mkt:st.mkt,firmId:f.id,firm:f.name,pi:st.pi,plan:progs.length>1&&P?P.name:"",size:st.size||""})}}
+      if(st.kind==="prop"&&f){Object.assign(r,{mkt:st.mkt,firmId:f.id,firm:f.name,pi:st.pi,plan:progs.length>1&&P?P.name:"",size:st.size||"",phase:st.phase||"eval",ddText:rpDD(f,P,st.phase)})}}
     if(!(num(r.start)>0)){toast("Enter the starting balance");return}rulesSave(acct,r);S._rulesEdit=null;S._rp=null;toast("Rules saved");render()}}
 function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered();const st=calc(ts);
   const meta=S.acct!=="all"?S.trades.find(t=>t.account===S.acct&&(t.firm||t.platform||t.acctSize)):null;const aSize=meta&&num(meta.acctSize)>0?num(meta.acctSize):null;
