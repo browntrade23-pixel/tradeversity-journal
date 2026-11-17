@@ -518,10 +518,10 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .st-tab.on{border-color:var(--gold);background:radial-gradient(120% 120% at 0% 0%,rgba(245,185,66,.18),transparent 60%),var(--panel);box-shadow:0 0 18px rgba(245,185,66,.18)}
 .st-ic{font-size:18px}.st-tx{display:flex;flex-direction:column;gap:1px}.st-tx b{font-size:13.5px;white-space:nowrap}.st-tx small{font-size:11px;color:var(--muted);white-space:nowrap}
 .st-add{border-style:dashed;border-color:rgba(46,197,201,.5);color:var(--muted)}.st-add .st-ic{color:#2ec5c9;font-weight:900}.st-add:hover{border-color:#2ec5c9;color:var(--text)}
-.st-del{color:var(--red);border-color:rgba(239,83,80,.4)}.st-del:hover{background:rgba(239,83,80,.1);border-color:var(--red)}
+.st-x{display:grid;place-items:center;width:28px;height:28px;margin-inline-start:4px;border-radius:8px;border:1px solid rgba(239,83,80,.35);background:rgba(239,83,80,.08);cursor:pointer;font-size:13px;flex:none;opacity:.75;transition:opacity .2s,background .2s,border-color .2s}
+.st-x:hover,.st-x:focus-visible{opacity:1;background:rgba(239,83,80,.2);border-color:var(--red)}
 .st-delbox{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:10px;background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.35);margin:6px 0 10px}
 .st-danger{background:var(--red);border-color:var(--red);color:#fff}.st-danger:disabled{opacity:.4;cursor:not-allowed}
-@media(max-width:600px){.st-del{width:100%;justify-content:center}}
 /* free indicator page */
 .ind-card{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;padding:16px;border-color:rgba(245,185,66,.4);background:radial-gradient(110% 80% at 100% 0%,rgba(245,185,66,.12),transparent 60%),var(--panel);margin-bottom:12px}
 @media(max-width:820px){.ind-card{grid-template-columns:1fr}}
@@ -1994,12 +1994,12 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
 /* ============ STATISTICS TABS: one tab per account, add another, delete ============ */
 function statTabs(){const ac=accounts();if(S.acct!=="all"&&!ac.includes(S.acct))ac.push(S.acct);
   const cnt=a=>S.trades.filter(t=>a==="all"||t.account===a).length,net=a=>S.trades.filter(t=>a==="all"||t.account===a).reduce((s,t)=>s+tradeNet(t),0);
-  const tab=(a,label,ic)=>{const n=net(a);return `<button type="button" class="st-tab ${S.acct===a?"on":""}" data-st="${esc(a)}"><span class="st-ic">${ic}</span><span class="st-tx"><b ${a==="all"?"":"data-notr"}>${label}</b><small><span class="mono ${cls(n)}">${kfmt(n)}</span> · ${cnt(a)} <span>trades</span></small></span></button>`};
+  const tab=(a,label,ic)=>{const n=net(a),canDel=a!=="all"&&!S.readonly&&cnt(a)>0;return `<div class="st-tab ${S.acct===a?"on":""}" role="button" tabindex="0" data-st="${esc(a)}"><span class="st-ic">${ic}</span><span class="st-tx"><b ${a==="all"?"":"data-notr"}>${label}</b><small><span class="mono ${cls(n)}">${kfmt(n)}</span> · ${cnt(a)} <span>trades</span></small></span>${canDel?`<button type="button" class="st-x" data-stdel="${esc(a)}" title="Delete these statistics" aria-label="Delete these statistics">🗑</button>`:""}</div>`};
   return `<div class="st-wrap"><div class="st-tabs" data-noswipe>${tab("all","All statistics","📊")}${ac.map(a=>tab(a,esc(a),"💼")).join("")}
-    ${S.readonly?"":`<button type="button" class="st-tab st-add" id="stAdd"><span class="st-ic">＋</span><span class="st-tx"><b>Add another statistics</b><small>New account or challenge</small></span></button>`}</div>
-   ${S.readonly||!cnt(S.acct)?"":`<button type="button" class="btn sm st-del" id="stDel">🗑 <span>${S.acct==="all"?"Delete all statistics":"Delete these statistics"}</span></button>`}</div>`}
+    ${S.readonly?"":`<button type="button" class="st-tab st-add" id="stAdd"><span class="st-ic">＋</span><span class="st-tx"><b>Add another statistics</b><small>New account or challenge</small></span></button>`}</div></div>`}
 function bindStatTabs(){
-  $$("[data-st]").forEach(b=>b.onclick=()=>{S.acct=b.dataset.st;S.calMonth=null;render()});
+  $$("[data-st]").forEach(b=>{b.onclick=e=>{if(e.target.closest("[data-stdel]"))return;S.acct=b.dataset.st;S.calMonth=null;render()};b.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();b.click()}}});
+  $$("[data-stdel]").forEach(x=>x.onclick=e=>{e.stopPropagation();delStats(x.dataset.stdel)});
   const add=$("#stAdd");if(add)add.onclick=()=>{
     openModal(`<h3 style="margin-top:0">＋ <span>Add another statistics</span></h3><p class="mut" style="font-size:13px;margin-top:-4px">Each account or challenge gets its own statistics tab.</p>
      <label class="f">Name of the account<input class="i" id="stName" placeholder="e.g. Apex 50K #2, FTMO 100K…" maxlength="40"></label>
@@ -2009,15 +2009,16 @@ function bindStatTabs(){
     $("#stX").onclick=closeModal;setTimeout(()=>$("#stName")&&$("#stName").focus(),50);
     $("#stImp").onclick=()=>{closeModal();const b=$("#impBox");if(!b)return;b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
     $("#stMan").onclick=()=>{const n=$("#stName").value.trim();if(!n){$("#stName").focus();toast("Write a name for the account first");return}closeModal();S.acct=n;render();editTrade(null)}};
-  const del=$("#stDel");if(del)del.onclick=()=>{const a=S.acct,ids=S.trades.filter(t=>a==="all"||t.account===a).map(t=>t.id),n=S.trades.filter(t=>ids.includes(t.id)).reduce((s,t)=>s+tradeNet(t),0);
+}
+function delStats(a){if(!a||a==="all")return;const ids=S.trades.filter(t=>t.account===a).map(t=>t.id),n=S.trades.filter(t=>t.account===a).reduce((s,t)=>s+tradeNet(t),0);
     const word="DELETE";
-    openModal(`<h3 style="margin-top:0;color:var(--red)">🗑 <span>${a==="all"?"Delete all statistics":"Delete these statistics"}</span></h3>
-     <div class="st-delbox"><b data-notr>${a==="all"?esc(I18N.t("All statistics")):esc(a)}</b><span>${ids.length} <span>trades</span> · <span class="mono ${cls(n)}">${money(n)}</span></span></div>
-     <p style="font-size:14px">${a==="all"?"Every trade in your journal will be deleted: all accounts, their screenshots and notes.":"All trades of this account will be deleted, with their screenshots and notes. Your other accounts stay."} <b>This can't be undone.</b></p>
+    openModal(`<h3 style="margin-top:0;color:var(--red)">🗑 <span>Delete these statistics</span></h3>
+     <div class="st-delbox"><b data-notr>${esc(a)}</b><span>${ids.length} <span>trades</span> · <span class="mono ${cls(n)}">${money(n)}</span></span></div>
+     <p style="font-size:14px">All trades of this account will be deleted, with their screenshots and notes. Your other accounts stay. <b>This can't be undone.</b></p>
      <label class="f"><span>Type DELETE to confirm</span><input class="i" id="stWord" autocomplete="off" placeholder="DELETE"></label>
      <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" id="stNo">Cancel</button><button class="btn st-danger" id="stYes" disabled>🗑 <span>Delete</span></button></div>`);
     $("#stNo").onclick=closeModal;const w=$("#stWord"),y=$("#stYes");w.oninput=()=>{y.disabled=w.value.trim().toUpperCase()!==word};
-    y.onclick=async()=>{y.disabled=true;y.textContent="…";try{await API.deleteTrades(ids);const s=new Set(ids);S.trades=S.trades.filter(t=>!s.has(t.id));S.acct="all";S.calMonth=null;closeModal();render();toast(`${ids.length} trades deleted`)}catch(e){y.disabled=false;y.textContent="Delete";toast("Couldn't delete: "+(e.message||e))}}}}
+    y.onclick=async()=>{y.disabled=true;y.textContent="…";try{await API.deleteTrades(ids);const s=new Set(ids);S.trades=S.trades.filter(t=>!s.has(t.id));if(S.acct===a)S.acct="all";S.calMonth=null;closeModal();render();toast(`${ids.length} trades deleted`)}catch(e){y.disabled=false;y.textContent="Delete";toast("Couldn't delete: "+(e.message||e))}}}
 
 /* ============ SHARE (public view-only link + QR code) ============ */
 const shareURL=tok=>`${location.origin}${location.pathname}?share=${tok}`;
