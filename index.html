@@ -711,8 +711,10 @@ html[lang=ar] .pf-lb{text-transform:none;letter-spacing:0;font-size:12px}
 .rm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
 @media(max-width:760px){.rm-grid{grid-template-columns:1fr}}
 .rm{--rc:var(--green);padding:12px;border-radius:12px;background:var(--panel2);border:1px solid color-mix(in srgb,var(--rc) 35%,var(--line))}
-.rm.warn{--rc:#f59e2a}.rm.bad{--rc:var(--red)}.rm.goal{--rc:var(--gold)}
-.rm.ok.dl{--rc:#3b9cff}   /* daily loss limit: calm blue while safe (not green), orange / red as the limit gets close */
+.rm.warn{--rc:#f59e2a}.rm.bad{--rc:var(--red)}.rm.goal{--rc:var(--green)}
+/* each limit has its own color while safe: profit target green, daily loss blue, max drawdown purple; orange / red as a limit gets close */
+.rm.ok.dl{--rc:#3b9cff}.rm.ok.mdd{--rc:#a78bfa}
+.rm,.rm.ok{color:var(--text)}.rm-top>span,.rm-top>span b{color:var(--rc)}
 .rm-top{display:flex;justify-content:space-between;gap:8px;font-size:13px}.rm-top b.mono{color:var(--rc)}
 .rm-bar{height:8px;border-radius:8px;background:var(--line);overflow:hidden;margin:9px 0 6px}
 .rm-bar i{display:block;height:100%;border-radius:8px;background:var(--rc);box-shadow:0 0 10px color-mix(in srgb,var(--rc) 60%,transparent);transition:width .5s ease}
@@ -2302,7 +2304,7 @@ function rulesCard(acct,aSize){const R=rulesAll()[acct];
    <div class="rm-grid">
     ${T>0?meter("Profit target","🎯",s.net/T,`${smoney(s.net,0)} / ${money(T,0)}`,s.net>=T?`<span class="pos">✔ Target reached</span>`:`${money(T-s.net,0)} <span>to go</span>`,true):""}
     ${D>0?meter("Daily loss limit","📉",Math.max(0,-s.tNet)/D,`${smoney(s.tNet,0)} <span class="mut">today</span>`,`${money(Math.max(0,D+s.tNet),0)} <span>left today</span>`,false,"dl"):""}
-    ${M>0?meter("Max drawdown","🛡",1-s.buffer/M,`${money(Math.max(0,s.buffer),0)} <span class="mut">left</span>`,`<span>Limit at</span> ${money(s.floor,0)}`):""}
+    ${M>0?meter("Max drawdown","🛡",1-s.buffer/M,`${money(Math.max(0,s.buffer),0)} <span class="mut">left</span>`,`<span>Limit at</span> ${money(s.floor,0)}`,false,"mdd"):""}
    </div></div>`}
 function bindRules(acct,aSize){const c=$("#rulesCard");if(!c)return;
   const set=$("#rSet",c);if(set)set.onclick=()=>{S._rulesEdit=acct;S._rp=null;render()};
