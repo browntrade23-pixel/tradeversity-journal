@@ -1246,6 +1246,10 @@ html[data-theme=light] .card>h3:first-child,html[data-theme=light] .card>.row:fi
 /* ---- no-trade day ---- */
 .ntd-card{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
 .ntd-card.on{border-color:rgba(160,166,184,.35)!important}
+.ntd-date{width:auto!important;min-width:150px}
+.ntd-trades{flex-basis:100%;display:grid;gap:6px}
+.ntd-t{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 10px;border-radius:12px;border:1px solid var(--line2);background:rgba(255,255,255,.03);font-size:13px}
+.ntd-t b{margin-inline-start:auto}
 .ntd-ic{font-size:24px}.ntd-tx{display:flex;flex-direction:column;gap:2px;flex:1;min-width:200px}.ntd-tx small{font-size:12px}
 .ntd-row{padding:10px 12px;border-radius:12px;border:1px dashed var(--line2);color:var(--muted);font-size:13px;margin-bottom:8px}
 .cal .c.nt{background:repeating-linear-gradient(135deg,rgba(160,166,184,.10) 0 6px,rgba(160,166,184,.04) 6px 12px);outline:1px dashed rgba(160,166,184,.35);outline-offset:-1px}
@@ -2172,11 +2176,17 @@ function noTradeDates(){let ds=(S.plans||[]).filter(p=>p.noTrade).map(p=>p.date)
   if(S.range&&S.range!=="all"){const d=new Date();d.setDate(d.getDate()-Number(S.range)+1);const c=ymd(d);ds=ds.filter(x=>x>=c)}return ds}
 /* add the no-trade days (with no trade saved that day) to a calc() result: $0 days on the calendar and the day count */
 function withNoTrade(st){const nd=noTradeDates().filter(d=>st.days[d]==null);nd.forEach(d=>st.days[d]=0);st.ntDays=nd.length;S._ntSet=new Set(noTradeDates());return st}
-function noTradeCard(){if(S.readonly)return "";const d=todayStr(),p=(S.plans||[]).find(x=>x.date===d),hasT=(S.trades||[]).some(t=>t.date===d);
-  if(hasT)return "";
-  return p&&p.noTrade?`<div class="card ntd-card on"><span class="ntd-ic">🚫</span><div class="ntd-tx"><b>${esc(I18N.t("No-trade day saved for today"))}</b><small class="mut">${esc(I18N.t("$0 P&L, counted in your statistics and your discipline streak. Not trading is a decision too."))}</small></div><button class="btn sm" type="button" id="ntdUndo">↩ <span>Undo</span></button></div>`
-   :`<div class="card ntd-card"><span class="ntd-ic">🚫</span><div class="ntd-tx"><b>${esc(I18N.t("Not trading today?"))}</b><small class="mut">${esc(I18N.t("Mark today as a no-trade day: it counts as a $0 day in your statistics."))}</small></div><button class="btn sm pri" type="button" id="ntdSet">🚫 <span>No trades today</span></button></div>`}
-function bindNoTrade(){const save=async on=>{const d=todayStr(),old=S.plans.find(x=>x.date===d);
+/* the card works on a chosen day: today by default, or a past day the trader forgot (never a future day) */
+const ntdDay=()=>{const t=todayStr(),d=S._ntdDate||t;return d>t?t:d};
+function noTradeCard(){if(S.readonly)return "";const t=todayStr(),d=ntdDay(),isT=d===t,p=(S.plans||[]).find(x=>x.date===d),hasT=(S.trades||[]).some(x=>x.date===d);
+  const pick=`<input class="i ntd-date" type="date" id="ntdDate" value="${d}" max="${t}" title="${esc(I18N.t("Choose the day"))}">`;
+  if(hasT){const dts=S.trades.filter(x=>x.date===d).sort(byDT);
+    return `<div class="card ntd-card"><span class="ntd-ic">📈</span><div class="ntd-tx"><b>${esc(fmtDate(d))}</b><small class="mut">${esc(I18N.t("You have trades on this day, so it can't be a no-trade day. You can edit or delete a trade you added by mistake."))}</small></div>${pick}
+     <div class="ntd-trades">${dts.map(x=>{const n=tradeNet(x);return `<div class="ntd-t"><span class="mono" data-notr>${esc(x.time||"")} ${esc(x.symbol||"")}</span><span class="tag ${x.side==="Long"?"long":"short"}">${x.side==="Long"?"▲ Long":"▼ Short"}</span><span class="mut" data-notr>${esc(x.account||"")}</span><b class="mono ${cls(n)}">${smoney(n)}</b><button type="button" class="btn sm" data-tedit="${x.id}">✎ <span>Edit</span></button></div>`}).join("")}</div></div>`}
+  return p&&p.noTrade?`<div class="card ntd-card on"><span class="ntd-ic">🚫</span><div class="ntd-tx"><b>${esc(isT?I18N.t("No-trade day saved for today"):I18N.t("No-trade day saved")+" · "+fmtDate(d))}</b><small class="mut">${esc(I18N.t("$0 P&L, counted in your statistics and your discipline streak. Not trading is a decision too."))}</small></div>${pick}<button class="btn sm" type="button" id="ntdUndo">↩ <span>Undo</span></button></div>`
+   :`<div class="card ntd-card"><span class="ntd-ic">🚫</span><div class="ntd-tx"><b>${esc(isT?I18N.t("Not trading today?"):I18N.t("Didn't trade on this day?")+" · "+fmtDate(d))}</b><small class="mut">${esc(I18N.t(isT?"Mark today as a no-trade day: it counts as a $0 day in your statistics.":"Forgot to mark it? Mark this day as a no-trade day: it counts as a $0 day in your statistics."))}</small></div>${pick}<button class="btn sm pri" type="button" id="ntdSet">🚫 <span>${esc(I18N.t(isT?"No trades today":"No trades this day"))}</span></button></div>`}
+function bindNoTrade(){const di=$("#ntdDate");if(di)di.onchange=()=>{const v=di.value;if(!v)return;S._ntdDate=v>todayStr()?todayStr():v;render()};
+  const save=async on=>{const d=ntdDay(),old=S.plans.find(x=>x.date===d);
     const np={...(old||{user_id:S.subject.id,date:d,maxLoss:"",target:"",maxTrades:"",riskPerTrade:"",bias:{},rules:{}}),noTrade:on,date:d,user_id:S.subject.id};
     try{await API.savePlan(np);const i=S.plans.findIndex(x=>x.date===d);if(i>=0)S.plans[i]=np;else S.plans.push(np);toast(I18N.t(on?"No-trade day saved":"No-trade day removed"));render()}catch(e){toast("Couldn't save: "+(e.message||e))}};
   const a=$("#ntdSet");if(a)a.onclick=()=>save(true);const u=$("#ntdUndo");if(u)u.onclick=()=>save(false)}
@@ -2375,7 +2385,7 @@ function editTrade(t0){
     <div class="drop" id="drop" style="margin-top:8px">📷 Add screenshot</div><input type="file" id="file" accept="image/*" multiple class="hidden"></div>
    <label class="f">Remark below the screenshot<input class="i" name="remark" value="${esc(t.remark)}" placeholder="e.g. Entry at the 15m FVG after the sweep of PDL"></label>
    <label class="f">Journal & lessons<textarea class="i" name="notes" style="min-height:110px" placeholder="What did I see? What did I do well? What will I do differently?">${esc(t.notes)}</textarea></label>
-   <div class="row" style="justify-content:flex-end"><button type="button" class="btn" id="cancel">Cancel</button><button class="btn pri" type="submit" id="saveT">Save trade</button></div>
+   <div class="row" style="justify-content:flex-end">${isNew?"":`<button type="button" class="btn danger" id="delInForm" style="margin-inline-end:auto">🗑 <span>Delete trade</span></button>`}<button type="button" class="btn" id="cancel">Cancel</button><button class="btn pri" type="submit" id="saveT">Save trade</button></div>
   </form>`);
   const f=$("#tf");
   const read=()=>{const d=Object.fromEntries(new FormData(f));Object.assign(t,d,{symbol:String(d.symbol).toUpperCase().trim()});if(t.acctType==="personal")t.firm="";else t.firm=t.firm||"";
@@ -2394,6 +2404,7 @@ function editTrade(t0){
   $("#drop").onclick=()=>$("#file").click();$("#file").onchange=e=>addFiles([...e.target.files]);
   document.onpaste=e=>{const fs=[...(e.clipboardData||{}).files||[]];if(fs.length)addFiles(fs)};
   $("#mx").onclick=$("#cancel").onclick=closeModal;
+  const dif=$("#delInForm");if(dif)dif.onclick=()=>{closeModal();confirmBox("Delete this trade? This can't be undone.",async()=>{try{await API.deleteTrade(t0);S.trades=S.trades.filter(x=>x.id!==t0.id);if(S.page===t0.id)S.page=null;render();toast("Trade deleted")}catch(e){toast(e.message||String(e))}})};
   f.onsubmit=async e=>{e.preventDefault();read();t.qty=num(t.qty)||0;$("#saveT").disabled=true;
     try{await API.saveTrade(t);const i=S.trades.findIndex(x=>x.id===t.id);if(i>=0)S.trades[i]=t;else S.trades.push(t);closeModal();S.page=t.id;S._justSaved=t.id;S.view="journal";render();toast("Trade saved")}
     catch(err){$("#saveT").disabled=false;toast("Couldn't save: "+(err.message||err))}};
