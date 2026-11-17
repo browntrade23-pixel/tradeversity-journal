@@ -1453,9 +1453,17 @@ const Cloud={
   async deleteTrades(ids){for(let i=0;i<ids.length;i+=200){const{error}=await this.sb.from("trades").delete().in("id",ids.slice(i,i+200));if(error)throw error}},
   async listPlans(uid_){const{data,error}=await this.sb.from("plans").select("*").eq("user_id",uid_).order("plan_date",{ascending:false});if(error)throw error;return data.map(r=>({...(r.data||{}),user_id:r.user_id,date:r.plan_date}))},
   async savePlan(p){const{error}=await this.sb.from("plans").upsert({user_id:p.user_id,plan_date:p.date,data:p},{onConflict:"user_id,plan_date"});if(error)throw error},
-  async listProfiles(){const{data,error}=await this.sb.from("profiles").select("*").order("created_at");if(error)throw error;return data.map(d=>({id:d.id,name:d.full_name,telegram:d.telegram,email:d.email,role:d.role,status:d.status,created_at:d.created_at,tgOk:!!d.telegram_verified}))},
+  async listProfiles(){const{data,error}=await this.sb.from("profiles").select("*").order("created_at");if(error)throw error;
+    let em={};try{const r=await this.sb.rpc("admin_email_status");if(!r.error&&r.data)r.data.forEach(x=>em[x.id]=x.email_ok)}catch(e){}
+    return data.map(d=>({id:d.id,name:d.full_name,telegram:d.telegram,email:d.email,role:d.role,status:d.status,created_at:d.created_at,tgOk:!!d.telegram_verified,emailOk:em[d.id]}))},
   async setStatus(id,status){const{error}=await this.sb.rpc("set_student_status",{target:id,new_status:status});if(error)throw error},
   async allTradesLite(){const{data,error}=await this.sb.from("trades").select("id,user_id,trade_date,symbol,account,pnl,data").limit(20000);if(error)throw error;return data.map(r=>({...(r.data||{}),id:r.id,user_id:r.user_id,shots:[]}))},
+  /* affiliate / coupon click counter (insert by anyone, read by admin only) */
+  track(kind,firm,place){try{if(!this.sb||!firm)return;this.sb.from("aff_clicks").insert({kind,firm:String(firm).slice(0,40),place:String(place||"").slice(0,40),user_id:(S.me&&S.me.id)||null}).then(()=>{},()=>{})}catch(e){}},
+  async affClicks(){const since=new Date(Date.now()-90*864e5).toISOString();const{data,error}=await this.sb.from("aff_clicks").select("kind,firm,place,created_at").gte("created_at",since).limit(10000);if(error)throw error;return data},
+  /* per-user settings saved in the account (prop firm rules, commission rates) */
+  async getSettings(){const{data,error}=await this.sb.from("user_settings").select("data").eq("user_id",S.me.id).maybeSingle();if(error)throw error;return (data&&data.data)||{}},
+  async saveSettings(d){const{error}=await this.sb.from("user_settings").upsert({user_id:S.me.id,data:d,updated_at:new Date().toISOString()});if(error)throw error},
   async allPlans(){const{data,error}=await this.sb.from("plans").select("*");if(error)throw error;return data.map(r=>({...(r.data||{}),user_id:r.user_id,date:r.plan_date}))},
   async news(fromISO,toISO){const{data,error}=await this.sb.from("econ_news").select("title,impact,starts_at,forecast,previous").gte("starts_at",fromISO).lte("starts_at",toISO).order("starts_at");if(error)throw error;return data||[]},
   async listShares(){const{data,error}=await this.sb.from("shares").select("*").eq("user_id",S.me.id).eq("revoked",false).order("created_at",{ascending:false});if(error)throw error;return data||[]},
@@ -1575,6 +1583,7 @@ async function enter(u){
   $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;
   if(u.role==="admin"){S.view="admin";await loadSubject(u,false);go("admin")}
   else{await loadSubject(u,false);go(location.hash.slice(1)||"journal")}
+  S._commR=null;settingsPull();
 }
 async function loadSubject(u,readonly){
   S.subject=u;S.readonly=readonly;S.acct="all";S.page=null;S._planDate=null;
@@ -2239,7 +2248,16 @@ function insights(ts){const out=[];if(ts.length<3)return out;
 /* ===== Prop firm rules tracker (per account, saved on this device) ===== */
 const rulesKey=()=>`tv_rules_${(S.me&&S.me.id)||"x"}`;
 function rulesAll(){try{return JSON.parse(localStorage.getItem(rulesKey()))||{}}catch(e){return {}}}
-function rulesSave(acct,r){const a=rulesAll();if(r)a[acct]=r;else delete a[acct];try{localStorage.setItem(rulesKey(),JSON.stringify(a))}catch(e){}}
+function rulesSave(acct,r){const a=rulesAll();if(r)a[acct]=r;else delete a[acct];try{localStorage.setItem(rulesKey(),JSON.stringify(a))}catch(e){}settingsPush()}
+/* prop firm rules + commission rates are saved in the student's account (Supabase user_settings), so they follow him on every device.
+   This device keeps a copy; on login the account copy wins, and an old device-only copy is uploaded once. */
+function settingsPush(){if(!API||!API.saveSettings||!S.me)return;clearTimeout(settingsPush._t);
+  settingsPush._t=setTimeout(()=>{let comm={};try{comm=JSON.parse(localStorage.getItem(calcKey("comm")))||{}}catch(e){}
+    API.saveSettings({rules:rulesAll(),comm}).catch(()=>toast(I18N.t("Couldn't save your settings online. They are kept on this device.")))},600)}
+async function settingsPull(){if(!API||!API.getSettings||!S.me)return;try{const d=await API.getSettings();
+  const hasCloud=d&&(Object.keys(d.rules||{}).length||Object.keys(d.comm||{}).length);
+  if(hasCloud){localStorage.setItem(rulesKey(),JSON.stringify(d.rules||{}));localStorage.setItem(calcKey("comm"),JSON.stringify(d.comm||{}));S._commR=null;if(S.view==="stats")render()}
+  else if(Object.keys(rulesAll()).length||localStorage.getItem(calcKey("comm")))settingsPush()}catch(e){}}
 function rulesStatus(acct,R){const ts=S.trades.filter(t=>t.account===acct),start=num(R.start)||0;
   const byDay={};ts.forEach(t=>byDay[t.date]=(byDay[t.date]||0)+tradeNet(t));const days=Object.keys(byDay).sort();
   let bal=start,peak=start,floorMin=Infinity,broke=null;
@@ -2386,7 +2404,7 @@ function commCard(ts){if(!ts.length)return "";const g={};
    </table></div>
    <p class="mut" style="font-size:12px;margin:8px 0 0">${I18N.t("Total commissions & fees")}: <b class="neg mono">${money(-tot)}</b>. ${I18N.t("Net P&L, win rate and every stat already include them. When your file has no fee column, the commission is estimated from your prop firm's rate per contract: change it if your firm charges a different rate.")}</p></div>`}
 function bindComm(el){$$(".cm-r",el).forEach(i=>i.onchange=()=>{const f=i.dataset.cf,R=commRates();R[f]={...commRate(f),[i.dataset.ck]:Math.max(0,num(i.value)||0)};
-  try{localStorage.setItem(calcKey("comm"),JSON.stringify(R))}catch(e){}render()})}
+  try{localStorage.setItem(calcKey("comm"),JSON.stringify(R))}catch(e){}settingsPush();render()})}
 /* ============ STATISTICS TABS: one tab per account, add another, delete ============ */
 function statTabs(){const ac=accounts();if(S.acct!=="all"&&!ac.includes(S.acct))ac.push(S.acct);
   const cnt=a=>S.trades.filter(t=>a==="all"||t.account===a).length,net=a=>S.trades.filter(t=>a==="all"||t.account===a).reduce((s,t)=>s+tradeNet(t),0);
@@ -2994,10 +3012,10 @@ function couponBox(f,P,size){const own=firmCode(f.id);if(!own)return "";
 async function copyCode(t){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}toast(I18N.t("Code copied")+": "+t)}
 function bindSizeCard(f){const c=$("#szCard");if(!c)return;
   const ci=$("#cpIn",c),ca=$("#cpApply",c);
-  if(ca){const ap=()=>{S._coupon=ci.value;S._couponTried=true;c.innerHTML=sizeCard(f);bindSizeCard(f)};ca.onclick=ap;ci.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();ap()}};
+  if(ca){const ap=()=>{S._coupon=ci.value;S._couponTried=true;if(String(ci.value).trim())affTrack("apply",f.id,ca);c.innerHTML=sizeCard(f);bindSizeCard(f)};ca.onclick=ap;ci.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();ap()}};
     /* editing the code hides the old result until Apply is clicked again */
     ci.oninput=()=>{if(S._couponTried){S._couponTried=false;S._coupon=ci.value;const p=ci.selectionStart;c.innerHTML=sizeCard(f);bindSizeCard(f);const n=$("#cpIn",c);n.focus();n.setSelectionRange(p,p)}}}
-  $$("[data-cpcopy]",c).forEach(b=>b.onclick=()=>copyCode(b.dataset.cpcopy));
+  $$("[data-cpcopy]",c).forEach(b=>b.onclick=()=>{copyCode(b.dataset.cpcopy);affTrack("copy",f.id,b)});
   $$("a[data-cpcode]",c).forEach(a=>a.addEventListener("click",()=>copyCode(a.dataset.cpcode)));
   $$("[data-cpprog]",c).forEach(b=>b.onclick=()=>{S._pfSz.p=Number(b.dataset.cpprog);c.innerHTML=sizeCard(f);bindSizeCard(f)});
   $$("[data-cpgo]",c).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.cpgo;S._pfSz=null;S._couponTried=false;render();window.scrollTo(0,0)});
@@ -3236,8 +3254,21 @@ function pfUpdatesCard(){const U=(window.PF_UPDATES||[]).slice(0,12);if(!U.lengt
   return `<div class="card pfu-card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">🔔 <span>Prop firm updates</span></h3>
      ${newest>last?`<span class="pfu-new">${U.filter(u=>u.date>last).length} <span>new</span></span>`:`<span class="mut" style="font-size:12px"><span>Checked automatically on the 1st and 15th</span></span>`}</div>
    <div class="pfu-list">${U.map(u=>`<div class="pfu-row ${u.date>last?"new":""}"><span class="pfu-ic">${IC[u.kind]||"•"}</span><div><b data-notr>${esc(u.firm)}</b> <span class="mut mono" style="font-size:11px" data-notr>${esc(fmtDate(u.date))}</span><p data-notr>${esc(u.text)}</p></div></div>`).join("")}</div></div>`}
+/* Affiliate & coupon clicks per firm: link clicks, code copies, coupon "Apply" (last 7 / 30 / 90 days) */
+function affCard(C){if(!C)return "";const now=Date.now(),inD=(c,d)=>now-new Date(c.created_at).getTime()<=d*864e5;
+  const names=Object.fromEntries((((window.PropFirms||{}).firms)||[]).map(f=>[f.id,f.name]));
+  const firms=[...new Set([...Object.keys(window.PF_AFF_LINKS||{}),...C.map(c=>c.firm)])];
+  const per=firms.map(id=>{const r=C.filter(c=>c.firm===id),n=(k,d)=>r.filter(c=>c.kind===k&&inD(c,d)).length;
+    const places={};r.filter(c=>c.kind==="link").forEach(c=>places[c.place||"—"]=(places[c.place||"—"]||0)+1);
+    return {id,name:names[id]||id,l7:n("link",7),l30:n("link",30),l90:n("link",90),c30:n("copy",30),a30:n("apply",30),top:Object.entries(places).sort((a,b)=>b[1]-a[1]).slice(0,3)}}).sort((a,b)=>b.l30-a.l30||b.l90-a.l90);
+  const tot=C.filter(c=>c.kind==="link"&&inD(c,30)).length;
+  return `<div class="card aff-card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">🔗 <span>Affiliate & coupon clicks</span></h3><span class="mut" style="font-size:12px">${tot} <span>link clicks in 30 days</span></span></div>
+   <div class="tw"><table class="t"><tr><th>Prop firm</th><th>Link clicks · 7 days</th><th>30 days</th><th>90 days</th><th>Code copied · 30 days</th><th>Coupon applied · 30 days</th><th>Clicked from</th></tr>
+   ${per.map(p=>`<tr><td><b data-notr>${esc(p.name)}</b></td><td class="mono"><b>${p.l7}</b></td><td class="mono">${p.l30}</td><td class="mono">${p.l90}</td><td class="mono">${p.c30}</td><td class="mono">${p.a30}</td><td style="font-size:12px">${p.top.map(([k,v])=>`<span data-notr>${esc(I18N.t(k))}</span> <span class="mut">${v}</span>`).join(" · ")||"—"}</td></tr>`).join("")}</table></div>
+   <p class="mut" style="font-size:12px;margin:8px 0 0">${I18N.t("Counts clicks on your affiliate links and BROWN23 buttons (login page, About, Prop firm tracker). A click is not a purchase: check sales in each firm's affiliate dashboard.")}</p></div>`}
 async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</div>';
   let profs,trades,plans;try{[profs,trades,plans]=await Promise.all([API.listProfiles(),API.allTradesLite(),API.allPlans()])}catch(e){el.innerHTML=`<div class="card empty">Couldn't load: ${esc(e.message||e)}</div>`;return}
+  let clicks=null;try{clicks=API.affClicks?await API.affClicks():null}catch(e){clicks=null}
   const stOf=p=>p.status||"approved";
   const pending=profs.filter(p=>p.role!=="admin"&&stOf(p)==="pending").sort((a,b)=>(a.created_at||"").localeCompare(b.created_at||""));
   const rejected=profs.filter(p=>p.role!=="admin"&&stOf(p)==="rejected");
@@ -3290,12 +3321,14 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
      <td><div class="row" style="justify-content:flex-end;flex-wrap:nowrap">
        <button class="btn sm" data-open="journal">📓 Journal</button><button class="btn sm" data-open="plan">🧭 Plan</button><button class="btn sm" data-open="stats">📊 Stats</button>
        ${tgUser(r.s)?`<a class="btn sm" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" title="Message on Telegram">💬</a>`:""}</div></td></tr>`;
-  const reqRow=(p,rej)=>`<tr data-pid="${p.id}"><td><b data-notr>${esc(p.name||"—")}</b>${contactLinks(p)}</td><td data-notr>${p.tgOk?`<span class="dyes">✅ <span>Telegram verified</span></span>`:`<span class="dno">⚠️ <span>Not verified</span></span>`}</td><td class="mut" data-notr>${p.created_at?esc(fmtDate(p.created_at.slice(0,10))):""}</td>
-     <td><div class="row" style="justify-content:flex-end">${rej?"":`<button class="btn sm danger" data-act="rejected">✖ Reject</button>`}<button class="btn sm pri" data-act="approved">✔ Approve</button></div></td></tr>`;
+  const reqRow=(p,rej)=>`<tr data-pid="${p.id}"><td><b data-notr>${esc(p.name||"—")}</b>${contactLinks(p)}</td><td data-notr>${p.tgOk?`<span class="dyes">✅ <span>Telegram verified</span></span>`:`<span class="dno">⚠️ <span>Telegram not verified</span></span>`}<br>${p.emailOk===false?`<span class="dno">⚠️ <span>Email not verified</span></span>`:p.emailOk?`<span class="dyes">✅ <span>Email verified</span></span>`:""}</td><td class="mut" data-notr>${p.created_at?esc(fmtDate(p.created_at.slice(0,10))):""}</td>
+     <td><div class="row" style="justify-content:flex-end">${rej?"":`<button class="btn sm danger" data-act="rejected">✖ Reject</button>`}${(()=>{const ok=p.tgOk&&p.emailOk!==false;
+       return `<button class="btn sm pri" data-act="approved" ${ok?"":`disabled title="${esc(I18N.t("Can be approved after the student verifies Telegram and email"))}"`}>${ok?"✔ <span>Approve</span>":"🔒 <span>Waiting for verification</span>"}</button>`})()}</div></td></tr>`;
   el.innerHTML=`<h1>👑 Admin dashboard</h1><p class="sub">All your Tradeversity students in one place. Click a student to open their journal, stats and plans (read-only).</p>
    ${pending.length?`<div class="card" style="margin-bottom:12px;border-color:var(--gold)"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0;color:var(--gold)">🔔 Pending requests</h3><span class="tag" style="background:rgba(245,185,66,.15);color:var(--gold)">${pending.length}</span></div>
      <p class="mut" style="margin:0 0 8px;font-size:12px">These people signed up and are waiting for you. They can't use the journal until you approve them.</p>
      <div class="tw"><table class="t" id="reqT"><tr><th>Student</th><th>Telegram check</th><th>Requested</th><th></th></tr>${pending.map(p=>reqRow(p,false)).join("")}</table></div></div>`:""}
+   ${affCard(clicks)}
    ${pfUpdatesCard()}
    ${weekCard}
    ${students.length?`<div class="card" style="margin-bottom:12px" id="discCard">
@@ -3318,7 +3351,8 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
      <td class="mono ${r.brk?"neg":""}">${r.brk}</td><td>${r.worstEmo?`<span class="tag bad">${esc(r.worstEmo.k)}</span>`:"—"}</td>${[r.jT,r.pT,r.pN].map(v=>`<td>${v?'<span class="dyes">✔ Yes</span>':'<span class="dno">✖ No</span>'}</td>`).join("")}</tr>`).join("")||`<tr><td colspan="9" class="empty">No students yet. Share the website link — they sign up for free.</td></tr>`}</table></div></div>
    ${rejected.length?`<details class="card" style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:600">Rejected requests (${rejected.length})</summary><div class="tw" style="margin-top:8px"><table class="t" id="rejT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${rejected.map(p=>reqRow(p,true)).join("")}</table></div></details>`:""}`;
   $$("tr[data-pid] button[data-act]",el).forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const id=b.closest("tr").dataset.pid,act=b.dataset.act;const p=profs.find(x=>x.id===id);
-    const go_=async()=>{b.disabled=true;try{await API.setStatus(id,act);toast(act==="approved"?"Student approved":"Request rejected");vAdmin(el)}catch(e){b.disabled=false;toast(e.message||String(e))}};
+    const go_=async()=>{b.disabled=true;try{await API.setStatus(id,act);toast(act==="approved"?"Student approved":"Request rejected");vAdmin(el)}catch(e){b.disabled=false;const m=String(e.message||e);
+      toast(/not_verified_telegram/.test(m)?I18N.t("This student hasn't verified Telegram yet."):/not_verified_email/.test(m)?I18N.t("This student hasn't verified the email yet."):m)}};
     if(act==="rejected")confirmBox(`Reject ${p&&p.name||"this request"}? They won't be able to use the journal.`,go_);else go_()});
   /* today's discipline: filters + open a student's journal / plan / stats */
   $$("#discF button").forEach(b=>b.onclick=()=>{$$("#discF button").forEach(x=>x.classList.toggle("on",x===b));const f=b.dataset.f;
@@ -3443,7 +3477,16 @@ function promoHTML(){return `<div class="promo"><div class="promo-l"><div class=
 $$("[data-promo]").forEach(el=>el.innerHTML=promoHTML());
 document.addEventListener("click",async e=>{const b=e.target.closest&&e.target.closest(".promo-copy");if(!b)return;
   try{await navigator.clipboard.writeText(PROMO.code)}catch(err){const t=document.createElement("textarea");t.value=PROMO.code;document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(_){}t.remove()}
-  toast("Code BROWN23 copied")});
+  toast("Code BROWN23 copied");affTrack("copy","earn2trade",b)});
+/* ---- affiliate & coupon clicks: counted for the admin dashboard (which firm, what, from which page) ---- */
+function affPlace(el){if(el&&el.closest){if(el.closest("#auth"))return "login page";if(el.closest(".about-hero,.about"))return "about";}
+  return S.view==="propfirms"?(S._pfId?"prop firm page":"prop firm list"):(S.view||"site")}
+function affTrack(kind,firm,el){if(firm&&API&&API.track)API.track(kind,firm,affPlace(el))}
+function affFirmOf(href){const h=String(href||"").toLowerCase();if(!h)return null;
+  const L=Object.assign({},window.PF_AFF_LINKS||{});Object.values(window.PF_COUPONS||{}).forEach(c=>Object.entries(c).forEach(([id,v])=>{if(v&&v.url&&!L[id])L[id]=v.url}));
+  for(const[id,u]of Object.entries(L))if(u&&h.startsWith(String(u).toLowerCase()))return id;
+  if(h.includes("a_pid=brown23"))return "earn2trade";if(h.includes("/aff/go/brown_trader"))return "bulenox";return null}
+document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest("a[href]");if(!a)return;const f=affFirmOf(a.href);if(f)affTrack("link",f,a)},true);
 
 /* ============ the gate (animated entrance) ============ */
 function openGate(instant){const g=$("#gate"),b=$(".authbox");if(!g||g.classList.contains("gone"))return;
