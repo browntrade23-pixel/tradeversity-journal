@@ -2715,7 +2715,7 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
    To add a code for another firm: COUPONS.CODE = { firmId:{pct:XX, url:"https://..."} } */
 /* prog = the code only works on plans whose name starts with this text */
 const COUPONS={BROWN23:{earn2trade:{pct:60,url:"https://www.earn2trade.com/?a_pid=BROWN23"},
-  bulenox:{pct:89,url:"https://bulenox.com/",prog:"Option 1"}}};
+  bulenox:{pct:89,url:"https://bulenox.com/member/aff/go/brown_trader",prog:"Option 1"}}};
 const dealFor=(code,fid,P)=>{const d=COUPONS[code]&&COUPONS[code][fid];return d&&(!d.prog||(P&&P.name.startsWith(d.prog)))?d:null};
 function couponBox(f,P,size){const raw=P&&((P.rows&&P.rows[size]&&P.rows[size].price)??(P.prices&&P.prices[size]));
   const code=(S._coupon||"").trim().toUpperCase(),c=code&&COUPONS[code],deal=c&&dealFor(code,f.id,P);let res="";
