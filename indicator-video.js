@@ -2,7 +2,8 @@
    Plays like a short video: an animated chart + the settings panel, with English and Arabic subtitles.
    Settings come from the real indicator (Inputs tab, read Nov 2026). */
 (function(){
-const W=600,H=300,N=64,X0=16,DX=(W-90)/N;
+/* high resolution: 1200x600 drawing space, TradingView-style price scale on the right and time axis at the bottom */
+const W=1200,H=600,N=64,X0=24,PX=W-132,DX=(PX-X0-70)/N,TOP=24,BOT=H-84;
 /* ---------- fake but realistic NQ price path (seeded so it is always the same) ---------- */
 function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const R=rng(23),C=[];let p=100;
@@ -19,26 +20,34 @@ for(let i=0;i<N;i++){
   if(i>=56){drift=.55;vol=.6}
   const o=p,c=o+drift+(R()-.5)*vol*2;const h=Math.max(o,c)+R()*vol,l=Math.min(o,c)-R()*vol;C.push({o,h,l,c});p=c}
 const lo=Math.min(...C.map(c=>c.l))-3,hi=Math.max(...C.map(c=>c.h))+3;
-const Y=v=>H-26-(v-lo)/(hi-lo)*(H-44),XI=i=>X0+i*DX+DX/2,XE=W-74;
+const Y=v=>BOT-(v-lo)/(hi-lo)*(BOT-TOP),XI=i=>X0+i*DX+DX/2,XE=PX;
+const PRICE=v=>(21480+(v-100)*28).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const TIMES=[[0,"18:00"],[8,"20:00"],[16,"00:00"],[24,"02:00"],[32,"08:00"],[40,"09:30"],[48,"10:30"],[56,"11:30"],[63,"12:15"]];
 const rangeHL=(a,b)=>{let h=-1e9,l=1e9;for(let i=a;i<=b;i++){h=Math.max(h,C[i].h);l=Math.min(l,C[i].l)}return{h,l}};
 let fvg=null;for(let i=45;i<N-1;i++){if(C[i-1].l>C[i+1].h){fvg={i,top:C[i-1].l,bot:C[i+1].h};break}if(C[i-1].h<C[i+1].l){fvg={i,top:C[i+1].l,bot:C[i-1].h};break}}
 const asia=rangeHL(0,15),lon=rangeHL(16,31),pm=rangeHL(32,39),mid=C[16].o,gapT=Math.max(C[39].c,C[40].o),gapB=Math.min(C[39].c,C[40].o);
 const day=rangeHL(0,N-1),PDH=day.h+1.4,PDL=day.l-1.2,PWH=hi-.6,PML=lo+.5;
 /* candles build one by one like a live chart (green = bullish, black = bearish), then the drawings appear */
-const CC=30,B=N*CC+250;
+const CC=32,B=N*CC+300;
 const BULL="#089981",BEAR="#131722";
-const candles=()=>C.map((c,i)=>{const x=XI(i),up=c.c>=c.o,col=up?BULL:BEAR;const yb=Math.min(Y(c.o),Y(c.c)),hb=Math.max(1.2,Math.abs(Y(c.o)-Y(c.c)));
-  return `<g class="cdl${i===N-1?" live":""}" style="animation-delay:${i*CC}ms"><line x1="${x}" x2="${x}" y1="${Y(c.h)}" y2="${Y(c.l)}" stroke="${col}" stroke-width="1"/><rect x="${x-DX*.34}" y="${yb}" width="${DX*.68}" height="${hb}" fill="${up?col:col}" stroke="${col}" stroke-width=".6" rx=".5"/></g>`}).join("");
-/* ---------- drawing helpers: each drawing grows from its start to the right edge ---------- */
-const lbl=(x,y,t,col)=>`<text x="${x}" y="${y}" fill="${col}" class="tx-l">${t}</text>`;
+const candles=()=>C.map((c,i)=>{const x=XI(i),up=c.c>=c.o,col=up?BULL:BEAR;const yb=Math.min(Y(c.o),Y(c.c)),hb=Math.max(2,Math.abs(Y(c.o)-Y(c.c)));
+  return `<g class="cdl${i===N-1?" live":""}" style="animation-delay:${i*CC}ms"><line x1="${x}" x2="${x}" y1="${Y(c.h)}" y2="${Y(c.l)}" stroke="${col}" stroke-width="2"/><rect x="${x-DX*.36}" y="${yb}" width="${DX*.72}" height="${hb}" fill="${col}" rx="1"/></g>`}).join("");
+/* chart frame: grid, price scale with prices, time axis, live price line */
+const frame=()=>{let g="";const steps=8;for(let k=0;k<=steps;k++){const v=lo+(hi-lo)*k/steps,y=Y(v);g+=`<line x1="${X0}" x2="${PX}" y1="${y}" y2="${y}" stroke="#eef0f4" stroke-width="1"/><text x="${PX+12}" y="${y+6}" class="tx-ax">${PRICE(v)}</text>`}
+  TIMES.forEach(([i,t])=>{const x=XI(i);g+=`<line x1="${x}" x2="${x}" y1="${TOP}" y2="${BOT}" stroke="#f1f3f6" stroke-width="1"/><text x="${x}" y="${BOT+26}" class="tx-ax" text-anchor="middle">${t}</text>`});
+  return g+`<line x1="${PX}" x2="${PX}" y1="0" y2="${H}" stroke="#e1e4ea" stroke-width="1.5"/><line x1="0" x2="${W}" y1="${BOT+6}" y2="${BOT+6}" stroke="#e1e4ea" stroke-width="1.5"/>`};
+const tag=(v,col,a)=>`<g class="pop" style="animation-delay:${a}ms"><rect x="${PX+4}" y="${Y(v)-13}" width="${W-PX-8}" height="26" rx="4" fill="${col}"/><text x="${(PX+W)/2}" y="${Y(v)+6}" class="tx-tag" text-anchor="middle">${PRICE(v)}</text></g>`;
+const livePrice=()=>{const c=C[N-1],col=c.c>=c.o?BULL:BEAR;return `<g class="pop" style="animation-delay:${N*CC}ms"><line x1="${X0}" x2="${PX}" y1="${Y(c.c)}" y2="${Y(c.c)}" stroke="${col}" stroke-width="1.2" stroke-dasharray="3 4" opacity=".7"/></g>`+tag(c.c,col,N*CC)};
+/* ---------- drawing helpers: each drawing grows from its start to the right edge, with its price tag on the scale ---------- */
+const lbl=(x,y,t,col,end)=>`<text x="${x}" y="${y}" fill="${col}" class="tx-l" ${end?'text-anchor="end"':""}>${t}</text>`;
 const G=(a,inner)=>`<g class="grow" style="animation-delay:${B+(a||0)}ms">${inner}</g>`;
-const line=(y,col,t,a,dash)=>G(a,`<line x1="${X0}" x2="${XE}" y1="${Y(y)}" y2="${Y(y)}" stroke="${col}" stroke-width="1.3" ${dash?'stroke-dasharray="6 4"':""}/>${lbl(XE+4,Y(y)+3,t,col)}`);
-const segLine=(i0,y,col,t,a,dash)=>G(a,`<line x1="${XI(i0)}" x2="${XE}" y1="${Y(y)}" y2="${Y(y)}" stroke="${col}" stroke-width="1.3" ${dash?'stroke-dasharray="6 4"':""}/>${lbl(XE+4,Y(y)+3,t,col)}`);
+const line=(y,col,t,a,dash)=>G(a,`<line x1="${X0}" x2="${XE}" y1="${Y(y)}" y2="${Y(y)}" stroke="${col}" stroke-width="2.4" ${dash?'stroke-dasharray="10 7"':""}/>${lbl(XE-10,Y(y)-8,t,col,1)}`)+tag(y,col,B+(a||0)+700);
+const segLine=(i0,y,col,t,a,dash)=>G(a,`<line x1="${XI(i0)}" x2="${XE}" y1="${Y(y)}" y2="${Y(y)}" stroke="${col}" stroke-width="2.4" ${dash?'stroke-dasharray="10 7"':""}/>${lbl(XE-10,Y(y)-8,t,col,1)}`)+tag(y,col,B+(a||0)+700);
 /* ext = box extended to the right edge of the chart */
 const box=(i0,i1,top,bot,fill,stroke,t,a,ext)=>{const x=XI(i0)-DX/2,w=ext?XE-x:(i1-i0+1)*DX;
-  return G(a,`<rect x="${x}" y="${Y(top)}" width="${w}" height="${Math.max(2,Y(bot)-Y(top))}" fill="${fill}" stroke="${stroke}" stroke-width="1" rx="1.5"/>${t?lbl(x+3,Y(top)-4,t,stroke):""}`)};
-const fibs=(i0,top,bot,col,a)=>[.25,.5,.75].map((f,k)=>{const y=top-(top-bot)*f;return G((a||0)+k*160,`<line x1="${XI(i0)-DX/2}" x2="${XE}" y1="${Y(y)}" y2="${Y(y)}" stroke="${col}" stroke-width=".8" stroke-dasharray="2 3"/>${lbl(XE+4,Y(y)+3,f,col)}`)}).join("");
-const sessBands=()=>[[0,15,"Asia"],[16,31,"London"],[32,39,"Pre-market"],[40,63,"New York"]].map(([a,b,t])=>`<text x="${(XI(a)+XI(b))/2}" y="${H-8}" class="tx-s" text-anchor="middle">${t}</text>`).join("");
+  return G(a,`<rect x="${x}" y="${Y(top)}" width="${w}" height="${Math.max(3,Y(bot)-Y(top))}" fill="${fill}" stroke="${stroke}" stroke-width="2" rx="3"/>${t?lbl(x+6,Y(top)-9,t,stroke):""}`)};
+const fibs=(i0,top,bot,col,a)=>[.25,.5,.75].map((f,k)=>{const y=top-(top-bot)*f;return G((a||0)+k*160,`<line x1="${XI(i0)-DX/2}" x2="${XE}" y1="${Y(y)}" y2="${Y(y)}" stroke="${col}" stroke-width="1.6" stroke-dasharray="4 5"/>${lbl(XE-10,Y(y)-5,f,col,1)}`)}).join("");
+const sessBands=()=>[[0,15,"ASIA"],[16,31,"LONDON"],[32,39,"PRE-MARKET"],[40,63,"NEW YORK"]].map(([a,b,t])=>`<rect x="${XI(a)-DX/2}" y="${H-14}" width="${(b-a+1)*DX-4}" height="4" rx="2" fill="#e6e9ef"/><text x="${(XI(a)+XI(b))/2}" y="${H-22}" class="tx-s" text-anchor="middle">${t}</text>`).join("");
 /* light-chart palette */
 const K={asia:"#c98a00",asiaF:"rgba(245,185,66,.14)",lon:"#2962ff",lonF:"rgba(41,98,255,.07)",mac:"#7e57c2",macF:"rgba(126,87,194,.10)",pm:"#00897b",
  fvg:"#d81b60",fvgF:"rgba(216,27,96,.09)",fvgFib:"#e8799f",mid:"#455a64",gap:"#ef6c00",gapF:"rgba(239,108,0,.10)",gapFib:"#f4a261",
@@ -48,7 +57,7 @@ const S=[
  {t:["Meet the indicator","تعرّف على المؤشر"],rows:[],
   en:"TRADEVERSITY NQ v1.3 draws the ICT levels on your Nasdaq chart for you.",
   ar:"مؤشر TRADEVERSITY NQ v1.3 يرسم لك مستويات ICT على رسم ناسداك تلقائيًا.",
-  draw:()=>`<g class="pop" style="animation-delay:${B}ms"><rect x="${W/2-190}" y="${H/2-44}" width="320" height="70" rx="12" fill="rgba(255,255,255,.92)" stroke="#e3e6ec"/><text x="${W/2-30}" y="${H/2-10}" text-anchor="middle" class="tx-big">TRADEVERSITY NQ</text><text x="${W/2-30}" y="${H/2+12}" text-anchor="middle" class="tx-sub">Advanced ICT &amp; Liquidity Engine · v1.3</text></g>`+sessBands()},
+  draw:()=>`<g class="pop" style="animation-delay:${B}ms"><rect x="${PX/2-330}" y="${H/2-90}" width="660" height="140" rx="20" fill="rgba(255,255,255,.95)" stroke="#e3e6ec" stroke-width="2"/><text x="${PX/2}" y="${H/2-22}" text-anchor="middle" class="tx-big">TRADEVERSITY NQ</text><text x="${PX/2}" y="${H/2+22}" text-anchor="middle" class="tx-sub">Advanced ICT &amp; Liquidity Engine · v1.3</text></g>`+sessBands()},
  {t:["Timezone","المنطقة الزمنية"],sec:"TIMEZONE",rows:[["Timezone","America/New_York"]],
   en:"Everything runs on New York time, like ICT teaches. Keep America/New_York.",
   ar:"كل شيء يعمل بتوقيت نيويورك كما يعلّم ICT. اترك America/New_York.",
@@ -88,28 +97,29 @@ const S=[
  {t:["Save your settings","احفظ إعداداتك"],sec:"",rows:[["Defaults","↺ reset"],["Ok","✓ save"]],
   en:"Click Ok to save, Defaults resets. Remember: this indicator makes your drawings easy, it does not take trades for you.",
   ar:"اضغط Ok للحفظ، و Defaults للإرجاع. تذكّر: هذا المؤشر يسهّل رسوماتك، ولا يأخذ الصفقات بدلًا عنك.",
-  draw:()=>`<g class="pop" style="animation-delay:${B}ms"><rect x="${W/2-190}" y="${H/2-40}" width="320" height="70" rx="12" fill="rgba(255,255,255,.92)" stroke="#e3e6ec"/><text x="${W/2-30}" y="${H/2-6}" text-anchor="middle" class="tx-big">Plan · Levels · Execution</text><text x="${W/2-30}" y="${H/2+16}" text-anchor="middle" class="tx-sub">TRADEVERSITY</text></g>`+sessBands()}
+  draw:()=>`<g class="pop" style="animation-delay:${B}ms"><rect x="${PX/2-330}" y="${H/2-86}" width="660" height="140" rx="20" fill="rgba(255,255,255,.95)" stroke="#e3e6ec" stroke-width="2"/><text x="${PX/2}" y="${H/2-18}" text-anchor="middle" class="tx-big">Plan · Levels · Execution</text><text x="${PX/2}" y="${H/2+24}" text-anchor="middle" class="tx-sub">TRADEVERSITY</text></g>`+sessBands()}
 ];
 const SCENE_MS=9500;
 function mount(root){
   root.innerHTML=`<div class="tvx" data-notr>
    <div class="tvx-screen">
-    <svg class="tvx-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><defs><pattern id="tvxg" width="50" height="40" patternUnits="userSpaceOnUse"><path d="M50 0H0V40" fill="none" stroke="#eceef2" stroke-width="1"/></pattern></defs>
-     <rect width="${W}" height="${H}" fill="#fafbfc"/><rect width="${W}" height="${H}" fill="url(#tvxg)"/><line x1="${XE+48}" x2="${XE+48}" y1="0" y2="${H}" stroke="#e3e6ec"/>
-     <text x="${W-8}" y="16" text-anchor="end" class="tx-sym">MNQ1! · 5</text><g class="tvx-c"></g><g class="tvx-o"></g></svg>
+    <svg class="tvx-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
+     <rect width="${W}" height="${H}" fill="#ffffff"/>${frame()}
+     <text x="${X0+4}" y="${TOP+20}" class="tx-sym">MNQ1! · 5m · CME</text><text x="${X0+4}" y="${TOP+44}" class="tx-ind">TRADEVERSITY NQ v1.3</text>
+     <g class="tvx-c"></g><g class="tvx-lp"></g><g class="tvx-o"></g></svg>
     <div class="tvx-panel"><div class="tvx-ph"><b>TRADEVERSITY NQ</b><span>Inputs · Style · Visibility</span></div><div class="tvx-rows"></div></div>
     <div class="tvx-title"></div>
     <div class="tvx-subs"><div class="tvx-en"></div><div class="tvx-ar" dir="rtl" lang="ar"></div></div>
     <button type="button" class="tvx-big" aria-label="Play">▶</button>
    </div>
-   <div class="tvx-ctrl"><button type="button" class="tvx-pp" aria-label="Play">▶</button><button type="button" class="tvx-pv" aria-label="Previous">⏮</button><button type="button" class="tvx-nx" aria-label="Next">⏭</button>
+   <div class="tvx-ctrl"><button type="button" class="tvx-pp" aria-label="Play">▶</button><button type="button" class="tvx-pv" aria-label="Previous">⏮</button><button type="button" class="tvx-nx" aria-label="Next">⏭</button><button type="button" class="tvx-fs" aria-label="Full screen" title="Full screen">⛶</button>
     <div class="tvx-bar">${S.map((s,i)=>`<button type="button" class="tvx-seg" data-i="${i}" title="${s.t[0]}"><i></i></button>`).join("")}</div><span class="tvx-n"></span></div>
    <div class="tvx-chips">${S.map((s,i)=>`<button type="button" class="tvx-chip" data-i="${i}"><b>${i+1}</b> ${s.t[0]}<span dir="rtl">${s.t[1]}</span></button>`).join("")}</div>
   </div>`;
   const $=s=>root.querySelector(s),$$=s=>[...root.querySelectorAll(s)];
   let cur=0,playing=false,t0=0,elapsed=0,raf=0;
   const show=i=>{cur=(i+S.length)%S.length;const s=S[cur];
-    $(".tvx-c").innerHTML=candles();$(".tvx-o").innerHTML=s.draw();
+    $(".tvx-c").innerHTML=candles();$(".tvx-lp").innerHTML=livePrice();$(".tvx-o").innerHTML=s.draw();
     $(".tvx-title").innerHTML=`<span>${cur+1}/${S.length}</span> ${s.t[0]} <em dir="rtl">${s.t[1]}</em>`;
     $(".tvx-en").textContent=s.en;$(".tvx-ar").textContent=s.ar;
     $$(".tvx-subs > div").forEach(d=>{d.classList.remove("in");void d.offsetWidth;d.classList.add("in")});
@@ -128,6 +138,7 @@ function mount(root){
   $(".tvx-pp").onclick=toggle;$(".tvx-big").onclick=()=>{show(cur);setPlay(true)};$(".tvx-screen").addEventListener("click",e=>{if(e.target.closest("button"))return;toggle()});
   $(".tvx-pv").onclick=()=>{show(cur-1);if(playing)setPlay(true)};$(".tvx-nx").onclick=()=>{show(cur+1);if(playing)setPlay(true)};
   $$("[data-i]").forEach(b=>b.onclick=()=>{show(Number(b.dataset.i));setPlay(true)});
+  $(".tvx-fs").onclick=()=>{const sc=root.querySelector(".tvx");if(document.fullscreenElement)document.exitFullscreen();else if(sc.requestFullscreen)sc.requestFullscreen().catch(()=>{});else if(sc.webkitRequestFullscreen)sc.webkitRequestFullscreen()};
   document.addEventListener("visibilitychange",()=>{if(document.hidden&&playing)setPlay(false)});
   show(0);
   return{stop:()=>setPlay(false)}}

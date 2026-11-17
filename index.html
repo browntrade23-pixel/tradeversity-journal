@@ -552,7 +552,7 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .ind-note-ic{font-size:24px;line-height:1}.ind-note b{color:#2ec5c9;font-size:14px}.ind-note p{margin:4px 0 0;font-size:14px;line-height:1.55}
 /* indicator explainer video (indicator-video.js) */
 .ind-vid{margin-bottom:12px;border-color:rgba(245,185,66,.35)}
-.tvx-screen{position:relative;display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);grid-template-rows:auto 1fr auto;gap:0;border-radius:14px;overflow:hidden;cursor:pointer;
+.tvx-screen{position:relative;display:grid;grid-template-columns:minmax(0,2.3fr) minmax(0,1fr);grid-template-rows:auto 1fr auto;gap:0;border-radius:14px;overflow:hidden;cursor:pointer;
   background:radial-gradient(120% 90% at 0% 0%,rgba(245,185,66,.08),transparent 55%),linear-gradient(180deg,#0b1220,#070b14);border:1px solid rgba(245,185,66,.3);min-height:360px}
 .tvx-title{grid-column:1/-1;grid-row:1;display:flex;align-items:center;gap:10px;padding:10px 14px;font-weight:800;font-size:15px;color:#fff;border-bottom:1px solid rgba(255,255,255,.06);animation:tvxIn .5s ease both}
 .tvx-title span{font-size:11px;font-weight:900;color:#1b1305;background:var(--gold);border-radius:6px;padding:2px 7px}
@@ -586,11 +586,18 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .tvx .pop{animation:tvxPop .6s cubic-bezier(.2,.8,.2,1) both}
 .tvx .grow{animation:tvxGrow 1.1s cubic-bezier(.3,.7,.2,1) both}
 .tvx.paused .tvx-chart *,.tvx.paused .tvx-rows *,.tvx.paused .tvx-subs>div{animation-play-state:paused!important}
-.tvx .tx-l{font-size:9px;font-weight:800;font-family:"JetBrains Mono",monospace;paint-order:stroke;stroke:#fafbfc;stroke-width:3px;stroke-linejoin:round}
-.tvx .tx-s{font-size:9px;fill:#9aa1b0;letter-spacing:.06em;font-weight:600}
-.tvx .tx-sym{font-size:10px;fill:#9aa1b0;font-weight:700;font-family:"JetBrains Mono",monospace}
-.tvx .tx-big{font-size:26px;font-weight:900;fill:#131722;letter-spacing:.04em}
-.tvx .tx-sub{font-size:12.5px;fill:#5d6575;font-weight:600}
+.tvx .tx-l{font-size:17px;font-weight:800;font-family:Inter,system-ui,sans-serif;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
+.tvx .tx-s{font-size:13px;fill:#9aa1b0;letter-spacing:.12em;font-weight:700}
+.tvx .tx-ax{font-size:15px;fill:#787b86;font-family:"JetBrains Mono",monospace;font-weight:500}
+.tvx .tx-tag{font-size:15px;fill:#fff;font-family:"JetBrains Mono",monospace;font-weight:700}
+.tvx .tx-sym{font-size:18px;fill:#131722;font-weight:800}
+.tvx .tx-ind{font-size:14px;fill:#b07a1c;font-weight:700;letter-spacing:.04em}
+.tvx .tx-big{font-size:56px;font-weight:900;fill:#131722;letter-spacing:.03em}
+.tvx .tx-sub{font-size:24px;fill:#5d6575;font-weight:600}
+.tvx-chart{shape-rendering:geometricPrecision}
+.tvx:fullscreen{background:#070a10;padding:2vh 2vw;display:flex;flex-direction:column;justify-content:center;overflow:auto}
+.tvx:fullscreen .tvx-screen{min-height:0}.tvx:fullscreen .tvx-en,.tvx:fullscreen .tvx-ar{font-size:22px}.tvx:fullscreen .tvx-title{font-size:20px}
+.tvx:fullscreen .tvx-panel{font-size:15px}.tvx:fullscreen .tvx-row b{font-size:14px}
 @keyframes tvxCdl{from{opacity:0;transform:scaleY(.25)}to{opacity:1;transform:none}}
 @keyframes tvxLive{0%,100%{opacity:1}50%{opacity:.45}}
 @keyframes tvxGrow{from{clip-path:inset(0 100% 0 0);opacity:.4}to{clip-path:inset(0 0 0 0);opacity:1}}
@@ -1058,6 +1065,18 @@ nav.tabs button.on{box-shadow:inset 0 0 0 1px var(--line2),inset 0 -2px 0 var(--
 .kpi .v{font-size:25px;letter-spacing:-.5px}
 .kpi .l{color:var(--muted);letter-spacing:.5px}
 h3{letter-spacing:.5px}
+.red-alert{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;margin-bottom:12px;border-radius:12px;border:1px solid rgba(239,83,80,.45);background:color-mix(in srgb,var(--red) 8%,var(--panel))}
+.red-alert>div>b{color:var(--red)}.ra-ic{font-size:20px;line-height:1.2}
+.ra-list{display:grid;gap:3px;margin:6px 0 4px;font-size:13.5px}.ra-list b{color:var(--text);margin-inline-end:6px;font-size:12.5px}
+.red-alert small{color:var(--muted);font-size:12px}
+.start-card{margin-bottom:12px;border-color:color-mix(in srgb,var(--gold) 35%,var(--line))!important}
+.sc-t{font-size:15px}.sc-n{margin-inline-start:10px;font-size:12px}
+.sc-bar{height:6px;border-radius:4px;background:var(--panel2);margin:10px 0 12px;overflow:hidden}.sc-bar i{display:block;height:100%;background:var(--gold);border-radius:4px;transition:width .5s}
+.sc-steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.sc-step{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);font:inherit;font-size:13px;text-align:start;cursor:pointer;transition:border-color .2s}
+.sc-step:hover:not(:disabled){border-color:var(--gold)}.sc-step.ok{opacity:.55;cursor:default;text-decoration:line-through}.sc-ic{font-size:17px}.sc-go{margin-inline-start:auto;color:var(--gold);font-size:18px}
+.wk-box{padding:12px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);display:grid;gap:6px;font-size:13px}
+.wk-box.good>b{color:var(--green)}.wk-box.attn>b{color:var(--amber)}
 .st-bin{color:var(--teal);border-color:color-mix(in srgb,var(--teal) 40%,transparent)}
 .bin-list{display:grid;gap:8px}.bin-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line2);border-radius:10px;background:var(--panel2)}
 .bin-row small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
@@ -1483,6 +1502,7 @@ async function loadNews(){try{if(!API||!API.news)return;const a=new Date();a.set
   S.news=await API.news(a.toISOString(),b.toISOString());S.newsLoaded=true;
   const nb=$("#newsBox");if(nb){nb.outerHTML=newsBox(nb.dataset.date,nb.dataset.ins==="1");const ta=$("#pNews");if(ta&&!ta.value.trim()&&!ta.disabled)ta.value=newsText(nb.dataset.date);bindNewsIns(nb.dataset.date)}
   const cn=$("#coachNews");if(cn)cn.innerHTML=coachNewsHTML();refreshNewsPanel();
+  const ra=$("#redAlert");if(ra)ra.outerHTML=redAlert(ra.dataset.date,ra.dataset.when);
   if(S.view==="journal"&&$(".coach")&&!S.page)render()  /* news days can extend the discipline streak */
   }catch(e){console.warn("news",e)}}
 function bindNewsIns(date){if($("#newsIns"))$("#newsIns").onclick=()=>{const t=newsText(date);if(!t)return;const ta=$("#pNews");ta.value=ta.value.trim()?ta.value.trim()+"\n"+t:t;toast("News added to your plan")}}
@@ -1712,6 +1732,27 @@ const QUOTES=[
   "Win or lose, follow the plan. That is the job.",
   "Process over outcome. Every single day."
 ];
+/* ---------- red folder news alert (top of Journal and Plan) ---------- */
+function redAlert(date,when){const reds=S.newsLoaded?newsFor(date).filter(n=>n.impact==="High"):[];
+  if(!reds.length)return `<div id="redAlert" data-date="${date}" data-when="${when||"today"}" class="hidden"></div>`;
+  return `<div id="redAlert" data-date="${date}" data-when="${when||"today"}" class="red-alert"><span class="ra-ic">🔴</span><div><b>${when==="plan"?"Red folder news on this day":"Red folder news today"}</b>
+    <div class="ra-list" data-notr>${reds.slice(0,4).map(n=>`<span><b class="mono">${tzTime(n.starts_at,NY)} NY · ${tzTime(n.starts_at,DZ)} DZ</b> ${esc(n.title)}</span>`).join("")}</div>
+    <small>No new trades 5 minutes before and after. Expect fast moves and wide spreads.</small></div></div>`}
+/* ---------- getting-started checklist for new students ---------- */
+function startCard(){if(S.readonly||!S.me)return "";const k=`tv_start_${S.me.id}`;try{if(localStorage.getItem(k))return ""}catch(e){}
+  let rules=false;try{const r=JSON.parse(localStorage.getItem(rulesKey())||"{}");rules=Object.keys(r).length>0}catch(e){}
+  const inst=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  const steps=[["📓","Add your first trade or import a CSV",S.trades.length>0,"trade"],["🧭","Write your plan for the next session",S.plans.length>0,"plan"],
+    ["🌙","Write an end-of-day review",S.plans.some(p=>p.followed||(p.review||"").trim()),"review"],["🏦","Set your prop firm rules (Statistics → choose an account)",rules,"rules"],
+    ["📲","Install the app on your phone",inst,"install"]];
+  const done=steps.filter(s=>s[2]).length;if(done===steps.length){try{localStorage.setItem(k,"1")}catch(e){}return ""}
+  return `<div class="card start-card"><div class="row" style="justify-content:space-between;gap:8px"><div><b class="sc-t">🚀 <span>Getting started</span></b><span class="mut sc-n"><span data-notr>${done}/${steps.length}</span> <span>done</span></span></div><button type="button" class="btn sm ghost" id="scHide" title="Hide">✕</button></div>
+   <div class="sc-bar"><i style="width:${done/steps.length*100}%"></i></div>
+   <div class="sc-steps">${steps.map(([ic,t,ok,act])=>`<button type="button" class="sc-step ${ok?"ok":""}" data-sc="${act}" ${ok?"disabled":""}><span class="sc-ic">${ok?"✅":ic}</span><span>${t}</span>${ok?"":`<span class="sc-go">›</span>`}</button>`).join("")}</div></div>`}
+function bindStart(){const h=$("#scHide");if(h)h.onclick=()=>{try{localStorage.setItem(`tv_start_${S.me.id}`,"1")}catch(e){}render()};
+  $$("[data-sc]").forEach(b=>b.onclick=()=>{const a=b.dataset.sc;
+    if(a==="trade")editTrade(null);else if(a==="plan")go("plan");else if(a==="review"){const e=$("#eodBox");if(e){e.open=true;e.scrollIntoView({behavior:"smooth",block:"center"})}}
+    else if(a==="rules"){const ac=accounts();if(ac.length)S.acct=ac[0];go("stats")}else if(a==="install"){const ib=$("#instBtn");if(ib&&!ib.classList.contains("hidden"))ib.click();else toast("Open the site in Chrome (Android) or Safari (iPhone) on your phone, then tap Install app")}})}
 function coachCard(){
   const today=todayStr(),nd=nextTradingDay(),d=discStreak(S.trades,S.plans);const s=Math.min(d.streak,DISC.goal);
   const planNext=S.plans.some(p=>p.date===nd),planToday=S.plans.find(p=>p.date===today),hr=new Date().getHours(),wd=new Date().getDay();
@@ -1748,6 +1789,8 @@ function vJournal(el){
   const byDay={};ts.forEach(t=>(byDay[t.date]=byDay[t.date]||[]).push(t));
   el.innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:6px"><div><h1>Trading journal</h1><p class="sub">${S.readonly?"Student's":"Your"} trades, screenshots, feelings and lessons.</p></div>
    <div class="row">${S.readonly?"":`<button class="btn pri" id="addT">+ New trade</button><button class="btn" id="impT">⬆ Import CSV</button>`}<button class="btn" id="expCsv">Export CSV</button></div></div>
+   ${S.readonly?"":redAlert(todayStr(),"today")}
+   ${startCard()}
    ${eodCard()}
    ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||S._impDone||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export: the trades appear below in your journal, ready for screenshots and notes</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
    ${coachCard()}
@@ -1762,7 +1805,7 @@ function vJournal(el){
    ${ts.length?Object.keys(byDay).sort().reverse().map(d=>{const dn=byDay[d].reduce((a,t)=>a+tradeNet(t),0);
      return `<div class="day"><div class="dayh"><span>${fmtDate(d)}</span><span class="mono ${cls(dn)}">${smoney(dn)}</span></div>${byDay[d].map(tcard).join("")}</div>`}).join("")
    :`<div class="card empty">No trades yet. ${S.readonly?"":"Add your first trade or import a CSV from your broker."}</div>`}`;
-  bindFilters();bindCoach();bindEod();if($("#addT"))$("#addT").onclick=()=>editTrade(null);
+  bindFilters();bindCoach();bindEod();bindStart();if($("#addT"))$("#addT").onclick=()=>editTrade(null);
   if($("#impBody"))vImport($("#impBody"),true);
   if($("#impT"))$("#impT").onclick=()=>{const b=$("#impBox");b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
   $("#expCsv").onclick=exportCSV;
@@ -2231,6 +2274,7 @@ function vPlan(el){
   const nCk=RULES.filter(r=>(p.rules||{})[r]).length;
   el.innerHTML=`<div class="row" style="justify-content:space-between"><div><h1>Trading plan</h1><p class="sub">Plan tomorrow tonight. Execute it tomorrow, then review it.</p></div>
    <div class="row"><input class="i" type="date" id="pDate" value="${cur}" style="width:auto">${dates.length?`<select class="i" id="pHist" style="width:auto"><option value="">Past plans…</option>${dates.map(d=>`<option value="${d}">${d}</option>`).join("")}</select>`:""}</div></div>
+  ${redAlert(cur,"plan")}
   <form id="pf" class="grid">
    <div class="grid g2 daytype">
     <label class="card rest-card trade-card"><input type="radio" name="dayType" value="trade" ${!p.rest&&p.dayType==="trade"?"checked":""} ${ro}><span><b>📈 Trading day</b><span class="mut">I'm trading this day. I follow my plan and my pre-trade checklist.</span></span></label>
@@ -2795,6 +2839,23 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
     return {s,tToday,pToday,pNext,reviewed,journaled:tToday.length>0||reviewed,days7,netToday:tToday.reduce((a,t)=>a+tradeNet(t),0),streak:ds.streak,over:tToday.length>DISC.maxPerDay}})
     .sort((a,b)=>(a.journaled+!!a.pNext)-(b.journaled+!!b.pNext)||(a.s.name||"").localeCompare(b.s.name||""));
   const nJ=disc.filter(r=>r.journaled).length,nPT=disc.filter(r=>r.pToday).length,nPN=disc.filter(r=>r.pNext).length;
+  /* this week (last 7 days) per student */
+  const wkRows=students.map(s=>{const ts=trades.filter(t=>t.user_id===s.id&&t.date>=d7s&&t.date<=today),pl=plans.filter(p=>p.user_id===s.id&&p.date>=d7s&&p.date<=today);
+    const days=new Set(ts.map(t=>t.date)).size,net=ts.reduce((a,t)=>a+tradeNet(t),0),rev=pl.filter(p=>p.followed),fol=rev.filter(p=>p.followed==="Yes").length;
+    let mlh=0;pl.forEach(p=>{const dn=ts.filter(t=>t.date===p.date).reduce((a,t)=>a+tradeNet(t),0);if(num(p.maxLoss)>0&&dn<=-num(p.maxLoss))mlh++});
+    const broke=ts.filter(t=>t.followed==="No").length+rev.filter(p=>p.followed==="No").length;
+    const score=days*2+pl.length+fol*2-mlh*3-broke*2;return {s,n:ts.length,days,net,plans:pl.length,rev:rev.length,fol,mlh,broke,score,quiet:!ts.length&&!pl.length}});
+  const wkBest=wkRows.filter(r=>!r.quiet&&!r.mlh&&!r.broke).sort((a,b)=>b.score-a.score).slice(0,3);
+  const wkAttn=wkRows.filter(r=>r.quiet||r.mlh||r.broke).sort((a,b)=>(b.mlh+b.broke)-(a.mlh+a.broke));
+  const nm=r=>`<b data-notr>${esc(r.s.name||"—")}</b>`;
+  const weekCard=students.length?`<div class="card wk-card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">🗓 <span>This week</span> — <span data-notr>${esc(fmtDate(d7s))} → ${esc(fmtDate(today))}</span></h3>
+     <span class="mut" style="font-size:12px"><span data-notr>${wkRows.filter(r=>!r.quiet).length}/${students.length}</span> <span>students active</span></span></div>
+    <div class="grid g2" style="margin-bottom:12px">
+     <div class="wk-box good"><b>🏆 <span>Most disciplined</span></b>${wkBest.length?wkBest.map(r=>`<div>${nm(r)} <span class="mut"><span data-notr>${r.days}</span> <span>days journaled</span> · <span data-notr>${r.plans}</span> <span>plans</span></span></div>`).join(""):`<div class="mut">No one yet this week.</div>`}</div>
+     <div class="wk-box attn"><b>⚠️ <span>Needs a message</span></b>${wkAttn.length?wkAttn.slice(0,6).map(r=>`<div>${nm(r)} <span class="mut">${r.quiet?"<span>No journal and no plan this week</span>":[r.mlh?`<span data-notr>${r.mlh}×</span> <span>max loss hit</span>`:"",r.broke?`<span data-notr>${r.broke}×</span> <span>broke the plan</span>`:""].filter(Boolean).join(" · ")}</span></div>`).join(""):`<div class="mut">Everyone is on track. 👏</div>`}</div></div>
+    <div class="tw"><table class="t"><tr><th>Student</th><th>Days journaled</th><th>Trades</th><th>Net P&L</th><th>Plans</th><th>Followed plan</th><th>Max loss hit</th></tr>
+     ${wkRows.sort((a,b)=>b.score-a.score).map(r=>`<tr><td>${nm(r)}</td><td class="mono" data-notr>${r.days}/7</td><td class="mono" data-notr>${r.n}</td><td class="mono ${cls(r.net)}" data-notr>${r.n?smoney(r.net,0):"—"}</td><td class="mono" data-notr>${r.plans}</td>
+       <td class="mono" data-notr>${r.rev?`${r.fol}/${r.rev}`:"—"}</td><td>${r.mlh?`<span class="dno" data-notr>✖ ${r.mlh}</span>`:`<span class="mut">—</span>`}</td></tr>`).join("")}</table></div></div>`:"";
   const yes=(t)=>`<span class="dyes">✔ ${t||""}</span>`,no=t=>`<span class="dno">✖ ${t||""}</span>`;
   const tgUser=s=>(s.telegram||"").replace(/^@/,"").replace(/^https?:\/\/t\.me\//,"").trim();
   const discRow=r=>`<tr data-sid="${r.s.id}" data-miss="${r.journaled?"":"j"}${r.pNext?"":"p"}">
@@ -2813,6 +2874,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    ${pending.length?`<div class="card" style="margin-bottom:12px;border-color:var(--gold)"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0;color:var(--gold)">🔔 Pending requests</h3><span class="tag" style="background:rgba(245,185,66,.15);color:var(--gold)">${pending.length}</span></div>
      <p class="mut" style="margin:0 0 8px;font-size:12px">These people signed up and are waiting for you. They can't use the journal until you approve them.</p>
      <div class="tw"><table class="t" id="reqT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${pending.map(p=>reqRow(p,false)).join("")}</table></div></div>`:""}
+   ${weekCard}
    ${students.length?`<div class="card" style="margin-bottom:12px" id="discCard">
      <div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">📅 Today's discipline — <span data-notr>${esc(fmtDate(today))}</span></h3>
        <div class="seg" id="discF"><button data-f="all" class="on">All</button><button data-f="j">Missing journal</button><button data-f="p">Missing plan</button></div></div>
@@ -2842,7 +2904,8 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
     const r=disc.find(x=>x.s.id===s.id);await loadSubject(s,true);
     if(v==="plan")S._planDate=r&&r.pNext?nd:today;
     S.view=v;render();window.scrollTo(0,0)});
-  $("#aq").oninput=e=>{const q=e.target.value.toLowerCase();$$("#aT tr[data-q]").forEach(tr=>tr.classList.toggle("hidden",!tr.dataset.q.includes(q)))};
+  if(!el.isConnected||!$("#aq",el))return;  /* the user left the admin page while it was loading */
+  $("#aq",el).oninput=e=>{const q=e.target.value.toLowerCase();$$("#aT tr[data-q]").forEach(tr=>tr.classList.toggle("hidden",!tr.dataset.q.includes(q)))};
   $$("#aT tr[data-id]").forEach(tr=>tr.onclick=async()=>{const s=students.find(x=>x.id===tr.dataset.id);await loadSubject(s,true);S.view="student";render();window.scrollTo(0,0)});
   $("#aExp").onclick=()=>{const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;saveFile(`tradeversity-students-${todayStr()}.csv`,["name,email,telegram,joined,trades,broke_plan,journaled_today,plan_today,plan_tomorrow,last_trade",...rows.map(r=>[r.s.name,r.s.email,r.s.telegram,(r.s.created_at||"").slice(0,10),r.c.n,r.brk,r.jT?"yes":"no",r.pT?"yes":"no",r.pN?"yes":"no",r.last].map(q).join(","))].join("\n"),"text/csv")};
 }
