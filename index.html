@@ -1095,6 +1095,20 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
 .sz-note{font-size:13px;margin:10px 0 0;color:var(--teal)}
 .sz-t.price{border-color:color-mix(in srgb,var(--gold) 40%,transparent)}.sz-t.price b{color:var(--gold);font-size:19px}
 .pf-from{color:var(--gold)}.pf-from b{font-weight:800}
+/* coupon box */
+.cp-box{margin-top:14px;padding:14px;border-radius:12px;border:1px dashed color-mix(in srgb,var(--gold) 55%,transparent);background:color-mix(in srgb,var(--gold) 5%,var(--panel2))}
+.cp-l{font-size:13px;margin-bottom:8px}
+.cp-form{display:flex;gap:8px;max-width:420px}.cp-in{flex:1;text-transform:uppercase;font-family:"JetBrains Mono",monospace;font-weight:700;letter-spacing:.08em}
+.cp-res{margin-top:10px;padding:10px 12px;border-radius:10px;font-size:13.5px;display:grid;gap:8px}
+.cp-res.bad{background:rgba(239,83,80,.1);color:var(--red)}
+.cp-res.warn{background:color-mix(in srgb,var(--teal) 10%,transparent);display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.cp-res.good{background:rgba(39,194,108,.1);border:1px solid rgba(39,194,108,.35)}
+.cp-top{font-size:14px}.cp-pct{display:inline-block;background:var(--green);color:#04170c;font-weight:900;border-radius:6px;padding:1px 7px;margin-inline-start:4px}
+.cp-prices{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}
+.cp-old{text-decoration:line-through;color:var(--muted);font-size:16px}.cp-arrow{color:var(--muted)}.cp-new{font-size:26px;font-weight:900;color:var(--green)}
+.cp-save{font-size:12.5px;color:var(--muted)}.cp-save b{color:var(--green)}
+.cp-go{justify-self:start}
+[dir=rtl] .cp-arrow{transform:scaleX(-1);display:inline-block}
 .sz-none{padding:12px 14px;border-radius:10px;border:1px dashed var(--line2);font-size:13.5px}
 .sz-src{font-size:11.5px;margin:6px 0 0}
 .st-bin{color:var(--teal);border-color:color-mix(in srgb,var(--teal) 40%,transparent)}
@@ -2685,11 +2699,31 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
   return `<h3>💰 <span>Choose your account size</span></h3>${ex?`<p class="mut" style="font-size:12.5px;margin:-4px 0 8px">ℹ️ <span>Example sizes: check which sizes this firm sells on its website.</span></p>`:""}
    <div class="sz-pick" data-noswipe>${f.sizes.map(s=>`<button type="button" class="sz-b ${s===size?"on":""}" data-sz="${s}">${s}</button>`).join("")}</div>
    ${progs.length>1?`<div class="sz-progs">${progs.map((p,i)=>`<button type="button" class="sz-p ${i===pi?"on":""}" data-szp="${i}" data-notr>${esc(p.name)}</button>`).join("")}</div>`:P?`<div class="mut sz-pn" data-notr>${esc(P.name)}</div>`:""}
-   ${cover&&tiles?`<div class="sz-grid">${tiles}</div>${P.note?`<p class="sz-note" data-notr>💡 ${esc(P.note)}</p>`:""}`
+   ${cover&&tiles?`<div class="sz-grid">${tiles}</div>${P.note?`<p class="sz-note" data-notr>💡 ${esc(P.note)}</p>`:""}${couponBox(f,P,size)}`
      :`<div class="sz-none">ℹ️ <span>No numbers for this size in this plan yet. Try another size.</span></div>`}
    <p class="mut" style="font-size:12px;margin:10px 0 0" data-notr>${esc(f.plans||"")}</p>
    <p class="mut sz-src"><span>Figures reported by review sites, checked November 2026. Confirm on the official website before buying.</span></p>`}
+/* ---------- partner coupon codes: which firm each code works on, the discount and the offer link ----------
+   To add a code for another firm: COUPONS.CODE = { firmId:{pct:XX, url:"https://..."} } */
+const COUPONS={BROWN23:{earn2trade:{pct:60,url:"https://www.earn2trade.com/?a_pid=BROWN23"}}};
+function couponBox(f,P,size){const raw=P&&((P.rows&&P.rows[size]&&P.rows[size].price)??(P.prices&&P.prices[size]));
+  const code=(S._coupon||"").trim().toUpperCase(),c=code&&COUPONS[code],deal=c&&c[f.id];let res="";
+  if(code&&S._couponTried){
+    if(!c)res=`<div class="cp-res bad">✖ <span>This code doesn't exist.</span></div>`;
+    else if(!deal){const ids=Object.keys(c),fx=(PropFirms.firms.find(x=>x.id===ids[0])||{}).name||ids[0];
+      res=`<div class="cp-res warn">ℹ️ <span>This code works on</span> <b data-notr>${esc(fx)}</b><span>, not on this firm.</span> <button type="button" class="btn sm" data-cpgo="${ids[0]}">➜ <span>See</span> <span data-notr>${esc(fx)}</span></button></div>`}
+    else{const v=firstNum(raw),mo=/\/mo/.test(String(raw)),after=v!=null?v*(1-deal.pct/100):null;
+      res=`<div class="cp-res good"><div class="cp-top">✅ <b data-notr>${esc(code)}</b> <span>applied:</span> <span class="cp-pct" data-notr>-${deal.pct}%</span></div>
+       ${v!=null?`<div class="cp-prices"><span class="cp-old mono" data-notr>${money(v,v%1?2:0)}${mo?" / "+esc(I18N.t("month")):""}</span><span class="cp-arrow">→</span><span class="cp-new mono" data-notr>${money(after,after%1?2:0)}${mo?" / "+esc(I18N.t("month")):""}</span>
+         <span class="cp-save"><span>You save</span> <b class="mono" data-notr>${money(v-after,(v-after)%1?2:0)}</b></span></div>`:""}
+       <a class="btn pri cp-go" href="${deal.url}" target="_blank" rel="sponsored noopener">🎁 <span>Get this offer</span></a>
+       <small class="mut"><span>The discount is applied on the firm's website when you open the offer with this code.</span></small></div>`}}
+  return `<div class="cp-box"><div class="cp-l">🏷️ <b>Coupon code</b></div>
+    <div class="cp-form"><input class="i cp-in" id="cpIn" value="${esc(S._coupon||"")}" placeholder="BROWN23" autocomplete="off" data-noswipe><button type="button" class="btn pri" id="cpApply">Apply</button></div>${res}</div>`}
 function bindSizeCard(f){const c=$("#szCard");if(!c)return;
+  const ci=$("#cpIn",c),ca=$("#cpApply",c);
+  if(ca){const ap=()=>{S._coupon=ci.value;S._couponTried=true;c.innerHTML=sizeCard(f);bindSizeCard(f)};ca.onclick=ap;ci.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();ap()}}}
+  $$("[data-cpgo]",c).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.cpgo;S._pfSz=null;render();window.scrollTo(0,0)});
   $$("[data-sz]",c).forEach(b=>b.onclick=()=>{S._pfSz.size=b.dataset.sz;c.innerHTML=sizeCard(f);bindSizeCard(f)});
   /* a plan button always shows a size that exists in that plan */
   $$("[data-szp]",c).forEach(b=>b.onclick=()=>{const k=Number(b.dataset.szp),P=((window.PF_SIZES||{})[f.id]||{progs:[]}).progs[k];S._pfSz.p=k;
