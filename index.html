@@ -77,6 +77,10 @@ h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:0 0 12px}h3{font-size:
 .btn.danger{color:var(--red)}
 .btn.ghost{background:none}
 label.f{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:600}
+.risk-h{justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.risk-st{font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(76,141,255,.12);color:var(--blue)}
+.risk-st.ok{background:rgba(39,194,108,.12);color:var(--green)}
+.risk-lim label.f{justify-content:flex-end}.risk-lim label.f .i{margin-top:auto}
 input.i,select.i,textarea.i{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:9px 11px;color:var(--text);outline:none}
 input.i:focus,select.i:focus,textarea.i:focus{border-color:var(--gold)}
 textarea.i{min-height:80px;resize:vertical}
@@ -1997,7 +2001,10 @@ async function bootShare(tok){SH.tok=tok;$("#auth").classList.add("hidden");$("#
 function vPlan(el){
   const dates=S.plans.map(p=>p.date).sort().reverse();
   let cur=S._planDate||(S.readonly?(dates[0]||nextTradingDay()):nextTradingDay());S._planDate=cur;
-  const p=S.plans.find(x=>x.date===cur)||{user_id:S.subject.id,date:cur,maxLoss:"",target:"",maxTrades:2,riskPerTrade:"",bias:{},htf:"",levels:"",news:"",session:"NY AM",model:"",noTrade:"",rules:{},mindset:"",followed:"",review:""};
+  const saved=S.plans.find(x=>x.date===cur);
+  /* a new day starts with the risk limits of the last plan before it */
+  const prev=saved?null:S.plans.filter(x=>x.date<cur&&(x.maxLoss||x.target||x.riskPerTrade)).sort((a,b)=>a.date<b.date?1:-1)[0];
+  const p=saved||{user_id:S.subject.id,date:cur,maxLoss:prev?prev.maxLoss:"",target:prev?prev.target:"",maxTrades:prev&&prev.maxTrades?prev.maxTrades:2,riskPerTrade:prev?prev.riskPerTrade:"",bias:{},htf:"",levels:"",news:"",session:"NY AM",model:"",noTrade:"",rules:{},mindset:"",followed:"",review:""};
   const ro=S.readonly?"disabled":"";
   const RULES=["Daily direction defined","1H imbalance or 15m confirmation","Sell stops taken / buy stops taken","Judas swing at a specific time into the HTF imbalance","Using a macro imbalance entry","Not a no-trade day (no red news / holiday)"];
   const nCk=RULES.filter(r=>(p.rules||{})[r]).length;
@@ -2008,7 +2015,8 @@ function vPlan(el){
     <label class="card rest-card trade-card"><input type="radio" name="dayType" value="trade" ${!p.rest&&p.dayType==="trade"?"checked":""} ${ro}><span><b>📈 Trading day</b><span class="mut">I'm trading this day. I follow my plan and my pre-trade checklist.</span></span></label>
     <label class="card rest-card"><input type="radio" name="dayType" value="rest" ${p.rest?"checked":""} ${ro}><span><b>😴 Rest day</b><span class="mut">I'm not trading this day. A planned rest day counts for the discipline streak.</span></span></label>
    </div>
-   <div class="card"><h3>Risk limits for ${fmtDate(cur)}</h3><div class="grid g4">
+   <div class="card"><div class="row risk-h"><h3 style="margin:0">Risk limits for ${fmtDate(cur)}</h3><span class="risk-st ${saved?"ok":""}">${saved?"✔ <span>Saved plan</span>":prev?`<span>New plan · limits copied from</span> ${fmtDate(prev.date)}`:"<span>New plan</span>"}</span></div>
+    <div class="grid g4 risk-lim">
     <label class="f">Max daily loss $<input class="i" type="number" step="any" name="maxLoss" value="${esc(p.maxLoss)}" ${ro} placeholder="e.g. 300"></label>
     <label class="f">Daily profit target $<input class="i" type="number" step="any" name="target" value="${esc(p.target)}" ${ro} placeholder="e.g. 600"></label>
     <label class="f">Max number of trades<input class="i" type="number" name="maxTrades" value="${esc(p.maxTrades)}" ${ro} placeholder="e.g. 3"></label>
@@ -2036,6 +2044,7 @@ function vPlan(el){
    ${S.readonly?"":`<div class="row" style="justify-content:flex-end"><button class="btn pri" type="submit">Save plan</button></div>`}
   </form>`;
   bindNewsIns(cur);if($("#pHist"))$("#pHist").onchange=e=>{if(e.target.value){S._planDate=e.target.value;render()}};
+  $("#pDate").onchange=e=>{const v=e.target.value;if(v&&v!==cur){S._planDate=v;render()}};
   const charts=[...(p.charts||[])];
   const drawCharts=()=>{const box=$("#pCharts");
     box.innerHTML=charts.length?charts.map((s,i)=>`<div class="pchart"><img src="${s}" alt="Plan chart ${i+1}" data-z="${i}">${S.readonly?"":`<button type="button" data-i="${i}" aria-label="Remove">×</button>`}</div>`).join(""):(S.readonly?`<div class="empty mut">No chart image</div>`:"");
