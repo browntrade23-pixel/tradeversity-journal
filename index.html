@@ -1100,6 +1100,10 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
 .pf-szp{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .pf-sz{display:inline-flex;align-items:baseline;gap:5px;padding:2px 8px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);font-size:11.5px;white-space:nowrap}
 .pf-sz b{font-family:"JetBrains Mono",monospace;font-weight:800;color:var(--text)}.pf-sz i{font-style:normal;color:var(--gold);font-weight:700}
+.ct-links{display:flex;flex-wrap:wrap;gap:4px 8px;margin-top:3px}
+.ct{font-size:11.5px;text-decoration:none;padding:1px 7px;border-radius:6px;white-space:nowrap}
+.ct.tg{color:#2aabee;background:rgba(42,171,238,.12)}.ct.tg:hover{background:rgba(42,171,238,.24)}
+.ct.em{color:var(--muted);background:var(--panel2)}.ct.em:hover{color:var(--text)}
 .pfu-list{display:grid;gap:6px;max-height:320px;overflow:auto}
 .pfu-row{display:flex;gap:10px;padding:8px 10px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}.pfu-row.new{border-color:color-mix(in srgb,var(--gold) 50%,transparent)}
 .pfu-row p{margin:2px 0 0;font-size:13px;line-height:1.45}.pfu-ic{font-size:17px}
@@ -2976,6 +2980,9 @@ function impDoneHTML(s){return `<div class="imp-done"><button class="x" type="bu
    ${s.ids&&s.until>Date.now()&&!S.readonly?`<button class="btn undo-b" type="button" id="impUndo"><span class="un-ring"><span class="un-s"></span></span><span class="un-l">Undo import</span></button>`:""}</div></div>`}
 
 /* ============ ADMIN ============ */
+/* a student's Telegram (opens the chat directly) and email (opens your mail app), clickable everywhere on the dashboard */
+function contactLinks(s){const tg=(s.telegram||"").replace(/^@/,"").replace(/^https?:\/\/t\.me\//,"").trim();
+  return `<div class="ct-links" data-notr>${tg?`<a class="ct tg" href="https://t.me/${encodeURIComponent(tg)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Open the Telegram chat">✈️ @${esc(tg)}</a>`:""}${s.email?`<a class="ct em" href="mailto:${esc(s.email)}" onclick="event.stopPropagation()" title="Send an email">✉️ ${esc(s.email)}</a>`:""}</div>`}
 /* admin: changes made to the prop firm tracker (prices, discounts, rules, new firms) from propfirms-updates.js */
 function pfUpdatesCard(){const U=(window.PF_UPDATES||[]).slice(0,12);if(!U.length)return "";
   const seenKey="tv_pfupd_seen",last=(()=>{try{return localStorage.getItem(seenKey)||""}catch(e){return ""}})(),newest=U[0].date;
@@ -3017,18 +3024,19 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
   const wkBest=wkRows.filter(r=>!r.quiet&&!r.mlh&&!r.broke).sort((a,b)=>b.score-a.score).slice(0,3);
   const wkAttn=wkRows.filter(r=>r.quiet||r.mlh||r.broke).sort((a,b)=>(b.mlh+b.broke)-(a.mlh+a.broke));
   const nm=r=>`<b data-notr>${esc(r.s.name||"—")}</b>`;
+  const nmc=r=>`${nm(r)}${contactLinks(r.s)}`;
   const weekCard=students.length?`<div class="card wk-card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">🗓 <span>This week</span> — <span data-notr>${esc(fmtDate(d7s))} → ${esc(fmtDate(today))}</span></h3>
      <span class="mut" style="font-size:12px"><span data-notr>${wkRows.filter(r=>!r.quiet).length}/${students.length}</span> <span>students active</span></span></div>
     <div class="grid g2" style="margin-bottom:12px">
      <div class="wk-box good"><b>🏆 <span>Most disciplined</span></b>${wkBest.length?wkBest.map(r=>`<div>${nm(r)} <span class="mut"><span data-notr>${r.days}</span> <span>days journaled</span> · <span data-notr>${r.plans}</span> <span>plans</span></span></div>`).join(""):`<div class="mut">No one yet this week.</div>`}</div>
      <div class="wk-box attn"><b>⚠️ <span>Needs a message</span></b>${wkAttn.length?wkAttn.slice(0,6).map(r=>`<div>${nm(r)} <span class="mut">${r.quiet?"<span>No journal and no plan this week</span>":[r.mlh?`<span data-notr>${r.mlh}×</span> <span>max loss hit</span>`:"",r.broke?`<span data-notr>${r.broke}×</span> <span>broke the plan</span>`:""].filter(Boolean).join(" · ")}</span></div>`).join(""):`<div class="mut">Everyone is on track. 👏</div>`}</div></div>
     <div class="tw"><table class="t"><tr><th>Student</th><th>Days journaled</th><th>Trades</th><th>Net P&L</th><th>Plans</th><th>Followed plan</th><th>Max loss hit</th></tr>
-     ${wkRows.sort((a,b)=>b.score-a.score).map(r=>`<tr><td>${nm(r)}</td><td class="mono" data-notr>${r.days}/7</td><td class="mono" data-notr>${r.n}</td><td class="mono ${cls(r.net)}" data-notr>${r.n?smoney(r.net,0):"—"}</td><td class="mono" data-notr>${r.plans}</td>
+     ${wkRows.sort((a,b)=>b.score-a.score).map(r=>`<tr><td>${nmc(r)}</td><td class="mono" data-notr>${r.days}/7</td><td class="mono" data-notr>${r.n}</td><td class="mono ${cls(r.net)}" data-notr>${r.n?smoney(r.net,0):"—"}</td><td class="mono" data-notr>${r.plans}</td>
        <td class="mono" data-notr>${r.rev?`${r.fol}/${r.rev}`:"—"}</td><td>${r.mlh?`<span class="dno" data-notr>✖ ${r.mlh}</span>`:`<span class="mut">—</span>`}</td></tr>`).join("")}</table></div></div>`:"";
   const yes=(t)=>`<span class="dyes">✔ ${t||""}</span>`,no=t=>`<span class="dno">✖ ${t||""}</span>`;
   const tgUser=s=>(s.telegram||"").replace(/^@/,"").replace(/^https?:\/\/t\.me\//,"").trim();
   const discRow=r=>`<tr data-sid="${r.s.id}" data-miss="${r.journaled?"":"j"}${r.pNext?"":"p"}">
-     <td><b data-notr>${esc(r.s.name||"—")}</b><div class="mut mono" style="font-size:11px" data-notr>${esc(r.s.telegram||"")}</div></td>
+     <td><b data-notr>${esc(r.s.name||"—")}</b>${contactLinks(r.s)}</td>
      <td>${r.journaled?yes(r.tToday.length?`<span data-notr>${r.tToday.length}</span> <span>${r.tToday.length===1?"trade":"trades"}</span> <span class="mono ${cls(r.netToday)}" data-notr>${smoney(r.netToday,0)}</span>`:"Review written"):no("Nothing yet")}${r.over?` <span class="tag over">Overtrading</span>`:""}</td>
      <td>${r.pToday?yes(r.pToday.followed?`<span>Followed:</span> <span>${esc(r.pToday.followed)}</span>`:"Planned"):no("No plan")}</td>
      <td>${r.pNext?yes("Planned"):no("Not yet")}</td>
