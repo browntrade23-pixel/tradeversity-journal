@@ -1350,7 +1350,13 @@ function tradeGross(t){
 }
 /* Contract commissions per prop firm: round trip per contract, USD (mini = NQ/ES/YM/GC…, micro = MNQ/MES/MYM/MGC…).
    Used only when the imported file has no fee column. Estimates: the student can change his firm's rate in Statistics. */
-const COMM_DEF={"Topstep":{mini:2.80,micro:0.74},"Topstep (ProjectX)":{mini:2.80,micro:0.74},"Apex Trader Funding":{mini:3.10,micro:1.04},"_":{mini:4.00,micro:1.24}};
+const COMM_DEF={"Topstep":{mini:2.80,micro:0.74},"Topstep (ProjectX)":{mini:2.80,micro:0.74},"Apex Trader Funding":{mini:3.10,micro:1.04},
+  "Earn2Trade":{mini:4.04,micro:1.34},"Take Profit Trader":{mini:5.00,micro:1.50},"Tradeify":{mini:3.50,micro:1.00},"MyFundedFutures":{mini:4.00,micro:1.24},
+  "Bulenox":{mini:3.88,micro:1.24},"Lucid Trading":{mini:3.50,micro:1.00},"Alpha Futures":{mini:3.50,micro:1.00},"FundedNext Futures":{mini:3.00,micro:1.00},
+  "Elite Trader Funding":{mini:4.00,micro:1.24},"TradeDay":{mini:3.64,micro:1.04},"Funded Futures Network":{mini:4.00,micro:1.24},"FTMO Futures":{mini:4.00,micro:1.20},
+  "Phidias":{mini:3.50,micro:1.00},"Phidias Propfirm":{mini:3.50,micro:1.00},"The5ers Futures":{mini:4.00,micro:1.24},"The Trading Pit":{mini:4.00,micro:1.24},
+  "Top One Futures":{mini:3.50,micro:1.00},"DayTraders":{mini:4.00,micro:1.24},"DayTraders.com":{mini:4.00,micro:1.24},"Blue Guardian Futures":{mini:3.50,micro:1.00},
+  "Goat Funded Futures":{mini:3.50,micro:1.00},"OneUp Trader":{mini:4.00,micro:1.24},"Leeloo":{mini:4.00,micro:1.24},"_":{mini:4.00,micro:1.24}};
 const commRates=()=>S._commR||(S.me?(S._commR=calcLoad("comm")||{}):{});
 const commRate=f=>{const o=commRates()[f];return o||COMM_DEF[f]||COMM_DEF._};
 const isMicro=sym=>{const r=rootOf(sym);return MK[r]?MK[r].type==="Micro":/^(MCL|MBT|MET|M2K|M6E|M6B|M6A|SIL|MHG|MNG|MZN|MZB|MZF|MYM|MES|MNQ|MGC)$/.test(r)};
@@ -2054,6 +2060,11 @@ function compress(file,maxW=1280,maxBytes=170000){return new Promise((res,rej)=>
 function editTrade(t0){
   const isNew=!t0;const t=t0?JSON.parse(JSON.stringify(t0)):{id:uuid(),user_id:S.subject.id,date:todayStr(),time:"",account:S.acct!=="all"?S.acct:(accounts()[0]||""),symbol:"MNQ",side:"Long",qty:1,entry:"",exit:"",stop:"",target:"",pnl:"",fees:"",setup:"",session:"NY AM",emotions:[],feeling:"",followed:"Yes",rating:3,shots:[],remark:"",notes:""};
   const syms=Object.keys(MK);
+  /* personal or prop firm account: new trades copy the last choice used on this account */
+  if(t.acctType==null){const last=[...S.trades].reverse().find(x=>x.account===t.account&&(x.acctType||x.firm));t.acctType=last?(last.acctType||(x=>x&&!/personal/i.test(x)?"prop":"personal")(last.firm)):"prop";if(!t.firm&&last)t.firm=last.firm||""}
+  const PFL=(window.PropFirms&&window.PropFirms.firms)||[],fNames=ty=>PFL.filter(x=>x.type===ty).map(x=>x.name);
+  const firmOpts=`<option value="">— ${I18N.t("Choose your prop firm")} —</option>`+[["Futures","futures"],["CFD","cfd"]].map(([l,ty])=>`<optgroup label="${l}">${fNames(ty).map(n=>`<option ${t.firm===n?"selected":""}>${esc(n)}</option>`).join("")}</optgroup>`).join("")
+    +(t.firm&&!PFL.some(x=>x.name===t.firm)&&!/personal/i.test(t.firm)?`<option selected>${esc(t.firm)}</option>`:"");
   openModal(`<div class="mhead"><h2>${isNew?"New trade":"Edit trade"}</h2><button class="x" id="mx">×</button></div>
   <form id="tf" class="grid">
    <div class="grid g4">
@@ -2061,6 +2072,10 @@ function editTrade(t0){
     <label class="f">Time<input class="i" type="time" name="time" value="${esc(t.time)}"></label>
     <label class="f">Account<input class="i" name="account" list="acList" value="${esc(t.account)}" placeholder="Eval 50K"></label>
     <label class="f">Instrument<input class="i" name="symbol" list="symList" value="${esc(t.symbol)}" required></label>
+   </div>
+   <div class="grid g2 acct-type">
+    <label class="f">${I18N.t("Account type")}<select class="i" name="acctType" id="tAType"><option value="prop" ${t.acctType!=="personal"?"selected":""}>🏦 ${I18N.t("Prop firm account")}</option><option value="personal" ${t.acctType==="personal"?"selected":""}>👤 ${I18N.t("Personal account")}</option></select></label>
+    <label class="f ${t.acctType==="personal"?"hidden":""}" id="tFirmL">${I18N.t("Prop firm")}<select class="i" name="firm" id="tFirm">${firmOpts}</select></label>
    </div>
    <datalist id="acList">${accounts().map(a=>`<option>${esc(a)}</option>`).join("")}</datalist>
    <datalist id="symList">${syms.map(s=>`<option value="${s}">${MK[s].name}</option>`).join("")}</datalist>
@@ -2093,9 +2108,10 @@ function editTrade(t0){
    <div class="row" style="justify-content:flex-end"><button type="button" class="btn" id="cancel">Cancel</button><button class="btn pri" type="submit" id="saveT">Save trade</button></div>
   </form>`);
   const f=$("#tf");
-  const read=()=>{const d=Object.fromEntries(new FormData(f));Object.assign(t,d,{symbol:String(d.symbol).toUpperCase().trim()})};
-  const live=()=>{read();const n=tradeNet(t),r=tradeRisk(t),R=tradeR(t);$("#live").innerHTML=`<span>Net P&L <b class="${cls(n)}">${smoney(n)}</b></span><span>Risk <b>${money(r)}</b></span><span>R multiple <b>${isFinite(R)?R.toFixed(2)+"R":"—"}</b></span><span>Result <b>${resultOf(t)}</b></span>`};
-  f.addEventListener("input",live);live();
+  const read=()=>{const d=Object.fromEntries(new FormData(f));Object.assign(t,d,{symbol:String(d.symbol).toUpperCase().trim()});if(t.acctType==="personal")t.firm="";else t.firm=t.firm||""};
+  const live=()=>{read();const n=tradeNet(t),r=tradeRisk(t),R=tradeR(t),cm=commOf(t);$("#live").innerHTML=`<span>Net P&L <b class="${cls(n)}">${smoney(n)}</b></span>${cm?`<span>${I18N.t("Commission")} <b class="neg">${money(-cm)}</b> <small class="mut" data-notr>(${esc(t.firm)})</small></span>`:""}<span>Risk <b>${money(r)}</b></span><span>R multiple <b>${isFinite(R)?R.toFixed(2)+"R":"—"}</b></span><span>Result <b>${resultOf(t)}</b></span>`};
+  f.addEventListener("input",live);f.addEventListener("change",live);live();
+  $("#tAType").onchange=e=>{$("#tFirmL").classList.toggle("hidden",e.target.value==="personal");live()};
   $$("#rate button").forEach(b=>b.onclick=()=>{t.rating=Number(b.dataset.v);$$("#rate button").forEach(x=>x.classList.toggle("on",x===b))});
   $$("#emo .pill").forEach(p=>p.onclick=()=>{const e=p.dataset.e;t.emotions=t.emotions||[];if(t.emotions.includes(e))t.emotions=t.emotions.filter(x=>x!==e);else t.emotions.push(e);p.classList.toggle("on")});
   const drawShots=()=>{$("#shots").innerHTML=(t.shots||[]).map((s,i)=>`<div class="shot" style="background-image:url('${s}')"><button type="button" data-i="${i}">×</button></div>`).join("");

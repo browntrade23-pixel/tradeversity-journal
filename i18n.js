@@ -143,6 +143,8 @@ const T={
 "Gross P&L":["P&L brut","الربح/الخسارة الإجمالي"],"Contracts":["Contrats","العقود"],"from your file":["depuis votre fichier","من ملفك"],
 "Total commissions & fees":["Total commissions et frais","مجموع العمولات والرسوم"],
 "Net P&L, win rate and every stat already include them. When your file has no fee column, the commission is estimated from your prop firm's rate per contract: change it if your firm charges a different rate.":["Le P&L net, le win rate et toutes les stats les incluent déjà. Si votre fichier n'a pas de colonne de frais, la commission est estimée avec le tarif par contrat de votre prop firm : modifiez-le si votre firm applique un autre tarif.","صافي الربح ونسبة الربح وكل الإحصائيات تشملها بالفعل. إذا لم يحتوِ ملفك على عمود الرسوم، تُقدَّر العمولة حسب سعر العقد لدى شركة التمويل الخاصة بك: غيّره إذا كانت شركتك تفرض سعراً مختلفاً."],
+"Account type":["Type de compte","نوع الحساب"],"Prop firm account":["Compte prop firm","حساب شركة تمويل"],"Personal account":["Compte personnel","حساب شخصي"],
+"Choose your prop firm":["Choisissez votre prop firm","اختر شركة التمويل"],"Commission":["Commission","العمولة"],
 "Prop firm not found":["Prop firm non trouvée","لم يتم العثور على شركة التمويل"],"Platform not recognised":["Plateforme non reconnue","المنصة غير معروفة"],"commission":["commission","عمولة"],
 "average per trade":["moyenne par trade","المتوسط لكل صفقة"],
 "above 1.5 is solid":["au-dessus de 1,5 c'est solide","أكثر من 1.5 جيد"],
