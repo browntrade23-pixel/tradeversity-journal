@@ -1,7 +1,7 @@
 // Tradeversity Telegram reminders (Supabase Edge Function "tg-reminders", JWT verification OFF).
 // Called every 5 minutes by pg_cron (header x-cron-key = public.app_secrets 'cron', which only the database knows).
 // Sends, in the student's language (EN / FR / AR), each message only once (public.tg_sent):
-//   - red news (High impact) 15 minutes and 5 minutes before
+//   - red news (High impact): one alert 5 minutes before the release
 //   - "plan tomorrow" at 21:30 Algiers time (Sunday to Thursday) if tomorrow has no plan
 //   - daily loss: 80% of the limit, and limit reached (prop firm rules daily limit, or today's plan max loss)
 //   - Sunday 20:00: weekly summary for the admin (top students, broken plans, inactive, requests, affiliate clicks)
@@ -65,9 +65,9 @@ const M: Record<string, Record<L, (a: Record<string, string>) => string>> = {
     ar: (a) => "🛑 <b>وصلت إلى حد الخسارة اليومي</b>\n" + a.acct + ": " + a.loss + " / " + a.limit + ".\nأغلق المنصة. إغلاقها هو أفضل صفقة اليوم.",
   },
   test: {
-    en: () => "✅ <b>Tradeversity reminders are on</b>\nYou will get: red news 15 and 5 minutes before, \"plan tomorrow\" at 21:30, and daily loss alerts.",
-    fr: () => "✅ <b>Les rappels Tradeversity sont activés</b>\nVous recevrez : news rouges 15 et 5 minutes avant, \"plan de demain\" à 21h30, et alertes de perte journalière.",
-    ar: () => "✅ <b>تنبيهات Tradeversity مفعلة</b>\nستصلك: الأخبار الحمراء قبل 15 و5 دقائق، تذكير \"خطة الغد\" الساعة 21:30، وتنبيهات حد الخسارة اليومي.",
+    en: () => "✅ <b>Tradeversity reminders are on</b>\nYou will get: red news 5 minutes before, \"plan tomorrow\" at 21:30, and daily loss alerts.",
+    fr: () => "✅ <b>Les rappels Tradeversity sont activés</b>\nVous recevrez : news rouges 5 minutes avant, \"plan de demain\" à 21h30, et alertes de perte journalière.",
+    ar: () => "✅ <b>تنبيهات Tradeversity مفعلة</b>\nستصلك: الأخبار الحمراء قبل 5 دقائق، تذكير \"خطة الغد\" الساعة 21:30، وتنبيهات حد الخسارة اليومي.",
   },
 };
 const msg = (k: string, lang: string, a: Record<string, string> = {}) => (M[k][(["en", "fr", "ar"].includes(lang) ? lang : "en") as L])(a);
@@ -147,12 +147,12 @@ Deno.serve(async (req) => {
 
   // 1) red news: 15 minutes and 5 minutes before
   const { data: news } = await sb.from("econ_news").select("title,impact,starts_at").eq("impact", "High")
-    .gte("starts_at", now.toISOString()).lte("starts_at", new Date(now.getTime() + 17 * 60000).toISOString()).order("starts_at");
+    .gte("starts_at", now.toISOString()).lte("starts_at", new Date(now.getTime() + 8 * 60000).toISOString()).order("starts_at");
   const groups: Record<string, any[]> = {};
   (news || []).forEach((n: any) => (groups[n.starts_at] = groups[n.starts_at] || []).push(n));
   for (const [at, evs] of Object.entries(groups)) {
     const mins = (new Date(at).getTime() - now.getTime()) / 60000;
-    const kind = mins > 9 && mins <= 17 ? "n15" : mins > 0 && mins <= 7 ? "n5" : null;
+    const kind = mins > 0 && mins <= 7 ? "n5" : null; // one alert only, about 5 minutes before the release
     if (!kind) continue;
     const ls = evs.map((e: any) => "• " + hhmm(at) + "  " + esc(e.title)).join("\n");
     for (const s of list) if (s.notify.news && (await once(s.id + ":" + kind + ":" + at, s.telegram_id, msg(kind, s.lang, { list: ls })))) out.news++;
