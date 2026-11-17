@@ -712,6 +712,7 @@ html[lang=ar] .pf-lb{text-transform:none;letter-spacing:0;font-size:12px}
 @media(max-width:760px){.rm-grid{grid-template-columns:1fr}}
 .rm{--rc:var(--green);padding:12px;border-radius:12px;background:var(--panel2);border:1px solid color-mix(in srgb,var(--rc) 35%,var(--line))}
 .rm.warn{--rc:#f59e2a}.rm.bad{--rc:var(--red)}.rm.goal{--rc:var(--gold)}
+.rm.ok.dl{--rc:#3b9cff}   /* daily loss limit: calm blue while safe (not green), orange / red as the limit gets close */
 .rm-top{display:flex;justify-content:space-between;gap:8px;font-size:13px}.rm-top b.mono{color:var(--rc)}
 .rm-bar{height:8px;border-radius:8px;background:var(--line);overflow:hidden;margin:9px 0 6px}
 .rm-bar i{display:block;height:100%;border-radius:8px;background:var(--rc);box-shadow:0 0 10px color-mix(in srgb,var(--rc) 60%,transparent);transition:width .5s ease}
@@ -2245,9 +2246,9 @@ function rulesStatus(acct,R){const ts=S.trades.filter(t=>t.account===acct),start
   const floor=R.ddType==="trailing"?Math.min(peak-num(R.maxDD),start):start-num(R.maxDD);
   const today=todayStr(),tNet=byDay[today]||0,net=bal-start;
   return {bal,peak,floor,net,tNet,buffer:bal-floor,broke,days:days.length}}
-function meter(lab,ic,used,main,sub,inv){/* used 0..1 of the limit; inv = progress toward a goal (green as it fills) */
+function meter(lab,ic,used,main,sub,inv,xc){/* used 0..1 of the limit; inv = progress toward a goal (green as it fills) */
   const u=Math.max(0,Math.min(1,used)),c=inv?(u>=1?"ok":"goal"):(u>=1?"bad":u>=.8?"bad":u>=.5?"warn":"ok");
-  return `<div class="rm ${c}"><div class="rm-top"><span>${ic} <b>${lab}</b></span><b class="mono">${main}</b></div><div class="rm-bar"><i style="width:${u*100}%"></i></div><div class="rm-sub">${sub}</div></div>`}
+  return `<div class="rm ${c} ${xc||""}"><div class="rm-top"><span>${ic} <b>${lab}</b></span><b class="mono">${main}</b></div><div class="rm-bar"><i style="width:${u*100}%"></i></div><div class="rm-sub">${sub}</div></div>`}
 /* step-by-step picker: Personal / Prop firm → Futures / CFD → firm → plan → account size (fills the rules from the tracker) */
 const PFLIST=()=>((window.PropFirms||{}).firms)||[];
 const rpProgs=id=>(((window.PF_SIZES||{})[id]||{}).progs)||[];
@@ -2300,7 +2301,7 @@ function rulesCard(acct,aSize){const R=rulesAll()[acct];
    ${s.broke?`<div class="status badd" style="margin:8px 0">✖ <span>A rule was broken on</span> ${fmtDate(s.broke)}</div>`:""}
    <div class="rm-grid">
     ${T>0?meter("Profit target","🎯",s.net/T,`${smoney(s.net,0)} / ${money(T,0)}`,s.net>=T?`<span class="pos">✔ Target reached</span>`:`${money(T-s.net,0)} <span>to go</span>`,true):""}
-    ${D>0?meter("Daily loss limit","📉",Math.max(0,-s.tNet)/D,`${smoney(s.tNet,0)} <span class="mut">today</span>`,`${money(Math.max(0,D+s.tNet),0)} <span>left today</span>`):""}
+    ${D>0?meter("Daily loss limit","📉",Math.max(0,-s.tNet)/D,`${smoney(s.tNet,0)} <span class="mut">today</span>`,`${money(Math.max(0,D+s.tNet),0)} <span>left today</span>`,false,"dl"):""}
     ${M>0?meter("Max drawdown","🛡",1-s.buffer/M,`${money(Math.max(0,s.buffer),0)} <span class="mut">left</span>`,`<span>Limit at</span> ${money(s.floor,0)}`):""}
    </div></div>`}
 function bindRules(acct,aSize){const c=$("#rulesCard");if(!c)return;
