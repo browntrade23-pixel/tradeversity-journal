@@ -1108,6 +1108,8 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
 .cp-old{text-decoration:line-through;color:var(--muted);font-size:16px}.cp-arrow{color:var(--muted)}.cp-new{font-size:26px;font-weight:900;color:var(--green)}
 .cp-save{font-size:12.5px;color:var(--muted)}.cp-save b{color:var(--green)}
 .cp-go{justify-self:start}
+.sz-t.price.disc{border-color:rgba(39,194,108,.55);background:rgba(39,194,108,.08)}.sz-t.price.disc b{color:var(--green)}.sz-t.price.disc s{color:var(--muted)}
+.sz-t.price.disc .cp-pct{font-size:10px;padding:0 5px}
 [dir=rtl] .cp-arrow{transform:scaleX(-1);display:inline-block}
 .sz-none{padding:12px 14px;border-radius:10px;border:1px dashed var(--line2);font-size:13.5px}
 .sz-src{font-size:11.5px;margin:6px 0 0}
@@ -2679,6 +2681,12 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
   if(progs.length&&!progHas(progs[S._pfSz.p],S._pfSz.size)){const k=progs.findIndex(P=>progHas(P,S._pfSz.size));if(k>=0)S._pfSz.p=k}
   const sel=S._pfSz,pi=Math.min(sel.p,Math.max(0,progs.length-1)),P=progs[pi],size=sel.size,n=szNum(size);
   let tiles="",cover=true;
+  /* the price only changes AFTER the user clicks Apply with a code that works on this firm */
+  const cc=(S._coupon||"").trim().toUpperCase(),deal=S._couponTried&&COUPONS[cc]&&COUPONS[cc][f.id];
+  const priceTile=raw=>{const v=firstNum(raw),mo=/\/mo/.test(String(raw));
+    if(!deal||v==null)return tile("💳","Price",esc(priceTxt(raw)),"","price");
+    const a=v*(1-deal.pct/100),m=x=>money(x,x%1?2:0)+(mo?" / "+I18N.t("month"):"");
+    return `<div class="sz-t price disc"><span class="sz-l">💳 <span>Price</span> <span class="cp-pct" data-notr>-${deal.pct}%</span></span><b class="mono" data-notr>${m(a)}</b><small><s data-notr>${m(v)}</s> · <span>with</span> <span data-notr>${esc(cc)}</span></small></div>`};
   const tile=(ic,lb,val,sub,cl)=>val==null?"":`<div class="sz-t ${cl||""}"><span class="sz-l">${ic} <span>${lb}</span></span><b class="mono" data-notr>${val}</b>${sub?`<small>${sub}</small>`:""}</div>`;
   if(P&&P.pct){const q=P.pct,$p=v=>money(n*v/100,0);
     tiles+=q.t1!=null?tile("🎯",q.t2!=null?"Profit target · phase 1":"Profit target",$p(q.t1),`${q.t1}%`,"good"):"";
@@ -2686,14 +2694,14 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
     tiles+=q.dl!=null?tile("📉","Daily loss limit",$p(q.dl),`${q.dl}%`,"bad"):"";
     tiles+=q.dd!=null?tile("🛑","Max drawdown",$p(q.dd),`${q.dd}% · ${esc(I18N.t(P.ddT||""))}`,"bad"):"";
     tiles+=q.dd!=null?tile("⚠️","Account fails below",money(n-n*q.dd/100,0),"Starting balance minus max drawdown","warn"):"";
-    tiles+=P.prices&&P.prices[size]!=null?tile("💳","Price",esc(priceTxt(P.prices[size])),"","price"):""}
+    tiles+=P.prices&&P.prices[size]!=null?priceTile(P.prices[size]):""}
   else if(P&&P.rows&&P.rows[size]){const r=P.rows[size];
     tiles+=tile("🎯","Profit target",usd(r.t),r.t&&typeof r.t==="number"?`${+(r.t/n*100).toFixed(1)}%`:"","good");
     tiles+=tile("🛑","Max drawdown",usd(r.dd),esc(I18N.t(P.ddT||"")),"bad");
     tiles+=r.dl===0?tile("📉","Daily loss limit",esc(I18N.t("None")),"","good"):typeof r.dl==="string"?tile("📉","Daily loss limit",esc(r.dl),"","bad"):tile("📉","Daily loss limit",usd(r.dl),"","bad");
     tiles+=tile("📊","Max contracts",r.ct!=null?esc(r.ct):null,"");
     tiles+=tile("📅","Minimum trading days",r.days!=null?String(r.days):null,"");
-    tiles+=tile("💳","Price",r.price!=null?esc(priceTxt(r.price)):null,"","price");
+    tiles+=r.price!=null?priceTile(r.price):"";
     tiles+=typeof r.dd==="number"?tile("⚠️","Account fails below",money(n-r.dd,0),"At the start, before the drawdown trails","warn"):""}
   else cover=false;
   return `<h3>💰 <span>Choose your account size</span></h3>${ex?`<p class="mut" style="font-size:12.5px;margin:-4px 0 8px">ℹ️ <span>Example sizes: check which sizes this firm sells on its website.</span></p>`:""}
