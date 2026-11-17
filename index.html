@@ -417,6 +417,12 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .impbox summary::-webkit-details-marker{display:none}
 .impbox summary::after{content:"▾";margin-inline-start:auto;color:var(--gold);transition:transform .2s}
 .impbox[open] summary::after{transform:rotate(180deg)}
+.eod-card{margin-bottom:14px;border-color:rgba(160,123,255,.4);background:radial-gradient(110% 80% at 0% 0%,rgba(160,123,255,.13),transparent 60%),var(--panel)}
+.eod-card summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:12px}
+.eod-card summary::-webkit-details-marker{display:none}
+.eod-card summary::after{content:"▾";margin-inline-start:auto;color:#a07bff;transition:transform .2s}
+.eod-card[open] summary::after{transform:rotate(180deg)}
+.eod-ic{font-size:22px}.eod-sub{display:block;font-size:12px;font-weight:500}
 .imp-ic{font-size:22px}.imp-sub{display:block;font-size:12px;font-weight:500}
 .impbox .drop{padding:22px;font-size:14px;border-color:rgba(245,185,66,.45)}
 .imp-prog{margin-top:12px;border-color:rgba(245,185,66,.35);animation:ckPop .3s ease}
@@ -1567,6 +1573,7 @@ function vJournal(el){
   const byDay={};ts.forEach(t=>(byDay[t.date]=byDay[t.date]||[]).push(t));
   el.innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:6px"><div><h1>Trading journal</h1><p class="sub">${S.readonly?"Student's":"Your"} trades, screenshots, feelings and lessons.</p></div>
    <div class="row">${S.readonly?"":`<button class="btn pri" id="addT">+ New trade</button><button class="btn" id="impT">⬆ Import CSV</button>`}<button class="btn" id="expCsv">Export CSV</button></div></div>
+   ${eodCard()}
    ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||S._impDone||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export: the trades appear below in your journal, ready for screenshots and notes</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
    ${coachCard()}
    ${S.readonly?"":reviewCard()}
@@ -1580,13 +1587,35 @@ function vJournal(el){
    ${ts.length?Object.keys(byDay).sort().reverse().map(d=>{const dn=byDay[d].reduce((a,t)=>a+tradeNet(t),0);
      return `<div class="day"><div class="dayh"><span>${fmtDate(d)}</span><span class="mono ${cls(dn)}">${smoney(dn)}</span></div>${byDay[d].map(tcard).join("")}</div>`}).join("")
    :`<div class="card empty">No trades yet. ${S.readonly?"":"Add your first trade or import a CSV from your broker."}</div>`}`;
-  bindFilters();bindCoach();if($("#addT"))$("#addT").onclick=()=>editTrade(null);
+  bindFilters();bindCoach();bindEod();if($("#addT"))$("#addT").onclick=()=>editTrade(null);
   if($("#impBody"))vImport($("#impBody"),true);
   if($("#impT"))$("#impT").onclick=()=>{const b=$("#impBox");b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
   $("#expCsv").onclick=exportCSV;
   $$(".tcard",el).forEach(c=>c.onclick=()=>{S.page=c.dataset.id;S._review=null;render();window.scrollTo(0,0)});
   const rv=$("#rvStart",el);if(rv)rv.onclick=()=>{const ids=toReview().map(t=>t.id);if(!ids.length)return;S._review=ids;S.page=ids[0];render();window.scrollTo(0,0)};
 }
+/* End-of-day review (saved in that day's plan: followed + review) */
+function eodCard(){const d=S._eodDate||todayStr();
+  const p=S.plans.find(x=>x.date===d)||{},dt=S.trades.filter(t=>t.date===d),dn=dt.reduce((a,t)=>a+tradeNet(t),0);
+  const breach=num(p.maxLoss)>0&&dn<=-num(p.maxLoss),overT=num(p.maxTrades)>0&&dt.length>num(p.maxTrades),ro=S.readonly?"disabled":"";
+  return `<details class="card eod-card" id="eodBox" ${S._eodOpen===false?"":"open"}><summary><span class="eod-ic">🌙</span><span><b>End-of-day review</b><span class="mut eod-sub">${p.followed||(p.review||"").trim()?"✔ <span>Done for this day</span>":"<span>How did your day go? Check it against your plan.</span>"}</span></span></summary>
+   <div style="margin-top:12px">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px"><input class="i" type="date" id="eodDate" value="${d}" style="width:auto">${!S.plans.find(x=>x.date===d)?`<span class="mut" style="font-size:12px">ℹ️ <span>No plan for this day: limits are not checked.</span></span>`:""}</div>
+    <div class="grid g3" style="margin-bottom:12px">
+     ${kpi("Day P&L (journal)",`<span class="${cls(dn)}">${smoney(dn)}</span>`,`${dt.length} trade${dt.length===1?"":"s"} logged`)}
+     <div class="kpi"><div class="l">Max loss</div><div style="margin-top:8px" class="status ${!dt.length||!num(p.maxLoss)?"mid":breach?"badd":"good"}">${!dt.length?"⏳ No trades yet":!num(p.maxLoss)?"—":breach?"✖ Max loss hit":"✔ Respected"}</div></div>
+     <div class="kpi"><div class="l">Trade count</div><div style="margin-top:8px" class="status ${!dt.length?"mid":overT?"badd":"good"}">${!dt.length?"⏳ —":overT?`✖ ${dt.length} / ${p.maxTrades}`:`✔ ${dt.length}${p.maxTrades?" / "+p.maxTrades:""}`}</div></div></div>
+    <div class="grid g2"><label class="f">Did I follow my plan?<select class="i" id="eodF" ${ro}><option value="">—</option>${["Yes","Partly","No"].map(o=>`<option ${p.followed===o?"selected":""}>${o}</option>`).join("")}</select></label>
+     <label class="f">Review note<input class="i" id="eodR" value="${esc(p.review||"")}" ${ro} placeholder="What went right / wrong?"></label></div>
+    ${S.readonly?"":`<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn pri" type="button" id="eodSave">Save review</button></div>`}
+   </div></details>`}
+function bindEod(){const box=$("#eodBox");if(!box)return;
+  box.ontoggle=()=>{S._eodOpen=box.open};
+  $("#eodDate").onchange=e=>{if(e.target.value){S._eodDate=e.target.value;render()}};
+  const sv=$("#eodSave");if(!sv)return;
+  sv.onclick=async()=>{const d=S._eodDate||todayStr();const old=S.plans.find(x=>x.date===d);
+    const np={...(old||{user_id:S.subject.id,date:d,maxLoss:"",target:"",maxTrades:"",riskPerTrade:"",bias:{},rules:{}}),followed:$("#eodF").value,review:$("#eodR").value,date:d,user_id:S.subject.id};
+    sv.disabled=true;try{await API.savePlan(np);const i=S.plans.findIndex(x=>x.date===d);if(i>=0)S.plans[i]=np;else S.plans.push(np);toast("Review saved");render()}catch(err){sv.disabled=false;toast("Couldn't save: "+(err.message||err))}}}
 /* imported trades with no screenshot, notes or emotions yet = waiting for review */
 const needsReview=t=>t.imported&&!t.reviewed&&!((t.shots||[]).length||String(t.notes||"").trim()||String(t.feeling||"").trim()||(t.emotions||[]).length);
 const toReview=()=>S.trades.filter(needsReview).sort(byDT);
@@ -1967,11 +1996,9 @@ function vPlan(el){
   const dates=S.plans.map(p=>p.date).sort().reverse();
   let cur=S._planDate||(S.readonly?(dates[0]||nextTradingDay()):nextTradingDay());S._planDate=cur;
   const p=S.plans.find(x=>x.date===cur)||{user_id:S.subject.id,date:cur,maxLoss:"",target:"",maxTrades:2,riskPerTrade:"",bias:{},htf:"",levels:"",news:"",session:"NY AM",model:"",noTrade:"",rules:{},mindset:"",followed:"",review:""};
-  const dayTrades=S.trades.filter(t=>t.date===cur),dn=dayTrades.reduce((a,t)=>a+tradeNet(t),0);
   const ro=S.readonly?"disabled":"";
   const RULES=["Daily direction defined","1H imbalance or 15m confirmation","Sell stops taken / buy stops taken","Judas swing at a specific time into the HTF imbalance","Using a macro imbalance entry","Not a no-trade day (no red news / holiday)"];
   const nCk=RULES.filter(r=>(p.rules||{})[r]).length;
-  const breach=num(p.maxLoss)>0&&dn<=-num(p.maxLoss),overT=num(p.maxTrades)>0&&dayTrades.length>num(p.maxTrades);
   el.innerHTML=`<div class="row" style="justify-content:space-between"><div><h1>Trading plan</h1><p class="sub">Plan tomorrow tonight. Execute it tomorrow, then review it.</p></div>
    <div class="row"><input class="i" type="date" id="pDate" value="${cur}" style="width:auto">${dates.length?`<select class="i" id="pHist" style="width:auto"><option value="">Past plans…</option>${dates.map(d=>`<option value="${d}">${d}</option>`).join("")}</select>`:""}</div></div>
   <form id="pf" class="grid">
@@ -2004,13 +2031,6 @@ function vPlan(el){
     <div class="ck-bar"><i id="ckBar" style="width:${nCk/RULES.length*100}%"></i></div>
     ${RULES.map((r,i)=>`<label class="check ck"><input type="checkbox" data-r="${esc(r)}" ${(p.rules||{})[r]?"checked":""} ${ro}><span class="ck-i">${i+1}</span><span>${esc(r)}</span></label>`).join("")}
     <div class="ck-go ${nCk===RULES.length?"on":""}" id="ckGo">✅ <span>All checks done: you can take the trade</span></div></div>
-   <div class="card"><h3>End-of-day review</h3>
-    <div class="grid g3" style="margin-bottom:12px">
-     ${kpi("Day P&L (journal)",`<span class="${cls(dn)}">${smoney(dn)}</span>`,`${dayTrades.length} trade${dayTrades.length===1?"":"s"} logged`)}
-     <div class="kpi"><div class="l">Max loss</div><div style="margin-top:8px" class="status ${!dayTrades.length?"mid":breach?"badd":"good"}">${!dayTrades.length?"⏳ No trades yet":breach?"✖ Max loss hit":"✔ Respected"}</div></div>
-     <div class="kpi"><div class="l">Trade count</div><div style="margin-top:8px" class="status ${!dayTrades.length?"mid":overT?"badd":"good"}">${!dayTrades.length?"⏳ —":overT?`✖ ${dayTrades.length} / ${p.maxTrades}`:`✔ ${dayTrades.length}${p.maxTrades?" / "+p.maxTrades:""}`}</div></div></div>
-    <div class="grid g2"><label class="f">Did I follow my plan?<select class="i" name="followed" ${ro}><option value="">—</option>${["Yes","Partly","No"].map(o=>`<option ${p.followed===o?"selected":""}>${o}</option>`).join("")}</select></label>
-     <label class="f">Review note<input class="i" name="review" value="${esc(p.review)}" ${ro} placeholder="What went right / wrong?"></label></div></div>
    ${S.readonly?"":`<div class="row" style="justify-content:flex-end"><button class="btn pri" type="submit">Save plan</button></div>`}
   </form>`;
   bindNewsIns(cur);if($("#pHist"))$("#pHist").onchange=e=>{if(e.target.value){S._planDate=e.target.value;render()}};
