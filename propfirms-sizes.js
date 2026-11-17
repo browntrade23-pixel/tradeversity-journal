@@ -67,5 +67,16 @@ brightfunded:{progs:[{name:"2-Step",ddT:"Static",pct:{t1:8,t2:5,dl:5,dd:10},note
 goat:{progs:[{name:"2-Step GOAT",ddT:"Static",pct:{t1:8,t2:6,dl:4,dd:10}}]},
 fxify:{progs:[{name:"Two Phase",ddT:"Static (Classic) or trailing (Standard)",pct:{t1:10,t2:5,dl:4,dd:10}}]},
 blueguardian:{progs:[{name:"Unlimited Guardian",ddT:"Trailing (highest closed balance)",pct:{t1:8,dd:8}},{name:"Rapid Guardian",ddT:"Trailing",pct:{t1:10,dd:6}}]},
-holaprime:{progs:[{name:"1-Step (some accounts)",ddT:"Trailing",pct:{dl:3,dd:7}}]}
+holaprime:{progs:[{name:"1-Step (some accounts)",ddT:"Trailing",pct:{dl:3,dd:7}}]},
+/* added November 2026 */
+goatfutures:{progs:[{name:"EOD",ddT:"End of day",rows:{"$50K":{t:3000,dd:2000,dl:0},"$100K":{t:6000,dd:3000,dl:0},"$150K":{t:9000,dd:4500,dl:0}},note:"No daily loss limit reported."}]},
+oneup:{progs:[{name:"Evaluation",ddT:"Trailing (stops at the starting balance)",rows:{"$25K":{t:1500,dd:1500,dl:0,days:10},"$50K":{t:3000,dl:0,days:10},"$100K":{dl:0,days:10},"$150K":{t:9000,dl:0,days:10},"$250K":{t:15000,dd:5500,dl:0,days:10}},
+  note:"Drawdown for the middle sizes differs between sources."}]},
+funderpro:{progs:[{name:"1-Step",ddT:"Static",pct:{t1:10,dl:5,dd:10},note:"Some sources say 3% daily / 6% max."}]},
+cti:{progs:[{name:"2-Step",ddT:"Static",pct:{t1:10,t2:5,dl:5,dd:10}},{name:"1-Step",ddT:"Trailing",pct:{t1:8,dd:5},note:"No daily loss limit. 3 profitable days."}]},
+audacity:{progs:[{name:"Ability Challenge",ddT:"Static",pct:{t1:10,t2:5,dl:7.5,dd:15}}]},
+fintokei:{progs:[{name:"ProTrader",ddT:"Static",pct:{t1:8,t2:6,dl:5,dd:10}},{name:"SwiftTrader",ddT:"Static (start-of-day equity)",pct:{t1:10,dl:3,dd:6},note:"At least 3% profit per payout."}]},
+blueberry:{progs:[{name:"Prime 2-Step",ddT:"Static",pct:{t1:8,t2:6,dl:4,dd:10},note:"Minimum 5 trading days per phase."},{name:"Standard 2-Step",ddT:"Static",pct:{t1:10,t2:5,dl:5,dd:10}},{name:"1-Step",ddT:"Static",pct:{t1:10,dl:4,dd:6}}]},
+lark:{progs:[{name:"1-Step",ddT:"Static",pct:{t1:10,dl:5,dd:6},note:"Some sources say 7% max."}]},
+fortraders:{progs:[{name:"2-Step",ddT:"Static",pct:{t1:9,t2:5,dl:3,dd:6}}]}
 };

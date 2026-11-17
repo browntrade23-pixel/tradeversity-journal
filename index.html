@@ -2648,6 +2648,8 @@ function vPropFirm(el,f){const d=PFDZ[f.dz]||PFDZ.check;f=Object.assign({},f,pfL
 const szNum=s=>{const m=String(s).match(/([\d.]+)\s*K/i);return m?Number(m[1])*1000:0};
 const usd=v=>v==null||v===""?null:typeof v==="number"?money(v,0):"$"+String(v).replace(/^~/,"≈ ");
 function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
+  /* firms without a clear size list: show example sizes so percentages still turn into dollars */
+  const ex=!szNum(f.sizes[0]),SZ=ex?["$10K","$25K","$50K","$100K","$200K"]:f.sizes;f={...f,sizes:SZ};
   if(!S._pfSz||S._pfSz.id!==f.id)S._pfSz={id:f.id,size:f.sizes[Math.min(1,f.sizes.length-1)],p:0};
   const sel=S._pfSz,pi=Math.min(sel.p,Math.max(0,progs.length-1)),P=progs[pi],size=sel.size,n=szNum(size);
   let tiles="",cover=true;
@@ -2667,7 +2669,7 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
     tiles+=tile("💳","Price",r.price!=null?money(r.price,0):null,"");
     tiles+=typeof r.dd==="number"?tile("⚠️","Account fails below",money(n-r.dd,0),"At the start, before the drawdown trails","warn"):""}
   else cover=false;
-  return `<h3>💰 <span>Choose your account size</span></h3>
+  return `<h3>💰 <span>Choose your account size</span></h3>${ex?`<p class="mut" style="font-size:12.5px;margin:-4px 0 8px">ℹ️ <span>Example sizes: check which sizes this firm sells on its website.</span></p>`:""}
    <div class="sz-pick" data-noswipe>${f.sizes.map(s=>`<button type="button" class="sz-b ${s===size?"on":""}" data-sz="${s}">${s}</button>`).join("")}</div>
    ${progs.length>1?`<div class="sz-progs">${progs.map((p,i)=>`<button type="button" class="sz-p ${i===pi?"on":""}" data-szp="${i}" data-notr>${esc(p.name)}</button>`).join("")}</div>`:P?`<div class="mut sz-pn" data-notr>${esc(P.name)}</div>`:""}
    ${cover&&tiles?`<div class="sz-grid">${tiles}</div>${P.note?`<p class="sz-note" data-notr>💡 ${esc(P.note)}</p>`:""}`
