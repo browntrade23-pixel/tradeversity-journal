@@ -131,6 +131,10 @@ textarea.i{min-height:80px;resize:vertical}
 .tmeta{min-width:0}.tmeta .t1{font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .tmeta .t2{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tpnl{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:16px;text-align:right}
+.wait-steps{display:grid;gap:8px;margin:14px 0 4px;text-align:left}
+.ws{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2)}
+.ws.todo{border-color:rgba(245,185,66,.45)}.ws.ok{border-color:rgba(34,197,94,.35);opacity:.85}
+.ws-ic{font-size:20px;flex:none}.ws-tx{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}.ws-tx small{color:var(--muted);font-size:12px;overflow-wrap:anywhere}
 .comm-chk{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);cursor:pointer;font-size:13px}
 .comm-chk input{width:18px;height:18px;margin-top:2px;accent-color:var(--gold,#f5b942);flex:none;cursor:pointer}.comm-chk span{display:flex;flex-direction:column;gap:2px}.comm-chk small{font-size:12px}
 .comm-chk:has(input:checked){border-color:color-mix(in srgb,var(--gold,#f5b942) 60%,var(--line2))}
@@ -1213,6 +1217,7 @@ html[lang=ar] .imf-s small{text-transform:none;letter-spacing:0}
       <div style="font-size:40px;margin-bottom:6px" id="waitIcon">⏳</div>
       <h2 id="waitTitle">Waiting for approval</h2>
       <p class="mut" id="waitText">Your account was created. Brown Algo needs to accept you before you can use the journal. You'll be able to log in as soon as you're approved.</p>
+      <div id="waitSteps" class="wait-steps"></div>
       <div class="row" style="justify-content:center;margin-top:12px">
         <button class="btn pri" id="waitCheck">Check again</button>
         <button class="btn" id="waitOut">Log out</button>
@@ -1418,7 +1423,8 @@ const Cloud={
   async init(){await new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.onload=res;s.onerror=rej;document.head.appendChild(s)});
     this.sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
     this.sb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY")openNewPassword()});},
-  async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,status:data.status,created_at:data.created_at,tgOk:!!data.telegram_verified}},
+  async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,status:data.status,created_at:data.created_at,tgOk:!!data.telegram_verified,emailOk:await this.emailOk(id)}},
+  async emailOk(id){try{const{data}=await this.sb.auth.getSession();const su=data&&data.session&&data.session.user;return su&&su.id===id?!!(su.email_confirmed_at||su.confirmed_at):true}catch(e){return true}},
   /* Telegram verification: does a username exist? / check the code the bot sent / change my username */
   async tgExists(u){try{const r=await fetch(CONFIG.SUPABASE_URL+"/functions/v1/telegram-verify?check="+encodeURIComponent(u));const j=await r.json();return j.valid===false?false:j.exists}catch(e){return null}},
   async tgVerify(code){const{data,error}=await this.sb.rpc("verify_telegram",{p_code:code});if(error)throw error;return data},
@@ -1462,7 +1468,21 @@ function showAuth(){$("#app").classList.add("hidden");$("#auth").classList.remov
 function showWaiting(u){showAuth();$("#authCard").classList.add("hidden");$("#waitBox").classList.remove("hidden");
   const rej=u.status==="rejected";$("#waitIcon").textContent=rej?"⛔":"⏳";
   $("#waitTitle").textContent=rej?"Request not accepted":"Waiting for approval";
-  $("#waitText").textContent=rej?"Your request to join was not accepted. Contact Brown Algo on Telegram if you think this is a mistake.":"Your account was created. Brown Algo needs to accept you before you can use the journal. You'll be able to log in as soon as you're approved."}
+  /* what THIS student still has to do: email, Telegram, or both — then Brown Algo's approval */
+  const needE=!rej&&u.emailOk===false,needT=!rej&&!!CONFIG.TG_BOT&&!u.tgOk,miss=[needE&&"email",needT&&"Telegram"].filter(Boolean);
+  $("#waitText").textContent=rej?I18N.t("Your request to join was not accepted. Contact Brown Algo on Telegram if you think this is a mistake."):
+    miss.length===2?I18N.t("To be accepted, you need to verify your email and your Telegram first. Then Brown Algo can approve your account."):
+    needE?I18N.t("To be accepted, you need to verify your email first. Then Brown Algo can approve your account."):
+    needT?I18N.t("To be accepted, you need to verify your Telegram first. Then Brown Algo can approve your account."):
+    I18N.t("Your account was created. Brown Algo needs to accept you before you can use the journal. You'll be able to log in as soon as you're approved.");
+  const step=(ok,ic,title,sub,btn)=>`<div class="ws ${ok?"ok":"todo"}"><span class="ws-ic">${ok?"✅":ic}</span><div class="ws-tx"><b>${esc(I18N.t(title))}</b><small>${sub}</small></div>${!ok&&btn?btn:""}</div>`;
+  $("#waitSteps").innerHTML=rej?"":
+    step(!needE,"📧","Verify your email",needE?`${esc(I18N.t("Required to be accepted."))} <span data-notr>${esc(u.email||"")}</span>`:esc(I18N.t("Email verified")),`<button class="btn sm pri" type="button" id="wsMail">${esc(I18N.t("Verify email"))}</button>`)+
+    (CONFIG.TG_BOT?step(!needT,"✈️","Verify your Telegram",needT?`${esc(I18N.t("Required to be accepted."))} <span data-notr>${esc(u.telegram||"")}</span>`:esc(I18N.t("Telegram verified")),`<button class="btn sm pri" type="button" id="wsTg">${esc(I18N.t("Verify Telegram"))}</button>`):"")+
+    step(false,"⏳","Approval by Brown Algo",esc(I18N.t(miss.length?"Comes after your verification.":"Your verification is done. Brown Algo will approve you soon.")),"");
+  const wt=$("#wsTg");if(wt)wt.onclick=()=>{$("#waitBox").classList.add("hidden");$("#authCard").classList.remove("hidden");showTg(u)};
+  const wm=$("#wsMail");if(wm)wm.onclick=async()=>{$("#waitBox").classList.add("hidden");$("#authCard").classList.remove("hidden");showOtp(u.email,false);
+    try{await API.resendCode(u.email);otpCooldown();$("#authMsg").innerHTML=`<span class="ok">${esc(I18N.t("New code sent. Check your email."))}</span>`}catch(err){$("#authMsg").innerHTML=authErr(err)}}}
 $("#waitOut").onclick=async()=>{await API.signOut();showAuth()};
 $("#waitCheck").onclick=async()=>{try{const u=await API.session();if(u)await enter(u);else showAuth()}catch(e){toast(e.message||String(e))}};
 const isApproved=u=>u.role==="admin"||!u.status||u.status==="approved";
@@ -1541,8 +1561,8 @@ $("#tgSave").onclick=async()=>{const tg=cleanTg($("#tgNew").value);
   try{await API.setTelegram(_tgU.id,tg);_tgU=await API.session();showTg(_tgU);$("#authMsg").innerHTML=`<span class="ok">${esc(I18N.t("Username saved. Now open the bot and press Start."))}</span>`}catch(err){$("#authMsg").innerHTML=authErr(err)}};
 $("#tgOut").onclick=async e=>{e.preventDefault();await API.signOut();hideTg();showAuth()};
 async function enter(u){
+  if(!isApproved(u)){S.me=null;showWaiting(u);return}   /* waiting screen lists what is missing: email, Telegram, or both */
   if(needsTg(u)){S.me=null;showTg(u);return}
-  if(!isApproved(u)){S.me=null;showWaiting(u);return}
   S.me=u;$("#auth").classList.add("hidden");$("#app").classList.remove("hidden");
   $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;
   if(u.role==="admin"){S.view="admin";await loadSubject(u,false);go("admin")}
