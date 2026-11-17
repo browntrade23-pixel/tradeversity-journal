@@ -131,6 +131,12 @@ textarea.i{min-height:80px;resize:vertical}
 .tmeta{min-width:0}.tmeta .t1{font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .tmeta .t2{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tpnl{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:16px;text-align:right}
+.tcard:has(.tc-edit){grid-template-columns:96px 1fr auto auto;position:relative}
+.tc-edit{width:34px;height:34px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);color:var(--muted);font-size:15px;cursor:pointer;transition:.15s}
+.tc-edit:hover{color:var(--gold,#f5c84b);border-color:var(--gold,#f5c84b);transform:scale(1.06)}
+.saved-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;margin-bottom:12px;border-radius:12px;border:1px solid rgba(34,197,94,.35);background:rgba(34,197,94,.08);font-size:13px}
+.eod-done{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);font-size:13px}
+@media(max-width:560px){.tcard:has(.tc-edit){grid-template-columns:72px 1fr}.tc-edit{position:absolute;top:8px;right:8px;width:30px;height:30px}}
 @media(max-width:560px){.tcard{grid-template-columns:72px 1fr}.thumb{width:72px;height:52px}.tpnl{grid-column:2;text-align:left;font-size:14px}}
 /* trade page */
 .page{max-width:860px;margin:0 auto}
@@ -1360,7 +1366,7 @@ const COMM_DEF={"Topstep":{mini:2.80,micro:0.74},"Topstep (ProjectX)":{mini:2.80
 const commRates=()=>S._commR||(S.me?(S._commR=calcLoad("comm")||{}):{});
 const commRate=f=>{const o=commRates()[f];return o||COMM_DEF[f]||COMM_DEF._};
 const isMicro=sym=>{const r=rootOf(sym);return MK[r]?MK[r].type==="Micro":/^(MCL|MBT|MET|M2K|M6E|M6B|M6A|SIL|MHG|MNG|MZN|MZB|MZF|MYM|MES|MNQ|MGC)$/.test(r)};
-function commOf(t){if(!t||!t.firm||/personal/i.test(t.firm))return 0;if(t.fees!==""&&t.fees!=null&&isFinite(num(t.fees)))return 0;
+function commOf(t){if(!t||!t.firm||/personal/i.test(t.firm)||t.commIncl==="yes")return 0;if(t.fees!==""&&t.fees!=null&&isFinite(num(t.fees)))return 0;
   if((t.market||marketOf(t.symbol,t.platform))==="CFD")return 0;const r=commRate(t.firm);return (num(t.qty)||1)*(isMicro(t.symbol)?r.micro:r.mini)}
 const tradeCost=t=>(num(t.fees)||0)+commOf(t);
 const tradeNet=t=>tradeGross(t)-tradeCost(t);
@@ -1809,7 +1815,7 @@ function vStudent(el){const u=S.subject,ts=[...S.trades].sort((a,b)=>byDT(b,a)),
    <div class="card"><h3>All plans <span class="mut" style="text-transform:none;letter-spacing:0">(${plans.length})</span></h3>
      ${plans.length?plans.map(planCard).join(""):`<div class="empty">No plans written yet.</div>`}</div>`;
   $$("[data-goto]",el).forEach(b=>b.onclick=()=>go(b.dataset.goto));
-  $$(".tcard",el).forEach(c=>c.onclick=()=>{S.view="journal";S.page=c.dataset.id;render();window.scrollTo(0,0)});
+  bindTEdit(el);$$(".tcard",el).forEach(c=>c.onclick=()=>{S.view="journal";S.page=c.dataset.id;render();window.scrollTo(0,0)});
 }
 
 /* ============ discipline coach ============
@@ -1947,7 +1953,7 @@ function vJournal(el){
   if($("#impBody"))vImport($("#impBody"),true);
   if($("#impT"))$("#impT").onclick=()=>{const b=$("#impBox");b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
   $("#expCsv").onclick=exportCSV;
-  $$(".tcard",el).forEach(c=>c.onclick=()=>{S.page=c.dataset.id;S._review=null;render();window.scrollTo(0,0)});
+  bindTEdit(el);$$(".tcard",el).forEach(c=>c.onclick=()=>{S.page=c.dataset.id;S._review=null;render();window.scrollTo(0,0)});
   const rv=$("#rvStart",el);if(rv)rv.onclick=()=>{const ids=toReview().map(t=>t.id);if(!ids.length)return;S._review=ids;S.page=ids[0];render();window.scrollTo(0,0)};
 }
 /* End-of-day review (saved in that day's plan: followed + review) */
@@ -1961,17 +1967,19 @@ function eodCard(){const d=S._eodDate||todayStr();
      ${kpi("Day P&L (journal)",`<span class="${cls(dn)}">${smoney(dn)}</span>`,`${dt.length} trade${dt.length===1?"":"s"} logged`)}
      <div class="kpi"><div class="l">Max loss</div><div style="margin-top:8px" class="status ${!dt.length||!num(p.maxLoss)?"mid":breach?"badd":"good"}">${!dt.length?"⏳ No trades yet":!num(p.maxLoss)?"—":breach?"✖ Max loss hit":"✔ Respected"}</div></div>
      <div class="kpi"><div class="l">Trade count</div><div style="margin-top:8px" class="status ${!dt.length?"mid":overT?"badd":"good"}">${!dt.length?"⏳ —":overT?`✖ ${dt.length} / ${p.maxTrades}`:`✔ ${dt.length}${p.maxTrades?" / "+p.maxTrades:""}`}</div></div></div>
+    ${(p.followed||(p.review||"").trim())&&S._eodEdit!==d?`<div class="eod-done"><span>✅ <b>${I18N.t("Review saved")}</b> · <span>Did I follow my plan?</span> <b>${esc(p.followed||"—")}</b>${(p.review||"").trim()?` · <i data-notr>“${esc(p.review)}”</i>`:""}</span>${S.readonly?"":`<button class="btn sm pri" type="button" id="eodEdit">✎ <span>Edit review</span></button>`}</div>`:`
     <div class="grid g2"><label class="f">Did I follow my plan?<select class="i" id="eodF" ${ro}><option value="">—</option>${["Yes","Partly","No"].map(o=>`<option ${p.followed===o?"selected":""}>${o}</option>`).join("")}</select></label>
      <label class="f">Review note<input class="i" id="eodR" value="${esc(p.review||"")}" ${ro} placeholder="What went right / wrong?"></label></div>
-    ${S.readonly?"":`<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn pri" type="button" id="eodSave">Save review</button></div>`}
+    ${S.readonly?"":`<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn pri" type="button" id="eodSave">Save review</button></div>`}`}
    </div></details>`}
 function bindEod(){const box=$("#eodBox");if(!box)return;
   box.ontoggle=()=>{S._eodOpen=box.open};
   $("#eodDate").onchange=e=>{if(e.target.value){S._eodDate=e.target.value;render()}};
+  const ed=$("#eodEdit");if(ed)ed.onclick=()=>{S._eodEdit=S._eodDate||todayStr();render()};
   const sv=$("#eodSave");if(!sv)return;
   sv.onclick=async()=>{const d=S._eodDate||todayStr();const old=S.plans.find(x=>x.date===d);
     const np={...(old||{user_id:S.subject.id,date:d,maxLoss:"",target:"",maxTrades:"",riskPerTrade:"",bias:{},rules:{}}),followed:$("#eodF").value,review:$("#eodR").value,date:d,user_id:S.subject.id};
-    sv.disabled=true;try{await API.savePlan(np);const i=S.plans.findIndex(x=>x.date===d);if(i>=0)S.plans[i]=np;else S.plans.push(np);toast("Review saved");render()}catch(err){sv.disabled=false;toast("Couldn't save: "+(err.message||err))}}}
+    sv.disabled=true;try{await API.savePlan(np);const i=S.plans.findIndex(x=>x.date===d);if(i>=0)S.plans[i]=np;else S.plans.push(np);S._eodEdit=null;toast("Review saved");render()}catch(err){sv.disabled=false;toast("Couldn't save: "+(err.message||err))}}}
 /* imported trades with no screenshot, notes or emotions yet = waiting for review */
 const needsReview=t=>t.imported&&!t.reviewed&&!((t.shots||[]).length||String(t.notes||"").trim()||String(t.feeling||"").trim()||(t.emotions||[]).length);
 const toReview=()=>S.trades.filter(needsReview).sort(byDT);
@@ -1991,17 +1999,21 @@ function tcard(t){const n=tradeNet(t),R=tradeR(t),res=resultOf(t);
     <div class="thumb" style="${t.shots&&t.shots[0]?`background-image:url('${t.shots[0]}')`:""}">${t.shots&&t.shots[0]?"":"no image"}</div>
     <div class="tmeta"><div class="t1"><span class="mono">${esc(t.symbol)}</span><span class="tag ${t.side==="Long"?"long":"short"}">${t.side==="Long"?"▲ Long":"▼ Short"}</span><span class="tag ${res==="Win"?"win":res==="Loss"?"loss":""}">${res}</span>${(t.emotions||[]).map(e=>`<span class="tag ${EMO_BAD.includes(e)?"bad":"good"}">${esc(e)}</span>`).join("")}</div>
       <div class="t2">${esc(t.time||"")} · ${esc(t.qty||"")} ct · ${esc(t.setup||"No setup")} · ${esc(t.account||"")}${t.remark?" · "+esc(t.remark):""}</div></div>
-    <div class="tpnl ${cls(n)}">${smoney(n)}<div class="mut" style="font-size:11px;font-weight:600">${isFinite(R)?R.toFixed(2)+"R":""}</div></div></div>`}
+    <div class="tpnl ${cls(n)}">${smoney(n)}<div class="mut" style="font-size:11px;font-weight:600">${isFinite(R)?R.toFixed(2)+"R":""}</div></div>${S.readonly?"":`<button type="button" class="tc-edit" data-tedit="${t.id}" title="Edit trade">✎</button>`}</div>`}
+/* ✎ on every trade card opens the edit form directly (the card click still opens the trade page) */
+function bindTEdit(el){$$("[data-tedit]",el).forEach(b=>b.onclick=e=>{e.stopPropagation();const t=S.trades.find(x=>x.id===b.dataset.tedit);if(t)editTrade(t)})}
 
 function vTradePage(el,id){const t=S.trades.find(x=>x.id===id);if(!t){S.page=null;return vJournal(el)}
   el.innerHTML=`<div class="page">
    <div class="row" style="justify-content:space-between;margin-bottom:14px"><button class="btn sm" id="back">${S._fromDay?"← Day":"← Journal"}</button>
-   ${S.readonly?"":`<div class="row"><button class="btn sm" id="edit">Edit</button><button class="btn sm danger" id="del">Delete</button></div>`}</div>
+   ${S.readonly?"":`<div class="row"><button class="btn sm pri" id="edit">✎ <span>Edit trade</span></button><button class="btn sm danger" id="del">Delete</button></div>`}</div>
+   ${!S.readonly&&S._justSaved===t.id?`<div class="saved-bar"><span>✅ <b>Trade saved.</b> <span>Something to change? You can edit this trade at any time.</span></span><button class="btn sm pri" id="edit2" type="button">✎ <span>Edit trade</span></button></div>`:""}
    ${S.readonly?"":reviewBar(t)}
    ${tradeDetail(t)}
   </div>`;
   bindReviewBar(t);
   $("#back").onclick=()=>{S.page=null;S._review=null;if(S._fromDay){S.dayPage=S._fromDay;S._fromDay=null;S.view="stats";try{history.replaceState(null,"","#stats")}catch(e){}}render();window.scrollTo(0,0)};
+  S._justSaved=null;if($("#edit2"))$("#edit2").onclick=()=>editTrade(t);
   if($("#edit")){$("#edit").onclick=()=>editTrade(t);$("#del").onclick=()=>confirmBox("Delete this trade? This can't be undone.",async()=>{try{await API.deleteTrade(t);S.trades=S.trades.filter(x=>x.id!==t.id);S.page=null;render();toast("Trade deleted")}catch(e){toast(e.message)}})}
 }
 function tradeDetail(t,h="h1"){const n=tradeNet(t),R=tradeR(t),risk=tradeRisk(t),m=MK[rootOf(t.symbol)];
@@ -2061,7 +2073,7 @@ function editTrade(t0){
   const isNew=!t0;const t=t0?JSON.parse(JSON.stringify(t0)):{id:uuid(),user_id:S.subject.id,date:todayStr(),time:"",account:S.acct!=="all"?S.acct:(accounts()[0]||""),symbol:"MNQ",side:"Long",qty:1,entry:"",exit:"",stop:"",target:"",pnl:"",fees:"",setup:"",session:"NY AM",emotions:[],feeling:"",followed:"Yes",rating:3,shots:[],remark:"",notes:""};
   const syms=Object.keys(MK);
   /* personal or prop firm account: new trades copy the last choice used on this account */
-  if(t.acctType==null){const last=[...S.trades].reverse().find(x=>x.account===t.account&&(x.acctType||x.firm));t.acctType=last?(last.acctType||(x=>x&&!/personal/i.test(x)?"prop":"personal")(last.firm)):"prop";if(!t.firm&&last)t.firm=last.firm||""}
+  if(t.acctType==null){const last=[...S.trades].reverse().find(x=>x.account===t.account&&(x.acctType||x.firm));t.acctType=last?(last.acctType||(x=>x&&!/personal/i.test(x)?"prop":"personal")(last.firm)):"prop";if(!t.firm&&last)t.firm=last.firm||"";if(t.commIncl==null&&last&&last.commIncl)t.commIncl=last.commIncl}
   const PFL=(window.PropFirms&&window.PropFirms.firms)||[],fNames=ty=>PFL.filter(x=>x.type===ty).map(x=>x.name);
   const firmOpts=`<option value="">— ${I18N.t("Choose your prop firm")} —</option>`+[["Futures","futures"],["CFD","cfd"]].map(([l,ty])=>`<optgroup label="${l}">${fNames(ty).map(n=>`<option ${t.firm===n?"selected":""}>${esc(n)}</option>`).join("")}</optgroup>`).join("")
     +(t.firm&&!PFL.some(x=>x.name===t.firm)&&!/personal/i.test(t.firm)?`<option selected>${esc(t.firm)}</option>`:"");
@@ -2073,9 +2085,10 @@ function editTrade(t0){
     <label class="f">Account<input class="i" name="account" list="acList" value="${esc(t.account)}" placeholder="Eval 50K"></label>
     <label class="f">Instrument<input class="i" name="symbol" list="symList" value="${esc(t.symbol)}" required></label>
    </div>
-   <div class="grid g2 acct-type">
+   <div class="grid g3 acct-type">
     <label class="f">${I18N.t("Account type")}<select class="i" name="acctType" id="tAType"><option value="prop" ${t.acctType!=="personal"?"selected":""}>🏦 ${I18N.t("Prop firm account")}</option><option value="personal" ${t.acctType==="personal"?"selected":""}>👤 ${I18N.t("Personal account")}</option></select></label>
     <label class="f ${t.acctType==="personal"?"hidden":""}" id="tFirmL">${I18N.t("Prop firm")}<select class="i" name="firm" id="tFirm">${firmOpts}</select></label>
+    <label class="f ${t.acctType==="personal"?"hidden":""}" id="tCommL">${I18N.t("Commissions in my P&L")}<select class="i" name="commIncl" id="tComm"><option value="no" ${t.commIncl!=="yes"?"selected":""}>➖ ${I18N.t("Not included: calculate them for me")}</option><option value="yes" ${t.commIncl==="yes"?"selected":""}>✔ ${I18N.t("Already included: keep my P&L as it is")}</option></select></label>
    </div>
    <datalist id="acList">${accounts().map(a=>`<option>${esc(a)}</option>`).join("")}</datalist>
    <datalist id="symList">${syms.map(s=>`<option value="${s}">${MK[s].name}</option>`).join("")}</datalist>
@@ -2111,7 +2124,7 @@ function editTrade(t0){
   const read=()=>{const d=Object.fromEntries(new FormData(f));Object.assign(t,d,{symbol:String(d.symbol).toUpperCase().trim()});if(t.acctType==="personal")t.firm="";else t.firm=t.firm||""};
   const live=()=>{read();const n=tradeNet(t),r=tradeRisk(t),R=tradeR(t),cm=commOf(t);$("#live").innerHTML=`<span>Net P&L <b class="${cls(n)}">${smoney(n)}</b></span>${cm?`<span>${I18N.t("Commission")} <b class="neg">${money(-cm)}</b> <small class="mut" data-notr>(${esc(t.firm)})</small></span>`:""}<span>Risk <b>${money(r)}</b></span><span>R multiple <b>${isFinite(R)?R.toFixed(2)+"R":"—"}</b></span><span>Result <b>${resultOf(t)}</b></span>`};
   f.addEventListener("input",live);f.addEventListener("change",live);live();
-  $("#tAType").onchange=e=>{$("#tFirmL").classList.toggle("hidden",e.target.value==="personal");live()};
+  $("#tAType").onchange=e=>{const pe=e.target.value==="personal";$("#tFirmL").classList.toggle("hidden",pe);$("#tCommL").classList.toggle("hidden",pe);live()};
   $$("#rate button").forEach(b=>b.onclick=()=>{t.rating=Number(b.dataset.v);$$("#rate button").forEach(x=>x.classList.toggle("on",x===b))});
   $$("#emo .pill").forEach(p=>p.onclick=()=>{const e=p.dataset.e;t.emotions=t.emotions||[];if(t.emotions.includes(e))t.emotions=t.emotions.filter(x=>x!==e);else t.emotions.push(e);p.classList.toggle("on")});
   const drawShots=()=>{$("#shots").innerHTML=(t.shots||[]).map((s,i)=>`<div class="shot" style="background-image:url('${s}')"><button type="button" data-i="${i}">×</button></div>`).join("");
@@ -2122,7 +2135,7 @@ function editTrade(t0){
   document.onpaste=e=>{const fs=[...(e.clipboardData||{}).files||[]];if(fs.length)addFiles(fs)};
   $("#mx").onclick=$("#cancel").onclick=closeModal;
   f.onsubmit=async e=>{e.preventDefault();read();t.qty=num(t.qty)||0;$("#saveT").disabled=true;
-    try{await API.saveTrade(t);const i=S.trades.findIndex(x=>x.id===t.id);if(i>=0)S.trades[i]=t;else S.trades.push(t);closeModal();S.page=t.id;S.view="journal";render();toast("Trade saved")}
+    try{await API.saveTrade(t);const i=S.trades.findIndex(x=>x.id===t.id);if(i>=0)S.trades[i]=t;else S.trades.push(t);closeModal();S.page=t.id;S._justSaved=t.id;S.view="journal";render();toast("Trade saved")}
     catch(err){$("#saveT").disabled=false;toast("Couldn't save: "+(err.message||err))}};
 }
 
