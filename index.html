@@ -1109,6 +1109,11 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
 .cp-old{text-decoration:line-through;color:var(--muted);font-size:16px}.cp-arrow{color:var(--muted)}.cp-new{font-size:26px;font-weight:900;color:var(--green)}
 .cp-save{font-size:12.5px;color:var(--muted)}.cp-save b{color:var(--green)}
 .cp-go{justify-self:start}
+.cp-acts{display:flex;flex-wrap:wrap;gap:8px}
+.cp-steps{font-size:13.5px}.cp-code{background:var(--gold);color:#1b1305;border-radius:6px;padding:1px 8px;letter-spacing:.06em}
+.cp-apply{animation:cpPulse 1.8s ease-in-out infinite}
+@keyframes cpPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,185,66,.5)}50%{box-shadow:0 0 0 7px rgba(245,185,66,0)}}
+@media(prefers-reduced-motion:reduce){.cp-apply{animation:none}}
 .sz-t.price.disc{border-color:rgba(39,194,108,.55);background:rgba(39,194,108,.08)}.sz-t.price.disc b{color:var(--green)}.sz-t.price.disc s{color:var(--muted)}
 .sz-t.price.disc .cp-pct{font-size:10px;padding:0 5px}
 [dir=rtl] .cp-arrow{transform:scaleX(-1);display:inline-block}
@@ -2720,7 +2725,11 @@ const PF_AFF={bulenox:"https://bulenox.com/member/aff/go/brown_trader",earn2trad
 const COUPONS={BROWN23:{earn2trade:{pct:60,url:"https://www.earn2trade.com/?a_pid=BROWN23"},
   bulenox:{pct:89,url:"https://bulenox.com/member/aff/go/brown_trader",prog:"Option 1"}}};
 const dealFor=(code,fid,P)=>{const d=COUPONS[code]&&COUPONS[code][fid];return d&&(!d.prog||(P&&P.name.startsWith(d.prog)))?d:null};
-function couponBox(f,P,size){const raw=P&&((P.rows&&P.rows[size]&&P.rows[size].price)??(P.prices&&P.prices[size]));
+/* the coupon box only shows on firms that have one of my codes, already filled in */
+const firmCode=fid=>Object.keys(COUPONS).find(k=>COUPONS[k][fid]);
+function couponBox(f,P,size){const own=firmCode(f.id);if(!own)return "";
+  if(S._couponFirm!==f.id){S._couponFirm=f.id;S._coupon=own;S._couponTried=false}
+  const raw=P&&((P.rows&&P.rows[size]&&P.rows[size].price)??(P.prices&&P.prices[size]));
   const code=(S._coupon||"").trim().toUpperCase(),c=code&&COUPONS[code],deal=c&&dealFor(code,f.id,P);let res="";
   if(code&&S._couponTried){
     if(!c)res=`<div class="cp-res bad">✖ <span>This code doesn't exist.</span></div>`;
@@ -2732,15 +2741,21 @@ function couponBox(f,P,size){const raw=P&&((P.rows&&P.rows[size]&&P.rows[size].p
       res=`<div class="cp-res good"><div class="cp-top">✅ <b data-notr>${esc(code)}</b> <span>applied:</span> <span class="cp-pct" data-notr>-${deal.pct}%</span></div>
        ${v!=null?`<div class="cp-prices"><span class="cp-old mono" data-notr>${money(v,v%1?2:0)}${mo?" / "+esc(I18N.t("month")):""}</span><span class="cp-arrow">→</span><span class="cp-new mono" data-notr>${money(after,after%1?2:0)}${mo?" / "+esc(I18N.t("month")):""}</span>
          <span class="cp-save"><span>You save</span> <b class="mono" data-notr>${money(v-after,(v-after)%1?2:0)}</b></span></div>`:""}
-       <a class="btn pri cp-go" href="${deal.url}" target="_blank" rel="sponsored noopener">🎁 <span>Get this offer</span></a>
-       <small class="mut"><span>The discount is applied on the firm's website when you open the offer with this code.</span></small></div>`}}
-  return `<div class="cp-box"><div class="cp-l">🏷️ <b>Coupon code</b></div>
-    <div class="cp-form"><input class="i cp-in" id="cpIn" value="${esc(S._coupon||"")}" placeholder="BROWN23" autocomplete="off" data-noswipe><button type="button" class="btn pri" id="cpApply">Apply</button></div>${res}</div>`}
+       <div class="cp-steps"><b>Next step:</b> <span>open the offer, then use the code</span> <b class="cp-code mono" data-notr>${esc(code)}</b> <span>at checkout.</span></div>
+       <div class="cp-acts"><a class="btn pri cp-go" href="${deal.url}" target="_blank" rel="sponsored noopener" data-cpcode="${esc(code)}">🎁 <span>Get this offer</span></a>
+        <button type="button" class="btn cp-copy" data-cpcopy="${esc(code)}">📋 <span>Copy code</span></button></div>
+       <small class="mut"><span>Opening the offer also copies the code for you: paste it at checkout if it is not already applied.</span></small></div>`}}
+  return `<div class="cp-box"><div class="cp-l">🏷️ <b>My coupon code for this firm</b> <span class="mut">· <span>click Apply to see your discount</span></span></div>
+    <div class="cp-form"><input class="i cp-in" id="cpIn" value="${esc(S._coupon||"")}" placeholder="${esc(own)}" autocomplete="off" data-noswipe><button type="button" class="btn pri cp-apply" id="cpApply">Apply</button></div>${res}</div>`}
+/* copy the code (used by "Copy code" and when opening the offer) */
+async function copyCode(t){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}toast(I18N.t("Code copied")+": "+t)}
 function bindSizeCard(f){const c=$("#szCard");if(!c)return;
   const ci=$("#cpIn",c),ca=$("#cpApply",c);
   if(ca){const ap=()=>{S._coupon=ci.value;S._couponTried=true;c.innerHTML=sizeCard(f);bindSizeCard(f)};ca.onclick=ap;ci.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();ap()}};
     /* editing the code hides the old result until Apply is clicked again */
     ci.oninput=()=>{if(S._couponTried){S._couponTried=false;S._coupon=ci.value;const p=ci.selectionStart;c.innerHTML=sizeCard(f);bindSizeCard(f);const n=$("#cpIn",c);n.focus();n.setSelectionRange(p,p)}}}
+  $$("[data-cpcopy]",c).forEach(b=>b.onclick=()=>copyCode(b.dataset.cpcopy));
+  $$("a[data-cpcode]",c).forEach(a=>a.addEventListener("click",()=>copyCode(a.dataset.cpcode)));
   $$("[data-cpprog]",c).forEach(b=>b.onclick=()=>{S._pfSz.p=Number(b.dataset.cpprog);c.innerHTML=sizeCard(f);bindSizeCard(f)});
   $$("[data-cpgo]",c).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.cpgo;S._pfSz=null;S._couponTried=false;render();window.scrollTo(0,0)});
   $$("[data-sz]",c).forEach(b=>b.onclick=()=>{S._pfSz.size=b.dataset.sz;S._couponTried=false;c.innerHTML=sizeCard(f);bindSizeCard(f)});
