@@ -1100,6 +1100,13 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
 .pf-szp{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .pf-sz{display:inline-flex;align-items:baseline;gap:5px;padding:2px 8px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);font-size:11.5px;white-space:nowrap}
 .pf-sz b{font-family:"JetBrains Mono",monospace;font-weight:800;color:var(--text)}.pf-sz i{font-style:normal;color:var(--gold);font-weight:700}
+.ct.ok,.ct.warn{padding:1px 3px;background:none}
+#tgForm .tg-steps{display:grid;gap:10px}
+.tg-step{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);text-align:start}
+.tg-step>div{display:grid;gap:6px;flex:1}.tg-step .mut{font-size:12px}
+.tg-n{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#2aabee;color:#fff;font-weight:900;font-size:12px;flex:none}
+.tg-open{background:#2aabee!important;border-color:#2aabee!important;color:#fff!important;justify-self:start;text-decoration:none}
+.tg-edit{display:flex;gap:8px}.tg-edit .i{flex:1}
 .ct-links{display:flex;flex-wrap:wrap;gap:4px 8px;margin-top:3px}
 .ct{font-size:11.5px;text-decoration:none;padding:1px 7px;border-radius:6px;white-space:nowrap}
 .ct.tg{color:#2aabee;background:rgba(42,171,238,.12)}.ct.tg:hover{background:rgba(42,171,238,.24)}
@@ -1214,6 +1221,19 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
         <div class="row" style="justify-content:space-between;font-size:12px"><a href="#" id="otpResend">Send a new code</a><a href="#" id="otpBack">← Change email</a></div>
         <p class="mut" style="font-size:11px;margin:0">Can't find it? Check your Spam / Promotions folder. The code expires after 1 hour.</p>
       </form>
+      <form id="tgForm" class="grid hidden" autocomplete="off">
+        <div class="otp-head"><div class="otp-ic">✈️</div><b>Verify your Telegram</b><span class="mut">Last step: prove this Telegram account is yours.</span><b class="otp-mail mono" id="tgUser" data-notr></b></div>
+        <div class="tg-steps">
+          <div class="tg-step"><span class="tg-n">1</span><div><b>Open our bot and press Start</b><span class="mut">It sends you a 6-digit code right away.</span>
+            <a class="btn pri tg-open" id="tgOpen" href="#" target="_blank" rel="noopener">✈️ <span>Open the bot on Telegram</span></a></div></div>
+          <div class="tg-step"><span class="tg-n">2</span><div><b>Type the code here</b>
+            <input class="i otp-in mono" id="tgCode" inputmode="numeric" maxlength="6" placeholder="••••••"></div></div>
+        </div>
+        <button class="btn pri" type="submit">Verify my Telegram</button>
+        <div class="row" style="justify-content:space-between;font-size:12px"><a href="#" id="tgChange">✏️ Change my Telegram username</a><a href="#" id="tgOut">Log out</a></div>
+        <div class="tg-edit hidden" id="tgEdit"><input class="i" id="tgNew" placeholder="@username"><button type="button" class="btn sm" id="tgSave">Save</button></div>
+        <p class="mut" style="font-size:11px;margin:0">The code only goes to the Telegram account with this username. It expires after 15 minutes.</p>
+      </form>
       <div id="authMsg" class="mut" style="margin-top:10px;font-size:13px"></div>
     </div>
 
@@ -1260,6 +1280,8 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
    ===================================================================== */
 const CONFIG = {
   SUPABASE_URL: "https://szovzzkukzuytkzieuae.supabase.co",
+  /* Telegram verification bot (username without @). Empty = the Telegram code step is switched off. */
+  TG_BOT: "",
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6b3Z6emt1a3p1eXRremlldWFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ3ODIyMTgsImV4cCI6MjExMDM1ODIxOH0.hEcb4PhOIrKOZiwvMG6YQQHdR2zr1AhHOHmWeCSKJG0"
 };
 
@@ -1355,7 +1377,11 @@ const Cloud={
   async init(){await new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.onload=res;s.onerror=rej;document.head.appendChild(s)});
     this.sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
     this.sb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY")openNewPassword()});},
-  async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,status:data.status,created_at:data.created_at}},
+  async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,status:data.status,created_at:data.created_at,tgOk:!!data.telegram_verified}},
+  /* Telegram verification: does a username exist? / check the code the bot sent / change my username */
+  async tgExists(u){try{const r=await fetch(CONFIG.SUPABASE_URL+"/functions/v1/telegram-verify?check="+encodeURIComponent(u));const j=await r.json();return j.valid===false?false:j.exists}catch(e){return null}},
+  async tgVerify(code){const{data,error}=await this.sb.rpc("verify_telegram",{p_code:code});if(error)throw error;return data},
+  async setTelegram(id,tg){const{error}=await this.sb.from("profiles").update({telegram:tg}).eq("id",id);if(error)throw error},
   async session(){const{data}=await this.sb.auth.getSession();if(!data.session)return null;return this.profile(data.session.user.id)},
   async signIn(email,password){const{data,error}=await this.sb.auth.signInWithPassword({email,password});if(error)throw error;return this.profile(data.user.id)},
   async signUp({email,password,name,telegram}){const{data,error}=await this.sb.auth.signUp({email,password,options:{data:{full_name:name,telegram},emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
@@ -1372,7 +1398,7 @@ const Cloud={
   async deleteTrades(ids){for(let i=0;i<ids.length;i+=200){const{error}=await this.sb.from("trades").delete().in("id",ids.slice(i,i+200));if(error)throw error}},
   async listPlans(uid_){const{data,error}=await this.sb.from("plans").select("*").eq("user_id",uid_).order("plan_date",{ascending:false});if(error)throw error;return data.map(r=>({...(r.data||{}),user_id:r.user_id,date:r.plan_date}))},
   async savePlan(p){const{error}=await this.sb.from("plans").upsert({user_id:p.user_id,plan_date:p.date,data:p},{onConflict:"user_id,plan_date"});if(error)throw error},
-  async listProfiles(){const{data,error}=await this.sb.from("profiles").select("*").order("created_at");if(error)throw error;return data.map(d=>({id:d.id,name:d.full_name,telegram:d.telegram,email:d.email,role:d.role,status:d.status,created_at:d.created_at}))},
+  async listProfiles(){const{data,error}=await this.sb.from("profiles").select("*").order("created_at");if(error)throw error;return data.map(d=>({id:d.id,name:d.full_name,telegram:d.telegram,email:d.email,role:d.role,status:d.status,created_at:d.created_at,tgOk:!!d.telegram_verified}))},
   async setStatus(id,status){const{error}=await this.sb.rpc("set_student_status",{target:id,new_status:status});if(error)throw error},
   async allTradesLite(){const{data,error}=await this.sb.from("trades").select("id,user_id,trade_date,symbol,account,pnl,data").limit(20000);if(error)throw error;return data.map(r=>({...(r.data||{}),id:r.id,user_id:r.user_id,shots:[]}))},
   async allPlans(){const{data,error}=await this.sb.from("plans").select("*");if(error)throw error;return data.map(r=>({...(r.data||{}),user_id:r.user_id,date:r.plan_date}))},
@@ -1420,6 +1446,8 @@ $("#signupForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.ta
   if(f.get("password")!==f.get("password2")){$("#authMsg").innerHTML='<span class="neg">Passwords don\'t match.</span>';return}
   let tg=f.get("telegram").trim().replace(/^https?:\/\/t\.me\//i,"");if(tg&&!tg.startsWith("@"))tg="@"+tg;
   if(!/^@[A-Za-z0-9_]{5,32}$/.test(tg)){$("#authMsg").innerHTML=`<span class="neg">${esc(I18N.t("Your Telegram username is required to join (e.g. @brown_algo). Open Telegram > Settings to see it."))}</span>`;return}
+  $("#authMsg").textContent=I18N.t("Checking your Telegram username…");
+  if(await API.tgExists(tg)===false){$("#authMsg").innerHTML=`<span class="neg">❌ ${esc(I18N.t("Telegram username not found. Check it in Telegram > Settings > Username."))}</span>`;return}
   $("#authMsg").textContent="Creating your account…";
   try{const r=await API.signUp({email:f.get("email").trim(),password:f.get("password"),name:f.get("name").trim(),telegram:tg});
     if(r.needsConfirm)showOtp(f.get("email").trim(),true);
@@ -1447,7 +1475,32 @@ $("#logout").onclick=async()=>{await API.signOut();S.me=null;S.subject=null;try{
 function openNewPassword(){openModal(`<div class="mhead"><h2>Set a new password</h2></div><form id="npf" class="grid"><input class="i" type="password" minlength="8" name="p" placeholder="New password" required><button class="btn pri">Save password</button></form>`);
   $("#npf").onsubmit=async e=>{e.preventDefault();const{error}=await Cloud.sb.auth.updateUser({password:new FormData(e.target).get("p")});if(error)toast(error.message);else{toast("Password updated");closeModal()}}}
 
+/* ---- Telegram verification (code sent by our bot); required for everyone except the admin ---- */
+const needsTg=u=>!!CONFIG.TG_BOT&&u.role!=="admin"&&!u.tgOk;
+let _tgU=null;
+function showTg(u){_tgU=u;showAuth();["loginForm","signupForm","otpForm"].forEach(id=>$("#"+id).classList.add("hidden"));$("#authCard .seg").classList.add("hidden");
+  $("#tgForm").classList.remove("hidden");$("#tgUser").textContent=u.telegram||"—";$("#tgOpen").href="https://t.me/"+CONFIG.TG_BOT+"?start=verify";
+  $("#tgCode").value="";$("#tgEdit").classList.add("hidden");$("#authMsg").textContent=""}
+function hideTg(){$("#tgForm").classList.add("hidden");$("#authCard .seg").classList.remove("hidden");$("#tabLogin").click()}
+const cleanTg=v=>{let t=String(v||"").trim().replace(/^https?:\/\/t\.me\//i,"");if(t&&!t.startsWith("@"))t="@"+t;return t};
+$("#tgCode").oninput=e=>{const v=e.target.value.replace(/\D/g,"").slice(0,6);e.target.value=v;if(v.length===6)setTimeout(()=>{if($("#tgCode").value===v)$("#tgForm").requestSubmit()},250)};
+$("#tgForm").onsubmit=async e=>{e.preventDefault();const code=$("#tgCode").value.trim();if(code.length!==6){$("#authMsg").innerHTML=`<span class="neg">${esc(I18N.t("Enter the 6-digit code the bot sent you on Telegram."))}</span>`;return}
+  const b=$("#tgForm button[type=submit]");b.disabled=true;$("#authMsg").textContent=I18N.t("Checking your code…");
+  try{const r=await API.tgVerify(code);
+    if(r&&r.ok){$("#authMsg").innerHTML=`<span class="ok">✔ ${esc(I18N.t("Telegram verified!"))}</span>`;const u=await API.session();hideTg();if(u)await enter(u)}
+    else{const k={wrong:"Wrong code. Check the last message from the bot.",no_code:"No valid code yet. Open the bot, press Start, then type the new code.",too_many:"Too many wrong tries. Press Start in the bot again to get a new code.",no_username:"Add your Telegram username first."}[r&&r.error]||"Something went wrong. Try again.";
+      $("#authMsg").innerHTML=`<span class="neg">${esc(I18N.t(k))}</span>`}}
+  catch(err){$("#authMsg").innerHTML=authErr(err)}
+  b.disabled=false};
+$("#tgChange").onclick=e=>{e.preventDefault();$("#tgEdit").classList.toggle("hidden");$("#tgNew").value=_tgU&&_tgU.telegram||"";$("#tgNew").focus()};
+$("#tgSave").onclick=async()=>{const tg=cleanTg($("#tgNew").value);
+  if(!/^@[A-Za-z][A-Za-z0-9_]{4,31}$/.test(tg)){$("#authMsg").innerHTML=`<span class="neg">${esc(I18N.t("This isn't a valid Telegram username (5-32 letters, numbers or _)."))}</span>`;return}
+  $("#authMsg").textContent=I18N.t("Checking this username on Telegram…");
+  if(await API.tgExists(tg)===false){$("#authMsg").innerHTML=`<span class="neg">❌ ${esc(I18N.t("Telegram username not found. Check it in Telegram > Settings > Username."))}</span>`;return}
+  try{await API.setTelegram(_tgU.id,tg);_tgU=await API.session();showTg(_tgU);$("#authMsg").innerHTML=`<span class="ok">${esc(I18N.t("Username saved. Now open the bot and press Start."))}</span>`}catch(err){$("#authMsg").innerHTML=authErr(err)}};
+$("#tgOut").onclick=async e=>{e.preventDefault();await API.signOut();hideTg();showAuth()};
 async function enter(u){
+  if(needsTg(u)){S.me=null;showTg(u);return}
   if(!isApproved(u)){S.me=null;showWaiting(u);return}
   S.me=u;$("#auth").classList.add("hidden");$("#app").classList.remove("hidden");
   $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;
@@ -2982,7 +3035,7 @@ function impDoneHTML(s){return `<div class="imp-done"><button class="x" type="bu
 /* ============ ADMIN ============ */
 /* a student's Telegram (opens the chat directly) and email (opens your mail app), clickable everywhere on the dashboard */
 function contactLinks(s){const tg=(s.telegram||"").replace(/^@/,"").replace(/^https?:\/\/t\.me\//,"").trim();
-  return `<div class="ct-links" data-notr>${tg?`<a class="ct tg" href="https://t.me/${encodeURIComponent(tg)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Open the Telegram chat">✈️ @${esc(tg)}</a>`:""}${s.email?`<a class="ct em" href="mailto:${esc(s.email)}" onclick="event.stopPropagation()" title="Send an email">✉️ ${esc(s.email)}</a>`:""}</div>`}
+  return `<div class="ct-links" data-notr>${tg?(s.tgOk?`<span class="ct ok" title="Telegram verified">✅</span>`:`<span class="ct warn" title="Telegram not verified yet">⚠️</span>`):""}${tg?`<a class="ct tg" href="https://t.me/${encodeURIComponent(tg)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Open the Telegram chat">✈️ @${esc(tg)}</a>`:""}${s.email?`<a class="ct em" href="mailto:${esc(s.email)}" onclick="event.stopPropagation()" title="Send an email">✉️ ${esc(s.email)}</a>`:""}</div>`}
 /* admin: changes made to the prop firm tracker (prices, discounts, rules, new firms) from propfirms-updates.js */
 function pfUpdatesCard(){const U=(window.PF_UPDATES||[]).slice(0,12);if(!U.length)return "";
   const seenKey="tv_pfupd_seen",last=(()=>{try{return localStorage.getItem(seenKey)||""}catch(e){return ""}})(),newest=U[0].date;
@@ -3045,12 +3098,12 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
      <td><div class="row" style="justify-content:flex-end;flex-wrap:nowrap">
        <button class="btn sm" data-open="journal">📓 Journal</button><button class="btn sm" data-open="plan">🧭 Plan</button><button class="btn sm" data-open="stats">📊 Stats</button>
        ${tgUser(r.s)?`<a class="btn sm" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" title="Message on Telegram">💬</a>`:""}</div></td></tr>`;
-  const reqRow=(p,rej)=>`<tr data-pid="${p.id}"><td><b data-notr>${esc(p.name||"—")}</b><div class="mut" style="font-size:11px" data-notr>${esc(p.email||"")}</div></td><td class="mono" data-notr>${esc(p.telegram||"")}</td><td class="mut" data-notr>${p.created_at?esc(fmtDate(p.created_at.slice(0,10))):""}</td>
+  const reqRow=(p,rej)=>`<tr data-pid="${p.id}"><td><b data-notr>${esc(p.name||"—")}</b>${contactLinks(p)}</td><td data-notr>${p.tgOk?`<span class="dyes">✅ <span>Telegram verified</span></span>`:`<span class="dno">⚠️ <span>Not verified</span></span>`}</td><td class="mut" data-notr>${p.created_at?esc(fmtDate(p.created_at.slice(0,10))):""}</td>
      <td><div class="row" style="justify-content:flex-end">${rej?"":`<button class="btn sm danger" data-act="rejected">✖ Reject</button>`}<button class="btn sm pri" data-act="approved">✔ Approve</button></div></td></tr>`;
   el.innerHTML=`<h1>👑 Admin dashboard</h1><p class="sub">All your Tradeversity students in one place. Click a student to open their journal, stats and plans (read-only).</p>
    ${pending.length?`<div class="card" style="margin-bottom:12px;border-color:var(--gold)"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0;color:var(--gold)">🔔 Pending requests</h3><span class="tag" style="background:rgba(245,185,66,.15);color:var(--gold)">${pending.length}</span></div>
      <p class="mut" style="margin:0 0 8px;font-size:12px">These people signed up and are waiting for you. They can't use the journal until you approve them.</p>
-     <div class="tw"><table class="t" id="reqT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${pending.map(p=>reqRow(p,false)).join("")}</table></div></div>`:""}
+     <div class="tw"><table class="t" id="reqT"><tr><th>Student</th><th>Telegram check</th><th>Requested</th><th></th></tr>${pending.map(p=>reqRow(p,false)).join("")}</table></div></div>`:""}
    ${pfUpdatesCard()}
    ${weekCard}
    ${students.length?`<div class="card" style="margin-bottom:12px" id="discCard">
@@ -3069,7 +3122,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    ${emoAll.length?`<div class="card" style="margin-bottom:12px"><h3>Group weak spots</h3>${emoAll.map(r=>`<div class="insight"><span class="ic">⚠️</span><span><b>${esc(r.k)}</b> trades across students: <b class="neg">${money(r.net,0)}</b> over ${r.n} trades (${pct(r.wr,0)} win). Good topic for the next live.</span></div>`).join("")}</div>`:""}
    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">Students</h3><div class="row"><input class="i" id="aq" placeholder="Search name, email, Telegram" style="width:240px"><button class="btn sm" id="aExp">Export CSV</button></div></div>
    <div class="tw"><table class="t" id="aT"><tr><th>Name (username)</th><th>Email</th><th>Telegram username</th><th>Trades</th><th>Broke plan</th><th>Weak spot</th><th>Journaled today</th><th>Plan today</th><th>Plan tomorrow</th></tr>
-   ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b data-notr>${esc(r.s.name||"—")}</b> <span class="tag">👤 Open</span></td><td data-notr><a class="lnk" href="mailto:${esc(r.s.email||"")}" onclick="event.stopPropagation()">${esc(r.s.email||"—")}</a></td><td class="mono" data-notr>${tgUser(r.s)?`<a class="lnk" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">@${esc(tgUser(r.s))}</a>`:"—"}</td><td class="mono">${r.c.n}</td>
+   ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b data-notr>${esc(r.s.name||"—")}</b> <span class="tag">👤 Open</span></td><td data-notr><a class="lnk" href="mailto:${esc(r.s.email||"")}" onclick="event.stopPropagation()">${esc(r.s.email||"—")}</a></td><td class="mono" data-notr>${tgUser(r.s)?`${r.s.tgOk?"✅":"⚠️"} <a class="lnk" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">@${esc(tgUser(r.s))}</a>`:"—"}</td><td class="mono">${r.c.n}</td>
      <td class="mono ${r.brk?"neg":""}">${r.brk}</td><td>${r.worstEmo?`<span class="tag bad">${esc(r.worstEmo.k)}</span>`:"—"}</td>${[r.jT,r.pT,r.pN].map(v=>`<td>${v?'<span class="dyes">✔ Yes</span>':'<span class="dno">✖ No</span>'}</td>`).join("")}</tr>`).join("")||`<tr><td colspan="9" class="empty">No students yet. Share the website link — they sign up for free.</td></tr>`}</table></div></div>
    ${rejected.length?`<details class="card" style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:600">Rejected requests (${rejected.length})</summary><div class="tw" style="margin-top:8px"><table class="t" id="rejT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${rejected.map(p=>reqRow(p,true)).join("")}</table></div></details>`:""}`;
   $$("tr[data-pid] button[data-act]",el).forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const id=b.closest("tr").dataset.pid,act=b.dataset.act;const p=profs.find(x=>x.id===id);
