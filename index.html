@@ -1096,6 +1096,14 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
 .sz-note{font-size:13px;margin:10px 0 0;color:var(--teal)}
 .sz-t.price{border-color:color-mix(in srgb,var(--gold) 40%,transparent)}.sz-t.price b{color:var(--gold);font-size:19px}
 .pf-from{color:var(--gold)}.pf-from b{font-weight:800}
+/* list: price of every size + coupon badge */
+.pf-szp{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.pf-sz{display:inline-flex;align-items:baseline;gap:5px;padding:2px 8px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);font-size:11.5px;white-space:nowrap}
+.pf-sz b{font-family:"JetBrains Mono",monospace;font-weight:800;color:var(--text)}.pf-sz i{font-style:normal;color:var(--gold);font-weight:700}
+.pf-cp{display:inline-flex;align-items:center;gap:4px;margin-top:4px;width:fit-content;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700;background:rgba(39,194,108,.14);color:var(--green);border:1px solid rgba(39,194,108,.4)}
+.pf-row .pf-tx{gap:3px}
+/* size buttons show their price */
+.sz-b{display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}.sz-b small{font-size:11px;font-weight:700;opacity:.8;font-family:Inter,system-ui,sans-serif}
 /* coupon box */
 .cp-box{margin-top:14px;padding:14px;border-radius:12px;border:1px dashed color-mix(in srgb,var(--gold) 55%,transparent);background:color-mix(in srgb,var(--gold) 5%,var(--panel2))}
 .cp-l{font-size:13px;margin-bottom:8px}
@@ -2637,7 +2645,7 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
    <div class="pf-list">${list.length?list.map(f=>{const L=f.name.replace(/^The /,"").charAt(0).toUpperCase();const h=L!==letter?(letter=L,`<div class="pf-letter"><span>${L}</span></div>`):"";
      const mini=(ic,t,items,cl)=>items&&items.length?`<div class="pf-mini ${cl}"><h4>${ic} <span>${t}</span></h4><ul>${items.map(pfLi).join("")}</ul></div>`:"";
      f=Object.assign({},f,pfLoc(f));
-     return `${h}<div class="pf-item ${f.type}"><button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b><small><span data-notr>${esc(f.sizes.join(" · "))}</span>${pfFrom(f.id)!=null?` · <span class="pf-from"><span>from</span> <b class="mono" data-notr>${money(pfFrom(f.id),0)}</b></span>`:""}</small></span>${dzBadge(f)}<span class="pf-go">›</span></button>
+     return `${h}<div class="pf-item ${f.type}"><button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b>${cpBadge(f.id)}<span class="pf-szp" data-notr>${f.sizes.map(s=>{const p=sizePrice(f.id,s);return `<span class="pf-sz"><b>${esc(s)}</b>${p!=null?`<i>${esc(priceTxt(p))}</i>`:""}</span>`}).join("")}</span></span>${dzBadge(f)}<span class="pf-go">›</span></button>
       <details class="pf-rules"${S._pfShut?"":" open"}><summary><span>Rules &amp; hidden rules</span></summary>
        <div class="pf-grid">${mini("📝","Evaluation: rules",f.eval,"r")}${mini("🕵️","Evaluation: hidden rules",f.evalH,"h")}${mini("🏦","Funded: rules",f.funded,"r f")}${mini("🕵️","Funded: hidden rules",f.fundedH,"h")}</div>
        ${mini("💸","Withdrawal conditions",f.payout,"p")}</details></div>`}).join("")
@@ -2676,6 +2684,12 @@ const priceTxt=v=>{if(v==null||v==="")return null;if(typeof v==="number")return 
   return (s[0]==="≈"?"≈ $"+s.slice(1).trim():"$"+s).replace("/mo"," / "+I18N.t("month"))};
 const firstNum=v=>typeof v==="number"?v:(m=>m?Number(m[0].replace(/,/g,"")):null)(String(v||"").match(/[\d,]+(\.\d+)?/));
 const progHas=(P,s)=>!!(P&&(P.pct||(P.rows&&P.rows[s])));
+/* price of one size: from a given plan, or the cheapest plan that has it */
+function sizePrice(id,s,pi){const D=(window.PF_SIZES||{})[id];if(!D)return null;const ps=pi!=null?[D.progs[pi]]:D.progs;let best=null,bv=null;
+  ps.forEach(P=>{if(!P)return;const raw=(P.rows&&P.rows[s]&&P.rows[s].price)??(P.prices&&P.prices[s]);if(raw==null)return;const v=firstNum(raw);if(best==null||(v!=null&&(bv==null||v<bv))){best=raw;bv=v}});return best}
+/* badge in the list for firms that have one of my coupon codes */
+function cpBadge(id){const k=Object.keys(COUPONS).find(c=>COUPONS[c][id]);if(!k)return "";const d=COUPONS[k][id];
+  return `<span class="pf-cp">🏷️ <b data-notr>-${d.pct}%</b> <span>with</span> <b data-notr>${esc(k)}</b>${d.prog?` <span class="mut" data-notr>(${esc(d.prog)})</span>`:""}</span>`}
 /* cheapest listed price of a firm (for the list) */
 function pfFrom(id){const D=(window.PF_SIZES||{})[id];if(!D)return null;let m=null;
   D.progs.forEach(P=>{Object.values(P.rows||{}).forEach(r=>{const v=firstNum(r.price);if(v&&(m==null||v<m))m=v});Object.values(P.prices||{}).forEach(p=>{const v=firstNum(p);if(v&&(m==null||v<m))m=v})});return m}
@@ -2711,7 +2725,7 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
     tiles+=typeof r.dd==="number"?tile("⚠️","Account fails below",money(n-r.dd,0),"At the start, before the drawdown trails","warn"):""}
   else cover=false;
   return `<h3>💰 <span>Choose your account size</span></h3>${ex?`<p class="mut" style="font-size:12.5px;margin:-4px 0 8px">ℹ️ <span>Example sizes: check which sizes this firm sells on its website.</span></p>`:""}
-   <div class="sz-pick" data-noswipe>${f.sizes.map(s=>`<button type="button" class="sz-b ${s===size?"on":""}" data-sz="${s}">${s}</button>`).join("")}</div>
+   <div class="sz-pick" data-noswipe>${f.sizes.map(s=>{const p=sizePrice(f.id,s,pi);return `<button type="button" class="sz-b ${s===size?"on":""}" data-sz="${s}">${s}${p!=null?`<small data-notr>${esc(priceTxt(p))}</small>`:""}</button>`}).join("")}</div>
    ${progs.length>1?`<div class="sz-progs">${progs.map((p,i)=>`<button type="button" class="sz-p ${i===pi?"on":""}" data-szp="${i}" data-notr>${esc(p.name)}</button>`).join("")}</div>`:P?`<div class="mut sz-pn" data-notr>${esc(P.name)}</div>`:""}
    ${cover&&tiles?`<div class="sz-grid">${tiles}</div>${P.note?`<p class="sz-note" data-notr>💡 ${esc(P.note)}</p>`:""}${couponBox(f,P,size)}`
      :`<div class="sz-none">ℹ️ <span>No numbers for this size in this plan yet. Try another size.</span></div>`}
