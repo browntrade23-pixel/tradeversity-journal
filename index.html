@@ -1243,6 +1243,12 @@ html:not([data-theme=light]) table.t :is(th,td){border-color:rgba(255,255,255,.0
 /* light theme: same shapes, light surfaces */
 html[data-theme=light] .seg button.on:not(.bull):not(.bear):not(.nt){background:linear-gradient(180deg,#6e7cf5,#4655e6);color:#fff}
 html[data-theme=light] .card>h3:first-child,html[data-theme=light] .card>.row:first-child>h3{color:#3a48c8}
+/* ---- admin requests: Ready to approve / Waiting for verification ---- */
+.rq-grp{margin-top:6px;padding:10px 12px;border-radius:14px;border:1px solid var(--line2)}
+.rq-grp.ready{border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.06)}
+.rq-grp.wait{background:rgba(255,255,255,.02);margin-top:10px}.rq-grp.wait>summary{cursor:pointer;list-style:none}.rq-grp.wait>summary::-webkit-details-marker{display:none}
+.rq-t{font-size:14px}.rq-n{display:inline-block;min-width:22px;padding:1px 7px;margin-inline-start:4px;border-radius:999px;background:rgba(255,255,255,.08);font-size:12px;text-align:center}
+.rq-grp.ready .rq-n{background:rgba(34,197,94,.2);color:var(--green)}
 /* ---- 🔔 notification bell + panel ---- */
 .ntf-bell{position:relative;display:inline-grid;place-items:center;width:36px;height:36px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;transition:background .2s,border-color .2s,box-shadow .2s}
 .ntf-bell:hover{border-color:rgba(110,124,245,.6);background:rgba(58,72,224,.14);box-shadow:0 0 16px -6px rgba(58,72,224,.6)}
@@ -1706,7 +1712,7 @@ async function enter(u){
   $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;
   if(u.role==="admin"){S.view="admin";await loadSubject(u,false);go("admin")}
   else{await loadSubject(u,false);go(location.hash.slice(1)||"journal")}
-  S._commR=null;settingsPull();
+  S._commR=null;settingsPull();rqReadyLoad();
 }
 async function loadSubject(u,readonly){
   S.subject=u;S.readonly=readonly;S.acct="all";S.page=null;S._planDate=null;
@@ -1785,6 +1791,11 @@ function ntfItems(){const out=[];if(!S.me)return out;const now=Date.now(),me=S.m
       t:`${I18N.t("Today's news")}: ${evT.length}${reds?` (${reds} ${I18N.t("red")})`:""}`,
       s:evT.slice(0,5).map(n=>`${n.impact==="High"?"🔴":"🟠"} ${tzTime(n.starts_at,DZ)} DZ · ${esc(n.title)}`).join("<br>")+(evT.length>5?`<br>+${evT.length-5}`:""),
       sub2:I18N.t("Tap to open the news page and read what each news means.")})}
+  /* admin: students who finished Telegram + email verification and wait for approval (new student = new unseen notification) */
+  if(!student&&S._rqReady&&S._rqReady.length){const R=S._rqReady;
+    out.unshift({id:"ready:"+R.map(x=>x.id).sort().join(","),ic:"🎉",lv:"warn",go:"admin",
+      t:`${R.length} ${I18N.t(R.length===1?"student verified, ready to approve":"students verified, ready to approve")}`,
+      s:R.slice(0,5).map(x=>esc(x.name||"—")).join(" · ")+(R.length>5?` +${R.length-5}`:""),sub2:I18N.t("Tap to open your requests and approve them.")})}
   if(student&&!S.readonly){const today=todayStr(),d=new Date(),wd=d.getDay(),h=d.getHours();
     const plans=S.plans||[],pToday=plans.find(p=>p.date===today);
     /* 3) journal: every trading day, after the New York close (16:00 NY), until a trade or the end-of-day review is saved */
@@ -1816,6 +1827,10 @@ $("#ntfBell").onclick=e=>{e.stopPropagation();const p=$("#ntfPanel"),open=p.clas
     const r=$("#ntfBell").getBoundingClientRect();p.style.top=(r.bottom+8)+"px";const pw=Math.min(360,innerWidth-16);p.style.right=Math.max(8,Math.min(innerWidth-r.right-6,innerWidth-pw-8))+"px";ntfDraw(items);ntfRefresh()}};
 document.addEventListener("click",e=>{const p=$("#ntfPanel");if(p&&!p.classList.contains("hidden")&&!e.target.closest("#ntfPanel,#ntfBell"))p.classList.add("hidden")});
 setInterval(ntfRefresh,30000);
+/* admin: keep the "ready to approve" list fresh for the bell (every 3 minutes) */
+async function rqReadyLoad(){if(!S.me||S.me.role!=="admin"||!API||!API.listProfiles)return;
+  try{const P=await API.listProfiles();S._rqReady=P.filter(p=>p.role!=="admin"&&p.status==="pending"&&p.tgOk&&p.emailOk!==false).map(p=>({id:p.id,name:p.name}));ntfRefresh()}catch(e){}}
+setInterval(rqReadyLoad,180000);
 function render(){renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
   const fn={journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
@@ -3463,6 +3478,7 @@ function affCard(C){if(!C)return "";const now=Date.now(),inD=(c,d)=>now-new Date
 async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</div>';
   let profs,trades,plans;try{[profs,trades,plans]=await Promise.all([API.listProfiles(),API.allTradesLite(),API.allPlans()])}catch(e){el.innerHTML=`<div class="card empty">Couldn't load: ${esc(e.message||e)}</div>`;return}
   let clicks=null;try{clicks=API.affClicks?await API.affClicks():null}catch(e){clicks=null}
+  S._rqReady=profs.filter(p=>p.role!=="admin"&&p.status==="pending"&&p.tgOk&&p.emailOk!==false).map(p=>({id:p.id,name:p.name}));setTimeout(ntfRefresh,0);
   const stOf=p=>p.status||"approved";
   const pending=profs.filter(p=>p.role!=="admin"&&stOf(p)==="pending").sort((a,b)=>(a.created_at||"").localeCompare(b.created_at||""));
   const rejected=profs.filter(p=>p.role!=="admin"&&stOf(p)==="rejected");
@@ -3522,7 +3538,13 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    ${notifyCard(true)}
    ${pending.length?`<div class="card" style="margin-bottom:12px;border-color:var(--gold)"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0;color:var(--gold)">🔔 Pending requests</h3><span class="tag" style="background:rgba(245,185,66,.15);color:var(--gold)">${pending.length}</span></div>
      <p class="mut" style="margin:0 0 8px;font-size:12px">These people signed up and are waiting for you. They can't use the journal until you approve them.</p>
-     <div class="tw"><table class="t" id="reqT"><tr><th>Student</th><th>Telegram check</th><th>Requested</th><th></th></tr>${pending.map(p=>reqRow(p,false)).join("")}</table></div></div>`:""}
+     ${(()=>{const ready=pending.filter(p=>p.tgOk&&p.emailOk!==false),wait=pending.filter(p=>!(p.tgOk&&p.emailOk!==false));
+       const head=`<tr><th>Student</th><th>Verification</th><th>Requested</th><th></th></tr>`;
+       return `<div class="rq-grp ready"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap;margin:4px 0 6px"><b class="rq-t">✅ <span>Ready to approve</span> <span class="rq-n">${ready.length}</span></b>
+         ${ready.length>1?`<button class="btn sm pri" type="button" id="approveAllV">✔ <span>Approve all verified</span> (${ready.length})</button>`:""}</div>
+         ${ready.length?`<div class="tw"><table class="t" id="reqT">${head}${ready.map(p=>reqRow(p,false)).join("")}</table></div>`:`<p class="mut" style="font-size:12px;margin:0 0 6px">${esc(I18N.t("Nobody yet. Students appear here as soon as they verify Telegram and email."))}</p>`}</div>
+       ${wait.length?`<details class="rq-grp wait" ${S._rqWaitOpen?"open":""} id="rqWait"><summary class="rq-t">⏳ <span>Waiting for verification</span> <span class="rq-n">${wait.length}</span> <span class="mut" style="font-weight:500;font-size:12px">· ${esc(I18N.t("They must verify first. They move up to Ready by themselves."))}</span></summary>
+         <div class="tw" style="margin-top:6px"><table class="t">${head}${wait.map(p=>reqRow(p,false)).join("")}</table></div></details>`:""}`})()}</div>`:""}
    ${affCard(clicks)}
    ${pfUpdatesCard()}
    ${weekCard}
@@ -3546,6 +3568,11 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
      <td class="mono ${r.brk?"neg":""}">${r.brk}</td><td>${r.worstEmo?`<span class="tag bad">${esc(r.worstEmo.k)}</span>`:"—"}</td>${[r.jT,r.pT,r.pN].map(v=>`<td>${v?'<span class="dyes">✔ Yes</span>':'<span class="dno">✖ No</span>'}</td>`).join("")}</tr>`).join("")||`<tr><td colspan="9" class="empty">No students yet. Share the website link — they sign up for free.</td></tr>`}</table></div></div>
    ${rejected.length?`<details class="card" style="margin-top:12px"><summary style="cursor:pointer;color:var(--muted);font-weight:600">Rejected requests (${rejected.length})</summary><div class="tw" style="margin-top:8px"><table class="t" id="rejT"><tr><th>Student</th><th>Telegram</th><th>Requested</th><th></th></tr>${rejected.map(p=>reqRow(p,true)).join("")}</table></div></details>`:""}`;
   bindNotify(el);
+  const rw=$("#rqWait",el);if(rw)rw.ontoggle=()=>{S._rqWaitOpen=rw.open};
+  const aav=$("#approveAllV",el);if(aav)aav.onclick=()=>{const ready=pending.filter(p=>p.tgOk&&p.emailOk!==false);
+    confirmBox(`${I18N.t("Approve")} ${ready.length} ${I18N.t("verified students? They will get access to the journal.")}`,async()=>{aav.disabled=true;let ok=0,bad=0;
+      for(const p of ready){try{await API.setStatus(p.id,"approved");ok++}catch(e){bad++}}
+      toast(`${ok} ${I18N.t("students approved")}${bad?` · ${bad} ${I18N.t("not approved (not verified)")}`:""}`);vAdmin(el)})};
   $$("tr[data-pid] button[data-act]",el).forEach(b=>b.onclick=async ev=>{ev.stopPropagation();const id=b.closest("tr").dataset.pid,act=b.dataset.act;const p=profs.find(x=>x.id===id);
     const go_=async()=>{b.disabled=true;try{await API.setStatus(id,act);toast(act==="approved"?"Student approved":"Request rejected");vAdmin(el)}catch(e){b.disabled=false;const m=String(e.message||e);
       toast(/not_verified_telegram/.test(m)?I18N.t("This student hasn't verified Telegram yet."):/not_verified_email/.test(m)?I18N.t("This student hasn't verified the email yet."):m)}};
