@@ -235,7 +235,7 @@ lark:{eval:["1-Step : 10 % · 3-Step : 5 %, 4 %, 3 %","1-Step : 5 % · 3-Step : 
  fundedH:["Avis partagés sur des retraits après des violations présumées"],
  payout:["Tous les 14 jours"]},
 fortraders:{dzNote:"Listée comme acceptant les traders algériens sur une liste futures de 2026 : confirmez pour le CFD avec le support.",plans:"1-Step, 2-Step (forex, crypto et futures)",
- eval:["2-Step : 9 % puis 5 %","3 %","6 %"],
+ eval:["Classic : 8 % puis 5 % · Fast : 9 %","Classic : 4 % · Fast : 3 %","Classic : 8 % · Fast : 6 %"],
  evalH:["Spreads bruts + environ 3 $ de commission par lot"],
  funded:["Commence à 80 %, +10 % par retrait jusqu'à 90 %"],
  fundedH:["Au moins 3 % de croissance avant un retrait"],
