@@ -2682,7 +2682,7 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
   const sel=S._pfSz,pi=Math.min(sel.p,Math.max(0,progs.length-1)),P=progs[pi],size=sel.size,n=szNum(size);
   let tiles="",cover=true;
   /* the price only changes AFTER the user clicks Apply with a code that works on this firm */
-  const cc=(S._coupon||"").trim().toUpperCase(),deal=S._couponTried&&COUPONS[cc]&&COUPONS[cc][f.id];
+  const cc=(S._coupon||"").trim().toUpperCase(),deal=S._couponTried&&dealFor(cc,f.id,P);
   const priceTile=raw=>{const v=firstNum(raw),mo=/\/mo/.test(String(raw));
     if(!deal||v==null)return tile("💳","Price",esc(priceTxt(raw)),"","price");
     const a=v*(1-deal.pct/100),m=x=>money(x,x%1?2:0)+(mo?" / "+I18N.t("month"):"");
@@ -2713,13 +2713,18 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
    <p class="mut sz-src"><span>Figures reported by review sites, checked November 2026. Confirm on the official website before buying.</span></p>`}
 /* ---------- partner coupon codes: which firm each code works on, the discount and the offer link ----------
    To add a code for another firm: COUPONS.CODE = { firmId:{pct:XX, url:"https://..."} } */
-const COUPONS={BROWN23:{earn2trade:{pct:60,url:"https://www.earn2trade.com/?a_pid=BROWN23"}}};
+/* prog = the code only works on plans whose name starts with this text */
+const COUPONS={BROWN23:{earn2trade:{pct:60,url:"https://www.earn2trade.com/?a_pid=BROWN23"},
+  bulenox:{pct:89,url:"https://bulenox.com/",prog:"Option 1"}}};
+const dealFor=(code,fid,P)=>{const d=COUPONS[code]&&COUPONS[code][fid];return d&&(!d.prog||(P&&P.name.startsWith(d.prog)))?d:null};
 function couponBox(f,P,size){const raw=P&&((P.rows&&P.rows[size]&&P.rows[size].price)??(P.prices&&P.prices[size]));
-  const code=(S._coupon||"").trim().toUpperCase(),c=code&&COUPONS[code],deal=c&&c[f.id];let res="";
+  const code=(S._coupon||"").trim().toUpperCase(),c=code&&COUPONS[code],deal=c&&dealFor(code,f.id,P);let res="";
   if(code&&S._couponTried){
     if(!c)res=`<div class="cp-res bad">✖ <span>This code doesn't exist.</span></div>`;
-    else if(!deal){const ids=Object.keys(c),fx=(PropFirms.firms.find(x=>x.id===ids[0])||{}).name||ids[0];
-      res=`<div class="cp-res warn">ℹ️ <span>This code works on</span> <b data-notr>${esc(fx)}</b><span>, not on this firm.</span> <button type="button" class="btn sm" data-cpgo="${ids[0]}">➜ <span>See</span> <span data-notr>${esc(fx)}</span></button></div>`}
+    else if(!deal&&c[f.id]&&c[f.id].prog){const k=(((window.PF_SIZES||{})[f.id]||{progs:[]}).progs).findIndex(p=>p.name.startsWith(c[f.id].prog));
+      res=`<div class="cp-res warn">ℹ️ <span>On this firm the code works on this plan only:</span> <b data-notr>${esc(c[f.id].prog)}</b> ${k>=0?`<button type="button" class="btn sm" data-cpprog="${k}">➜ <span>Switch plan</span></button>`:""}</div>`}
+    else if(!deal){const ids=Object.keys(c),nm=id=>(PropFirms.firms.find(x=>x.id===id)||{}).name||id;
+      res=`<div class="cp-res warn">ℹ️ <span>This code works on</span> <b data-notr>${ids.map(id=>esc(nm(id))).join(", ")}</b><span>, not on this firm.</span> ${ids.map(id=>`<button type="button" class="btn sm" data-cpgo="${id}">➜ <span data-notr>${esc(nm(id))}</span></button>`).join(" ")}</div>`}
     else{const v=firstNum(raw),mo=/\/mo/.test(String(raw)),after=v!=null?v*(1-deal.pct/100):null;
       res=`<div class="cp-res good"><div class="cp-top">✅ <b data-notr>${esc(code)}</b> <span>applied:</span> <span class="cp-pct" data-notr>-${deal.pct}%</span></div>
        ${v!=null?`<div class="cp-prices"><span class="cp-old mono" data-notr>${money(v,v%1?2:0)}${mo?" / "+esc(I18N.t("month")):""}</span><span class="cp-arrow">→</span><span class="cp-new mono" data-notr>${money(after,after%1?2:0)}${mo?" / "+esc(I18N.t("month")):""}</span>
@@ -2733,6 +2738,7 @@ function bindSizeCard(f){const c=$("#szCard");if(!c)return;
   if(ca){const ap=()=>{S._coupon=ci.value;S._couponTried=true;c.innerHTML=sizeCard(f);bindSizeCard(f)};ca.onclick=ap;ci.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();ap()}};
     /* editing the code hides the old result until Apply is clicked again */
     ci.oninput=()=>{if(S._couponTried){S._couponTried=false;S._coupon=ci.value;const p=ci.selectionStart;c.innerHTML=sizeCard(f);bindSizeCard(f);const n=$("#cpIn",c);n.focus();n.setSelectionRange(p,p)}}}
+  $$("[data-cpprog]",c).forEach(b=>b.onclick=()=>{S._pfSz.p=Number(b.dataset.cpprog);c.innerHTML=sizeCard(f);bindSizeCard(f)});
   $$("[data-cpgo]",c).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.cpgo;S._pfSz=null;S._couponTried=false;render();window.scrollTo(0,0)});
   $$("[data-sz]",c).forEach(b=>b.onclick=()=>{S._pfSz.size=b.dataset.sz;S._couponTried=false;c.innerHTML=sizeCard(f);bindSizeCard(f)});
   /* a plan button always shows a size that exists in that plan */
