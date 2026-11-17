@@ -1552,7 +1552,12 @@ const Cloud={
   async setTelegram(id,tg){const{error}=await this.sb.from("profiles").update({telegram:tg}).eq("id",id);if(error)throw error},
   async session(){const{data}=await this.sb.auth.getSession();if(!data.session)return null;return this.profile(data.session.user.id)},
   async signIn(email,password){const{data,error}=await this.sb.auth.signInWithPassword({email,password});if(error)throw error;return this.profile(data.user.id)},
-  async signUp({email,password,name,telegram}){const{data,error}=await this.sb.auth.signUp({email,password,options:{data:{full_name:name,telegram},emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
+  async emailTaken(email){try{const{data,error}=await this.sb.rpc("email_registered",{p_email:email});return error?null:!!data}catch(e){return null}},
+  async signUp({email,password,name,telegram}){
+    /* this email already has an account: say it before trying (no email is sent, no rate limit used) */
+    if(await this.emailTaken(email))throw new Error("already registered");
+    const{data,error}=await this.sb.auth.signUp({email,password,options:{data:{full_name:name,telegram},emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
+    if(data.user&&Array.isArray(data.user.identities)&&!data.user.identities.length)throw new Error("already registered");   /* Supabase's hidden "email taken" answer */
     if(!data.session)return {needsConfirm:true};return {user:await this.profile(data.user.id),needsConfirm:false}},
   async verifyCode(email,token){const{data,error}=await this.sb.auth.verifyOtp({email,token,type:"signup"});if(error)throw error;return await this.profile(data.user.id)},
   async resendCode(email){const{error}=await this.sb.auth.resend({type:"signup",email,options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error},
@@ -1644,7 +1649,7 @@ $("#signupForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.ta
     else await enter(r.user)}catch(err){const m=String(err&&err.message||err),em=f.get("email").trim();
       /* "email rate limit exceeded" / "already registered": most of the time the account already exists → offer to log in */
       if(/rate limit|over_email_send_rate|429|already registered|already exists|already been registered/i.test(m)){
-        $("#authMsg").innerHTML=`<span class="neg">${esc(I18N.t(/rate limit|over_email|429/i.test(m)?"Too many sign-ups right now, we can't send the email code.":"This email already has an account."))}</span><br><span class="mut">${esc(I18N.t("If you already created your account before, just log in with your email and password."))}</span><br><button type="button" class="btn sm pri" id="suToLogin" style="margin-top:8px">${esc(I18N.t("Log in instead"))}</button>`;
+        $("#authMsg").innerHTML=`<span class="neg">${esc(I18N.t(/rate limit|over_email|429/i.test(m)?"Too many sign-ups right now, we can't send the email code.":"You already have an account with this email."))}</span><br><span class="mut">${esc(I18N.t("If you already created your account before, just log in with your email and password."))}</span><br><button type="button" class="btn sm pri" id="suToLogin" style="margin-top:8px">${esc(I18N.t("Log in instead"))}</button>`;
         $("#suToLogin").onclick=()=>{$("#tabLogin").click();const le=$("#loginForm [name=email]");if(le)le.value=em;const lp=$("#loginForm [name=password]");if(lp)lp.focus()}}
       else $("#authMsg").innerHTML=authErr(err)}};
 /* ---- email verification code (6-digit code sent by email) ---- */

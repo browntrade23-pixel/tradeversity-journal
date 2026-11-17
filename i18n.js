@@ -150,6 +150,7 @@ const T={
 "Notifications":["Notifications","الإشعارات"],
 "Too many sign-ups right now, we can't send the email code.":["Trop d'inscriptions en ce moment, nous ne pouvons pas envoyer le code par email.","هناك تسجيلات كثيرة الآن، لا يمكننا إرسال رمز البريد."],
 "This email already has an account.":["Cet email a déjà un compte.","هذا البريد لديه حساب بالفعل."],
+"You already have an account with this email.":["Vous avez déjà un compte avec cet email.","لديك حساب بالفعل بهذا البريد الإلكتروني."],
 "If you already created your account before, just log in with your email and password.":["Si vous avez déjà créé votre compte, connectez-vous simplement avec votre email et votre mot de passe.","إذا أنشأت حسابك من قبل، سجّل الدخول فقط ببريدك وكلمة المرور."],
 "Log in instead":["Se connecter","تسجيل الدخول"],"unseen":["non vu(s)","غير مقروء"],"Today's news":["News du jour","أخبار اليوم"],"red":["rouge(s)","حمراء"],
 "Tap to see what this news means.":["Touchez pour voir ce que signifie cette news.","اضغط لترى معنى هذا الخبر."],
