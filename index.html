@@ -131,6 +131,9 @@ textarea.i{min-height:80px;resize:vertical}
 .tmeta{min-width:0}.tmeta .t1{font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .tmeta .t2{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tpnl{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:16px;text-align:right}
+.rpk{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0 4px;padding:12px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2)}
+.rpk-step{display:flex;flex-direction:column;gap:6px;min-width:0}.rpk-step>small{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rpk-wide{grid-column:1/-1}.rpk-sizes{flex-wrap:wrap}.rpk-note{grid-column:1/-1;margin:0;font-size:12px}
 .tcard:has(.tc-edit){grid-template-columns:96px 1fr auto auto;position:relative}
 .tc-edit{width:34px;height:34px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);color:var(--muted);font-size:15px;cursor:pointer;transition:.15s}
 .tc-edit:hover{color:var(--gold,#f5c84b);border-color:var(--gold,#f5c84b);transform:scale(1.06)}
@@ -2210,10 +2213,33 @@ function rulesStatus(acct,R){const ts=S.trades.filter(t=>t.account===acct),start
 function meter(lab,ic,used,main,sub,inv){/* used 0..1 of the limit; inv = progress toward a goal (green as it fills) */
   const u=Math.max(0,Math.min(1,used)),c=inv?(u>=1?"ok":"goal"):(u>=1?"bad":u>=.8?"bad":u>=.5?"warn":"ok");
   return `<div class="rm ${c}"><div class="rm-top"><span>${ic} <b>${lab}</b></span><b class="mono">${main}</b></div><div class="rm-bar"><i style="width:${u*100}%"></i></div><div class="rm-sub">${sub}</div></div>`}
+/* step-by-step picker: Personal / Prop firm → Futures / CFD → firm → plan → account size (fills the rules from the tracker) */
+const PFLIST=()=>((window.PropFirms||{}).firms)||[];
+const rpProgs=id=>(((window.PF_SIZES||{})[id]||{}).progs)||[];
+function rpSizes(f,P){if(!f)return [];const k=P&&P.rows?Object.keys(P.rows):P&&P.prices?Object.keys(P.prices):[];return (k.length?k:(f.sizes||[])).filter(s=>szNum(s)>0)}
+function rpRules(f,P,size){const n=szNum(size),o={start:n||"",target:"",daily:"",maxDD:"",ddType:P&&/trail/i.test(P.ddT||"")?"trailing":"static"};if(!P)return o;
+  if(P.pct){const q=P.pct;if(q.t1!=null)o.target=Math.round(n*q.t1/100);if(q.dl!=null)o.daily=Math.round(n*q.dl/100);if(q.dd!=null)o.maxDD=Math.round(n*q.dd/100)}
+  else if(P.rows&&P.rows[size]){const r=P.rows[size];if(typeof r.t==="number")o.target=r.t;if(typeof r.dd==="number")o.maxDD=r.dd;if(typeof r.dl==="number"&&r.dl>0)o.daily=r.dl}
+  return o}
+function rpState(acct,R,aSize){if(S._rp&&S._rp.acct===acct)return S._rp;const L=PFLIST();
+  const meta=S.trades.find(t=>t.account===acct&&(t.firm||t.acctType)),mf=meta&&meta.firm;
+  const f=R&&R.firmId?L.find(x=>x.id===R.firmId):mf?L.find(x=>x.name===mf)||L.find(x=>mf.startsWith(x.name)||x.name.startsWith(mf)):null;
+  return S._rp={acct,kind:R&&R.kind||(meta&&meta.acctType==="personal"?"personal":"prop"),mkt:R&&R.mkt||(f?f.type:"futures"),firmId:f?f.id:"",pi:R&&R.pi||0,size:R&&R.size||(aSize?kSize(aSize):""),vals:null,filled:false}}
+function rpHTML(st){const L=PFLIST(),f=L.find(x=>x.id===st.firmId),progs=f?rpProgs(f.id):[],P=progs[st.pi]||progs[0],sizes=rpSizes(f,P);
+  const b=(attr,v,on,lab)=>`<button type="button" ${attr}="${v}" class="${on?"on":""}">${lab}</button>`;
+  return `<div class="rpk">
+   <div class="rpk-step"><small>1 · <span>Account</span></small><div class="seg">${b("data-rk","prop",st.kind==="prop",`🏦 <span>Prop firm account</span>`)}${b("data-rk","personal",st.kind==="personal",`👤 <span>Personal account</span>`)}</div></div>
+   ${st.kind==="personal"?`<p class="mut rpk-note">👤 <span>Personal account: no prop firm rules. You can still set your own limits below.</span></p>`:`
+   <div class="rpk-step"><small>2 · <span>Market</span></small><div class="seg">${b("data-rm","futures",st.mkt==="futures",`📈 <span>Futures</span>`)}${b("data-rm","cfd",st.mkt==="cfd",`💹 <span>CFD</span>`)}</div></div>
+   <div class="rpk-step"><small>3 · <span>Prop firm</span></small><select class="i" id="rpFirm"><option value="">— ${I18N.t("Choose your prop firm")} —</option>${L.filter(x=>x.type===st.mkt).map(x=>`<option value="${x.id}" ${x.id===st.firmId?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div>
+   ${f&&progs.length>1?`<div class="rpk-step"><small><span>Plan</span></small><select class="i" id="rpPlan">${progs.map((p,i)=>`<option value="${i}" ${i===st.pi?"selected":""}>${esc(p.name)}</option>`).join("")}</select></div>`:""}
+   ${f?`<div class="rpk-step rpk-wide"><small>4 · <span>Account size</span></small><div class="seg rpk-sizes">${sizes.map(s=>b("data-rs",s,s===st.size,`<span data-notr>${esc(s)}</span>`)).join("")||`<span class="mut">—</span>`}</div></div>`:""}
+   ${st.filled&&f&&st.size?`<p class="mut rpk-note">✅ <span>Rules filled from</span> <b data-notr>${esc(f.name)}${P&&progs.length>1?" · "+esc(P.name):""} · ${esc(st.size)}</b>. <span>Check them and change anything if your account is different.</span></p>`:""}`}
+  </div>`}
 function rulesCard(acct,aSize){const R=rulesAll()[acct];
-  if(!R||S._rulesEdit===acct){const r=R||{start:aSize||"",target:"",daily:"",maxDD:"",ddType:"static"};
+  if(!R||S._rulesEdit===acct){const st=S._rulesEdit===acct?rpState(acct,R,aSize):null;const r=(st&&st.vals)||R||{start:aSize||"",target:"",daily:"",maxDD:"",ddType:"static"};
     return `<div class="card rules-card" id="rulesCard"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🏦 Prop firm rules</h3>${R?"":`<span class="mut" style="font-size:12px">Optional</span>`}</div>
-     ${R||S._rulesEdit===acct?`<p class="mut" style="font-size:12px;margin:6px 0 10px">Enter the rules of your evaluation or funded account. They are saved on this device.</p>
+     ${R||S._rulesEdit===acct?`${rpHTML(st)}<p class="mut" style="font-size:12px;margin:6px 0 10px">Enter the rules of your evaluation or funded account. They are saved on this device.</p>
      <div class="grid g4"><label class="f">Starting balance $<input class="i" id="rStart" type="number" step="any" value="${esc(r.start)}" placeholder="e.g. 50000"></label>
       <label class="f">Profit target $<input class="i" id="rTarget" type="number" step="any" value="${esc(r.target)}" placeholder="e.g. 3000"></label>
       <label class="f">Daily loss limit $<input class="i" id="rDaily" type="number" step="any" value="${esc(r.daily)}" placeholder="e.g. 1000"></label>
@@ -2224,6 +2250,7 @@ function rulesCard(acct,aSize){const R=rulesAll()[acct];
   const s=rulesStatus(acct,R),T=num(R.target),D=num(R.daily),M=num(R.maxDD);
   return `<div class="card rules-card" id="rulesCard"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🏦 Prop firm rules</h3><button class="btn sm" type="button" id="rEdit">✎ <span>Edit</span></button></div>
    <div class="rm-head"><span class="mut">Balance</span> <b class="mono">${money(s.bal,0)}</b> <span class="mut">· <span>start</span> ${money(num(R.start),0)} · ${R.ddType==="trailing"?"<span>Trailing drawdown</span>":"<span>Static drawdown</span>"}</span></div>
+   ${R.kind==="personal"?`<div class="det-line"><span class="chip">👤 <span>Personal account</span></span></div>`:R.firm?`<div class="det-line"><span class="chip">${R.mkt==="cfd"?"💹 CFD":"📈 Futures"}</span><span class="chip">🏦 <span data-notr>${esc(R.firm)}</span></span>${R.plan?`<span class="chip" data-notr>${esc(R.plan)}</span>`:""}${R.size?`<span class="chip">💰 <span data-notr>${esc(R.size)}</span></span>`:""}</div>`:""}
    ${s.broke?`<div class="status badd" style="margin:8px 0">✖ <span>A rule was broken on</span> ${fmtDate(s.broke)}</div>`:""}
    <div class="rm-grid">
     ${T>0?meter("Profit target","🎯",s.net/T,`${smoney(s.net,0)} / ${money(T,0)}`,s.net>=T?`<span class="pos">✔ Target reached</span>`:`${money(T-s.net,0)} <span>to go</span>`,true):""}
@@ -2231,13 +2258,29 @@ function rulesCard(acct,aSize){const R=rulesAll()[acct];
     ${M>0?meter("Max drawdown","🛡",1-s.buffer/M,`${money(Math.max(0,s.buffer),0)} <span class="mut">left</span>`,`<span>Limit at</span> ${money(s.floor,0)}`):""}
    </div></div>`}
 function bindRules(acct,aSize){const c=$("#rulesCard");if(!c)return;
-  const set=$("#rSet",c);if(set)set.onclick=()=>{S._rulesEdit=acct;render()};
-  const ed=$("#rEdit",c);if(ed)ed.onclick=()=>{S._rulesEdit=acct;render()};
-  let ddt=(rulesAll()[acct]||{}).ddType||"static";$$("#rDDT button",c).forEach(b=>b.onclick=()=>{ddt=b.dataset.t;$$("#rDDT button",c).forEach(x=>x.classList.toggle("on",x===b))});
-  const cc=$("#rCancel",c);if(cc)cc.onclick=()=>{S._rulesEdit=null;render()};
-  const dl=$("#rDel",c);if(dl)dl.onclick=()=>{rulesSave(acct,null);S._rulesEdit=null;render()};
-  const sv=$("#rSave",c);if(sv)sv.onclick=()=>{const r={start:$("#rStart").value,target:$("#rTarget").value,daily:$("#rDaily").value,maxDD:$("#rDD").value,ddType:ddt};
-    if(!(num(r.start)>0)){toast("Enter the starting balance");return}rulesSave(acct,r);S._rulesEdit=null;toast("Rules saved");render()}}
+  const set=$("#rSet",c);if(set)set.onclick=()=>{S._rulesEdit=acct;S._rp=null;render()};
+  const ed=$("#rEdit",c);if(ed)ed.onclick=()=>{S._rulesEdit=acct;S._rp=null;render()};
+  const st=S._rp&&S._rp.acct===acct?S._rp:null;
+  let ddt=(st&&st.vals&&st.vals.ddType)||(rulesAll()[acct]||{}).ddType||"static";$$("#rDDT button",c).forEach(b=>b.onclick=()=>{ddt=b.dataset.t;$$("#rDDT button",c).forEach(x=>x.classList.toggle("on",x===b))});
+  const vals=()=>({start:$("#rStart").value,target:$("#rTarget").value,daily:$("#rDaily").value,maxDD:$("#rDD").value,ddType:ddt});
+  /* picker: redraw only this card, keeping what was typed */
+  const redraw=()=>{c.outerHTML=rulesCard(acct,aSize);bindRules(acct,aSize)};
+  const fill=()=>{const f=PFLIST().find(x=>x.id===st.firmId),progs=f?rpProgs(f.id):[],P=progs[st.pi]||progs[0];
+    if(f&&st.size&&rpSizes(f,P).includes(st.size)){st.vals=rpRules(f,P,st.size);st.filled=true}else{st.vals=vals();st.filled=false}};
+  if(st){
+    $$("[data-rk]",c).forEach(b=>b.onclick=()=>{st.vals=vals();st.kind=b.dataset.rk;st.filled=false;redraw()});
+    $$("[data-rm]",c).forEach(b=>b.onclick=()=>{st.vals=vals();if(st.mkt!==b.dataset.rm){st.mkt=b.dataset.rm;st.firmId="";st.pi=0;st.filled=false}redraw()});
+    const fs=$("#rpFirm",c);if(fs)fs.onchange=()=>{st.firmId=fs.value;st.pi=0;const f=PFLIST().find(x=>x.id===st.firmId),pr=f?rpProgs(f.id):[];
+      if(f&&!rpSizes(f,pr[0]).includes(st.size))st.size="";fill();redraw()};
+    const ps=$("#rpPlan",c);if(ps)ps.onchange=()=>{st.pi=Number(ps.value)||0;fill();redraw()};
+    $$("[data-rs]",c).forEach(b=>b.onclick=()=>{st.size=b.dataset.rs;fill();redraw()});
+  }
+  const cc=$("#rCancel",c);if(cc)cc.onclick=()=>{S._rulesEdit=null;S._rp=null;render()};
+  const dl=$("#rDel",c);if(dl)dl.onclick=()=>{rulesSave(acct,null);S._rulesEdit=null;S._rp=null;render()};
+  const sv=$("#rSave",c);if(sv)sv.onclick=()=>{const r=vals();
+    if(st){const f=PFLIST().find(x=>x.id===st.firmId),progs=f?rpProgs(f.id):[],P=progs[st.pi]||progs[0];r.kind=st.kind;
+      if(st.kind==="prop"&&f){Object.assign(r,{mkt:st.mkt,firmId:f.id,firm:f.name,pi:st.pi,plan:progs.length>1&&P?P.name:"",size:st.size||""})}}
+    if(!(num(r.start)>0)){toast("Enter the starting balance");return}rulesSave(acct,r);S._rulesEdit=null;S._rp=null;toast("Rules saved");render()}}
 function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered();const st=calc(ts);
   const meta=S.acct!=="all"?S.trades.find(t=>t.account===S.acct&&(t.firm||t.platform||t.acctSize)):null;const aSize=meta&&num(meta.acctSize)>0?num(meta.acctSize):null;
   el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px"><div><h1>Statistics</h1><p class="sub">${S.acct==="all"?"All accounts":esc(S.acct)} · ${ts.length} trades</p>
