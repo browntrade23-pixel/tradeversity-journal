@@ -1256,6 +1256,9 @@ html[data-theme=light] .ntf-panel{background:#fff;border-color:#e2e7ef;box-shado
 .ntf-it{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:start;padding:10px;margin-top:6px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:inherit;font:inherit;cursor:pointer;transition:border-color .2s,background .2s}
 .ntf-it:hover{border-color:rgba(110,124,245,.55);background:rgba(58,72,224,.1)}
 .ntf-it.bad{border-color:rgba(239,83,80,.5);background:rgba(239,83,80,.08)}.ntf-it.warn{border-color:rgba(245,185,66,.35)}
+.ntf-it{position:relative}.ntf-it.seen{opacity:.62}.ntf-it.seen:hover{opacity:1}
+.ntf-dot{position:absolute;top:10px;inset-inline-end:10px;width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 0 3px rgba(239,83,80,.2),0 0 10px rgba(239,83,80,.8)}
+.ntf-un{color:var(--red);font-weight:700}
 .ntf-i{font-size:20px;line-height:1.1}.ntf-b{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}.ntf-b b{font-size:13.5px}.ntf-b small{font-size:12px;color:var(--muted)}
 .ntf-it.bad .ntf-b b{color:var(--red)}.ntf-go{color:var(--muted);font-size:18px;align-self:center}
 .ntf-empty{padding:16px 10px;font-size:13px;color:var(--muted);text-align:center}
@@ -1780,14 +1783,16 @@ function ntfRefresh(){const b=$("#ntfBell");if(!b)return;const items=ntfItems(),
   b.classList.toggle("hidden",!S.me);const bd=$("#ntfBadge");bd.textContent=unread>9?"9+":unread;bd.classList.toggle("hidden",!unread);
   b.classList.toggle("ring",items.some(i=>i.lv==="bad"&&!seen[i.id]));
   const p=$("#ntfPanel");if(p&&!p.classList.contains("hidden"))ntfDraw(items)}
-function ntfDraw(items){const p=$("#ntfPanel");
-  p.innerHTML=`<div class="ntf-h"><b>${esc(I18N.t("Notifications"))}</b><span class="mut">${items.length?items.length:""}</span></div>`+
-    (items.length?items.map(i=>`<button type="button" class="ntf-it ${i.lv}" data-ntfgo="${i.go}"><span class="ntf-i">${i.ic}</span><span class="ntf-b"><b>${esc(i.t)}</b><small data-notr>${i.s}</small>${i.sub2?`<small>${esc(i.sub2)}</small>`:""}</span><span class="ntf-go">›</span></button>`).join(""):
+/* a notification stays unseen (red dot + counted on the bell) until the student clicks it */
+function ntfMarkSeen(id){const seen=ntfSeen();seen[id]=Date.now();Object.keys(seen).forEach(k=>{if(Date.now()-seen[k]>7*864e5)delete seen[k]});
+  try{localStorage.setItem(ntfSeenKey(),JSON.stringify(seen))}catch(_){}}
+function ntfDraw(items){const p=$("#ntfPanel"),seen=ntfSeen(),un=items.filter(i=>!seen[i.id]).length;
+  p.innerHTML=`<div class="ntf-h"><b>${esc(I18N.t("Notifications"))}</b><span class="mut">${un?`<span class="ntf-un">${un} ${esc(I18N.t("unseen"))}</span>`:items.length||""}</span></div>`+
+    (items.length?items.map(i=>`<button type="button" class="ntf-it ${i.lv} ${seen[i.id]?"seen":"unseen"}" data-ntfgo="${i.go}" data-ntfid="${esc(i.id)}">${seen[i.id]?"":`<span class="ntf-dot"></span>`}<span class="ntf-i">${i.ic}</span><span class="ntf-b"><b>${esc(i.t)}</b><small data-notr>${i.s}</small>${i.sub2?`<small>${esc(i.sub2)}</small>`:""}</span><span class="ntf-go">›</span></button>`).join(""):
      `<div class="ntf-empty">✅ <span>${esc(I18N.t("All good. Nothing to do right now."))}</span></div>`);
-  $$("[data-ntfgo]",p).forEach(x=>x.onclick=()=>{p.classList.add("hidden");go(x.dataset.ntfgo)})}
+  $$("[data-ntfgo]",p).forEach(x=>x.onclick=()=>{ntfMarkSeen(x.dataset.ntfid);p.classList.add("hidden");go(x.dataset.ntfgo);ntfRefresh()})}
 $("#ntfBell").onclick=e=>{e.stopPropagation();const p=$("#ntfPanel"),open=p.classList.contains("hidden");p.classList.toggle("hidden",!open);
-  if(open){const items=ntfItems(),seen=ntfSeen();items.forEach(i=>seen[i.id]=Date.now());
-    Object.keys(seen).forEach(k=>{if(Date.now()-seen[k]>7*864e5)delete seen[k]});try{localStorage.setItem(ntfSeenKey(),JSON.stringify(seen))}catch(_){}
+  if(open){const items=ntfItems();   /* opening the list does NOT mark anything as seen */
     const r=$("#ntfBell").getBoundingClientRect();p.style.top=(r.bottom+8)+"px";const pw=Math.min(360,innerWidth-16);p.style.right=Math.max(8,Math.min(innerWidth-r.right-6,innerWidth-pw-8))+"px";ntfDraw(items);ntfRefresh()}};
 document.addEventListener("click",e=>{const p=$("#ntfPanel");if(p&&!p.classList.contains("hidden")&&!e.target.closest("#ntfPanel,#ntfBell"))p.classList.add("hidden")});
 setInterval(ntfRefresh,30000);
