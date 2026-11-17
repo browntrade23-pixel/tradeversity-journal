@@ -2640,7 +2640,7 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
     <div class="pfc-grid">${pfCommon().map(([ic,t,d])=>`<div class="pfc" data-notr><span class="pfc-ic">${ic}</span><div><b>${esc(t)}</b><p>${esc(d)}</p></div></div>`).join("")}</div></div>
    <p class="mut pf-disc">ℹ️ <span>Rules checked in November 2026 from public sources. Prop firms change rules often: always confirm on the firm's official website before buying. Algeria availability comes from published restricted-country lists; ✅ means accepted, ⛔ means restricted.</span></p>`;
   $$("[data-pft]",el).forEach(b=>b.onclick=()=>{S._pfType=b.dataset.pft;render()});
-  $$("[data-pf]",el).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.pf;render();window.scrollTo(0,0)});
+  $$("[data-pf]",el).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.pf;S._couponTried=false;render();window.scrollTo(0,0)});
   const qi=$("#pfQ",el);qi.oninput=()=>{S._pfQ=qi.value;const p=qi.selectionStart;render();const n=$("#pfQ");n.focus();n.setSelectionRange(p,p)};
   $("#pfDz",el).onchange=e=>{S._pfDz=e.target.checked;render()};
   $("#pfAll",el).onclick=()=>{S._pfShut=!S._pfShut;render()}}
@@ -2730,11 +2730,13 @@ function couponBox(f,P,size){const raw=P&&((P.rows&&P.rows[size]&&P.rows[size].p
     <div class="cp-form"><input class="i cp-in" id="cpIn" value="${esc(S._coupon||"")}" placeholder="BROWN23" autocomplete="off" data-noswipe><button type="button" class="btn pri" id="cpApply">Apply</button></div>${res}</div>`}
 function bindSizeCard(f){const c=$("#szCard");if(!c)return;
   const ci=$("#cpIn",c),ca=$("#cpApply",c);
-  if(ca){const ap=()=>{S._coupon=ci.value;S._couponTried=true;c.innerHTML=sizeCard(f);bindSizeCard(f)};ca.onclick=ap;ci.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();ap()}}}
-  $$("[data-cpgo]",c).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.cpgo;S._pfSz=null;render();window.scrollTo(0,0)});
-  $$("[data-sz]",c).forEach(b=>b.onclick=()=>{S._pfSz.size=b.dataset.sz;c.innerHTML=sizeCard(f);bindSizeCard(f)});
+  if(ca){const ap=()=>{S._coupon=ci.value;S._couponTried=true;c.innerHTML=sizeCard(f);bindSizeCard(f)};ca.onclick=ap;ci.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();ap()}};
+    /* editing the code hides the old result until Apply is clicked again */
+    ci.oninput=()=>{if(S._couponTried){S._couponTried=false;S._coupon=ci.value;const p=ci.selectionStart;c.innerHTML=sizeCard(f);bindSizeCard(f);const n=$("#cpIn",c);n.focus();n.setSelectionRange(p,p)}}}
+  $$("[data-cpgo]",c).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.cpgo;S._pfSz=null;S._couponTried=false;render();window.scrollTo(0,0)});
+  $$("[data-sz]",c).forEach(b=>b.onclick=()=>{S._pfSz.size=b.dataset.sz;S._couponTried=false;c.innerHTML=sizeCard(f);bindSizeCard(f)});
   /* a plan button always shows a size that exists in that plan */
-  $$("[data-szp]",c).forEach(b=>b.onclick=()=>{const k=Number(b.dataset.szp),P=((window.PF_SIZES||{})[f.id]||{progs:[]}).progs[k];S._pfSz.p=k;
+  $$("[data-szp]",c).forEach(b=>b.onclick=()=>{const k=Number(b.dataset.szp),P=((window.PF_SIZES||{})[f.id]||{progs:[]}).progs[k];S._pfSz.p=k;S._couponTried=false;
     if(P&&P.rows&&!P.rows[S._pfSz.size]){const s=Object.keys(P.rows)[0];if(s)S._pfSz.size=s}c.innerHTML=sizeCard(f);bindSizeCard(f)})}
 
 /* ============ IMPORT ============ */
