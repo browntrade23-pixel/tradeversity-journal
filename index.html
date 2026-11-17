@@ -131,6 +131,7 @@ textarea.i{min-height:80px;resize:vertical}
 .tmeta{min-width:0}.tmeta .t1{font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .tmeta .t2{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tpnl{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:16px;text-align:right}
+.rpk-auto{font-size:12px;align-self:center}
 .rpk-rules{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:10px;border:1px dashed var(--line2);background:var(--panel)}
 .rpk-dd{display:flex;gap:6px;flex-wrap:wrap}.rpk-dd .chip.warn{border-color:rgba(245,185,66,.5)}.rpk-dd .chip.ok{border-color:rgba(34,197,94,.45)}
 .rpk-ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
@@ -2252,8 +2253,9 @@ const PFLIST=()=>((window.PropFirms||{}).firms)||[];
 const rpProgs=id=>(((window.PF_SIZES||{})[id]||{}).progs)||[];
 function rpSizes(f,P){if(!f)return [];const k=P&&P.rows?Object.keys(P.rows):P&&P.prices?Object.keys(P.prices):[];return (k.length?k:(f.sizes||[])).filter(s=>szNum(s)>0)}
 /* drawdown type of the chosen account: evaluation = the plan's type; funded = the firm's funded drawdown line if it has one */
-function rpDD(f,P,phase){const line=k=>((f&&f[k])||[]).find(x=>x[0]==="dd");const fl=phase==="funded"&&line("funded");
-  return fl?fl[1]:(P&&P.ddT)||((line("eval")||[])[1])||""}
+function rpDD(f,P,phase){if(!P)return "";if(phase==="funded"&&P.ddF)return P.ddF;return P.ddT||""}
+/* funded drawdown is the evaluation one unless the tracker has a different funded type for this plan */
+const rpDDSame=(P,phase)=>phase==="funded"&&P&&!P.ddF;
 const rpTrail=t=>!/^\s*static/i.test(t||"")&&/trail|dynamic|end.?of.?day|eod|intraday/i.test(t||"");
 function rpRules(f,P,size,phase){const n=szNum(size),o={start:n||"",target:"",daily:"",maxDD:"",ddType:rpTrail(rpDD(f,P,phase))?"trailing":"static"};if(!P)return o;
   if(P.pct){const q=P.pct;if(q.t1!=null)o.target=Math.round(n*q.t1/100);if(q.dl!=null)o.daily=Math.round(n*q.dl/100);if(q.dd!=null)o.maxDD=Math.round(n*q.dd/100)}
@@ -2275,7 +2277,7 @@ function rpHTML(st){const L=PFLIST(),f=L.find(x=>x.id===st.firmId),progs=f?rpPro
    ${f?`<div class="rpk-step"><small>4 · <span>Account stage</span></small><div class="seg">${b("data-rph","eval",st.phase!=="funded",`📝 <span>Evaluation</span>`)}${b("data-rph","funded",st.phase==="funded",`💰 <span>Funded</span>`)}</div></div>
    <div class="rpk-step rpk-wide"><small>5 · <span>Account size</span></small><div class="seg rpk-sizes">${sizes.map(s=>b("data-rs",s,s===st.size,`<span data-notr>${esc(s)}</span>`)).join("")||`<span class="mut">—</span>`}</div></div>`:""}
    ${f?(()=>{const lo=pfLoc(f),ph=st.phase==="funded",dd=rpDD(f,P,st.phase),lines=ph?[...lo.funded,...lo.fundedH,...lo.payout]:[...lo.eval,...lo.evalH];
-     return `<div class="rpk-rules rpk-wide"><div class="rpk-dd"><span class="chip ${rpTrail(dd)?"warn":"ok"}">🛑 <span>Drawdown type</span>: <b data-notr>${esc(I18N.t(dd)||"—")}</b></span><span class="chip">${ph?"💰 <span>Funded account rules</span>":"📝 <span>Evaluation rules</span>"}</span></div>
+     return `<div class="rpk-rules rpk-wide"><div class="rpk-dd"><span class="chip ${rpTrail(dd)?"warn":"ok"}">🛑 <span>Drawdown type</span>: <b data-notr>${esc(I18N.t(dd)||"—")}</b>${rpDDSame(P,st.phase)?` <small class="mut">(${esc(I18N.t("same as the evaluation"))})</small>`:""}</span><span class="chip">${rpTrail(dd)?"📈 <span>Trailing drawdown</span>":"📏 <span>Static drawdown</span>"} · <span>set automatically</span></span><span class="chip">${ph?"💰 <span>Funded account rules</span>":"📝 <span>Evaluation rules</span>"}</span></div>
       ${ph?`<p class="mut rpk-note">💡 <span>Funded account: there is no profit target to pass. Your drawdown and daily loss limit still apply.</span></p>`:""}
       ${lines.length?`<ul class="pf-ul rpk-ul">${lines.map(pfLi).join("")}</ul>`:""}</div>`})():""}
    ${st.filled&&f&&st.size?`<p class="mut rpk-note">✅ <span>Rules filled from</span> <b data-notr>${esc(f.name)}${P&&progs.length>1?" · "+esc(P.name):""} · ${esc(I18N.t(st.phase==="funded"?"Funded":"Evaluation"))} · ${esc(st.size)}</b>. <span>Check them and change anything if your account is different.</span></p>`:""}`}
@@ -2288,7 +2290,7 @@ function rulesCard(acct,aSize){const R=rulesAll()[acct];
       <label class="f">Profit target $<input class="i" id="rTarget" type="number" step="any" value="${esc(r.target)}" placeholder="e.g. 3000"></label>
       <label class="f">Daily loss limit $<input class="i" id="rDaily" type="number" step="any" value="${esc(r.daily)}" placeholder="e.g. 1000"></label>
       <label class="f">Max drawdown $<input class="i" id="rDD" type="number" step="any" value="${esc(r.maxDD)}" placeholder="e.g. 2500"></label></div>
-     <div class="row" style="justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:8px"><div class="seg" id="rDDT"><button type="button" data-t="static" class="${r.ddType!=="trailing"?"on":""}">Static drawdown</button><button type="button" data-t="trailing" class="${r.ddType==="trailing"?"on":""}">Trailing drawdown</button></div>
+     <div class="row" style="justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:8px"><div class="seg" id="rDDT"><button type="button" data-t="static" class="${r.ddType!=="trailing"?"on":""}">Static drawdown</button><button type="button" data-t="trailing" class="${r.ddType==="trailing"?"on":""}">Trailing drawdown</button></div>${st&&st.kind==="prop"&&st.firmId?`<small class="mut rpk-auto">🔒 <span>Set automatically from</span> <b data-notr>${esc((PFLIST().find(x=>x.id===st.firmId)||{}).name||"")}</b> · <span>${esc(I18N.t(st.phase==="funded"?"Funded":"Evaluation"))}</span></small>`:""}
       <div class="row">${R?`<button class="btn sm danger" type="button" id="rDel">Remove</button>`:""}<button class="btn sm" type="button" id="rCancel">Cancel</button><button class="btn sm pri" type="button" id="rSave">Save rules</button></div></div>`
      :`<div class="row" style="justify-content:space-between;margin-top:6px;flex-wrap:wrap;gap:8px"><span class="mut" style="font-size:13px">Track your daily loss limit, max drawdown and profit target for <b data-notr>${esc(acct)}</b>.</span><button class="btn sm pri" type="button" id="rSet">Set my rules</button></div>`}</div>`}
   const s=rulesStatus(acct,R),T=num(R.target),D=num(R.daily),M=num(R.maxDD);

@@ -3,7 +3,7 @@
    Prices are in USD, ORIGINAL list prices before discount codes. "/mo" = monthly subscription. Always confirm on the firm's official site.
    Futures firms: dollar tables per size  -> rows:{ "$50K":{t,dd,dl,ct,days,price} }
    CFD firms:     percentage rules         -> pct:{t1,t2,t3,dl,dd} + prices:{ "$50K":299 }  (the page calculates the dollars)
-   Keys: t = profit target $, dd = max drawdown $, ddT = drawdown type, dl = daily loss limit $ (0 = none), ct = max contracts,
+   Keys: t = profit target $, dd = max drawdown $, ddT = drawdown type (evaluation), ddF = drawdown type of the FUNDED account when it differs (if missing, funded = same as ddT), dl = daily loss limit $ (0 = none), ct = max contracts,
    days = minimum trading days, price = evaluation price (number = USD one-time, or text like "139/mo"), note = short remark.
    UPDATE THIS FILE (rules AND prices) in the twice-monthly prop firm check (see propfirms.js). */
 (function(){
@@ -78,7 +78,7 @@ topstep:{progs:[{name:"Trading Combine",ddT:"Trailing (end of day)",
   note:"Plus $149 activation (or a no-activation plan at ≈ $109–$209/mo). Best day ≤ 50% of total profit."}]},
 toponefut:{progs:[{name:"Elite Challenge",ddT:"Trailing (end of day)",rows:{"$25K":{t:1500,dd:1000,dl:625,price:39},"$50K":{t:3000,dd:2000,dl:1250,price:59},"$100K":{t:6000,dd:3000,dl:2500,price:109},"$150K":{t:9000,dd:4500,dl:3750,ct:"12 minis / 120 micros",price:169}}},
  {name:"Elite Daily",ddT:"Trailing (end of day)",rows:{"$25K":{dd:1000,dl:500,price:89},"$50K":{dd:2000,dl:1000,price:109},"$100K":{dd:2500,dl:1250,price:199},"$150K":{dd:3500,dl:1500,price:275}},note:"First payout: reach the buffer + $500."}]},
-tpt:{progs:[{name:"Test",ddT:"Trailing (end of day)",
+tpt:{progs:[{name:"Test",ddT:"Trailing (end of day)",ddF:"Trailing (intraday)",
   rows:{"$25K":{t:1500,dd:1500,dl:0,ct:"3 minis / 30 micros",price:"150/mo"},"$50K":{t:3000,dd:2000,dl:0,ct:"6 minis / 60 micros",price:"170/mo"},
         "$75K":{t:4500,dd:2500,dl:0,ct:"9 minis / 90 micros",price:"245/mo"},"$100K":{t:6000,dd:3000,dl:0,ct:"12 minis / 120 micros",price:"330/mo"},
         "$150K":{t:9000,dd:4500,dl:0,ct:"15 minis / 150 micros",price:"360/mo"}},
