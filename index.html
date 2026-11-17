@@ -131,6 +131,9 @@ textarea.i{min-height:80px;resize:vertical}
 .tmeta{min-width:0}.tmeta .t1{font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .tmeta .t2{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tpnl{font-family:"JetBrains Mono",monospace;font-weight:800;font-size:16px;text-align:right}
+.comm-chk{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);cursor:pointer;font-size:13px}
+.comm-chk input{width:18px;height:18px;margin-top:2px;accent-color:var(--gold,#f5b942);flex:none;cursor:pointer}.comm-chk span{display:flex;flex-direction:column;gap:2px}.comm-chk small{font-size:12px}
+.comm-chk:has(input:checked){border-color:color-mix(in srgb,var(--gold,#f5b942) 60%,var(--line2))}
 .rpk{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0 4px;padding:12px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2)}
 .rpk-step{display:flex;flex-direction:column;gap:6px;min-width:0}.rpk-step>small{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .rpk-wide{grid-column:1/-1}.rpk-sizes{flex-wrap:wrap}.rpk-note{grid-column:1/-1;margin:0;font-size:12px}
@@ -2091,10 +2094,9 @@ function editTrade(t0){
     <label class="f">Account<input class="i" name="account" list="acList" value="${esc(t.account)}" placeholder="Eval 50K"></label>
     <label class="f">Instrument<input class="i" name="symbol" list="symList" value="${esc(t.symbol)}" required></label>
    </div>
-   <div class="grid g3 acct-type">
+   <div class="grid g2 acct-type">
     <label class="f">${I18N.t("Account type")}<select class="i" name="acctType" id="tAType"><option value="prop" ${t.acctType!=="personal"?"selected":""}>🏦 ${I18N.t("Prop firm account")}</option><option value="personal" ${t.acctType==="personal"?"selected":""}>👤 ${I18N.t("Personal account")}</option></select></label>
     <label class="f ${t.acctType==="personal"?"hidden":""}" id="tFirmL">${I18N.t("Prop firm")}<select class="i" name="firm" id="tFirm">${firmOpts}</select></label>
-    <label class="f ${t.acctType==="personal"?"hidden":""}" id="tCommL">${I18N.t("Commissions in my P&L")}<select class="i" name="commIncl" id="tComm"><option value="no" ${t.commIncl!=="yes"?"selected":""}>➖ ${I18N.t("Not included: calculate them for me")}</option><option value="yes" ${t.commIncl==="yes"?"selected":""}>✔ ${I18N.t("Already included: keep my P&L as it is")}</option></select></label>
    </div>
    <datalist id="acList">${accounts().map(a=>`<option>${esc(a)}</option>`).join("")}</datalist>
    <datalist id="symList">${syms.map(s=>`<option value="${s}">${MK[s].name}</option>`).join("")}</datalist>
@@ -2108,6 +2110,8 @@ function editTrade(t0){
     <label class="f">P&L $ (optional)<input class="i" type="number" step="any" name="pnl" value="${esc(t.pnl)}" placeholder="auto from prices"></label>
     <label class="f">Fees $<input class="i" type="number" step="any" name="fees" value="${esc(t.fees)}"></label>
    </div>
+   <label class="comm-chk ${t.acctType==="personal"?"hidden":""}" id="tCommL"><input type="checkbox" id="tComm" ${t.commIncl==="yes"?"checked":""}>
+    <span><b>${I18N.t("Commissions are already included in my P&L")}</b><small class="mut" id="tCommS">${t.commIncl==="yes"?I18N.t("Your P&L is saved exactly as you wrote it."):I18N.t("Not checked: the commission of your prop firm is calculated and taken off your P&L.")}</small></span></label>
    <div class="live" id="live"></div>
    <div class="grid g3">
     <label class="f">Setup / model<input class="i" name="setup" list="setList" value="${esc(t.setup)}"></label>
@@ -2128,6 +2132,7 @@ function editTrade(t0){
   </form>`);
   const f=$("#tf");
   const read=()=>{const d=Object.fromEntries(new FormData(f));Object.assign(t,d,{symbol:String(d.symbol).toUpperCase().trim()});if(t.acctType==="personal")t.firm="";else t.firm=t.firm||"";
+    const ck=$("#tComm");if(ck){t.commIncl=ck.checked?"yes":"no";const cs=$("#tCommS");if(cs)cs.textContent=I18N.t(ck.checked?"Your P&L is saved exactly as you wrote it.":"Not checked: the commission of your prop firm is calculated and taken off your P&L.")}
     delete t.unit;const lots=isLots(t);t.unit=lots?"lots":"contracts";if(lots)t.market="CFD";else if(t.market==="CFD")t.market="";
     const L=$("#tQtyL"),q=$("#tQty");if(L&&L.textContent!==I18N.t(lots?"Lot size":"Contracts")){L.textContent=I18N.t(lots?"Lot size":"Contracts");q.step=lots?"0.01":"1";q.placeholder=lots?"e.g. 0.50":"e.g. 2"}};
   const live=()=>{read();const n=tradeNet(t),r=tradeRisk(t),R=tradeR(t),cm=commOf(t);$("#live").innerHTML=`<span>Net P&L <b class="${cls(n)}">${smoney(n)}</b></span>${cm?`<span>${I18N.t("Commission")} <b class="neg">${money(-cm)}</b> <small class="mut" data-notr>(${esc(t.firm)})</small></span>`:""}<span>Risk <b>${money(r)}</b></span><span>R multiple <b>${isFinite(R)?R.toFixed(2)+"R":"—"}</b></span><span>Result <b>${resultOf(t)}</b></span>`};
