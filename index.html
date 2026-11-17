@@ -1100,6 +1100,17 @@ html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
 .pf-szp{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .pf-sz{display:inline-flex;align-items:baseline;gap:5px;padding:2px 8px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);font-size:11.5px;white-space:nowrap}
 .pf-sz b{font-family:"JetBrains Mono",monospace;font-weight:800;color:var(--text)}.pf-sz i{font-style:normal;color:var(--gold);font-weight:700}
+.imf-card{margin:0 0 14px}
+.imf-list{display:grid;gap:8px}
+.imf-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);flex-wrap:wrap}
+.imf-ic{font-size:20px}.imf-tx{flex:1;min-width:180px;display:grid;gap:2px}.imf-tx small{color:var(--muted);font-size:12px}
+.imf-net{font-size:15px}.imf-act{display:flex;gap:6px}.imf-del{color:var(--red)}
+.imf-tags{flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap}
+.comm-ed{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-size:12px}.comm-ed .i{width:64px;padding:4px 6px;font-size:12px}
+.imf-stats{flex-basis:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-top:4px}
+.imf-s{padding:7px 9px;border-radius:9px;background:var(--panel);border:1px solid var(--line);display:grid;gap:2px}
+.imf-s small{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700}.imf-s b{font-size:13.5px}
+html[lang=ar] .imf-s small{text-transform:none;letter-spacing:0}
 .ct.ok,.ct.warn{padding:1px 3px;background:none}
 #tgForm .tg-steps{display:grid;gap:10px}
 .tg-step{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);text-align:start}
@@ -1337,7 +1348,16 @@ function tradeGross(t){
   if(m&&isFinite(e)&&isFinite(x)&&q)return (x-e)*(t.side==="Short"?-1:1)*m.pv*q;
   return 0;
 }
-const tradeNet=t=>tradeGross(t)-(num(t.fees)||0);
+/* Contract commissions per prop firm: round trip per contract, USD (mini = NQ/ES/YM/GC…, micro = MNQ/MES/MYM/MGC…).
+   Used only when the imported file has no fee column. Estimates: the student can change his firm's rate in Statistics. */
+const COMM_DEF={"Topstep":{mini:2.80,micro:0.74},"Topstep (ProjectX)":{mini:2.80,micro:0.74},"Apex Trader Funding":{mini:3.10,micro:1.04},"_":{mini:4.00,micro:1.24}};
+const commRates=()=>S._commR||(S.me?(S._commR=calcLoad("comm")||{}):{});
+const commRate=f=>{const o=commRates()[f];return o||COMM_DEF[f]||COMM_DEF._};
+const isMicro=sym=>{const r=rootOf(sym);return MK[r]?MK[r].type==="Micro":/^(MCL|MBT|MET|M2K|M6E|M6B|M6A|SIL|MHG|MNG|MZN|MZB|MZF|MYM|MES|MNQ|MGC)$/.test(r)};
+function commOf(t){if(!t||!t.firm||/personal/i.test(t.firm))return 0;if(t.fees!==""&&t.fees!=null&&isFinite(num(t.fees)))return 0;
+  if((t.market||marketOf(t.symbol,t.platform))==="CFD")return 0;const r=commRate(t.firm);return (num(t.qty)||1)*(isMicro(t.symbol)?r.micro:r.mini)}
+const tradeCost=t=>(num(t.fees)||0)+commOf(t);
+const tradeNet=t=>tradeGross(t)-tradeCost(t);
 function tradeRisk(t){const m=MK[rootOf(t.symbol)],e=num(t.entry),s=num(t.stop),q=num(t.qty)||0;if(m&&isFinite(e)&&isFinite(s)&&q&&e!==s)return Math.abs(e-s)*m.pv*q;
   const c=CFD[cfdOf(t.symbol)];if(c&&isFinite(e)&&isFinite(s)&&q&&e!==s)return Math.abs(e-s)/c.pip*c.pv*q;return NaN}
 /* CFD symbol names differ by broker: GOLD = XAUUSD, US100 / USTEC = NAS100, SPX500 = US500… (suffixes like .r or m are ignored) */
@@ -1904,7 +1924,7 @@ function vJournal(el){
    ${S.readonly?"":redAlert(todayStr(),"today")}
    ${startCard()}
    ${eodCard()}
-   ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||S._impDone||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export: the trades appear below in your journal, ready for screenshots and notes</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
+   ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||S._impDone||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export: the trades appear below in your journal, ready for screenshots and notes</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}${S.readonly?"":impFilesHTML()}
    ${coachCard()}
    ${S.readonly?"":reviewCard()}
    ${filterBar()}
@@ -1917,7 +1937,7 @@ function vJournal(el){
    ${ts.length?Object.keys(byDay).sort().reverse().map(d=>{const dn=byDay[d].reduce((a,t)=>a+tradeNet(t),0);
      return `<div class="day"><div class="dayh"><span>${fmtDate(d)}</span><span class="mono ${cls(dn)}">${smoney(dn)}</span></div>${byDay[d].map(tcard).join("")}</div>`}).join("")
    :`<div class="card empty">No trades yet. ${S.readonly?"":"Add your first trade or import a CSV from your broker."}</div>`}`;
-  bindFilters();bindCoach();bindEod();bindStart();if($("#addT"))$("#addT").onclick=()=>editTrade(null);
+  bindFilters();bindCoach();bindEod();bindStart();bindImpFiles(el);if($("#addT"))$("#addT").onclick=()=>editTrade(null);
   if($("#impBody"))vImport($("#impBody"),true);
   if($("#impT"))$("#impT").onclick=()=>{const b=$("#impBox");b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
   $("#expCsv").onclick=exportCSV;
@@ -1989,7 +2009,7 @@ function tradeDetail(t,h="h1"){const n=tradeNet(t),R=tradeR(t),risk=tradeRisk(t)
      <div>Entry / Exit</div><div class="mono">${esc(t.entry||"—")} → ${esc(t.exit||"—")}</div>
      <div>Stop / Target</div><div class="mono">${esc(t.stop||"—")} / ${esc(t.target||"—")}</div>
      <div>Risk</div><div class="mono">${money(risk)}</div>
-     <div>Gross / Fees / Net</div><div class="mono">${money(tradeGross(t))} / ${money(num(t.fees)||0)} / <b class="${cls(n)}">${money(n)}</b></div>
+     <div>Gross / Fees / Net</div><div class="mono">${money(tradeGross(t))} / ${money(tradeCost(t))}${commOf(t)?` <small class="mut">(${esc(t.firm)} commission)</small>`:""} / <b class="${cls(n)}">${money(n)}</b></div>
      <div>Setup</div><div>${esc(t.setup||"—")}</div>
      <div>Session</div><div>${esc(t.session||"—")}</div>
      <div>Followed plan</div><div>${t.followed==="Yes"?'<span class="ok">✔ Yes</span>':t.followed==="No"?'<span class="neg">✖ No</span>':"—"}</div>
@@ -2193,7 +2213,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   const meta=S.acct!=="all"?S.trades.find(t=>t.account===S.acct&&(t.firm||t.platform||t.acctSize)):null;const aSize=meta&&num(meta.acctSize)>0?num(meta.acctSize):null;
   el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px"><div><h1>Statistics</h1><p class="sub">${S.acct==="all"?"All accounts":esc(S.acct)} · ${ts.length} trades</p>
    ${meta?`<div class="det-line">${meta.firm?`<span class="chip">🏦 <span data-notr>${esc(meta.firm)}</span></span>`:""}${aSize?`<span class="chip">💰 ${money(aSize,0)}</span>`:""}${meta.platform?`<span class="chip">🖥 <span data-notr>${esc(meta.platform)}</span></span>`:""}</div>`:""}</div>${S.readonly?"":`<button class="btn pri share-btn" id="shareBtn">🔗 Share my results</button>`}</div>
-  ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||S._impDone||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export and see that account's stats and equity curve</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}
+  ${S.readonly?"":`<details class="card impbox" id="impBox" ${(S._imp&&S._imp.rows)||S._impDone||!S.trades.length?"open":""}><summary><span class="imp-ic">⬆️</span><span><b>Import a CSV</b><span class="mut imp-sub">Add your broker export and see that account's stats and equity curve</span></span></summary><div id="impBody" style="margin-top:12px"></div></details>`}${S.readonly?"":impFilesHTML()}
   ${statTabs()}
   ${filterBar(true)}
   ${S.acct!=="all"&&!S.readonly?rulesCard(S.acct,aSize):""}
@@ -2207,6 +2227,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
    ${kpi("Best / worst day",`<span class="pos">${st.bestDay?kfmt(st.bestDay[1]):"—"}</span> <span class="mut">/</span> <span class="neg">${st.worstDay?kfmt(st.worstDay[1]):"—"}</span>`,`${st.greenDays} green · ${st.redDays} red days`)}
    ${kpi("Streaks",`${st.maxW}W <span class="mut">/</span> ${st.maxL}L`,"longest win / loss streak")}
   </div>
+  ${commCard(ts)}
   ${insights(ts).length?`<div class="card" style="margin-bottom:12px"><h3>What your journal says</h3>${insights(ts).map(([i,t])=>`<div class="insight"><span class="ic">${i}</span><span>${t}</span></div>`).join("")}</div>`:""}
   <div class="card" style="margin-bottom:12px"><h3>Equity curve</h3>${equityChart(st.curve)}</div>
   <div class="grid g2" style="margin-bottom:12px"><div class="card"><h3>Daily P&L</h3>${dailyBars(st.days)}</div><div class="card"><h3>Calendar</h3>${calendar(st.days,true)}<p class="mut" style="font-size:12px;margin:8px 0 0">👆 <span>Click a day to see its trades, screenshots and journal.</span></p></div></div>
@@ -2220,12 +2241,30 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
    ${bdTable("By account",groupBy(ts,t=>t.account))}
    ${bdTable("Long vs short",groupBy(ts,t=>t.side))}
   </div>`;
-  bindFilters();if($("#impBody"))vImport($("#impBody"),true);if($("#shareBtn"))$("#shareBtn").onclick=openShare;bindRules(S.acct,aSize);
+  bindFilters();if($("#impBody"))vImport($("#impBody"),true);bindImpFiles(el);if($("#shareBtn"))$("#shareBtn").onclick=openShare;bindRules(S.acct,aSize);
   const shift=d=>{const keys=Object.keys(st.days).sort();const ref=S.calMonth||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7));const[y,m]=ref.split("-").map(Number);const n=new Date(y,m-1+d,1);S.calMonth=`${n.getFullYear()}-${pad(n.getMonth()+1)}`;render()};
   $("#calP").onclick=()=>shift(-1);$("#calN").onclick=()=>shift(1);
   $$(".cal .c[data-day]",el).forEach(c=>c.onclick=()=>{$("#tip").style.display="none";S.dayPage=c.dataset.day;render();window.scrollTo(0,0)});
-  bindStatTabs();
+  bindStatTabs();bindComm(el);
 }
+/* ============ PROP FIRM, PLATFORM & COMMISSIONS (per prop firm) ============ */
+function commCard(ts){if(!ts.length)return "";const g={};
+  ts.forEach(t=>{const f=t.firm||"";const o=g[f]||(g[f]={firm:f,plat:new Set(),accts:new Set(),mini:0,micro:0,n:0,gross:0,fees:0,est:0});
+    o.n++;o.gross+=tradeGross(t);o.fees+=num(t.fees)||0;o.est+=commOf(t);if(t.platform)o.plat.add(t.platform);o.accts.add(t.account);
+    if((t.market||marketOf(t.symbol,t.platform))!=="CFD"){if(isMicro(t.symbol))o.micro+=num(t.qty)||1;else o.mini+=num(t.qty)||1}});
+  const R=Object.values(g).sort((a,b)=>b.n-a.n);if(!R.some(r=>r.firm||r.plat.size||r.fees||r.est))return "";
+  const tot=R.reduce((a,r)=>a+r.fees+r.est,0);
+  return `<div class="card comm-card" style="margin-bottom:12px"><h3>🏦 <span>Prop firm, platform & commissions</span></h3>
+   <div class="tw"><table class="t"><tr><th>Prop firm</th><th>Platform</th><th>Contracts</th><th>Commission / contract (round trip)</th><th>Gross P&L</th><th>Commissions & fees</th><th>Net P&L</th></tr>
+   ${R.map(r=>{const rt=commRate(r.firm),ed=r.firm&&!/personal/i.test(r.firm)&&!S.readonly;
+     return `<tr><td><b data-notr>${r.firm?esc(r.firm):I18N.t("No prop firm")}</b></td><td data-notr>${esc([...r.plat].join(", "))||"—"}</td>
+      <td class="mono">${r.mini?`${r.mini} mini`:""}${r.mini&&r.micro?" · ":""}${r.micro?`${r.micro} micro`:""}${r.mini||r.micro?"":"—"}</td>
+      <td>${ed?`<span class="comm-ed">mini $<input class="i cm-r" type="number" step="0.01" min="0" data-cf="${esc(r.firm)}" data-ck="mini" value="${rt.mini}"> micro $<input class="i cm-r" type="number" step="0.01" min="0" data-cf="${esc(r.firm)}" data-ck="micro" value="${rt.micro}"></span>${r.fees?`<small class="mut"> · ${I18N.t("from your file")}</small>`:""}`:"—"}</td>
+      <td class="mono ${cls(r.gross)}">${smoney(r.gross)}</td><td class="mono neg">${money(-(r.fees+r.est))}</td><td class="mono ${cls(r.gross-r.fees-r.est)}"><b>${smoney(r.gross-r.fees-r.est)}</b></td></tr>`}).join("")}
+   </table></div>
+   <p class="mut" style="font-size:12px;margin:8px 0 0">${I18N.t("Total commissions & fees")}: <b class="neg mono">${money(-tot)}</b>. ${I18N.t("Net P&L, win rate and every stat already include them. When your file has no fee column, the commission is estimated from your prop firm's rate per contract: change it if your firm charges a different rate.")}</p></div>`}
+function bindComm(el){$$(".cm-r",el).forEach(i=>i.onchange=()=>{const f=i.dataset.cf,R=commRates();R[f]={...commRate(f),[i.dataset.ck]:Math.max(0,num(i.value)||0)};
+  try{localStorage.setItem(calcKey("comm"),JSON.stringify(R))}catch(e){}render()})}
 /* ============ STATISTICS TABS: one tab per account, add another, delete ============ */
 function statTabs(){const ac=accounts();if(S.acct!=="all"&&!ac.includes(S.acct))ac.push(S.acct);
   const cnt=a=>S.trades.filter(t=>a==="all"||t.account===a).length,net=a=>S.trades.filter(t=>a==="all"||t.account===a).reduce((s,t)=>s+tradeNet(t),0);
@@ -2907,7 +2946,7 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
   el.innerHTML=`${embedded?`<p class="mut" style="margin:0 0 10px;font-size:13px">Works with Tradovate, NinjaTrader, Rithmic/R|Trader, TradingView and most broker exports. Columns are matched automatically — fix anything below before importing.</p>`:`<h1>Import trades from CSV</h1><p class="sub">Works with Tradovate, NinjaTrader, Rithmic/R|Trader, TradingView and most broker exports. Columns are matched automatically — fix anything below before importing.</p>`}
    <div class="${embedded?"":"card "}grid"><div class="drop" id="cDrop">📄 Choose a CSV file (or drop it here)</div><input type="file" id="cFile" accept=".csv,.txt,text/csv" class="hidden">
    <label class="f">Account name for these trades<input class="i" id="cAcctName" list="acList2" value="${esc(I.acct)}" placeholder="e.g. Eval 50K"></label><datalist id="acList2">${accounts().map(a=>`<option>${esc(a)}</option>`).join("")}</datalist></div>
-   <div id="cMap"></div>`;
+   <div id="cMap"></div>${embedded?"":impFilesHTML()}`;
   /* animated progress card (file upload / import) */
   const prog=(icon,title,sub)=>{$("#cMap").innerHTML=`<div class="card imp-prog"><div class="ip-top"><span class="ip-ic">${icon}</span><div class="ip-t"><b data-notr>${esc(title)}</b><span class="mut" data-notr>${esc(sub||"")}</span></div><b class="mono ip-pct" id="ipPct">0%</b></div>
     <div class="ip-bar"><i id="ipBar"></i></div><div class="ip-step" id="ipStep"></div></div>`};
@@ -2970,6 +3009,8 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
     const upd=(k,v)=>{I.det=I.det||{accts:[],per:{},ai:-1};I.det[k]=v;Object.values(I.det.per||{}).forEach(p=>{if(k==="firm")p.firm=v||p.firm;if(k==="size")p.size=v||p.size});autoName();draw()};
     $("#dPlat").onchange=e=>upd("platform",e.target.value.trim()||null);$("#dFirm").onchange=e=>upd("firm",e.target.value.trim()||null);$("#dSize").onchange=e=>upd("size",Number(e.target.value)||null);
     $("#cGo").onclick=async()=>{const hv=new Set(S.trades.map(tradeKey)),ts=build().filter(t=>!hv.has(tradeKey(t)));if(!ts.length)return;const keep=$("#cMap").innerHTML;
+      /* remember which file each trade came from, so the file stays listed in "My imported files" */
+      const at=new Date().toISOString();ts.forEach(t=>{t.importFile=I.fileName||"CSV";t.importedAt=at});
       prog("⬆️",I.fileName||"CSV",`${ts.length} trades`);
       try{await Promise.all([API.saveTrades(ts),anim(0,92,900,"Saving trades to your journal…")]);await anim(92,100,300,"Calculating your statistics…");$(".imp-prog").classList.add("done");
         S.trades.push(...ts);const ua=[...new Set(ts.map(t=>t.account))];const acct=ua.length===1?ua[0]:"all";
@@ -2979,9 +3020,38 @@ function vImport(el,embedded){const I=S._imp||(S._imp={rows:null,map:{},acct:""}
   if(S._impDone)el.insertAdjacentHTML("afterbegin",impDoneHTML(S._impDone));
   $$("[data-impgo]",el).forEach(b=>b.onclick=()=>{const v=b.dataset.impgo;S._impDone=null;go(v)});
   const x=$(".imp-done .x",el);if(x)x.onclick=()=>{S._impDone=null;$(".imp-done",el).remove()};
-  bindUndo(el);
+  bindUndo(el);bindImpFiles(el);
   if(I.rows)draw();
 }
+/* ---------- My imported files: stays on the page (saved with the trades, so it works on every device) ---------- */
+function impFiles(){const g={};S.trades.filter(t=>t.imported).forEach(t=>{const k=(t.importFile||"")+"|"+(t.importFile?(t.importedAt||"").slice(0,16):t.account);
+    (g[k]=g[k]||{file:t.importFile||"",at:t.importedAt||"",accts:new Set(),ts:[]}).ts.push(t);g[k].accts.add(t.account)});
+  return Object.entries(g).map(([k,v])=>({key:k,...v,accts:[...v.accts]})).sort((a,b)=>(b.at||"").localeCompare(a.at||""))}
+function impFilesHTML(){if(S.readonly)return "";const F=impFiles();if(!F.length)return "";
+  return `<div class="card imf-card"><h3>📂 <span>My imported files</span> <span class="mut" style="text-transform:none;letter-spacing:0">(${F.length})</span></h3>
+   <div class="imf-list">${F.map(f=>{const c=calc(f.ts),ds=f.ts.map(t=>t.date).sort(),v=f.ts.map(tradeNet),best=Math.max(...v),worst=Math.min(...v);
+     const st=(l,val,cl)=>`<div class="imf-s"><small>${l}</small><b class="mono ${cl||""}" data-notr>${val}</b></div>`;
+     const stats=`<div class="imf-stats">
+       ${st(I18N.t("Win rate"),pct(c.wr,0),c.wr>=.5?"pos":"neg")}${st(I18N.t("Wins / losses"),`${c.w}W · ${c.l}L${c.be?` · ${c.be}BE`:""}`)}
+       ${st(I18N.t("Profit factor"),isFinite(c.pf)?c.pf.toFixed(2):c.pf===Infinity?"∞":"—",c.pf>=1.5?"pos":c.pf<1?"neg":"")}
+       ${st(I18N.t("Avg win / loss"),`<span class="pos">${money(c.avgW,0)}</span> / <span class="neg">${money(c.avgL,0)}</span>`)}
+       ${st(I18N.t("Best / worst trade"),`<span class="pos">${smoney(best,0)}</span> / <span class="neg">${smoney(worst,0)}</span>`)}
+       ${st(I18N.t("Max drawdown"),money(-c.mdd,0),"neg")}${st(I18N.t("Trading days"),`${c.nDays} · ${c.greenDays}🟢 ${c.redDays}🔴`)}
+       ${st(I18N.t("Expectancy"),money(c.exp),cls(c.exp))}
+       ${st(I18N.t("Commissions & fees"),money(-f.ts.reduce((a,t)=>a+tradeCost(t),0)),"neg")}</div>`;
+     const firms=[...new Set(f.ts.map(t=>t.firm).filter(Boolean))],plats=[...new Set(f.ts.map(t=>t.platform).filter(Boolean))];
+     const tags=`<div class="imf-tags"><span class="chip">🏦 <span data-notr>${firms.length?esc(firms.join(", ")):I18N.t("Prop firm not found")}</span></span><span class="chip">🖥 <span data-notr>${plats.length?esc(plats.join(", ")):I18N.t("Platform not recognised")}</span></span></div>`;
+     return `<div class="imf-row">
+     <span class="imf-ic">📄</span><div class="imf-tx"><b data-notr>${esc(f.file||I18N.t("Earlier import"))}</b>
+      <small><span data-notr>${esc(f.accts.join(", "))}</span> · ${f.ts.length} <span>trades</span> · ${fmtDate(ds[0])} → ${fmtDate(ds[ds.length-1])}${f.at?` · <span>imported</span> <span data-notr>${esc(fmtDate(f.at.slice(0,10)))}</span>`:""}</small></div>
+     <b class="mono imf-net ${cls(c.net)}">${smoney(c.net)}</b>
+     <div class="imf-act"><button type="button" class="btn sm" data-imfstats="${esc(f.key)}">📊 <span>Full statistics</span></button><button type="button" class="btn sm imf-del" data-imfdel="${esc(f.key)}" title="Delete this file's trades">🗑</button></div>${tags}${stats}</div>`}).join("")}</div>
+   <p class="mut" style="font-size:12px;margin:8px 0 0">${I18N.t("Each file stays here with its trades. Deleted files can be restored for 7 days from Recently deleted (Statistics).")}</p></div>`}
+function bindImpFiles(el){
+  $$("[data-imfstats]",el).forEach(b=>b.onclick=()=>{const f=impFiles().find(x=>x.key===b.dataset.imfstats);if(!f)return;S.acct=f.accts.length===1?f.accts[0]:"all";S.range="all";S.calMonth=null;go("stats")});
+  $$("[data-imfdel]",el).forEach(b=>b.onclick=()=>{const f=impFiles().find(x=>x.key===b.dataset.imfdel);if(!f)return;
+    confirmBox(`${I18N.t("Delete this file and its")} ${f.ts.length} ${I18N.t("trades")}? (${f.file||f.accts.join(", ")}) — ${I18N.t("You can restore it for 7 days from Recently deleted.")}`,async()=>{
+      const ids=f.ts.map(t=>t.id);try{await Bin.put(f.file||f.accts.join(", "),f.ts);await API.deleteTrades(ids);const s=new Set(ids);S.trades=S.trades.filter(t=>!s.has(t.id));render();toast(`${ids.length} ${I18N.t("trades deleted")}`)}catch(e){toast("Couldn't delete: "+(e.message||e))}})})}
 /* Undo an import: for a short time after importing, remove exactly those trades */
 const UNDO_MS=15000;
 function bindUndo(el){const b=$("#impUndo",el);if(!b)return;const s=S._impDone;
