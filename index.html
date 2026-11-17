@@ -1371,6 +1371,9 @@ const commRate=f=>{const o=commRates()[f];return o||COMM_DEF[f]||COMM_DEF._};
 const isMicro=sym=>{const r=rootOf(sym);return MK[r]?MK[r].type==="Micro":/^(MCL|MBT|MET|M2K|M6E|M6B|M6A|SIL|MHG|MNG|MZN|MZB|MZF|MYM|MES|MNQ|MGC)$/.test(r)};
 function commOf(t){if(!t||!t.firm||/personal/i.test(t.firm)||t.commIncl==="yes")return 0;if(t.fees!==""&&t.fees!=null&&isFinite(num(t.fees)))return 0;
   if((t.market||marketOf(t.symbol,t.platform))==="CFD")return 0;const r=commRate(t.firm);return (num(t.qty)||1)*(isMicro(t.symbol)?r.micro:r.mini)}
+/* lots (CFD / personal account) or contracts (futures prop firm account) */
+function isLots(t){if(!t)return false;if(t.unit)return t.unit==="lots";if(t.acctType==="personal")return true;
+  const f=t.firm&&(((window.PropFirms||{}).firms)||[]).find(x=>x.name===t.firm);if(f)return f.type==="cfd";return (t.market||marketOf(t.symbol,t.platform))==="CFD"}
 const tradeCost=t=>(num(t.fees)||0)+commOf(t);
 const tradeNet=t=>tradeGross(t)-tradeCost(t);
 function tradeRisk(t){const m=MK[rootOf(t.symbol)],e=num(t.entry),s=num(t.stop),q=num(t.qty)||0;if(m&&isFinite(e)&&isFinite(s)&&q&&e!==s)return Math.abs(e-s)*m.pv*q;
@@ -2001,7 +2004,7 @@ function tcard(t){const n=tradeNet(t),R=tradeR(t),res=resultOf(t);
   return `<div class="tcard" data-id="${t.id}">
     <div class="thumb" style="${t.shots&&t.shots[0]?`background-image:url('${t.shots[0]}')`:""}">${t.shots&&t.shots[0]?"":"no image"}</div>
     <div class="tmeta"><div class="t1"><span class="mono">${esc(t.symbol)}</span><span class="tag ${t.side==="Long"?"long":"short"}">${t.side==="Long"?"▲ Long":"▼ Short"}</span><span class="tag ${res==="Win"?"win":res==="Loss"?"loss":""}">${res}</span>${(t.emotions||[]).map(e=>`<span class="tag ${EMO_BAD.includes(e)?"bad":"good"}">${esc(e)}</span>`).join("")}</div>
-      <div class="t2">${esc(t.time||"")} · ${esc(t.qty||"")} ct · ${esc(t.setup||"No setup")} · ${esc(t.account||"")}${t.remark?" · "+esc(t.remark):""}</div></div>
+      <div class="t2">${esc(t.time||"")} · ${esc(t.qty||"")} ${isLots(t)?I18N.t("lots"):"ct"} ·${esc(t.setup||"No setup")} · ${esc(t.account||"")}${t.remark?" · "+esc(t.remark):""}</div></div>
     <div class="tpnl ${cls(n)}">${smoney(n)}<div class="mut" style="font-size:11px;font-weight:600">${isFinite(R)?R.toFixed(2)+"R":""}</div></div>${S.readonly?"":`<button type="button" class="tc-edit" data-tedit="${t.id}" title="Edit trade">✎</button>`}</div>`}
 /* ✎ on every trade card opens the edit form directly (the card click still opens the trade page) */
 function bindTEdit(el){$$("[data-tedit]",el).forEach(b=>b.onclick=e=>{e.stopPropagation();const t=S.trades.find(x=>x.id===b.dataset.tedit);if(t)editTrade(t)})}
@@ -2026,7 +2029,7 @@ function tradeDetail(t,h="h1"){const n=tradeNet(t),R=tradeR(t),risk=tradeRisk(t)
    ${t.remark?`<div class="remark">📝 ${esc(t.remark)}</div>`:""}
    <div class="props">
      <div>Result</div><div><span class="tag ${resultOf(t)==="Win"?"win":resultOf(t)==="Loss"?"loss":""}">${resultOf(t)}</span> ${isFinite(R)?`<b class="mono">${R.toFixed(2)}R</b>`:""}</div>
-     <div>Contracts</div><div class="mono">${esc(t.qty)} × ${esc(t.symbol)} ${m?`<span class="mut">(${m.name}, $${m.pv}/pt)</span>`:""}</div>
+     <div>${isLots(t)?"Lot size":"Contracts"}</div><div class="mono">${esc(t.qty)} ${isLots(t)?I18N.t("lots"):"×"} ${esc(t.symbol)} ${m&&!isLots(t)?`<span class="mut">(${m.name}, $${m.pv}/pt)</span>`:""}</div>
      <div>Entry / Exit</div><div class="mono">${esc(t.entry||"—")} → ${esc(t.exit||"—")}</div>
      <div>Stop / Target</div><div class="mono">${esc(t.stop||"—")} / ${esc(t.target||"—")}</div>
      <div>Risk</div><div class="mono">${money(risk)}</div>
@@ -2097,7 +2100,7 @@ function editTrade(t0){
    <datalist id="symList">${syms.map(s=>`<option value="${s}">${MK[s].name}</option>`).join("")}</datalist>
    <div class="grid g4">
     <label class="f">Direction<select class="i" name="side"><option ${t.side==="Long"?"selected":""}>Long</option><option ${t.side==="Short"?"selected":""}>Short</option></select></label>
-    <label class="f">Contracts<input class="i" type="number" step="1" min="0" name="qty" value="${esc(t.qty)}"></label>
+    <label class="f"><span id="tQtyL">${isLots(t)?I18N.t("Lot size"):I18N.t("Contracts")}</span><input class="i" type="number" step="${isLots(t)?"0.01":"1"}" min="0" name="qty" id="tQty" value="${esc(t.qty)}" placeholder="${isLots(t)?"e.g. 0.50":"e.g. 2"}"></label>
     <label class="f">Entry price<input class="i" type="number" step="any" name="entry" value="${esc(t.entry)}"></label>
     <label class="f">Exit price<input class="i" type="number" step="any" name="exit" value="${esc(t.exit)}"></label>
     <label class="f">Stop loss<input class="i" type="number" step="any" name="stop" value="${esc(t.stop)}"></label>
@@ -2124,7 +2127,9 @@ function editTrade(t0){
    <div class="row" style="justify-content:flex-end"><button type="button" class="btn" id="cancel">Cancel</button><button class="btn pri" type="submit" id="saveT">Save trade</button></div>
   </form>`);
   const f=$("#tf");
-  const read=()=>{const d=Object.fromEntries(new FormData(f));Object.assign(t,d,{symbol:String(d.symbol).toUpperCase().trim()});if(t.acctType==="personal")t.firm="";else t.firm=t.firm||""};
+  const read=()=>{const d=Object.fromEntries(new FormData(f));Object.assign(t,d,{symbol:String(d.symbol).toUpperCase().trim()});if(t.acctType==="personal")t.firm="";else t.firm=t.firm||"";
+    delete t.unit;const lots=isLots(t);t.unit=lots?"lots":"contracts";if(lots)t.market="CFD";else if(t.market==="CFD")t.market="";
+    const L=$("#tQtyL"),q=$("#tQty");if(L&&L.textContent!==I18N.t(lots?"Lot size":"Contracts")){L.textContent=I18N.t(lots?"Lot size":"Contracts");q.step=lots?"0.01":"1";q.placeholder=lots?"e.g. 0.50":"e.g. 2"}};
   const live=()=>{read();const n=tradeNet(t),r=tradeRisk(t),R=tradeR(t),cm=commOf(t);$("#live").innerHTML=`<span>Net P&L <b class="${cls(n)}">${smoney(n)}</b></span>${cm?`<span>${I18N.t("Commission")} <b class="neg">${money(-cm)}</b> <small class="mut" data-notr>(${esc(t.firm)})</small></span>`:""}<span>Risk <b>${money(r)}</b></span><span>R multiple <b>${isFinite(R)?R.toFixed(2)+"R":"—"}</b></span><span>Result <b>${resultOf(t)}</b></span>`};
   f.addEventListener("input",live);f.addEventListener("change",live);live();
   $("#tAType").onchange=e=>{const pe=e.target.value==="personal";$("#tFirmL").classList.toggle("hidden",pe);$("#tCommL").classList.toggle("hidden",pe);live()};
