@@ -565,21 +565,27 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .tvx-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .tvx-chip{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:99px;border:1px solid var(--line2);background:var(--panel2);color:var(--muted);font:inherit;font-size:12px;cursor:pointer}
 .tvx-chip b{font-size:10px;color:var(--gold)}.tvx-chip span{opacity:.75}.tvx-chip.on{border-color:var(--gold);color:var(--text);background:rgba(245,185,66,.12)}
-.tvx .cdl{animation:tvxIn .4s ease both}
+.tvx-chart{background:#fafbfc;border-radius:10px;margin:10px 0 10px 10px;width:calc(100% - 10px)!important;height:auto!important;min-height:0!important;align-self:start;box-shadow:inset 0 0 0 1px #e3e6ec}
+.tvx .cdl{transform-box:fill-box;transform-origin:50% 100%;animation:tvxCdl .35s cubic-bezier(.2,.8,.2,1) both}
+.tvx .cdl.live{animation:tvxCdl .35s cubic-bezier(.2,.8,.2,1) both,tvxLive 1.1s ease-in-out infinite}
 .tvx .pop{animation:tvxPop .6s cubic-bezier(.2,.8,.2,1) both}
-.tvx .draw{stroke-dasharray:900;stroke-dashoffset:900;animation:tvxDraw 1.2s ease forwards}
-.tvx .pop .draw[stroke-dasharray="5 4"],.tvx .pop .draw[stroke-dasharray="2 3"]{animation:none;stroke-dashoffset:0}
-.tvx .tx-l{font-size:9.5px;font-weight:800;font-family:"JetBrains Mono",monospace}
-.tvx .tx-s{font-size:9px;fill:#7d8597;letter-spacing:.06em}
-.tvx .tx-big{font-size:30px;font-weight:900;fill:#f5b942;letter-spacing:.04em}
-.tvx .tx-sub{font-size:13px;fill:#c9d1e0;font-weight:600}
+.tvx .grow{animation:tvxGrow 1.1s cubic-bezier(.3,.7,.2,1) both}
+.tvx.paused .tvx-chart *,.tvx.paused .tvx-rows *,.tvx.paused .tvx-subs>div{animation-play-state:paused!important}
+.tvx .tx-l{font-size:9px;font-weight:800;font-family:"JetBrains Mono",monospace;paint-order:stroke;stroke:#fafbfc;stroke-width:3px;stroke-linejoin:round}
+.tvx .tx-s{font-size:9px;fill:#9aa1b0;letter-spacing:.06em;font-weight:600}
+.tvx .tx-sym{font-size:10px;fill:#9aa1b0;font-weight:700;font-family:"JetBrains Mono",monospace}
+.tvx .tx-big{font-size:26px;font-weight:900;fill:#131722;letter-spacing:.04em}
+.tvx .tx-sub{font-size:12.5px;fill:#5d6575;font-weight:600}
+@keyframes tvxCdl{from{opacity:0;transform:scaleY(.25)}to{opacity:1;transform:none}}
+@keyframes tvxLive{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes tvxGrow{from{clip-path:inset(0 100% 0 0);opacity:.4}to{clip-path:inset(0 0 0 0);opacity:1}}
 @keyframes tvxIn{from{opacity:0}to{opacity:1}}
 @keyframes tvxPop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes tvxDraw{to{stroke-dashoffset:0}}
 @keyframes tvxRow{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
 @keyframes tvxHi{0%{background:rgba(245,185,66,0)}35%{background:rgba(245,185,66,.22);box-shadow:inset 3px 0 0 var(--gold)}100%{background:rgba(255,255,255,.03)}}
 @keyframes tvxSub{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@media(max-width:700px){.tvx-screen{grid-template-columns:1fr;grid-template-rows:auto auto auto auto}.tvx-chart{grid-row:2;min-height:0;height:auto}
+@media(max-width:700px){.tvx-screen{grid-template-columns:1fr;grid-template-rows:auto auto auto auto}.tvx-chart{grid-row:2;min-height:0;height:auto;margin:8px!important;width:calc(100% - 16px)!important}
   .tvx-panel{grid-column:1;grid-row:4;margin:10px;padding:8px}.tvx-subs{grid-row:3}.tvx-ph{display:none}.tvx-row{padding:4px 8px}.tvx-en,.tvx-ar{font-size:13.5px}.tvx-title{font-size:13px}.tvx-title em{font-size:13px}
   .tvx-chips{display:none}.tvx-big{width:62px;height:62px;font-size:24px;bottom:auto;top:90px}}
 @media(prefers-reduced-motion:reduce){.tvx *{animation-duration:.01ms!important;animation-delay:0ms!important}}
