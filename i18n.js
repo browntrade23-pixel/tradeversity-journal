@@ -213,6 +213,8 @@ const T={
 "Every trade in your journal will be deleted: all accounts, their screenshots and notes.":["Tous les trades de votre journal seront supprimés : tous les comptes, leurs captures et notes.","سيتم حذف كل صفقات يومياتك: كل الحسابات وصورها وملاحظاتها."],
 "All trades of this account will be deleted, with their screenshots and notes. Your other accounts stay.":["Tous les trades de ce compte seront supprimés, avec leurs captures et notes. Vos autres comptes restent.","سيتم حذف كل صفقات هذا الحساب مع صورها وملاحظاتها. حساباتك الأخرى تبقى."],
 "This can't be undone.":["Impossible d'annuler.","لا يمكن التراجع عن هذا."],"Type DELETE to confirm":["Tapez DELETE pour confirmer","اكتب DELETE للتأكيد"],"Delete":["Supprimer","حذف"],
+"Remember":["À retenir","تذكّر"],
+"This indicator helps you with your drawings and chart annotations, to make them easy and fast. It is not made to take trades for you: your entries come from your plan and your own analysis.":["Cet indicateur vous aide pour vos tracés et annotations sur le graphique, pour les rendre simples et rapides. Il n'est pas fait pour prendre des trades à votre place : vos entrées viennent de votre plan et de votre propre analyse.","هذا المؤشر يساعدك في رسوماتك وتعليقاتك على الرسم البياني لتكون سهلة وسريعة. ليس مصممًا ليأخذ الصفقات بدلًا عنك: دخولك يأتي من خطتك وتحليلك الخاص."],
 "Free ICT indicator":["Indicateur ICT gratuit","مؤشر ICT مجاني"],
 "Our free indicator for ICT traders":["Notre indicateur gratuit pour les traders ICT","مؤشرنا المجاني لمتداولي ICT"],
 "Made by Tradeversity for Nasdaq futures traders. Free on TradingView.":["Créé par Tradeversity pour les traders de futures Nasdaq. Gratuit sur TradingView.","صُمّم من طرف Tradeversity لمتداولي عقود ناسداك الآجلة. مجاني على TradingView."],

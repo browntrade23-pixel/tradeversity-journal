@@ -86,8 +86,8 @@ const S=[
   ar:"كل قسم فيه وضع عرض: Today Only لرسم نظيف، و All Week لعرض كل أيام الأسبوع.",
   draw:()=>box(0,15,asia.h,asia.l,K.asiaF,K.asia,"Asia",0)+box(16,31,lon.h,lon.l,K.lonF,K.lon,"London",200)+segLine(16,mid,K.mid,"Midnight open",400,1)+(fvg?box(fvg.i-1,fvg.i+1,fvg.top,fvg.bot,K.fvgF,K.fvg,"FP.FVG",600,1):"")+line(PDH,K.pdh,"PDH",800)+sessBands()},
  {t:["Save your settings","احفظ إعداداتك"],sec:"",rows:[["Defaults","↺ reset"],["Ok","✓ save"]],
-  en:"Click Ok to save. Lost? Defaults puts everything back. Trade the levels with your plan, not alone.",
-  ar:"اضغط Ok للحفظ. إذا ضعت، Defaults يُرجع كل شيء كما كان. تداول المستويات مع خطتك.",
+  en:"Click Ok to save, Defaults resets. Remember: this indicator makes your drawings easy, it does not take trades for you.",
+  ar:"اضغط Ok للحفظ، و Defaults للإرجاع. تذكّر: هذا المؤشر يسهّل رسوماتك، ولا يأخذ الصفقات بدلًا عنك.",
   draw:()=>`<g class="pop" style="animation-delay:${B}ms"><rect x="${W/2-190}" y="${H/2-40}" width="320" height="70" rx="12" fill="rgba(255,255,255,.92)" stroke="#e3e6ec"/><text x="${W/2-30}" y="${H/2-6}" text-anchor="middle" class="tx-big">Plan · Levels · Execution</text><text x="${W/2-30}" y="${H/2+16}" text-anchor="middle" class="tx-sub">TRADEVERSITY</text></g>`+sessBands()}
 ];
 const SCENE_MS=9500;

@@ -535,6 +535,8 @@ html[lang=ar] .coach-t,html[lang=ar] .quote .qby{letter-spacing:0}
 .ind-list{list-style:none;padding:0;margin:0;display:grid;gap:7px}.ind-list li{font-size:14px;line-height:1.45}
 .ind-go{margin-top:16px;width:100%;justify-content:center;padding:12px;font-size:15px}
 .ind-steps{margin:0;padding-inline-start:20px;display:grid;gap:8px}.ind-steps li{font-size:14px;line-height:1.5}.ind-steps li::marker{color:var(--gold);font-weight:900}
+.ind-note{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;margin-bottom:12px;border-radius:14px;border:1px solid rgba(46,197,201,.45);background:radial-gradient(120% 120% at 0% 0%,rgba(46,197,201,.14),transparent 60%),var(--panel)}
+.ind-note-ic{font-size:24px;line-height:1}.ind-note b{color:#2ec5c9;font-size:14px}.ind-note p{margin:4px 0 0;font-size:14px;line-height:1.55}
 /* indicator explainer video (indicator-video.js) */
 .ind-vid{margin-bottom:12px;border-color:rgba(245,185,66,.35)}
 .tvx-screen{position:relative;display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);grid-template-rows:auto 1fr auto;gap:0;border-radius:14px;overflow:hidden;cursor:pointer;
@@ -2805,6 +2807,7 @@ document.addEventListener("click",e=>{const im=e.target.closest&&e.target.closes
 const INDICATOR={name:"TRADEVERSITY NQ v1.3: Advanced ICT & Liquidity Engine",url:"",img:"brand/indicator-nq.png"};
 function vIndicator(el){const has=!!INDICATOR.url;
   el.innerHTML=`<h1>Our free indicator for ICT traders</h1><p class="sub">Made by Tradeversity for Nasdaq futures traders. Free on TradingView.</p>
+   <div class="ind-note"><span class="ind-note-ic">💡</span><div><b>Remember</b><p>This indicator helps you with your drawings and chart annotations, to make them easy and fast. It is not made to take trades for you: your entries come from your plan and your own analysis.</p></div></div>
    <div class="card ind-vid"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">🎬 <span>Watch: what's inside and every setting</span></h3><span class="mut" style="font-size:12px">~1:30 · English + العربية</span></div><div id="tvxRoot"></div></div>
    <div class="card ind-card">
     <div class="ind-shot"><img src="${INDICATOR.img}" alt="${esc(INDICATOR.name)} on a TradingView chart" loading="lazy"></div>
