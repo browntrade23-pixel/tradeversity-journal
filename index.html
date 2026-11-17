@@ -1093,6 +1093,8 @@ h3{letter-spacing:.5px}
 html[lang=ar] .sz-l{text-transform:none;letter-spacing:0;font-size:12px}
 .sz-t.good b{color:var(--green)}.sz-t.bad b{color:var(--red)}.sz-t.warn{border-color:color-mix(in srgb,var(--amber) 40%,transparent)}.sz-t.warn b{color:var(--amber)}
 .sz-note{font-size:13px;margin:10px 0 0;color:var(--teal)}
+.sz-t.price{border-color:color-mix(in srgb,var(--gold) 40%,transparent)}.sz-t.price b{color:var(--gold);font-size:19px}
+.pf-from{color:var(--gold)}.pf-from b{font-weight:800}
 .sz-none{padding:12px 14px;border-radius:10px;border:1px dashed var(--line2);font-size:13.5px}
 .sz-src{font-size:11.5px;margin:6px 0 0}
 .st-bin{color:var(--teal);border-color:color-mix(in srgb,var(--teal) 40%,transparent)}
@@ -2613,7 +2615,7 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
    <div class="pf-list">${list.length?list.map(f=>{const L=f.name.replace(/^The /,"").charAt(0).toUpperCase();const h=L!==letter?(letter=L,`<div class="pf-letter"><span>${L}</span></div>`):"";
      const mini=(ic,t,items,cl)=>items&&items.length?`<div class="pf-mini ${cl}"><h4>${ic} <span>${t}</span></h4><ul>${items.map(pfLi).join("")}</ul></div>`:"";
      f=Object.assign({},f,pfLoc(f));
-     return `${h}<div class="pf-item ${f.type}"><button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b><small data-notr>${esc(f.sizes.join(" · "))}</small></span>${dzBadge(f)}<span class="pf-go">›</span></button>
+     return `${h}<div class="pf-item ${f.type}"><button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b><small><span data-notr>${esc(f.sizes.join(" · "))}</span>${pfFrom(f.id)!=null?` · <span class="pf-from"><span>from</span> <b class="mono" data-notr>${money(pfFrom(f.id),0)}</b></span>`:""}</small></span>${dzBadge(f)}<span class="pf-go">›</span></button>
       <details class="pf-rules"${S._pfShut?"":" open"}><summary><span>Rules &amp; hidden rules</span></summary>
        <div class="pf-grid">${mini("📝","Evaluation: rules",f.eval,"r")}${mini("🕵️","Evaluation: hidden rules",f.evalH,"h")}${mini("🏦","Funded: rules",f.funded,"r f")}${mini("🕵️","Funded: hidden rules",f.fundedH,"h")}</div>
        ${mini("💸","Withdrawal conditions",f.payout,"p")}</details></div>`}).join("")
@@ -2647,10 +2649,20 @@ function vPropFirm(el,f){const d=PFDZ[f.dz]||PFDZ.check;f=Object.assign({},f,pfL
 /* ---------- rules for the chosen account size ---------- */
 const szNum=s=>{const m=String(s).match(/([\d.]+)\s*K/i);return m?Number(m[1])*1000:0};
 const usd=v=>v==null||v===""?null:typeof v==="number"?money(v,0):"$"+String(v).replace(/^~/,"≈ ");
+/* price text: numbers are USD; text keeps its note ("139/mo", "≈ 150–160", "≈96 (€89)") */
+const priceTxt=v=>{if(v==null||v==="")return null;if(typeof v==="number")return money(v,v%1?2:0);const s=String(v).trim();
+  return (s[0]==="≈"?"≈ $"+s.slice(1).trim():"$"+s).replace("/mo"," / "+I18N.t("month"))};
+const firstNum=v=>typeof v==="number"?v:(m=>m?Number(m[0].replace(/,/g,"")):null)(String(v||"").match(/[\d,]+(\.\d+)?/));
+const progHas=(P,s)=>!!(P&&(P.pct||(P.rows&&P.rows[s])));
+/* cheapest listed price of a firm (for the list) */
+function pfFrom(id){const D=(window.PF_SIZES||{})[id];if(!D)return null;let m=null;
+  D.progs.forEach(P=>{Object.values(P.rows||{}).forEach(r=>{const v=firstNum(r.price);if(v&&(m==null||v<m))m=v});Object.values(P.prices||{}).forEach(p=>{const v=firstNum(p);if(v&&(m==null||v<m))m=v})});return m}
 function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
   /* firms without a clear size list: show example sizes so percentages still turn into dollars */
   const ex=!szNum(f.sizes[0]),SZ=ex?["$10K","$25K","$50K","$100K","$200K"]:f.sizes;f={...f,sizes:SZ};
-  if(!S._pfSz||S._pfSz.id!==f.id)S._pfSz={id:f.id,size:f.sizes[Math.min(1,f.sizes.length-1)],p:0};
+  if(!S._pfSz||S._pfSz.id!==f.id){const def=f.sizes.find(s=>progHas(progs[0],s)&&s!==f.sizes[0])||f.sizes.find(s=>progHas(progs[0],s))||f.sizes[0];S._pfSz={id:f.id,size:def,p:0}}
+  /* if the chosen size is not in this plan, switch to a plan that has it */
+  if(progs.length&&!progHas(progs[S._pfSz.p],S._pfSz.size)){const k=progs.findIndex(P=>progHas(P,S._pfSz.size));if(k>=0)S._pfSz.p=k}
   const sel=S._pfSz,pi=Math.min(sel.p,Math.max(0,progs.length-1)),P=progs[pi],size=sel.size,n=szNum(size);
   let tiles="",cover=true;
   const tile=(ic,lb,val,sub,cl)=>val==null?"":`<div class="sz-t ${cl||""}"><span class="sz-l">${ic} <span>${lb}</span></span><b class="mono" data-notr>${val}</b>${sub?`<small>${sub}</small>`:""}</div>`;
@@ -2659,26 +2671,29 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
     tiles+=q.t2!=null?tile("🎯","Profit target · phase 2",$p(q.t2),`${q.t2}%`,"good"):"";
     tiles+=q.dl!=null?tile("📉","Daily loss limit",$p(q.dl),`${q.dl}%`,"bad"):"";
     tiles+=q.dd!=null?tile("🛑","Max drawdown",$p(q.dd),`${q.dd}% · ${esc(I18N.t(P.ddT||""))}`,"bad"):"";
-    tiles+=q.dd!=null?tile("⚠️","Account fails below",money(n-n*q.dd/100,0),"Starting balance minus max drawdown","warn"):""}
+    tiles+=q.dd!=null?tile("⚠️","Account fails below",money(n-n*q.dd/100,0),"Starting balance minus max drawdown","warn"):"";
+    tiles+=P.prices&&P.prices[size]!=null?tile("💳","Price",esc(priceTxt(P.prices[size])),"","price"):""}
   else if(P&&P.rows&&P.rows[size]){const r=P.rows[size];
     tiles+=tile("🎯","Profit target",usd(r.t),r.t&&typeof r.t==="number"?`${+(r.t/n*100).toFixed(1)}%`:"","good");
     tiles+=tile("🛑","Max drawdown",usd(r.dd),esc(I18N.t(P.ddT||"")),"bad");
     tiles+=r.dl===0?tile("📉","Daily loss limit",esc(I18N.t("None")),"","good"):typeof r.dl==="string"?tile("📉","Daily loss limit",esc(r.dl),"","bad"):tile("📉","Daily loss limit",usd(r.dl),"","bad");
     tiles+=tile("📊","Max contracts",r.ct!=null?esc(r.ct):null,"");
     tiles+=tile("📅","Minimum trading days",r.days!=null?String(r.days):null,"");
-    tiles+=tile("💳","Price",r.price!=null?money(r.price,0):null,"");
+    tiles+=tile("💳","Price",r.price!=null?esc(priceTxt(r.price)):null,"","price");
     tiles+=typeof r.dd==="number"?tile("⚠️","Account fails below",money(n-r.dd,0),"At the start, before the drawdown trails","warn"):""}
   else cover=false;
   return `<h3>💰 <span>Choose your account size</span></h3>${ex?`<p class="mut" style="font-size:12.5px;margin:-4px 0 8px">ℹ️ <span>Example sizes: check which sizes this firm sells on its website.</span></p>`:""}
    <div class="sz-pick" data-noswipe>${f.sizes.map(s=>`<button type="button" class="sz-b ${s===size?"on":""}" data-sz="${s}">${s}</button>`).join("")}</div>
    ${progs.length>1?`<div class="sz-progs">${progs.map((p,i)=>`<button type="button" class="sz-p ${i===pi?"on":""}" data-szp="${i}" data-notr>${esc(p.name)}</button>`).join("")}</div>`:P?`<div class="mut sz-pn" data-notr>${esc(P.name)}</div>`:""}
    ${cover&&tiles?`<div class="sz-grid">${tiles}</div>${P.note?`<p class="sz-note" data-notr>💡 ${esc(P.note)}</p>`:""}`
-     :`<div class="sz-none">ℹ️ <span>${P?"No confirmed numbers for this size yet.":"Exact numbers for each size are not confirmed yet for this firm."}</span> <a href="https://${f.site}" target="_blank" rel="noopener nofollow">↗ <span>Check the official website</span></a></div>`}
+     :`<div class="sz-none">ℹ️ <span>No numbers for this size in this plan yet. Try another size.</span></div>`}
    <p class="mut" style="font-size:12px;margin:10px 0 0" data-notr>${esc(f.plans||"")}</p>
    <p class="mut sz-src"><span>Figures reported by review sites, checked November 2026. Confirm on the official website before buying.</span></p>`}
 function bindSizeCard(f){const c=$("#szCard");if(!c)return;
   $$("[data-sz]",c).forEach(b=>b.onclick=()=>{S._pfSz.size=b.dataset.sz;c.innerHTML=sizeCard(f);bindSizeCard(f)});
-  $$("[data-szp]",c).forEach(b=>b.onclick=()=>{S._pfSz.p=Number(b.dataset.szp);c.innerHTML=sizeCard(f);bindSizeCard(f)})}
+  /* a plan button always shows a size that exists in that plan */
+  $$("[data-szp]",c).forEach(b=>b.onclick=()=>{const k=Number(b.dataset.szp),P=((window.PF_SIZES||{})[f.id]||{progs:[]}).progs[k];S._pfSz.p=k;
+    if(P&&P.rows&&!P.rows[S._pfSz.size]){const s=Object.keys(P.rows)[0];if(s)S._pfSz.size=s}c.innerHTML=sizeCard(f);bindSizeCard(f)})}
 
 /* ============ IMPORT ============ */
 const FIELDS=[["date","Date / time"],["time","Time"],["symbol","Symbol"],["side","Side / direction"],["qty","Quantity"],["entry","Entry price"],["exit","Exit price"],["stop","Stop loss"],["target","Take profit"],["pnl","P&L"],["fees","Fees / commission"],["swap","Swap"],["boughtTs","Bought timestamp"],["soldTs","Sold timestamp"],["buyPrice","Buy price"],["sellPrice","Sell price"]];
