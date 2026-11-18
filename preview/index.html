@@ -13,8 +13,8 @@
 (function(){const q=new URLSearchParams(location.search),e=q.get("e"),exp=e?parseInt(e,36)*1000:0;
   if(exp&&Date.now()<exp&&exp-Date.now()<=49*3600e3){location.replace("../?demo=1&visit=1&e="+encodeURIComponent(e)+"#today");return}
   const ar=(navigator.language||"").startsWith("ar"),fr=(navigator.language||"").startsWith("fr");
-  const T=ar?["انتهت صلاحية رابط المعاينة","روابط الزوار صالحة لمدة 48 ساعة. اطلب رابطًا جديدًا من Tradeversity أو انضم مجانًا.","اكتشف Tradeversity"]
-    :fr?["Ce lien d'aperçu a expiré","Les liens visiteurs sont valables 48 heures. Demandez un nouveau lien à Tradeversity, ou rejoignez-nous gratuitement.","Découvrir Tradeversity"]
-    :["This preview link has expired","Visitor links are valid for 48 hours. Ask Tradeversity for a new link, or join for free.","Discover Tradeversity"];
-  document.getElementById("box").innerHTML=`<h1>⏳ ${T[0]}</h1><p>${T[1]}</p><a class="b" href="../welcome.html">${T[2]}</a>`;if(ar)document.body.dir="rtl"})();
+  const T=ar?["انتهت صلاحية رابط المعاينة","روابط الزوار صالحة لمدة 48 ساعة. اطلب رابطًا جديدًا من Tradeversity.","اكتشف Tradeversity"]
+    :fr?["Ce lien d'aperçu a expiré","Les liens visiteurs sont valables 48 heures. Demandez un nouveau lien à Tradeversity.","Découvrir Tradeversity"]
+    :["This preview link has expired","Visitor links are valid for 48 hours. Ask Tradeversity for a new link.","Discover Tradeversity"];
+  document.getElementById("box").innerHTML=`<h1>⏳ ${T[0]}</h1><p>${T[1]}</p>`;if(ar)document.body.dir="rtl"})();
 </script></body></html>
