@@ -128,7 +128,7 @@ export function firmGalaxy(el,firms,onFirm){const B=base(el,{h:small()?300:360,p
    galaxy = Prop firm tracker, bull = Journal, fibc = Statistics, bear = Risk calculator, fibr = Tomorrow's plan.
    The particles fly in and assemble the design, then it turns / zooms smoothly with the page scroll;
    a fast scroll shakes the particles loose and they settle back. */
-export function galaxyBackground(el,kind="galaxy"){
+export function galaxyBackground(el,kind="galaxy",opts={}){
   const r=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"});
   const ph=small(),isChart=kind==="bull"||kind==="bear"||kind==="fibr",N=kind==="galaxy"?(ph?9000:22000):(ph?7000:15000),dpr=Math.min(devicePixelRatio,ph?1.3:1.6);
   r.setPixelRatio(dpr);r.setSize(innerWidth,innerHeight);el.innerHTML="";el.appendChild(r.domElement);
@@ -207,8 +207,8 @@ export function galaxyBackground(el,kind="galaxy"){
     const ln=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0,blending:THREE.AdditiveBlending}));ln.userData={t:-Math.random()*6};shoot.push(ln);scene.add(ln)}
   let mx=0,my=0;const mv=e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5};addEventListener("pointermove",mv,{passive:true});
   const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()};addEventListener("resize",rs);
-  const clock=new THREE.Clock(),T0=performance.now();let last=0,cx=0,cy=6,sfs=0,vel=0,lastY=scrollY,spin=0,settled=false;
-  (function loop(){if(!el.isConnected){removeEventListener("pointermove",mv);removeEventListener("resize",rs);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose();return}
+  const clock=new THREE.Clock(),T0=performance.now()-(opts.still?9999:0);let stillN=0;let last=0,cx=0,cy=6,sfs=0,vel=0,lastY=scrollY,spin=0,settled=false;
+  let stopped=false;(function loop(){if(stopped)return;if(!el.isConnected){removeEventListener("pointermove",mv);removeEventListener("resize",rs);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose();return}
     requestAnimationFrame(loop);if(document.hidden)return;const t=clock.getElapsedTime(),dt=Math.min(.05,t-last);last=t;mat.uniforms.uT.value=t;
     /* scroll position (smoothed) drives the camera / rotation; scroll speed shakes the particles loose */
     const mxS=Math.max(1,document.documentElement.scrollHeight-innerHeight),sf=Math.min(1,Math.max(0,scrollY/mxS));sfs+=(sf-sfs)*Math.min(1,dt*3);
@@ -234,6 +234,8 @@ export function galaxyBackground(el,kind="galaxy"){
     neb.forEach((n,i)=>{n.position.x=n.userData.p[0]+Math.sin(t*.07+i)*2.5;n.position.y=n.userData.p[1]+Math.cos(t*.05+i)*1.5;n.material.opacity=n.userData.o*(.75+.25*Math.sin(t*.3+i*2))});
     shoot.forEach(s=>{const u=s.userData;u.t+=dt;if(u.t<0)return;if(!u.on){u.on=true;s.position.set(rnd(25),8+Math.random()*8,-20-Math.random()*10);s.rotation.z=-.35-Math.random()*.3}
       const p=u.t/1.1;s.position.x+=dt*22*Math.cos(s.rotation.z);s.position.y+=dt*22*Math.sin(s.rotation.z);s.material.opacity=p<1?Math.sin(p*Math.PI)*.9:0;if(p>=1){u.t=-3-Math.random()*7;u.on=false}});
-    r.render(scene,cam)})();
+    r.render(scene,cam);
+    /* Light mode: draw the finished design a few times, then stop (no animation, saves battery) */
+    if(opts.still&&++stillN>4){stopped=true;const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose()}},3000)}})();
   return {r}}
 

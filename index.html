@@ -1565,6 +1565,38 @@ html[dir=rtl] nav.tabs .tool-tab{animation-name:toolInR}@keyframes toolInR{from{
 /* Prop firm tracker: full-page 3D galaxy background */
 #galBg{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(1200px 700px at 50% 35%,#0b0f2a 0%,#03040a 70%)}
 #galBg canvas{display:block;width:100%!important;height:100%!important}
+/* Pack B: prop firm limits, start my session, weekly review, Ctrl+K, admin summary */
+.lim-card{margin:12px 0}.lim-acc{padding:8px 0;border-top:1px solid rgba(255,255,255,.06)}.lim-acc:first-of-type{border-top:0}
+.lim-an{font-size:13px;margin-bottom:6px}.lim-r{margin:6px 0 10px}.lim-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.lim-bar{position:relative;height:9px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden}.lim-bar i{position:absolute;inset:0 auto 0 0;border-radius:9px;background:linear-gradient(90deg,#12b886,#12e07a);transition:width .6s}
+.lim-bar em{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.25)}
+.lim-r.warn .lim-bar i{background:linear-gradient(90deg,#d99a1e,#f5b942)}.lim-r.bad .lim-bar i{background:linear-gradient(90deg,#d11a3f,#ff2d55);animation:limP 1.4s ease-in-out infinite}
+@keyframes limP{50%{opacity:.65}}.lim-r small{display:block;margin-top:4px;font-size:12px}.lim-r b.warn{color:#f5b942}
+.ss-btn{box-shadow:0 0 0 0 rgba(245,185,66,.5);animation:ssP 2.2s ease-in-out infinite}@keyframes ssP{50%{box-shadow:0 0 0 6px rgba(245,185,66,0)}}
+.chip.ss-on{color:#12e07a;border-color:rgba(18,224,122,.35)}
+.ss-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.ss-box{border:1px solid var(--line,rgba(255,255,255,.1));border-radius:14px;padding:12px;background:rgba(255,255,255,.025)}
+.ss-box h4{margin:0 0 8px;font-size:13px}.ss-wide{grid-column:1/-1}.ss-n{display:flex;gap:8px;font-size:13px;margin:3px 0}.ss-kv{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin:4px 0;flex-wrap:wrap}
+.ss-big{font-size:24px;font-weight:800;margin:2px 0}.ss-box .btn{margin-top:8px}
+.ss-chk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}.ss-c{display:flex;gap:8px;align-items:center;font-size:13px;padding:9px 10px;border-radius:11px;border:1px solid var(--line,rgba(255,255,255,.1));cursor:pointer}
+.ss-c:has(input:checked){border-color:rgba(18,224,122,.45);background:rgba(18,224,122,.07)}
+@media(max-width:820px){.ss-grid,.ss-chk{grid-template-columns:minmax(0,1fr)}}
+.wr-card{margin:12px 0}.wr-k{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:10px 0}.wr-k>div{border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:8px 10px}.wr-k small{display:block;font-size:11px;color:var(--muted)}.wr-k b{font-size:15px}
+@media(max-width:820px){.wr-k{grid-template-columns:repeat(3,minmax(0,1fr))}}.wr-card .f{margin-top:8px}.wr-done p{margin:6px 0;font-size:13px}
+.cmdk{position:fixed;inset:0;z-index:10000;background:rgba(2,3,8,.55);backdrop-filter:blur(4px);display:flex;justify-content:center;align-items:flex-start;padding:12vh 12px 12px}
+.cmdk-box{width:min(620px,100%);background:#0d1020;border:1px solid rgba(110,124,245,.45);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.6);overflow:hidden;animation:cmdIn .18s ease}
+@keyframes cmdIn{from{opacity:0;transform:translateY(-8px) scale(.98)}}
+.cmdk-in{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08)}.cmdk-in input{flex:1;background:transparent;border:0;outline:0;color:inherit;font-size:16px;min-width:0}
+.cmdk-in kbd{font-size:11px;border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:2px 6px;color:var(--muted)}
+.cmdk-l{max-height:min(420px,60vh);overflow:auto;padding:6px}.cmdk-i{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:transparent;border:0;color:inherit;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:14px}
+.cmdk-i.on,.cmdk-i:hover{background:rgba(58,72,224,.22)}.cmdk-ic{width:22px;text-align:center}
+html[data-theme=light] .cmdk-box{background:#fff;border-color:#d7dcf5}html[data-theme=light] .cmdk-i.on{background:#eef0ff}
+.adm-sum-t{white-space:pre-wrap;font:13px/1.5 ui-monospace,Consolas,monospace;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;margin:0 0 10px}
+.hd-ic{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:inherit;font-size:15px;line-height:1;cursor:pointer;display:inline-grid;place-items:center;padding:0}
+.hd-ic:hover{border-color:rgba(110,124,245,.55);background:rgba(58,72,224,.14)}
+html[data-theme=light] .hd-ic{border-color:var(--line);background:#fff}
+/* section backgrounds show through the cards (frosted glass) */
+html.gal-on:not([data-theme=light]) #view :is(.card,.kpi){background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008)),rgba(9,11,19,.72)!important;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+#galBg[data-k="aurora"]::after,#galBg[data-k="map"]::after,#galBg[data-k="dawn"]::after,#galBg[data-k="shield"]::after,#galBg[data-k="waves"]::after,#galBg[data-k="dust"]::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,rgba(0,0,0,.1) 0%,rgba(0,0,0,.35) 70%,rgba(0,0,0,.55) 100%)}
 #galBg[data-k="fibc"]::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,.4) 0%,rgba(0,0,0,.6) 60%,rgba(0,0,0,.75) 100%)}
 #galBg[data-k="galaxy"]::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,.28) 0%,rgba(0,0,0,.5) 60%,rgba(0,0,0,.68) 100%)}
 html.gal-on #app::before{opacity:0}
@@ -1696,6 +1728,8 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
       <div class="spacer"></div>
       <span id="socHead" class="soc icons"></span>
       <span class="theme-slot"></span>
+      <button type="button" class="hd-ic" id="cmdBtn" title="Search (Ctrl+K)" aria-label="Search">🔍</button>
+      <button type="button" class="hd-ic" id="bgBtn" title="Background" aria-label="Background">✨</button>
       <span id="langTop"></span>
       <span class="chip founder-chip" title="Founder"><span>Founder</span> <b>BROWN ALGO</b></span>
       <span class="chip" id="whoChip" data-notr></span>
@@ -2139,13 +2173,30 @@ async function rqReadyLoad(){if(!S.me||S.me.role!=="admin"||!API||!API.listProfi
 setInterval(rqReadyLoad,180000);
 /* one 3D background per section: galaxy (prop firms), bullish candles (journal), Fibonacci circles (stats),
    bearish candles (risk), Fibonacci retracement (plan) */
-const BG3D={propfirms:"galaxy",stats:"fibc"};   /* candle backgrounds (journal / risk / plan) removed on request */
-function galaxyBg(){const kind=S.me&&!S.page?BG3D[S.view]:null;let g=document.getElementById("galBg");
-  if(g&&g.dataset.k!==kind){g.remove();g=null}
+/* section backgrounds: 3D (three.js) for prop firms + statistics, light 2D canvases for the others.
+   Background switch: 3D (animated) / Light (one still image, saves battery) / Off. Dark theme only. */
+const BG3D={propfirms:"galaxy",stats:"fibc"},BG2D={today:"aurora",news:"map",plan:"dawn",risk:"shield",consistency:"waves",about:"dust"};
+const BGM={key:"tv_bg",
+  auto(){const n=navigator,ph=innerWidth<821;if(matchMedia("(prefers-reduced-motion: reduce)").matches||(n.connection&&n.connection.saveData))return "light";
+    if(ph&&((n.deviceMemory&&n.deviceMemory<=3)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)))return "light";return "3d"},
+  mode(){try{return localStorage.getItem(this.key)||this.auto()}catch(e){return this.auto()}},
+  set(m){try{localStorage.setItem(this.key,m)}catch(e){}const g=document.getElementById("galBg");if(g)g.remove();this.btn();galaxyBg();
+    toast(I18N.t(m==="3d"?"Background: 3D":m==="light"?"Background: Light (still image, saves battery)":"Background: Off"))},
+  next(){const o=["3d","light","off"],m=this.mode();this.set(o[(o.indexOf(m)+1)%3])},
+  btn(){const b=$("#bgBtn");if(!b)return;const m=this.mode();b.textContent=m==="3d"?"✨":m==="light"?"🖼":"⬛";b.title=I18N.t(m==="3d"?"Background: 3D":m==="light"?"Background: Light":"Background: Off")+" · "+I18N.t("tap to change")}};
+window.__bgState=window.__bgState||{};
+function bgStateNews(){try{const s=newsClockState();window.__bgState.redSoon=!!(s&&(s.inWindow||(s.mins>0&&s.mins<=5)))}catch(e){window.__bgState.redSoon=false}}
+function galaxyBg(){const m=BGM.mode(),light=document.documentElement.getAttribute("data-theme")==="light";
+  const kind=S.me&&!S.page&&!S.dayPage&&m!=="off"&&!light?(BG3D[S.view]||BG2D[S.view]||null):null,still=m==="light";let g=document.getElementById("galBg");
+  if(S.view==="today"){try{const sc=dayScore(todayStr());window.__bgState.score=sc.active?sc.score:null}catch(e){}}
+  if(S.view==="news")bgStateNews();
+  if(g&&(g.dataset.k!==kind||g.dataset.m!==m)){g.remove();g=null}
   if(!kind){document.documentElement.classList.remove("gal-on");return}
-  if(!g){g=document.createElement("div");g.id="galBg";g.dataset.k=kind;g.setAttribute("aria-hidden","true");$("#app").prepend(g);
-    A3().then(m=>{if(!g.isConnected)return;try{m.galaxyBackground(g,kind);document.documentElement.classList.add("gal-on")}catch(e){g.remove();document.documentElement.classList.remove("gal-on")}}).catch(()=>g.remove())}
+  if(!g){g=document.createElement("div");g.id="galBg";g.dataset.k=kind;g.dataset.m=m;g.setAttribute("aria-hidden","true");$("#app").prepend(g);
+    const p=BG3D[S.view]?A3().then(x=>x.galaxyBackground(g,kind,{still})):import("./bg2d.js?v=2").then(x=>x.sectionBg(g,kind,{still}));
+    p.then(()=>{if(g.isConnected)document.documentElement.classList.add("gal-on")}).catch(e=>{console.warn("bg off",e);g.remove();document.documentElement.classList.remove("gal-on")})}
   else document.documentElement.classList.add("gal-on")}
+setInterval(()=>{if(S.view==="news")bgStateNews()},20000);
 function render(){setTimeout(galaxyBg,0);const _tr=document.getElementById("pfTray");if(_tr&&S.view!=="propfirms")_tr.className="";document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
   const fn={today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
@@ -2618,7 +2669,7 @@ function vToday(el){
     celebrate(B,tHit);return}
   el.innerHTML=`<div class="td">
    <div class="td-hero"><div><div class="td-hi"><span>${hello}</span>${name?`, <b data-notr>${name}</b>`:""} 👋</div><div class="td-date mut" data-notr>${esc(fmtDate(t))}</div></div>
-    <div class="td-hr"><div class="td-q">“<span>${esc(q)}</span>” <small>— BROWN ALGO</small></div><button class="btn sm" type="button" id="tdFocusOn">🎯 <span>Focus mode</span></button><button class="btn sm" type="button" id="tdTour" title="Platform tour">❓ <span>Tour</span></button></div></div>
+    <div class="td-hr"><div class="td-q">“<span>${esc(q)}</span>” <small>— BROWN ALGO</small></div>${sessStarted()?`<span class="chip ss-on">✅ <span>Session started</span></span>`:`<button class="btn sm pri ss-btn" type="button" data-td="session">🚀 <span>Start my session</span></button>`}<button class="btn sm" type="button" id="tdFocusOn">🎯 <span>Focus mode</span></button><button class="btn sm" type="button" id="tdTour" title="Platform tour">❓ <span>Tour</span></button></div></div>
    ${cd?`<div class="td-cool"><span class="td-cool-i">🛑</span><div><b>${cd.why==="loss"?"Max daily loss reached":"Max trades reached for today"}</b><small>${cd.why==="loss"?"You hit your daily loss limit. Close the platform, protect the account, come back tomorrow.":"Your plan is done for today. Closing the platform is the trade now."}</small></div></div>`:""}
    ${tHit?`<div class="td-win">🎉 <b>Daily target reached!</b> <span>Lock it in: no more trades today.</span></div>`:""}
    <div class="td-grid">
@@ -2641,6 +2692,7 @@ function vToday(el){
        :`<p class="mut">No plan for today yet. A trader without a plan is a gambler.</p><button class="btn sm pri" type="button" data-td="planToday">🧭 <span>Write today's plan</span></button>`}
      <div class="td-news" id="coachNews">${coachNewsHTML()}</div></div>
    </div>
+   ${limitsCard()}
    <div class="td-acts">
     <button class="btn pri td-big" type="button" data-td="trade">＋ <span>Log a trade</span></button>
     <button class="btn" type="button" data-td="quick">⚡ <span>Quick log</span></button>
@@ -2648,6 +2700,7 @@ function vToday(el){
     <button class="btn" type="button" data-td="plan">🧭 <span>${nd===t?"Plan today":"Plan the next session"}</span></button>
     <button class="btn" type="button" data-td="notrade">🚫 <span>No trades today</span></button>
    </div>
+   ${weekReviewCard()}
    ${weekCard()}
    ${badgeCard(B)}
   </div>`;
@@ -2656,7 +2709,9 @@ function vToday(el){
     else if(a==="eod"){S._eodOpen=true;go("journal");setTimeout(()=>{const e=$("#eodBox");if(e){e.open=true;e.scrollIntoView({behavior:"smooth",block:"center"})}},200)}
     else if(a==="plan"){S._planDate=nd;go("plan")}else if(a==="planToday"){S._planDate=t;go("plan")}
     else if(a==="notrade"){S._ntdDate=t;go("journal");setTimeout(()=>{const n=$("#ntdSet");if(n)n.scrollIntoView({behavior:"smooth",block:"center"})},200)}
-    else if(a==="share")shareWeek()});
+    else if(a==="share")shareWeek();else if(a==="session")startSession();
+    else if(a==="rules"){const ac=accounts()[0];if(ac)S.acct=ac;go("stats");setTimeout(()=>{const r=$("#rulesCard");if(r)r.scrollIntoView({behavior:"smooth",block:"center"})},300)}});
+  bindWeekReview();
   $("#tdFocusOn").onclick=()=>setFocus(true);$("#tdTour").onclick=startTour;
   mount3d("a3Orb","disciplineOrb",sc.score,I18N.t("score"));mount3d("a3Flame","streakFlame",ds.streak);
   if($("#a3Trophy"))mount3d("a3Trophy","trophyRoom",B,b=>toast(`${b.ok?b.ic:"🔒"} ${I18N.t(b.n)} · ${b.ok?I18N.t(b.d):`${b.cur} / ${b.goal}`}`));
@@ -2832,7 +2887,9 @@ function compress(file,maxW=1280,maxBytes=170000){return new Promise((res,rej)=>
 function editTrade(t0){
   /* cool-down: max trades or max daily loss reached today */
   if(!t0&&!S._cdOk&&!S.readonly){const cd=coolDown(todayStr());if(cd){confirmBox(I18N.t(cd.why==="loss"?"You reached your max daily loss today. The disciplined move is to stop trading. Log a trade you already took?":"You reached your max trades for today. The disciplined move is to stop trading. Log a trade you already took?"),()=>{S._cdOk=1;setTimeout(()=>{editTrade(null);S._cdOk=0},50)});return}}
-  const isNew=!t0;const t=t0?JSON.parse(JSON.stringify(t0)):{id:uuid(),user_id:S.subject.id,date:todayStr(),time:"",account:S.acct!=="all"?S.acct:(accounts()[0]||""),symbol:"MNQ",side:"Long",qty:1,entry:"",exit:"",stop:"",target:"",pnl:"",fees:"",setup:"",session:"NY AM",emotions:[],feeling:"",followed:"Yes",rating:3,shots:[],remark:"",notes:""};
+  /* fast logging: a new trade starts with the last symbol, account, size and session you used, and the time now */
+  const lt=t0?null:[...S.trades].sort(byDT).pop(),nowHM=new Date().toTimeString().slice(0,5);
+  const isNew=!t0;const t=t0?JSON.parse(JSON.stringify(t0)):{id:uuid(),user_id:S.subject.id,date:todayStr(),time:nowHM,account:S.acct!=="all"?S.acct:((lt&&lt.account)||accounts()[0]||""),symbol:(lt&&lt.symbol)||"MNQ",side:"Long",qty:(lt&&lt.qty)||1,entry:"",exit:"",stop:"",target:"",pnl:"",fees:"",setup:"",session:(lt&&lt.session)||"NY AM",emotions:[],feeling:"",followed:"Yes",rating:3,shots:[],remark:"",notes:""};
   const syms=Object.keys(MK);
   /* personal or prop firm account: new trades copy the last choice used on this account */
   if(t.acctType==null){const last=[...S.trades].reverse().find(x=>x.account===t.account&&(x.acctType||x.firm));t.acctType=last?(last.acctType||(x=>x&&!/personal/i.test(x)?"prop":"personal")(last.firm)):"prop";if(!t.firm&&last)t.firm=last.firm||"";if(t.commIncl==null&&last&&last.commIncl)t.commIncl=last.commIncl}
@@ -3150,8 +3207,88 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
 /* Statistics: 3D equity mountain only (no 3D calendar); shown from 2 trading days */
 function a3Mtn(days){if(Object.keys(days).length<2)return "";
   return `<div class="card a3-card" style="margin-bottom:12px"><h3 style="margin:0 0 8px">🏔 <span>Equity mountain</span></h3><div id="a3_s" class="a3-box"></div><p class="mut a3-hint"><span>Drag to rotate · tap a day to open it</span></p></div>`}
+/* ============ PRO WORKFLOW: start my session · prop firm limits · Ctrl+K search · Friday review · admin summary ============ */
+const sessKey=d=>"tv_sess_"+((S.me&&S.me.id)||"x")+"_"+(d||todayStr());
+const sessStarted=()=>{try{return !!localStorage.getItem(sessKey())}catch(e){return false}};
+/* my prop firm accounts with rules: how much of the daily loss limit and of the max drawdown is used */
+function limitRows(){const R=rulesAll();return Object.keys(R).filter(a=>R[a]&&R[a].kind!=="personal"&&(num(R[a].daily)>0||num(R[a].maxDD)>0)).map(a=>{const r=R[a],s=rulesStatus(a,r),D=num(r.daily),M=num(r.maxDD);
+  return {a,r,s,D,M,dl:D>0?Math.max(0,-s.tNet)/D:0,dd:M>0?Math.max(0,Math.min(1,1-s.buffer/M)):0}})}
+function limBar(lab,used,left){const lv=used>=.9?"bad":used>=.7?"warn":"ok";
+  return `<div class="lim-r ${lv}"><div class="lim-h"><span>${lab}</span><b class="mono" data-notr>${Math.round(used*100)}%</b></div><div class="lim-bar"><i style="width:${Math.min(100,used*100)}%"></i><em style="left:70%"></em><em style="left:90%"></em></div>
+   <small class="mut">${left}${lv==="bad"?` · <b class="neg">🛑 <span>90% used: stop trading now</span></b>`:lv==="warn"?` · <b class="warn">⚠️ <span>70% used: slow down, A+ setups only</span></b>`:""}</small></div>`}
+function limitsCard(){const L=limitRows();
+  if(!L.length)return `<div class="card lim-card"><h3>🏦 <span>Prop firm limits</span></h3><p class="mut" style="margin:0 0 10px;font-size:13px"><span>Set the rules of your prop firm account once: you will see here how close you are to the daily loss limit and the max drawdown, with a warning at 70% and 90%.</span></p><button class="btn sm pri" type="button" data-td="rules">🏦 <span>Set my prop firm rules</span></button></div>`;
+  return `<div class="card lim-card"><h3>🏦 <span>Prop firm limits</span></h3>${L.slice(0,3).map(x=>`<div class="lim-acc"><div class="lim-an"><b data-notr>${esc(x.a)}</b>${x.r.firm?` <span class="mut" data-notr>· ${esc(x.r.firm)}${x.r.size?" "+esc(x.r.size):""}</span>`:""}</div>
+    ${x.D>0?limBar(I18N.t("Daily loss limit"),x.dl,`${money(Math.max(0,x.D+x.s.tNet),0)} <span>left today</span>`):""}
+    ${x.M>0?limBar(I18N.t("Max drawdown"),x.dd,`${money(Math.max(0,x.s.buffer),0)} <span>left before the limit</span>`):""}</div>`).join("")}</div>`}
+/* 🚀 Start my session: one screen before the open */
+function startSession(){const t=todayStr(),sc=dayScore(t),L=sc.L,p=L.p||{},rk=calcLoad("risk")||{},usd=rk.mode==="%"?num(rk.bal)*num(rk.risk)/100:num(rk.risk),rpt=num(p.riskPerTrade)||usd;
+  const reds=S.newsLoaded?newsFor(t).filter(n=>n.impact==="High").sort((a,b)=>a.starts_at<b.starts_at?-1:1):[];
+  const bias=Object.entries(p.bias||{}).filter(([,v])=>v).map(([k,v])=>`<span class="tag ${/bull/i.test(v)?"long":/bear/i.test(v)?"short":""}" data-notr>${esc(k)} · ${esc(I18N.t(v))}</span>`).join(" ");
+  const tm=iso=>new Date(iso).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+  const items=[["news","I know today's red news times"],["plan","My plan and my bias are written"],["risk","I know my risk per trade"],["limit","I know my daily loss limit"]];
+  openModal(`<div class="mhead"><h2>🚀 <span>Start my session</span></h2><button class="x" id="mx">×</button></div>
+   <p class="mut" style="margin:-4px 0 12px"><span>Everything you need before the open, on one screen.</span></p>
+   <div class="ss-grid">
+    <div class="ss-box"><h4>📰 <span>Red news today</span></h4>${reds.length?reds.map(n=>`<div class="ss-n"><b class="mono" data-notr>${esc(tm(n.starts_at))}</b><span data-notr>${esc(n.title)}</span></div>`).join("")+`<small class="mut"><span>No new trades 5 minutes before and after.</span></small>`:`<p class="mut" style="margin:0"><span>${S.newsLoaded?"No red news today.":"News not loaded yet."}</span></p>`}</div>
+    <div class="ss-box"><h4>🧭 <span>Today's plan</span></h4>${planOn(t)?`<div class="td-bias">${bias||`<span class="mut">No bias written.</span>`}</div><div class="ss-kv"><span>Max trades</span><b class="mono" data-notr>${L.maxT}</b></div>${L.maxL?`<div class="ss-kv"><span>Max daily loss</span><b class="mono" data-notr>${money(L.maxL)}</b></div>`:""}`:`<p class="mut" style="margin:0 0 8px"><span>No plan for today yet.</span></p><button class="btn sm pri" type="button" id="ssPlan">🧭 <span>Write today's plan</span></button>`}</div>
+    <div class="ss-box"><h4>🎯 <span>Risk per trade</span></h4>${rpt>0?`<div class="ss-big mono" data-notr>${money(rpt,0)}</div>${rk.grp?`<small class="mut" data-notr>${esc(rk.grp)}${rk.stop?" · "+esc(rk.stop)+" "+esc(rk.stopMode==="ticks"?"ticks":"pts"):""}</small>`:""}`:`<p class="mut" style="margin:0 0 8px"><span>Not set yet.</span></p>`}<button class="btn sm" type="button" id="ssRisk">🧮 <span>Risk calculator</span></button></div>
+    <div class="ss-box ss-wide"><h4>🏦 <span>Prop firm limits</span></h4>${(()=>{const R=limitRows();return R.length?R.slice(0,3).map(x=>`<div class="ss-kv"><span data-notr>${esc(x.a)}</span><b class="mono" data-notr>${x.D>0?money(Math.max(0,x.D+x.s.tNet),0)+" "+I18N.t("left today"):""}${x.M>0?" · "+money(Math.max(0,x.s.buffer),0)+" "+I18N.t("drawdown left"):""}</b></div>`).join(""):`<p class="mut" style="margin:0"><span>No prop firm rules saved yet.</span></p>`})()}</div>
+   </div>
+   <div class="ss-chk">${items.map(([k,l])=>`<label class="ss-c"><input type="checkbox" data-ss="${k}"> <span>${l}</span></label>`).join("")}</div>
+   <button class="btn pri" type="button" id="ssGo" style="width:100%;margin-top:12px" disabled>✅ <span>I'm ready: start my session</span></button>`);
+  $("#mx").onclick=closeModal;const go2=v=>{closeModal();if(v==="plan"){S._planDate=t;go("plan")}else go(v)};
+  if($("#ssPlan"))$("#ssPlan").onclick=()=>go2("plan");$("#ssRisk").onclick=()=>go2("risk");
+  const cks=$$("[data-ss]"),upd=()=>{$("#ssGo").disabled=!cks.every(c=>c.checked)};cks.forEach(c=>c.onchange=upd);
+  $("#ssGo").onclick=()=>{try{localStorage.setItem(sessKey(),String(Date.now()))}catch(e){}closeModal();confetti();toast(I18N.t("Session started. Trade your plan, nothing else."));render()}}
+/* 📝 Friday review (Friday to Sunday): the week in numbers + 3 questions */
+const wrKey=mon=>"tv_wr_"+((S.me&&S.me.id)||"x")+"_"+mon;
+function weekReviewCard(){const wd=new Date().getDay();if(!(wd===5||wd===6||wd===0)||S.readonly)return "";const w=weekStats();if(!w)return "";
+  let saved=null;try{saved=JSON.parse(localStorage.getItem(wrKey(w.from))||"null")}catch(e){}
+  const tr=[...w.ts].map(x=>[x,tradeNet(x)]).sort((a,b)=>b[1]-a[1]),bt=tr[0],wt=tr[tr.length-1],broke=w.ts.filter(x=>x.followed==="No").length;
+  const Q=[["good","What worked this week?"],["stop","What will I stop doing?"],["focus","My one focus for next week"]];
+  return `<div class="card wr-card" id="wrCard"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:6px"><h3 style="margin:0">📝 <span>Weekly review</span></h3><span class="mut" style="font-size:12px" data-notr>${esc(fmtDate(w.from))} → ${esc(fmtDate(w.to))}</span></div>
+   <div class="wr-k"><div><small>Trades</small><b class="mono" data-notr>${w.ts.length}</b></div><div><small>Net P&L</small><b class="mono ${cls(w.st.net)}">${smoney(w.st.net)}</b></div>
+    <div><small>Best trade</small><b class="mono pos" data-notr>${bt?smoney(bt[1]):"—"}</b></div><div><small>Worst trade</small><b class="mono ${wt&&wt[1]<0?"neg":""}" data-notr>${wt?smoney(wt[1]):"—"}</b></div>
+    <div><small>Rules broken</small><b class="mono ${broke?"neg":"pos"}" data-notr>${broke}</b></div><div><small>Average score</small><b class="mono" data-notr>${w.avg}</b></div></div>
+   ${saved?`<div class="wr-done">✅ <b>Review saved</b>${Q.map(([k,l])=>saved[k]?`<p><small class="mut">${l}</small><br><span data-notr>${esc(saved[k])}</span></p>`:"").join("")}<button class="btn sm" type="button" id="wrEdit">✎ <span>Edit</span></button></div>`
+    :`<p class="mut" style="font-size:13px;margin:8px 0"><span>2 minutes to answer, and next week is better.</span></p>${Q.map(([k,l])=>`<label class="f">${l}<textarea class="i" data-wr="${k}" maxlength="400" style="min-height:52px"></textarea></label>`).join("")}<button class="btn pri" type="button" id="wrSave" style="margin-top:8px">💾 <span>Save my review</span></button>`}</div>`}
+function bindWeekReview(){const c=$("#wrCard");if(!c)return;const w=weekStats();if(!w)return;
+  if($("#wrSave"))$("#wrSave").onclick=()=>{const o={};$$("[data-wr]",c).forEach(t=>o[t.dataset.wr]=t.value.trim());if(!o.good&&!o.stop&&!o.focus){toast(I18N.t("Write at least one answer"));return}
+    o.at=Date.now();try{localStorage.setItem(wrKey(w.from),JSON.stringify(o))}catch(e){}toast(I18N.t("Weekly review saved"));render()};
+  if($("#wrEdit"))$("#wrEdit").onclick=()=>{let o={};try{o=JSON.parse(localStorage.getItem(wrKey(w.from)))||{}}catch(e){}try{localStorage.removeItem(wrKey(w.from))}catch(e){}render();setTimeout(()=>$$("[data-wr]").forEach(t=>t.value=o[t.dataset.wr]||""),30)}}
+/* 🔍 Ctrl+K: search and do anything */
+const FUT_GRP={NQ:"Nasdaq",MNQ:"Nasdaq",NASDAQ:"Nasdaq",ES:"S&P 500",MES:"S&P 500",SP:"S&P 500",YM:"Dow Jones",MYM:"Dow Jones",DOW:"Dow Jones",GC:"Gold",MGC:"Gold",GOLD:"Gold"};
+function cmdItems(q){const out=[],t=q.trim().toLowerCase(),has=s=>!t||s.toLowerCase().includes(t)||I18N.t(s).toLowerCase().includes(t);
+  const m=t.match(/^(?:risk|risque|مخاطرة)\s+([a-z&]+)\s+(\d+(?:\.\d+)?)/i);
+  if(m){const g=FUT_GRP[m[1].toUpperCase()];if(g)out.push({ic:"🧮",l:`${I18N.t("Risk calculator")}: ${g} · ${m[2]} pts`,run:()=>{S._rtab="fut";const st=S._risk||(S._risk=calcLoad("risk")||{grp:"Nasdaq",bal:50000,mode:"$",risk:250,stopMode:"pts",stop:20,entry:"",stopPx:"",rr:2,fees:""});st.grp=g;st.stopMode="pts";st.stop=Number(m[2]);calcSaveAll();go("risk")}})}
+  const A=[["🚀","Start my session",()=>startSession()],["＋","Log a trade",()=>editTrade(null)],["⚡","Quick log",()=>quickLog()],["🌙","End-of-day review",()=>{S._eodOpen=true;go("journal")}],
+    ["🧭","Write today's plan",()=>{S._planDate=todayStr();go("plan")}],["🚫","No trades today",()=>{S._ntdDate=todayStr();go("journal")}],["🎯","Focus mode",()=>{try{localStorage.setItem("tv_focus","1")}catch(e){}go("today")}],
+    ["📥","Import a CSV",()=>go("stats")],["✨","Change the background",()=>BGM.next()],["📲","Install app",()=>{const b=$("#instBtn");if(b)b.click()}],["❓","Platform tour",()=>startTour()]];
+  A.forEach(([ic,l,run])=>{if(has(l))out.push({ic,l:I18N.t(l),run})});
+  VIEWS.forEach(([k,l])=>{if(has(l))out.push({ic:"↗",l:I18N.t(l),run:()=>go(k)})});
+  if(t.length>=2){const L=(typeof PFLIST==="function"?PFLIST():[]).filter(f=>f.name.toLowerCase().includes(t.replace(/\s*(rules?|règles?)\s*$/,"")));
+    L.slice(0,6).forEach(f=>out.push({ic:"🏦",l:`${f.name} · ${I18N.t("rules")}`,run:()=>{S._pfId=f.id;go("propfirms");window.scrollTo(0,0)}}))}
+  return out.slice(0,12)}
+function openCmd(){if(!S.me||$("#cmdK"))return;const ov=document.createElement("div");ov.id="cmdK";ov.className="cmdk";
+  ov.innerHTML=`<div class="cmdk-box" role="dialog" aria-label="Search"><div class="cmdk-in"><span>🔍</span><input id="cmdQ" placeholder="${esc(I18N.t("Search or type a command… e.g. risk NQ 20, Apex rules, new trade"))}" autocomplete="off"><kbd>Esc</kbd></div><div class="cmdk-l" id="cmdL"></div></div>`;
+  document.body.appendChild(ov);let sel=0,items=[];const q=$("#cmdQ"),L=$("#cmdL");
+  const draw=()=>{items=cmdItems(q.value);sel=Math.min(sel,Math.max(0,items.length-1));L.innerHTML=items.length?items.map((it,i)=>`<button type="button" class="cmdk-i ${i===sel?"on":""}" data-i="${i}"><span class="cmdk-ic">${it.ic}</span><span data-notr>${esc(it.l)}</span></button>`).join(""):`<div class="mut" style="padding:14px">${esc(I18N.t("Nothing found"))}</div>`};
+  const close=()=>{ov.remove();document.removeEventListener("keydown",key,true)},run=i=>{const it=items[i];if(!it)return;close();it.run()};
+  const key=e=>{if(e.key==="Escape"){e.preventDefault();close()}else if(e.key==="ArrowDown"){e.preventDefault();sel=Math.min(items.length-1,sel+1);draw()}else if(e.key==="ArrowUp"){e.preventDefault();sel=Math.max(0,sel-1);draw()}else if(e.key==="Enter"){e.preventDefault();run(sel)}};
+  document.addEventListener("keydown",key,true);q.oninput=()=>{sel=0;draw()};L.onclick=e=>{const b=e.target.closest("[data-i]");if(b)run(Number(b.dataset.i))};ov.onclick=e=>{if(e.target===ov)close()};
+  draw();setTimeout(()=>q.focus(),20)}
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"||e.key==="K")){if(!S.me)return;e.preventDefault();openCmd()}});
+(function(){const c=$("#cmdBtn"),b=$("#bgBtn");if(c)c.onclick=openCmd;if(b)b.onclick=()=>BGM.next();BGM.btn()})();
+/* 📨 admin: weekly summary ready to copy or share on Telegram */
+function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const today=todayStr(),d7=new Date();d7.setDate(d7.getDate()-6);const d7s=ymd(d7),sid=new Set(students.map(s=>s.id));
+  const tw=trades.filter(t=>sid.has(t.user_id)&&t.date>=d7s&&t.date<=today),act=new Set(tw.map(t=>t.user_id)).size,net=tw.reduce((a,t)=>a+tradeNet(t),0);
+  const broke=new Set(tw.filter(t=>t.followed==="No").map(t=>t.user_id)),risk=students.filter(s=>broke.has(s.id)),newU=profs.filter(p=>p.role!=="admin"&&(p.created_at||"").slice(0,10)>=d7s).length;
+  const txt=`📊 Tradeversity · ${fmtDate(d7s)} → ${fmtDate(today)}\n\n👥 ${act}/${students.length} ${I18N.t("students active this week")}\n📈 ${tw.length} ${I18N.t("trades")} · ${smoney(net,0)}\n⚠️ ${risk.length} ${I18N.t("broke their plan")}${risk.length?": "+risk.slice(0,8).map(s=>s.name||"—").join(", "):""}\n🆕 ${newU} ${I18N.t("new sign-ups")}\n🔔 ${pending.length} ${I18N.t("waiting for approval")}\n\n— BROWN ALGO`;
+  return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
+   <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-18h";
+const APP_VER="2026-11-18i";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3162,7 +3299,7 @@ const APP_VER="2026-11-18h";
   window.__updCheck=check;setTimeout(check,8000);setInterval(()=>{if(!document.hidden)check()},5*60000);
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)check()})})();
 /* ============ IN-APP 3D (app3d.js, loaded only where shown; the flat version stays if 3D can't run) ============ */
-let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=16"));
+let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=17"));
 function mount3d(id,fn,...args){setTimeout(()=>{const el=document.getElementById(id);if(!el||el.dataset.a3)return;el.dataset.a3="1";
   A3().then(m=>{if(!el.isConnected)return;try{m[fn](el,...args)}catch(e){console.warn("3D",e)}}).catch(e=>console.warn("3D off",e))},40)}
 function newsClockState(){const now=Date.now(),reds=S.newsLoaded?newsFor(todayStr()).filter(n=>n.impact==="High"):[],W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,t,a:t-5*60000,b:t+5*60000}});
@@ -3215,7 +3352,7 @@ const rpreKey=k=>"tv_rpre_"+k+"_"+((S.me&&S.me.id)||"x");
 function riskPresets(k){try{return JSON.parse(localStorage.getItem(rpreKey(k))||"[]")||[]}catch(e){return []}}
 function riskTools(kind,st){if(S.readonly)return "";const P=riskPresets(kind),R=rulesAll(),acs=Object.keys(R).filter(a=>R[a]&&(num(R[a].daily)>0||num(R[a].maxDD)>0));
   const usd=st.mode==="%"?num(st.bal)*num(st.risk)/100:num(st.risk),ra=S._rChk&&acs.includes(S._rChk)?S._rChk:acs[0];
-  let chk="";if(ra&&usd>0){const r=R[ra],dl=num(r.daily),dd=num(r.maxDD),lv=dl?(usd>dl*.5?"bad":usd>dl*.25?"warn":"ok"):(dd&&usd>dd*.2?"warn":"ok");
+  let chk="";window.__bgState.risk="ok";if(ra&&usd>0){const r=R[ra],dl=num(r.daily),dd=num(r.maxDD),lv=dl?(usd>dl*.5?"bad":usd>dl*.25?"warn":"ok"):(dd&&usd>dd*.2?"warn":"ok");window.__bgState.risk=lv;
     chk=`<div class="rk-chk ${lv}">${lv==="bad"?"🛑":lv==="warn"?"⚠️":"✅"} <span><span>Risk per trade</span> <b class="mono" data-notr>${money(usd,0)}</b>${dl?` = <b class="mono" data-notr>${Math.round(usd/dl*100)}%</b> <span>of your daily loss limit</span> <span class="mono" data-notr>(${money(dl,0)})</span> → <b data-notr>${Math.max(1,Math.floor(dl/usd))}</b> <span>losses in a row hit it</span>`:""}${dd?`<span class="mut"> · <span data-notr>${Math.round(usd/dd*100)}%</span> <span>of your max drawdown</span></span>`:""}.</span></div>`}
   return `<div class="card rk-tools"><div class="rk-pre"><span class="mut rk-l">⭐ <span>Presets</span></span>${P.map((p,i)=>`<button type="button" class="rk-chip" data-rpre="${kind}:${i}"><span data-notr>${esc(p.name)}</span><i data-rdel="${kind}:${i}" title="Delete">×</i></button>`).join("")||`<span class="mut" style="font-size:12px"><span>Save your usual account and risk to load them in one tap.</span></span>`}
     <button type="button" class="btn sm" data-rsave="${kind}">＋ <span>Save these settings</span></button></div>
@@ -3756,7 +3893,7 @@ function vConsistency(el){const c=S._cons||(S._cons=calcLoad("cons")||{size:5000
     if(!(P>0&&P<=1)||!(T>0)){$("#cOut").innerHTML='<div class="card empty">Enter the target and rule %.</div>';return}
     if(!vs.some(v=>v)){$("#cOut").innerHTML='<div class="card empty">Enter your daily P/L first.</div>';return}
     const needTotal=Math.max(T,best>0?best/P:0),remain=Math.max(0,needTotal-tot),ratio=tot>0?best/tot:NaN;
-    const ok=tot>0&&best<=tot*P+1e-9,maxToday=Math.max(0,(P*tot-best)/(1-P));
+    const ok=tot>0&&best<=tot*P+1e-9,maxToday=Math.max(0,(P*tot-best)/(1-P));window.__bgState.cons=ok?1:-1;
     const gt=(k,cl,lab,val,sub)=>{const bump=prev[k]!==val;prev[k]=val;return `<div class="ctile gt ${cl}"><div class="ct-h"><span class="ct-ty">${lab}</span></div>
       <div class="ct-n"><b class="mono ${bump?"bump":""}">${val}</b></div><div class="gt-sub">${sub}</div></div>`};
     $("#cOut").innerHTML=`<div class="card grid cs-res">
@@ -4397,6 +4534,7 @@ function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,dis
      <p class="mut" style="margin:6px 0 0;font-size:12px"><span>Green and calm = the class follows its plans. Red and agitated = rules are being broken.</span></p></div></div>
     <div class="card adm-inbox"><h3>📥 <span>Needs you</span></h3>
      ${inbox.length?inbox.map(([ic,lv,t,p,tab,btn])=>`<div class="adm-it ${lv}"><span class="adm-ic">${ic}</span><div class="adm-tx"><div>${t}</div>${p?`<div class="adm-ppl">${p}</div>`:""}</div><button type="button" class="btn sm" data-at="${tab}">${btn} ›</button></div>`).join(""):`<div class="adm-empty">✅ <span>All clear. Nothing needs you right now.</span></div>`}</div>
+    ${admSummary(D).html}
     <div class="card adm-ann"><h3>📣 <span>Announcement to all students</span></h3>
      <p class="mut" style="font-size:12px;margin:0 0 10px"><span>Shown in every student's bell and sent on Telegram to the students connected to the bot.</span></p>
      <input class="i" id="annT" maxlength="120" placeholder="Title (e.g. Live session tonight at 20:00)">
@@ -4433,6 +4571,7 @@ function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,dis
      S.ann=A;list.innerHTML=A.length?`<div class="mut" style="font-size:12px;margin:12px 0 6px"><span>Recent announcements</span></div>`+A.slice(0,5).map(a=>`<div class="adm-an"><div><b data-notr>${esc(a.title||"—")}</b> <span class="mut mono" style="font-size:11px" data-notr>${esc(fmtDate(a.created_at.slice(0,10)))}</span><p data-notr>${esc(a.body).slice(0,200)}</p></div><button class="btn sm danger" type="button" data-andel="${a.id}" title="Delete">🗑</button></div>`).join(""):"";
      $$("[data-andel]",list).forEach(b=>b.onclick=()=>confirmBox(I18N.t("Delete this announcement? It disappears from the students' bell (Telegram messages already sent stay)."),async()=>{try{const r=await tgFn("announce=delete&id="+encodeURIComponent(b.dataset.andel));if(!r.ok)throw new Error(r.error||"error");toast(I18N.t("Announcement deleted"));draw()}catch(e){toast(String(e.message||e))}}))};
    draw();
+   {const sc=box.querySelector("#sumCopy");if(sc)sc.onclick=()=>{const tx=admSummary(D).txt;(navigator.clipboard?navigator.clipboard.writeText(tx):Promise.reject()).then(()=>toast(I18N.t("Summary copied"))).catch(()=>copyText(tx))}}
    box.querySelector("#annSend").onclick=()=>{const title=box.querySelector("#annT").value.trim(),body=box.querySelector("#annB").value.trim(),tg=box.querySelector("#annTg").checked;
      if(!body){toast(I18N.t("Write your message first"));return}
      confirmBox(`${I18N.t("Send this announcement to all students?")}${tg?" "+I18N.t("It will also be sent on Telegram."):""}`,async()=>{const btn=box.querySelector("#annSend");btn.disabled=true;
