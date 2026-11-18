@@ -89,6 +89,29 @@ export function sectionBg(el,kind,opts={}){
       x.fillStyle="#03050b";x.fillRect(0,0,W,H);x.globalCompositeOperation="lighter";x.lineWidth=Math.max(1,1.4*SC*2);
       for(let k=0;k<7;k++){const yb=H*(.2+k*.1),cc=k%2?mix(c,C("#5b6cf0"),.5):c;x.strokeStyle=rgba(cc,.16+.05*Math.sin(t+k));x.beginPath();
         for(let i=0;i<=120;i++){const xx=i/120*W,y=yb+Math.sin(i/120*6.3*(1+k*.15)+t*(.5+k*.05)+k)*H*amp+Math.sin(i/120*23+t*1.7+k*3)*H*amp*chaos;i?x.lineTo(xx,y):x.moveTo(xx,y)}x.stroke()}}
+    else if(kind==="streak"){
+      /* Journal: a faint notebook page; a warm gold glow rises from the bottom and grows with the journaling streak (days in a row) */
+      const st=Math.max(0,Math.min(12,s.jstreak||0)),k=st/12,c=ease(mix(C("#5b6cf0"),C("#f5b942"),Math.min(1,.25+k)),.03);
+      x.fillStyle="#04050a";x.fillRect(0,0,W,H);
+      const gap=Math.max(10,Math.round(H/26));x.lineWidth=Math.max(1,SC);
+      for(let y=gap*2;y<H;y+=gap){x.strokeStyle="rgba(124,139,255,.045)";x.beginPath();x.moveTo(0,y+.5);x.lineTo(W,y+.5);x.stroke()}
+      const mx=W*(ph?.08:.12);x.strokeStyle="rgba(255,90,116,.07)";x.beginPath();x.moveTo(mx,0);x.lineTo(mx,H);x.stroke();
+      x.globalCompositeOperation="lighter";
+      const br=.08+.14*k+.02*Math.sin(t*.5),hh=H*(.45+.35*k),g=x.createRadialGradient(W*.5,H*1.1,0,W*.5,H*1.1,Math.max(W*.7,hh*1.4));g.addColorStop(0,rgba(c,br));g.addColorStop(.6,rgba(c,br*.35));g.addColorStop(1,rgba(c,0));x.fillStyle=g;x.fillRect(0,0,W,H);
+      for(const m of motes){m.y-=m.v*.012*(.5+k);if(m.y<.35)m.y=1.05;x.fillStyle=rgba(c,(.08+.12*k)*(.6+.4*Math.sin(t+m.p)));x.beginPath();x.arc((m.x+Math.sin(t*.2+m.p)*.01)*W,m.y*H,m.r*SC*1.3,0,7);x.fill()}}
+    else if(kind==="pillars"){
+      /* Consistency rule: soft light pillars like daily profits. Consistent = even and teal; one day too big = one pillar towers, amber */
+      const ok=s.cons,n=ph?9:14,tgt=ok===-1?C("#f5a742"):C("#2ad1c9"),c=ease(tgt,.03),c2=mix(c,C("#5b6cf0"),.5);
+      x.fillStyle="#03050b";x.fillRect(0,0,W,H);
+      for(const p of stars){x.fillStyle=`rgba(210,220,255,${.06+.06*Math.sin(t*1.1+p.p)})`;x.fillRect(p.x*W,p.y*H*.6,p.r*SC,p.r*SC)}
+      x.globalCompositeOperation="lighter";
+      const big=Math.floor(n*.62),gw=W/(n+1),bw=gw*.42,base=H*.92;
+      for(let i=0;i<n;i++){const seed=Math.sin(i*12.9898)*43758.5453%1,even=.2+.06*Math.abs(seed),hgt=(ok===-1&&i===big?.62:even+(ok===-1?.05*Math.abs(seed):0))*(1+.05*Math.sin(t*.5+i*1.3)),h=H*hgt,xx=gw*(i+1)-bw/2,cc=ok===-1&&i===big?C("#ff8a3d"):(i%2?c2:c);
+        const g=x.createLinearGradient(0,base-h,0,base);g.addColorStop(0,rgba(cc,0));g.addColorStop(.35,rgba(cc,.05));g.addColorStop(1,rgba(cc,.13));x.fillStyle=g;x.fillRect(xx,base-h,bw,h);
+        x.fillStyle=rgba(cc,.18+.06*Math.sin(t*.8+i));x.fillRect(xx,base-h,bw,Math.max(1,SC*1.5))}
+      /* the rule line: no pillar should cross it */
+      const ly=base-H*(ok===-1?.45:.34);x.strokeStyle=ok===-1?"rgba(255,138,61,.16)":"rgba(42,209,201,.12)";x.lineWidth=Math.max(1,SC*1.2);x.setLineDash([6,8]);x.beginPath();x.moveTo(gw*.5,ly);x.lineTo(W-gw*.5,ly);x.stroke();x.setLineDash([]);
+      const gl=x.createRadialGradient(W/2,H,0,W/2,H,W*.6);gl.addColorStop(0,rgba(c,.06));gl.addColorStop(1,rgba(c,0));x.fillStyle=gl;x.fillRect(0,0,W,H)}
     else if(kind==="tide"){
       /* Journal: slow soft waves coloured by the emotions logged today (or on the last trading day):
          calm / disciplined = blue · fear / hesitation = purple · impatience / FOMO / greed / revenge = orange */
