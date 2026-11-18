@@ -293,3 +293,65 @@ export function pillarsBackground(el,opts={}){
     r.render(scene,cam);
     if(opts.still&&++stillN>3){stopped=true;const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});r.dispose()}},3000)}})();
   return {r}}
+
+/* 10. NEWS BACKGROUND (3D): the Earth from orbit, NASA Blue Marble (day) + Black Marble (city lights) textures
+   (public domain, served with three.js). Real day/night line from the current sun position, drifting clouds,
+   thin atmosphere. Tokyo / London / New York glow while their session is open; the atmosphere turns softly red
+   before red news. Soft on purpose. opts.still = draw once (Light mode). */
+export function earthBackground(el,opts={}){
+  const ph=small(),r=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"}),dpr=Math.min(devicePixelRatio,ph?1.4:1.75);
+  r.setPixelRatio(dpr);r.setSize(innerWidth,innerHeight);el.innerHTML="";el.appendChild(r.domElement);
+  const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(ph?44:34,innerWidth/innerHeight,.1,500);cam.position.set(0,0,22);
+  const TX="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r164/examples/textures/planets/",L=new THREE.TextureLoader();L.setCrossOrigin("anonymous");
+  const tex=n=>{const t=L.load(TX+n);t.colorSpace=n.includes("normal")||n.includes("specular")?THREE.NoColorSpace:THREE.SRGBColorSpace;t.anisotropy=4;return t};
+  const day=tex("earth_atmos_2048.jpg"),night=tex("earth_lights_2048.png"),clouds=tex("earth_clouds_1024.png"),spec=tex("earth_specular_2048.jpg");
+  /* sun direction from the real date and time (subsolar point) */
+  const sunDir=()=>{const d=new Date(),utc=d.getUTCHours()+d.getUTCMinutes()/60,doy=Math.floor((d-new Date(Date.UTC(d.getUTCFullYear(),0,0)))/864e5),lon=(12-utc)*15*Math.PI/180,lat=-23.44*Math.cos(2*Math.PI*(doy+10)/365)*Math.PI/180;
+    return new THREE.Vector3(Math.cos(lat)*Math.sin(lon+Math.PI/2),Math.sin(lat),Math.cos(lat)*Math.cos(lon+Math.PI/2))};
+  const R=6,earth=new THREE.Group();scene.add(earth);
+  const U={dayMap:{value:day},nightMap:{value:night},specMap:{value:spec},sun:{value:sunDir()},soft:{value:.62}};
+  const mat=new THREE.ShaderMaterial({uniforms:U,
+    vertexShader:`varying vec2 vUv;varying vec3 vN;varying vec3 vV;void main(){vUv=uv;vN=normalize(mat3(modelMatrix)*normal);vec4 w=modelMatrix*vec4(position,1.);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}`,
+    fragmentShader:`uniform sampler2D dayMap;uniform sampler2D nightMap;uniform sampler2D specMap;uniform vec3 sun;uniform float soft;varying vec2 vUv;varying vec3 vN;varying vec3 vV;
+      void main(){float d=dot(normalize(vN),normalize(sun));float k=smoothstep(-.12,.28,d);
+        vec3 dayC=texture2D(dayMap,vUv).rgb*(.18+.95*max(d,0.));float sp=texture2D(specMap,vUv).r;vec3 h=normalize(normalize(sun)+vV);dayC+=vec3(.55,.7,1.)*pow(max(dot(normalize(vN),h),0.),40.)*sp*.35*k;
+        vec3 nightC=texture2D(nightMap,vUv).rgb*vec3(1.,.82,.55)*1.25;
+        vec3 c=mix(nightC,dayC,k);float fr=pow(1.-max(dot(normalize(vN),vV),0.),3.);c+=vec3(.25,.45,1.)*fr*(.18+.28*k);
+        gl_FragColor=vec4(c*soft,1.);}`});
+  const globe=new THREE.Mesh(new THREE.SphereGeometry(R,ph?64:96,ph?48:72),mat);earth.add(globe);
+  const cl=new THREE.Mesh(new THREE.SphereGeometry(R*1.012,ph?64:96,ph?48:72),new THREE.MeshLambertMaterial({map:clouds,transparent:true,opacity:.28,depthWrite:false}));earth.add(cl);
+  const sunL=new THREE.DirectionalLight(0xffffff,1.6);scene.add(sunL);scene.add(new THREE.AmbientLight(0x223355,.25));
+  /* atmosphere halo */
+  const AU={c:{value:new THREE.Color("#4d8bff")},s:{value:.32}};
+  const atm=new THREE.Mesh(new THREE.SphereGeometry(R*1.12,64,48),new THREE.ShaderMaterial({uniforms:AU,side:THREE.BackSide,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,
+    vertexShader:`varying vec3 vN;varying vec3 vV;void main(){vN=normalize(mat3(modelMatrix)*normal);vec4 w=modelMatrix*vec4(position,1.);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}`,
+    fragmentShader:`uniform vec3 c;uniform float s;varying vec3 vN;varying vec3 vV;void main(){float i=pow(max(.72-dot(vN,vV),0.),2.6);gl_FragColor=vec4(c,1.)*i*s;}`}));earth.add(atm);
+  /* session cities: glow when the session is open */
+  const glowTex=(()=>{const s=document.createElement("canvas");s.width=s.height=64;const x=s.getContext("2d"),g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,"rgba(255,255,255,1)");g.addColorStop(.3,"rgba(255,255,255,.5)");g.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(s)})();
+  const ll=(lat,lon,rad)=>{const p=(90-lat)*Math.PI/180,t=(lon+180)*Math.PI/180;return new THREE.Vector3(-rad*Math.sin(p)*Math.cos(t),rad*Math.cos(p),rad*Math.sin(p)*Math.sin(t))};
+  const SES=[["Asia/Tokyo",35.7,139.7,9,15,"#7c8bff"],["Europe/London",51.5,-.1,8,16.5,"#2ad1c9"],["America/New_York",40.7,-74,9.5,16,"#f5b942"]].map(([tz,la,lo,o,c,col])=>{
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:col,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:0}));sp.position.copy(ll(la,lo,R*1.01));sp.scale.set(.9,.9,1);globe.add(sp);return {tz,o,c,sp}});
+  const openNow=s=>{try{const p=new Intl.DateTimeFormat("en-US",{timeZone:s.tz,hour:"2-digit",minute:"2-digit",weekday:"short",hour12:false}).formatToParts(new Date()),g=k=>(p.find(x=>x.type===k)||{}).value,h=(Number(g("hour"))%24)+Number(g("minute"))/60,wd=g("weekday");return wd!=="Sat"&&wd!=="Sun"&&h>=s.o&&h<s.c}catch(e){return false}};
+  /* stars */
+  const SN=ph?900:1800,sp=new Float32Array(SN*3);for(let i=0;i<SN;i++){const u=Math.random()*2-1,a=Math.random()*Math.PI*2,rr=120+Math.random()*120,q=Math.sqrt(1-u*u);sp.set([rr*q*Math.cos(a),rr*u,rr*q*Math.sin(a)-60],i*3)}
+  const sg=new THREE.BufferGeometry();sg.setAttribute("position",new THREE.BufferAttribute(sp,3));scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xaab8ff,size:ph?.55:.45,transparent:true,opacity:.45,depthWrite:false})));
+  /* framing: a big Earth low on the right, like a satellite view */
+  const place=()=>{if(ph){earth.position.set(1.2,-6.2,0)}else{earth.position.set(5.2,-3.6,0)}};place();earth.rotation.z=.41;
+  const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()};addEventListener("resize",rs);
+  let mx=0,my=0;const mv=e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5};addEventListener("pointermove",mv,{passive:true});
+  const clock=new THREE.Clock();let last=0,cx=0,cy=0,stopped=false,stillN=0,red=0,openT=0;
+  /* the globe is turned so the sun-lit side faces the viewer a little; it then turns slowly */
+  globe.rotation.y=-1.2;
+  (function loop(){if(stopped)return;if(!el.isConnected){removeEventListener("resize",rs);removeEventListener("pointermove",mv);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){["map","dayMap"].forEach(k=>{});o.material.dispose()}});[day,night,clouds,spec,glowTex].forEach(t=>t.dispose());r.dispose();return}
+    requestAnimationFrame(loop);if(document.hidden)return;const t=opts.still?3:clock.getElapsedTime(),dt=opts.still?1:Math.min(.05,t-last);last=t;
+    globe.rotation.y+=dt*.012;cl.rotation.y=globe.rotation.y+t*.004;
+    /* sun follows the globe's turn so the real day/night line stays true on the map */
+    const s=sunDir().applyAxisAngle(new THREE.Vector3(0,1,0),globe.rotation.y).applyAxisAngle(new THREE.Vector3(0,0,1),earth.rotation.z);U.sun.value.copy(s);sunL.position.copy(s).multiplyScalar(50);
+    openT-=dt;if(openT<=0){openT=20;SES.forEach(x=>x.on=openNow(x))}
+    SES.forEach((x,i)=>{const tgt=x.on?.75+.25*Math.sin(t*2+i):.12;x.sp.material.opacity+=(tgt-x.sp.material.opacity)*Math.min(1,dt*2);const sc=x.on?1.1+.25*Math.sin(t*2+i):.6;x.sp.scale.set(sc,sc,1)});
+    const rs2=!!(window.__bgState||{}).redSoon;red+=((rs2?1:0)-red)*Math.min(1,dt*1.5);AU.c.value.set("#4d8bff").lerp(new THREE.Color("#ff2d55"),red*(.6+.4*Math.sin(t*3.2)));AU.s.value=.32+.3*red;
+    const mxS=Math.max(1,document.documentElement.scrollHeight-innerHeight),sf=Math.min(1,Math.max(0,scrollY/mxS));
+    cx+=(mx*.8-cx)*Math.min(1,dt*1.5);cy+=(-my*.5-cy)*Math.min(1,dt*1.5);cam.position.set(cx,cy+sf*1.5,22-sf*2);cam.lookAt(cx*.3,sf*.6,0);
+    r.render(scene,cam);
+    if(opts.still&&++stillN>8){stopped=true;const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);r.dispose()}},3000)}})();
+  return {r}}
