@@ -2005,18 +2005,9 @@ const VIEWS=[["today","Today"],["journal","Journal"],["stats","Statistics"],["ne
 function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button data-v="${k}" class="${c||""} ${S.view===k?"on":""}"><span class="tico t-${k}">${ico(k)}</span><span>${l}</span></button>`;
   if(S.me.role==="admin")h+=tab("admin","Admin dashboard","admin");
   if(S.readonly)h+=tab("student","Student file","admin");
-  const MAIN=["today","journal","stats","news","plan"],tools=VIEWS.filter(([k])=>!MAIN.includes(k)),onT=tools.find(([k])=>k===S.view);
-  VIEWS.forEach(([k,l])=>{if(MAIN.includes(k))h+=tab(k,l)});
-  if(S._toolsOpen==null)S._toolsOpen=!!onT;const open=S._toolsOpen||!!onT;
-  h+=`<button type="button" id="toolsBtn" class="tools-btn ${open?"open":""}" aria-expanded="${open}"><span class="tico">🧰</span><span>Tools</span><span class="tools-car">›</span></button>`;
-  if(open)h+=tools.map(([k,l],i)=>tab(k,l,"tool-tab").replace("<button ",`<button style="animation-delay:${i*45}ms" `)).join("");
+  /* every section side by side; the ‹ › arrows on the edges of the bar scroll it when it doesn't fit */
+  VIEWS.forEach(([k,l])=>{h+=tab(k,l)});
   t.innerHTML=h;$$("button[data-v]",t).forEach(b=>b.onclick=()=>go(b.dataset.v));
-  let tm=$("#toolsMenu");if(!tm){tm=document.createElement("div");tm.id="toolsMenu";tm.className="tools-menu hidden";document.body.appendChild(tm)}
-  tm.innerHTML=tools.map(([k,l])=>`<button type="button" data-v="${k}" class="${S.view===k?"on":""}"><span class="tico t-${k}">${ico(k)}</span><span>${l}</span></button>`).join("");
-  $$("button[data-v]",tm).forEach(b=>b.onclick=()=>{tm.classList.add("hidden");go(b.dataset.v)});
-  tm.classList.add("hidden");   /* kept only as the list for the phone "More" sheet and swipe order */
-  $("#toolsBtn").onclick=e=>{e.stopPropagation();const wasOpen=$("#toolsBtn").classList.contains("open");if(wasOpen&&onT)return;S._toolsOpen=!wasOpen;renderTabs();
-    if(S._toolsOpen)setTimeout(()=>{const tb=$("#tabs");tb.scrollTo({left:document.documentElement.dir==="rtl"?-tb.scrollWidth:tb.scrollWidth,behavior:"smooth"})},60)};
   const on=$("button.on",t);if(on&&t.scrollWidth>t.clientWidth)t.scrollTo({left:on.offsetLeft-(t.clientWidth-on.offsetWidth)/2,behavior:"smooth"});
   renderBottomNav();tabsArrows()}
 /* PC menu bar: ‹ › arrows appear when the sections don't fit; smooth scroll, mouse wheel scrolls sideways */
