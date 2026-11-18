@@ -6,7 +6,7 @@
 //   - daily loss: 80% of the limit, and limit reached (prop firm rules daily limit, or today's plan max loss)
 //   - Sunday 20:00: weekly summary for the admin (top students, broken plans, inactive, requests, affiliate clicks)
 // Students can turn each reminder off in the app (user_settings.data.notify). ?test=1 (with the user's login token) sends a test message;
-// ?test=weekly (admin) sends the weekly summary now.
+// ?test=weekly (admin) sends the weekly summary now. POST ?announce=1 (admin) saves an announcement and sends it to all students.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
@@ -123,6 +123,29 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (!TOKEN) return json({ ok: false, error: "TELEGRAM_BOT_TOKEN secret is missing" }, 500);
   const url = new URL(req.url);
+
+  // announcement from the admin (POST ?announce=1 {title, body}): saved in public.announcements (shown in the app's bell)
+  // and sent on Telegram to every approved student connected to the bot. ?announce=delete&id=... removes one.
+  const ann = url.searchParams.get("announce");
+  if (ann) {
+    const jwt = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+    const { data: u } = await sb.auth.getUser(jwt);
+    if (!u?.user) return json({ ok: false, error: "not_logged_in" }, 401);
+    const { data: me } = await sb.from("profiles").select("role").eq("id", u.user.id).single();
+    if (me?.role !== "admin") return json({ ok: false, error: "admin_only" }, 403);
+    if (ann === "delete") { const id = url.searchParams.get("id") || ""; const { error } = await sb.from("announcements").delete().eq("id", id); return json({ ok: !error }); }
+    const b = await req.json().catch(() => ({}));
+    const title = String(b.title || "").trim().slice(0, 120), body = String(b.body || "").trim().slice(0, 3000);
+    if (!body) return json({ ok: false, error: "empty" }, 400);
+    const { data: row, error } = await sb.from("announcements").insert({ title, body, created_by: u.user.id }).select("id").single();
+    if (error) return json({ ok: false, error: error.message }, 500);
+    let sent = 0, failed = 0;
+    if (b.telegram !== false) {
+      const text = "📣 <b>" + esc(title || "Tradeversity") + "</b>\n\n" + esc(body) + "\n\n— BROWN ALGO\n" + SITE;
+      for (const s of await students()) { if (await send(s.telegram_id, text)) sent++; else failed++; }
+    }
+    return json({ ok: true, id: row?.id, sent, failed });
+  }
 
   // test message for the logged-in user (button in the app)
   const test = url.searchParams.get("test");

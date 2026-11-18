@@ -1,4 +1,4 @@
-/* =====================================================================
+﻿/* =====================================================================
    Tradeversity Journal — languages (English / Français / العربية)
    The app is written in English. This file translates what is on screen,
    so saved data (sides, emotions, plans…) always stays in English.
@@ -861,6 +861,13 @@ const T={
 "Discipline leaderboard":["Classement de discipline","ترتيب الانضباط"],"Copy top 3 for Telegram":["Copier le top 3 pour Telegram","انسخ أفضل 3 لتيليغرام"],
 "Ranked by the average daily discipline score this month (at least 3 active days), not by profit.":["Classé selon le score de discipline journalier moyen de ce mois (au moins 3 jours actifs), pas selon le profit.","مرتب حسب متوسط نقاط الانضباط اليومية هذا الشهر (3 أيام نشطة على الأقل)، وليس حسب الربح."],
 "Active days":["Jours actifs","الأيام النشطة"],"Streak":["Série","السلسلة"],"Not enough activity yet this month.":["Pas encore assez d'activité ce mois-ci.","لا يوجد نشاط كافٍ هذا الشهر بعد."],
+"Announcement to all students":["Annonce à tous les étudiants","إعلان لجميع الطلاب"],"Shown in every student's bell and sent on Telegram to the students connected to the bot.":["Affichée dans la cloche de chaque étudiant et envoyée sur Telegram aux étudiants connectés au bot.","تظهر في جرس كل طالب وتُرسل على تيليغرام للطلاب المتصلين بالبوت."],
+"Title (e.g. Live session tonight at 20:00)":["Titre (ex. Live ce soir à 20h00)","العنوان (مثلاً: بث مباشر الليلة الساعة 20:00)"],"Your message":["Votre message","رسالتك"],"Also send on Telegram":["Envoyer aussi sur Telegram","أرسل أيضاً على تيليغرام"],
+"Send to all students":["Envoyer à tous les étudiants","أرسل لجميع الطلاب"],"Recent announcements":["Annonces récentes","الإعلانات الأخيرة"],"Announcement from Brown Algo":["Annonce de Brown Algo","إعلان من Brown Algo"],
+"Send this announcement to all students?":["Envoyer cette annonce à tous les étudiants ?","إرسال هذا الإعلان لجميع الطلاب؟"],"It will also be sent on Telegram.":["Elle sera aussi envoyée sur Telegram.","سيُرسل أيضاً على تيليغرام."],
+"Announcement sent":["Annonce envoyée","تم إرسال الإعلان"],"on Telegram":["sur Telegram","على تيليغرام"],"failed":["échecs","فشل"],"Couldn't send":["Envoi impossible","تعذّر الإرسال"],"Write your message first":["Écrivez d'abord votre message","اكتب رسالتك أولاً"],
+"Announcement deleted":["Annonce supprimée","تم حذف الإعلان"],"Announcements are not set up yet on the server.":["Les annonces ne sont pas encore activées sur le serveur.","الإعلانات غير مفعلة على الخادم بعد."],
+"Delete this announcement? It disappears from the students' bell (Telegram messages already sent stay).":["Supprimer cette annonce ? Elle disparaît de la cloche des étudiants (les messages Telegram déjà envoyés restent).","حذف هذا الإعلان؟ يختفي من جرس الطلاب (رسائل تيليغرام المرسلة تبقى)."],
 "Overview":["Vue d'ensemble","نظرة عامة"],"Requests":["Demandes","الطلبات"],"Discipline":["Discipline","الانضباط"],"Students":["Étudiants","الطلاب"],"Affiliates":["Affiliation","الإحالات"],"Settings & updates":["Réglages et mises à jour","الإعدادات والتحديثات"],
 "Ready to approve":["Prêts à approuver","جاهزون للقبول"],"Trades this week":["Trades cette semaine","صفقات هذا الأسبوع"],"Rule breaks this week":["Règles cassées cette semaine","مخالفات هذا الأسبوع"],"Link clicks · 30 days":["Clics sur liens · 30 jours","نقرات الروابط · 30 يوماً"],
 "active this week":["actifs cette semaine","نشطون هذا الأسبوع"],"waiting for verification":["en attente de vérification","في انتظار التحقق"],"broke the plan or hit max loss":["plan cassé ou perte max atteinte","خالفوا الخطة أو بلغوا أقصى خسارة"],"affiliate & BROWN23":["affiliation et BROWN23","الإحالة و BROWN23"],
@@ -1003,3 +1010,4 @@ window.I18N={
     document.addEventListener("change",e=>{if(e.target.classList&&e.target.classList.contains("langSel"))I18N.set(e.target.value)})}
 };
 })();
+

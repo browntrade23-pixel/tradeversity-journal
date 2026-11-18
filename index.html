@@ -1429,6 +1429,9 @@ html.focus-on #tabs,html.focus-on #bnav{display:none!important}
 @media(max-width:1000px){.bdg-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:820px){.bdg-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.td-fgrid{grid-template-columns:1fr}.td-hr{justify-content:flex-start}}
 </style>
+<style>
+.adm-an{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);margin-top:6px}.adm-an p{margin:4px 0 0;font-size:13px;white-space:pre-line}
+</style>
 </head>
 <body>
 
@@ -1711,6 +1714,7 @@ const Cloud={
   async allTradesLite(){const{data,error}=await this.sb.from("trades").select("id,user_id,trade_date,symbol,account,pnl,data").limit(20000);if(error)throw error;return data.map(r=>({...(r.data||{}),id:r.id,user_id:r.user_id,shots:[]}))},
   /* affiliate / coupon click counter (insert by anyone, read by admin only) */
   track(kind,firm,place){try{if(!this.sb||!firm)return;this.sb.from("aff_clicks").insert({kind,firm:String(firm).slice(0,40),place:String(place||"").slice(0,40),user_id:(S.me&&S.me.id)||null}).then(()=>{},()=>{})}catch(e){}},
+  async announcements(){const since=new Date(Date.now()-30*864e5).toISOString();const{data,error}=await this.sb.from("announcements").select("id,title,body,created_at").gte("created_at",since).order("created_at",{ascending:false}).limit(10);if(error)throw error;return data||[]},
   async affClicks(){const since=new Date(Date.now()-90*864e5).toISOString();const{data,error}=await this.sb.from("aff_clicks").select("kind,firm,place,created_at").gte("created_at",since).limit(10000);if(error)throw error;return data},
   /* per-user settings saved in the account (prop firm rules, commission rates) */
   async getSettings(){const{data,error}=await this.sb.from("user_settings").select("data").eq("user_id",S.me.id).maybeSingle();if(error)throw error;return (data&&data.data)||{}},
@@ -1844,8 +1848,10 @@ async function enter(u){
 async function loadSubject(u,readonly){
   S.subject=u;S.readonly=readonly;S.acct="all";S.page=null;S._planDate=null;
   try{[S.trades,S.plans]=await Promise.all([API.listTrades(u.id),API.listPlans(u.id)])}catch(e){toast("Couldn't load data: "+(e.message||e));S.trades=[];S.plans=[]}
-  loadNews();
+  loadNews();loadAnn();
 }
+/* 📣 announcements from Brown Algo (last 30 days), shown in the bell */
+S.ann=[];async function loadAnn(){try{if(!API||!API.announcements)return;S.ann=await API.announcements();setTimeout(ntfRefresh,0)}catch(e){S.ann=[]}}
 
 /* ============ nav ============ */
 /* crisp line icons (24×24, drawn with the current text colour) */
@@ -1919,6 +1925,8 @@ function ntfItems(){const out=[];if(!S.me)return out;const now=Date.now(),me=S.m
       t:`${I18N.t("Today's news")}: ${evT.length}${reds?` (${reds} ${I18N.t("red")})`:""}`,
       s:evT.slice(0,5).map(n=>`${n.impact==="High"?"🔴":"🟠"} ${tzTime(n.starts_at,DZ)} DZ · ${esc(n.title)}`).join("<br>")+(evT.length>5?`<br>+${evT.length-5}`:""),
       sub2:I18N.t("Tap to open the news page and read what each news means.")})}
+  /* 📣 announcements (last 14 days) */
+  (S.ann||[]).filter(a=>Date.now()-new Date(a.created_at).getTime()<14*864e5).forEach(a=>out.push({id:"ann:"+a.id,ic:"📣",lv:"info",go:"today",t:a.title||I18N.t("Announcement from Brown Algo"),s:esc(a.body||"").slice(0,400).replace(/\n/g,"<br>")}));
   /* admin: students who finished Telegram + email verification and wait for approval (new student = new unseen notification) */
   if(!student&&S._rqReady&&S._rqReady.length){const R=S._rqReady;
     out.unshift({id:"ready:"+R.map(x=>x.id).sort().join(","),ic:"🎉",lv:"warn",go:"admin",
@@ -3963,6 +3971,13 @@ function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,dis
     </div>
     <div class="card adm-inbox"><h3>📥 <span>Needs you</span></h3>
      ${inbox.length?inbox.map(([ic,lv,t,p,tab,btn])=>`<div class="adm-it ${lv}"><span class="adm-ic">${ic}</span><div class="adm-tx"><div>${t}</div>${p?`<div class="adm-ppl">${p}</div>`:""}</div><button type="button" class="btn sm" data-at="${tab}">${btn} ›</button></div>`).join(""):`<div class="adm-empty">✅ <span>All clear. Nothing needs you right now.</span></div>`}</div>
+    <div class="card adm-ann"><h3>📣 <span>Announcement to all students</span></h3>
+     <p class="mut" style="font-size:12px;margin:0 0 10px"><span>Shown in every student's bell and sent on Telegram to the students connected to the bot.</span></p>
+     <input class="i" id="annT" maxlength="120" placeholder="Title (e.g. Live session tonight at 20:00)">
+     <textarea class="i" id="annB" maxlength="3000" style="min-height:90px;margin-top:8px" placeholder="Your message"></textarea>
+     <div class="row" style="justify-content:space-between;gap:8px;margin-top:8px;flex-wrap:wrap"><label class="row" style="gap:6px;font-size:13px"><input type="checkbox" id="annTg" checked> <span>Also send on Telegram</span></label>
+      <button class="btn pri" type="button" id="annSend">📣 <span>Send to all students</span></button></div>
+     <div id="annList" class="adm-annl"></div></div>
     <div class="grid g2">
      <div class="card"><h3>📈 <span>Active students per day</span> <small class="mut">· <span>last 14 days</span></small></h3>${bars(act,days14.map(d=>fmtDate(d).split(",")[0]+" "+d.slice(8)))}</div>
      <div class="card"><h3>🆕 <span>New sign-ups per week</span> <small class="mut">· <span>last 8 weeks</span></small></h3>${bars(sign,wk8.map(w=>fmtDate(w[0])),"gold")}</div>
@@ -3986,6 +4001,19 @@ function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,dis
   [...el.querySelectorAll(":scope > .card, :scope > .grid")].forEach(n=>{if(n.querySelector("#aT"))put(n,"students");else if(/Group weak spots/.test(n.textContent))put(n,"overview");else if(n.classList.contains("grid")&&n.querySelector(".kpi"))n.remove()});
   if(!box.querySelector('[data-sec="requests"]').children.length)box.querySelector('[data-sec="requests"]').innerHTML=`<div class="card adm-empty">✅ <span>No pending requests.</span></div>`;
   if(!box.querySelector('[data-sec="affiliates"]').children.length)box.querySelector('[data-sec="affiliates"]').innerHTML=`<div class="card adm-empty"><span>No clicks recorded yet.</span></div>`;
+  /* 📣 announcements: send (server function: saves it + Telegram to all students), list, delete */
+  {const list=box.querySelector("#annList");
+   const draw=async()=>{let A=[];try{A=API.announcements?await API.announcements():[]}catch(e){list.innerHTML=`<p class="mut" style="font-size:12px">${esc(I18N.t("Announcements are not set up yet on the server."))}</p>`;return}
+     S.ann=A;list.innerHTML=A.length?`<div class="mut" style="font-size:12px;margin:12px 0 6px"><span>Recent announcements</span></div>`+A.slice(0,5).map(a=>`<div class="adm-an"><div><b data-notr>${esc(a.title||"—")}</b> <span class="mut mono" style="font-size:11px" data-notr>${esc(fmtDate(a.created_at.slice(0,10)))}</span><p data-notr>${esc(a.body).slice(0,200)}</p></div><button class="btn sm danger" type="button" data-andel="${a.id}" title="Delete">🗑</button></div>`).join(""):"";
+     $$("[data-andel]",list).forEach(b=>b.onclick=()=>confirmBox(I18N.t("Delete this announcement? It disappears from the students' bell (Telegram messages already sent stay)."),async()=>{try{const r=await tgFn("announce=delete&id="+encodeURIComponent(b.dataset.andel));if(!r.ok)throw new Error(r.error||"error");toast(I18N.t("Announcement deleted"));draw()}catch(e){toast(String(e.message||e))}}))};
+   draw();
+   box.querySelector("#annSend").onclick=()=>{const title=box.querySelector("#annT").value.trim(),body=box.querySelector("#annB").value.trim(),tg=box.querySelector("#annTg").checked;
+     if(!body){toast(I18N.t("Write your message first"));return}
+     confirmBox(`${I18N.t("Send this announcement to all students?")}${tg?" "+I18N.t("It will also be sent on Telegram."):""}`,async()=>{const btn=box.querySelector("#annSend");btn.disabled=true;
+       try{const {data}=await Cloud.sb.auth.getSession();const tok=data&&data.session&&data.session.access_token;
+         const r=await (await fetch(CONFIG.SUPABASE_URL+"/functions/v1/tg-reminders?announce=1",{method:"POST",headers:{Authorization:"Bearer "+tok,apikey:CONFIG.SUPABASE_ANON_KEY,"Content-Type":"application/json"},body:JSON.stringify({title,body,telegram:tg})})).json();
+         if(!r.ok)throw new Error(r.error||"error");toast(`📣 ${I18N.t("Announcement sent")}${tg?` · ${r.sent} ${I18N.t("on Telegram")}${r.failed?` · ${r.failed} ${I18N.t("failed")}`:""}`:""}`);
+         box.querySelector("#annT").value="";box.querySelector("#annB").value="";draw()}catch(e){toast(I18N.t("Couldn't send")+": "+(e.message||e))}btn.disabled=false})}}
   /* 🏆 discipline leaderboard of this month: average daily discipline score on active days (not profit) */
   {const m0=today.slice(0,8)+"01",mName=new Date().toLocaleString(I18N.lang==="fr"?"fr-FR":I18N.lang==="ar"?"ar":"en-US",{month:"long"});
    const lb=students.map(s=>{const TR=trades.filter(t=>t.user_id===s.id),PL=plans.filter(p=>p.user_id===s.id),J=judgeTrades(TR).out;
@@ -4202,7 +4230,7 @@ async function bootDemo(){const D=demoData();S._demo=true;
     listTrades:async()=>mem.trades,loadTrades:async()=>mem.trades,listPlans:async()=>mem.plans,getPlan:async()=>null,
     saveTrade:async t=>{const i=mem.trades.findIndex(x=>x.id===t.id);if(i>=0)mem.trades[i]=t;else mem.trades.push(t)},saveTrades:async ts=>{mem.trades.push(...ts)},
     deleteTrade:async t=>{mem.trades=mem.trades.filter(x=>x.id!==t.id)},deleteTrades:async ids=>{const s=new Set(ids);mem.trades=mem.trades.filter(x=>!s.has(x.id))},
-    savePlan:ok,news:async()=>D.news,getSettings:async()=>mem.settings,saveSettings:ok,track:()=>{},affClicks:async()=>[],
+    savePlan:ok,news:async()=>D.news,getSettings:async()=>mem.settings,saveSettings:ok,track:()=>{},affClicks:async()=>[],announcements:async()=>[],
     listShares:async()=>[],createShare:async()=>{throw new Error("Not available in the demo")},signOut:async()=>{location.href=location.pathname}};
   document.documentElement.classList.add("demo");
   await enter({id:"demo",email:"demo@tradeversity",role:"student",name:"Demo Trader",telegram:"@demo_trader",status:"approved",tgOk:true,emailOk:true});
@@ -4225,6 +4253,8 @@ async function bootDemo(){const D=demoData();S._demo=true;
 <script type="module">import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))</script>
 </body>
 </html>
+
+
 
 
 
