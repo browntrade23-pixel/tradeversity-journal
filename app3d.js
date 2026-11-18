@@ -445,3 +445,67 @@ export function bookBackground(el,opts={}){
     const a=dg.attributes.position.array;for(let i=0;i<DN;i++){a[i*3+1]+=dt*.08;if(a[i*3+1]>5)a[i*3+1]=0}dg.attributes.position.needsUpdate=true;
     cam.position.set(ph?0:.8,ph?6.6:5.4,ph?9.5:8.2);cam.lookAt(ph?0:1.7,0,.2)},()=>tx.forEach(x=>x.dispose()));
   return {r}}
+
+/* 13. ICT INDICATOR BACKGROUND (3D): the killzones ring. A 24-hour ring tilted in space (New York time),
+   the 4 ICT killzones as soft arcs (Asia 20-24, London 2-5, NY AM 7-10, NY PM 13:30-16), a hand at the time now;
+   the killzone you are in glows (weekdays). Soft on purpose. */
+export function killzonesBackground(el,opts={}){
+  const ph=small(),r=softRenderer(el),scene=new THREE.Scene();scene.fog=new THREE.Fog(0x03040a,14,40);
+  const cam=new THREE.PerspectiveCamera(ph?50:40,innerWidth/innerHeight,.1,200);
+  const gt=softGlowTex();
+  const SN=ph?500:900,sp=new Float32Array(SN*3);for(let i=0;i<SN;i++)sp.set([(Math.random()-.5)*90,(Math.random()-.2)*45,-20-Math.random()*40],i*3);
+  const sg=new THREE.BufferGeometry();sg.setAttribute("position",new THREE.BufferAttribute(sp,3));scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xaab8ff,size:.11,transparent:true,opacity:.35,depthWrite:false})));
+  const G=new THREE.Group();scene.add(G);G.rotation.x=-1.05;G.rotation.z=.15;
+  if(ph){G.position.set(0,-2.2,0);G.scale.setScalar(.72)}else{G.position.set(3.6,-.3,0);G.scale.setScalar(.78)}
+  G.add(new THREE.Mesh(new THREE.TorusGeometry(5,.025,8,180),new THREE.MeshBasicMaterial({color:0x2b3566,transparent:true,opacity:.6})));
+  for(let h=0;h<24;h++){const a=h/24*Math.PI*2,m=new THREE.Mesh(new THREE.BoxGeometry(h%6?.035:.06,h%6?.22:.45,.02),new THREE.MeshBasicMaterial({color:h%6?0x2e3866:0x5b6cf0,transparent:true,opacity:.7}));m.position.set(Math.sin(a)*5.45,Math.cos(a)*5.45,0);m.rotation.z=-a;G.add(m)}
+  const label=(txt,col)=>{const c=document.createElement("canvas");c.width=256;c.height=64;const x=c.getContext("2d");x.font="800 30px Inter, system-ui, sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillStyle=col;x.fillText(txt,128,34);
+    const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,opacity:.3,depthWrite:false}));s.scale.set(2.2,.55,1);return s};
+  const KZ=[[20,24,"#7c8bff","ASIA"],[2,5,"#2ad1c9","LONDON"],[7,10,"#f5b942","NY AM"],[13.5,16,"#ff8a3d","NY PM"]];
+  const arcs=KZ.map(([s,e,c,n])=>{const a0=s/24*Math.PI*2,a1=e/24*Math.PI*2,m=new THREE.Mesh(new THREE.TorusGeometry(5,.13,16,90,a1-a0),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false}));
+    m.rotation.z=Math.PI/2-a1;G.add(m);const gl=new THREE.Mesh(new THREE.TorusGeometry(5,.5,16,90,a1-a0),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.03,blending:THREE.AdditiveBlending,depthWrite:false}));gl.rotation.z=m.rotation.z;G.add(gl);
+    const am=(a0+a1)/2,lb=label(n,c);lb.position.set(Math.sin(am)*6.7,Math.cos(am)*6.7,.1);G.add(lb);return {m,gl,lb,s,e}});
+  const hand=new THREE.Mesh(new THREE.BoxGeometry(.04,4.6,.04),new THREE.MeshBasicMaterial({color:0xdfe6ff,transparent:true,opacity:.55}));hand.geometry.translate(0,2.3,0);G.add(hand);
+  const tip=new THREE.Sprite(new THREE.SpriteMaterial({map:gt,color:0xffffff,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false}));tip.scale.set(.9,.9,1);G.add(tip);
+  const core=new THREE.Sprite(new THREE.SpriteMaterial({map:gt,color:0x3a48e0,transparent:true,opacity:.25,blending:THREE.AdditiveBlending,depthWrite:false}));core.scale.set(6,6,1);G.add(core);
+  const nyNow=()=>{try{const p=new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit",second:"2-digit",weekday:"short",hour12:false}).formatToParts(new Date()),g=k=>(p.find(x=>x.type===k)||{}).value;
+    return {h:(Number(g("hour"))%24)+Number(g("minute"))/60+Number(g("second"))/3600,wd:g("weekday")}}catch(e){const d=new Date();return {h:d.getHours()+d.getMinutes()/60,wd:"Mon"}}};
+  let mx=0;const mv=e=>{mx=e.clientX/innerWidth-.5};addEventListener("pointermove",mv,{passive:true});let cx=0,nt=0,now=nyNow();
+  softLoop(el,r,scene,cam,opts,(t,dt)=>{nt-=dt;if(nt<=0){nt=5;now=nyNow()}
+    const h=now.h,wk=now.wd!=="Sat"&&now.wd!=="Sun"&&!(now.wd==="Fri"&&h>=17),a=(h%24)/24*Math.PI*2;
+    hand.rotation.z=-a;tip.position.set(Math.sin(a)*4.6,Math.cos(a)*4.6,.05);
+    arcs.forEach(o=>{const on=wk&&h>=o.s&&h<o.e,tg=on?.6:.28;o.m.material.opacity+=(tg-o.m.material.opacity)*Math.min(1,dt*2);o.gl.material.opacity=on?.08+.03*Math.sin(t*2):.025;o.lb.material.opacity=on?.6:.25});
+    G.rotation.z=.15+Math.sin(t*.08)*.05;
+    const mxS=Math.max(1,document.documentElement.scrollHeight-innerHeight),sf=Math.min(1,Math.max(0,scrollY/mxS));cx+=(mx*.8-cx)*Math.min(1,dt*1.5);
+    cam.position.set(cx,3.5+sf*1.2,16);cam.lookAt(ph?0:2.2,ph?-1:0,0)},()=>{removeEventListener("pointermove",mv);gt.dispose()});
+  return {r}}
+
+/* 14. ICT INDICATOR BACKGROUND (3D): liquidity sweep. Buy-side liquidity (teal) above, sell-side (rose) below,
+   resting orders as particles; a gold price path runs; a soft light wave sweeps the buy-side and scatters the orders. Soft. */
+export function liquidityBackground(el,opts={}){
+  const ph=small(),r=softRenderer(el),scene=new THREE.Scene();scene.fog=new THREE.Fog(0x03040a,12,36);
+  const cam=new THREE.PerspectiveCamera(ph?52:40,innerWidth/innerHeight,.1,200);const gt=softGlowTex();
+  const SN=ph?400:800,spp=new Float32Array(SN*3);for(let i=0;i<SN;i++)spp.set([(Math.random()-.5)*90,(Math.random()-.2)*45,-24-Math.random()*40],i*3);
+  const sg=new THREE.BufferGeometry();sg.setAttribute("position",new THREE.BufferAttribute(spp,3));scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xaab8ff,size:.1,transparent:true,opacity:.3,depthWrite:false})));
+  const grid=new THREE.GridHelper(80,80,0x1a2148,0x0f1430);grid.position.y=-4;grid.material.transparent=true;grid.material.opacity=.35;scene.add(grid);
+  const ROT=-.35,CX=ph?0:4,CZ=-6,BY=2.6,SY=-2.6;
+  const mkLine=(y,c)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(40,.03,.03),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.55}));m.position.set(CX,y,CZ);m.rotation.y=ROT;scene.add(m);
+    const g=new THREE.Mesh(new THREE.PlaneGeometry(40,.8),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.04,blending:THREE.AdditiveBlending,depthWrite:false}));g.position.copy(m.position);g.rotation.y=ROT;scene.add(g)};
+  mkLine(BY,0x2ad1c9);mkLine(SY,0xff5a74);
+  const N=ph?500:900,P=new Float32Array(N*3),B=[],cosR=Math.cos(ROT),sinR=Math.sin(ROT);
+  for(let i=0;i<N;i++){const top=i%2===0,u=(Math.random()-.5)*36,x=CX+u*cosR,z=CZ-u*sinR,y=(top?BY:SY)+(top?1:-1)*Math.random()*Math.random()*.6;B.push([x,y,z,top]);P.set([x,y,z],i*3)}
+  const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(P,3));const Cc=new Float32Array(N*3);for(let i=0;i<N;i++){const c=new THREE.Color(B[i][3]?"#7ff3ea":"#ff8aa0");Cc.set([c.r,c.g,c.b],i*3)}
+  g.setAttribute("color",new THREE.BufferAttribute(Cc,3));scene.add(new THREE.Points(g,new THREE.PointsMaterial({size:ph?.1:.08,vertexColors:true,transparent:true,opacity:.6,blending:THREE.AdditiveBlending,depthWrite:false})));
+  /* the price path: ranges, takes the buy-side liquidity, then drops */
+  const pts=[];for(let i=0;i<=60;i++){const x=-14+i*.6,y=Math.sin(i*.25)*1.2+Math.sin(i*.9)*.3+(i>40?(i-40)*.18:0)-(i>50?(i-50)*.5:0);pts.push(new THREE.Vector3(x+(ph?-4:0),y,-1-i*.05))}
+  const curve=new THREE.CatmullRomCurve3(pts);scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve,200,.028,8),new THREE.MeshBasicMaterial({color:0xf5b942,transparent:true,opacity:.55})));
+  const head=new THREE.Sprite(new THREE.SpriteMaterial({map:gt,color:0xffd27a,transparent:true,opacity:.6,blending:THREE.AdditiveBlending,depthWrite:false}));head.scale.set(1.1,1.1,1);scene.add(head);
+  const wave=new THREE.Sprite(new THREE.SpriteMaterial({map:gt,color:0x9ffff7,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));wave.scale.set(4.5,1.8,1);scene.add(wave);
+  let mx=0;const mv=e=>{mx=e.clientX/innerWidth-.5};addEventListener("pointermove",mv,{passive:true});let cx=0;
+  softLoop(el,r,scene,cam,opts,(t,dt)=>{
+    head.position.copy(curve.getPoint((t*.07)%1));
+    const sw=(t*.16)%1,wx=-10+sw*28;wave.position.set(CX+(wx-CX)*cosR,BY,CZ-(wx-CX)*sinR);wave.material.opacity=.32*Math.sin(sw*Math.PI);
+    const a=g.attributes.position.array;for(let i=0;i<N;i++){const [x,y,z,top]=B[i],d=Math.abs(x-wave.position.x),kick=top&&d<1.6?(1-d/1.6)*1.2*Math.sin(sw*Math.PI):0;a[i*3+1]=y+kick+Math.sin(t*1.5+i)*.02}g.attributes.position.needsUpdate=true;
+    const mxS=Math.max(1,document.documentElement.scrollHeight-innerHeight),sf=Math.min(1,Math.max(0,scrollY/mxS));cx+=(mx*.8-cx)*Math.min(1,dt*1.5);
+    cam.position.set(-2+cx,2.2+sf*1.2,ph?17:14);cam.lookAt(ph?0:2,0,-3)},()=>{removeEventListener("pointermove",mv);gt.dispose()});
+  return {r}}
