@@ -1579,6 +1579,15 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
 .pf-rules[open]>summary{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--line2)}
 .pf-rules[open]>.pf-grid,.pf-rules[open]>.pf-mini{animation:pfrIn .3s ease}@keyframes pfrIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 @media(max-width:820px){.pf-rules>summary{min-height:40px}}
+#updBar{position:fixed;left:50%;top:14px;z-index:9999;display:flex;align-items:center;gap:12px;width:min(480px,calc(100vw - 20px));box-sizing:border-box;padding:10px 10px 10px 14px;border-radius:16px;
+  background:linear-gradient(135deg,#1b2340,#12172a);border:1px solid rgba(245,197,66,.55);box-shadow:0 14px 40px rgba(0,0,0,.55),0 0 0 4px rgba(245,197,66,.08);
+  color:#fff;transform:translate(-50%,-140%);opacity:0;transition:transform .45s cubic-bezier(.2,.9,.3,1.2),opacity .3s}
+#updBar.on{transform:translate(-50%,0);opacity:1}
+#updBar .ub-ico{font-size:22px;animation:ubPulse 1.6s ease-in-out infinite}@keyframes ubPulse{50%{transform:scale(1.18)}}
+#updBar .ub-txt{display:flex;flex-direction:column;line-height:1.25;min-width:0;flex:1}#updBar .ub-txt b{font-size:14px}#updBar .ub-txt small{font-size:12px;color:#aab3c8}
+#updBar .ub-go{flex:none;border:0;border-radius:11px;padding:9px 16px;font-weight:700;cursor:pointer;background:#f5c542;color:#151515}
+#updBar .ub-go:hover{filter:brightness(1.08)}
+#updBar .ub-x{flex:none;border:0;background:transparent;color:#8d97ad;font-size:15px;cursor:pointer;padding:6px}
 </style>
 </head>
 <body>
@@ -3133,8 +3142,19 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   bindStatTabs();bindComm(el);
   a3Mount(st.days,"s",el);
 }
+/* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
+const APP_VER="2026-11-18a";
+(function updWatch(){let shown=false;
+  const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
+    b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
+    document.body.appendChild(b);requestAnimationFrame(()=>b.classList.add("on"));
+    b.querySelector(".ub-go").onclick=()=>{const u=new URL(location.href);u.searchParams.set("r",Date.now());location.replace(u.toString())};
+    b.querySelector(".ub-x").onclick=()=>{b.classList.remove("on");setTimeout(()=>b.remove(),400);setTimeout(()=>{shown=false},30*60000)}};
+  const check=()=>{if(location.protocol==="file:")return;fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.v&&j.v!==APP_VER)show()}).catch(()=>{})};
+  window.__updCheck=check;setTimeout(check,8000);setInterval(()=>{if(!document.hidden)check()},5*60000);
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)check()})})();
 /* ============ IN-APP 3D (app3d.js, loaded only where shown; the flat version stays if 3D can't run) ============ */
-let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=6"));
+let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=12"));
 function mount3d(id,fn,...args){setTimeout(()=>{const el=document.getElementById(id);if(!el||el.dataset.a3)return;el.dataset.a3="1";
   A3().then(m=>{if(!el.isConnected)return;try{m[fn](el,...args)}catch(e){console.warn("3D",e)}}).catch(e=>console.warn("3D off",e))},40)}
 function newsClockState(){const now=Date.now(),reds=S.newsLoaded?newsFor(todayStr()).filter(n=>n.impact==="High"):[],W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,t,a:t-5*60000,b:t+5*60000}});
@@ -4673,6 +4693,12 @@ let __a3=false;const __a3t=setInterval(()=>{const a=document.getElementById("aut
   import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))},250)</script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 
