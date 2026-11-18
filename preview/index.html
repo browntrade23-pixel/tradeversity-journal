@@ -5,7 +5,16 @@
 <meta name="description" content="See the Tradeversity trading journal with sample data. No account needed, nothing is saved.">
 <meta property="og:title" content="The Effective Journal · visitor preview">
 <meta property="og:description" content="See the platform with sample data. No account needed.">
-<meta http-equiv="refresh" content="0; url=../?demo=1&amp;visit=1#today">
-<script>location.replace("../?demo=1&visit=1"+"#today")</script>
-<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#030407;color:#c9cede;font:15px Inter,system-ui,sans-serif}a{color:#f5b942}</style>
-</head><body><p>Opening the visitor preview… <a href="../?demo=1&amp;visit=1#today">Open it</a></p></body></html>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(700px 400px at 50% -10%,rgba(58,72,224,.35),transparent 70%),#030407;color:#e8ebf5;font:15px Inter,system-ui,sans-serif;text-align:center;padding:20px}
+.box{max-width:420px}h1{font-size:24px;margin:0 0 10px}p{color:#a0a6b8;line-height:1.5}a.b{display:inline-block;margin-top:14px;padding:12px 22px;border-radius:999px;background:linear-gradient(180deg,#ffd27a,#f5b942);color:#1b1305;font-weight:800;text-decoration:none}</style>
+</head><body><div class="box" id="box"><p>Opening the visitor preview…</p></div>
+<script>
+/* A visitor link is valid for 48 hours: ?e = expiry time (seconds, base 36), made by the admin dashboard. */
+(function(){const q=new URLSearchParams(location.search),e=q.get("e"),exp=e?parseInt(e,36)*1000:0;
+  if(exp&&Date.now()<exp&&exp-Date.now()<=49*3600e3){location.replace("../?demo=1&visit=1&e="+encodeURIComponent(e)+"#today");return}
+  const ar=(navigator.language||"").startsWith("ar"),fr=(navigator.language||"").startsWith("fr");
+  const T=ar?["انتهت صلاحية رابط المعاينة","روابط الزوار صالحة لمدة 48 ساعة. اطلب رابطًا جديدًا من Tradeversity أو انضم مجانًا.","اكتشف Tradeversity"]
+    :fr?["Ce lien d'aperçu a expiré","Les liens visiteurs sont valables 48 heures. Demandez un nouveau lien à Tradeversity, ou rejoignez-nous gratuitement.","Découvrir Tradeversity"]
+    :["This preview link has expired","Visitor links are valid for 48 hours. Ask Tradeversity for a new link, or join for free.","Discover Tradeversity"];
+  document.getElementById("box").innerHTML=`<h1>⏳ ${T[0]}</h1><p>${T[1]}</p><a class="b" href="../welcome.html">${T[2]}</a>`;if(ar)document.body.dir="rtl"})();
+</script></body></html>

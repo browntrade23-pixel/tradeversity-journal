@@ -3298,7 +3298,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-18n";
+const APP_VER="2026-11-18o";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4545,6 +4545,9 @@ function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,dis
     <div class="card adm-inbox"><h3>📥 <span>Needs you</span></h3>
      ${inbox.length?inbox.map(([ic,lv,t,p,tab,btn])=>`<div class="adm-it ${lv}"><span class="adm-ic">${ic}</span><div class="adm-tx"><div>${t}</div>${p?`<div class="adm-ppl">${p}</div>`:""}</div><button type="button" class="btn sm" data-at="${tab}">${btn} ›</button></div>`).join(""):`<div class="adm-empty">✅ <span>All clear. Nothing needs you right now.</span></div>`}</div>
     ${admSummary(D).html}
+    <div class="card adm-visit"><h3>🔗 <span>Visitor link · 48 hours</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Anyone with this link can look around the platform with sample data, no account needed. It stops working after 48 hours.</span></p>
+     <div class="row" style="gap:8px;flex-wrap:wrap"><input class="i" id="visLink" readonly placeholder="—" style="flex:1;min-width:220px"><button class="btn sm pri" type="button" id="visNew">🔗 <span>Create a 48-hour link</span></button><button class="btn sm" type="button" id="visCopy">📋 <span>Copy</span></button></div>
+     <small class="mut" id="visExp" style="display:block;margin-top:6px"></small></div>
     <div class="card adm-ann"><h3>📣 <span>Announcement to all students</span></h3>
      <p class="mut" style="font-size:12px;margin:0 0 10px"><span>Shown in every student's bell and sent on Telegram to the students connected to the bot.</span></p>
      <input class="i" id="annT" maxlength="120" placeholder="Title (e.g. Live session tonight at 20:00)">
@@ -4581,6 +4584,10 @@ function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,dis
      S.ann=A;list.innerHTML=A.length?`<div class="mut" style="font-size:12px;margin:12px 0 6px"><span>Recent announcements</span></div>`+A.slice(0,5).map(a=>`<div class="adm-an"><div><b data-notr>${esc(a.title||"—")}</b> <span class="mut mono" style="font-size:11px" data-notr>${esc(fmtDate(a.created_at.slice(0,10)))}</span><p data-notr>${esc(a.body).slice(0,200)}</p></div><button class="btn sm danger" type="button" data-andel="${a.id}" title="Delete">🗑</button></div>`).join(""):"";
      $$("[data-andel]",list).forEach(b=>b.onclick=()=>confirmBox(I18N.t("Delete this announcement? It disappears from the students' bell (Telegram messages already sent stay)."),async()=>{try{const r=await tgFn("announce=delete&id="+encodeURIComponent(b.dataset.andel));if(!r.ok)throw new Error(r.error||"error");toast(I18N.t("Announcement deleted"));draw()}catch(e){toast(String(e.message||e))}}))};
    draw();
+   {const vn=box.querySelector("#visNew"),vl=box.querySelector("#visLink"),vc=box.querySelector("#visCopy"),vx=box.querySelector("#visExp");
+    const mk=()=>{const exp=Date.now()+48*3600e3,u=location.origin+"/preview/?e="+Math.floor(exp/1000).toString(36);vl.value=u;vx.textContent=I18N.t("Valid until")+" "+new Date(exp).toLocaleString();return u};
+    if(vn)vn.onclick=()=>{const u=mk();(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast(I18N.t("Visitor link copied (48 hours)"))).catch(()=>{})};
+    if(vc)vc.onclick=()=>{const u=vl.value||mk();(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast(I18N.t("Visitor link copied (48 hours)"))).catch(()=>copyText(u))}}
    {const sc=box.querySelector("#sumCopy");if(sc)sc.onclick=()=>{const tx=admSummary(D).txt;(navigator.clipboard?navigator.clipboard.writeText(tx):Promise.reject()).then(()=>toast(I18N.t("Summary copied"))).catch(()=>copyText(tx))}}
    box.querySelector("#annSend").onclick=()=>{const title=box.querySelector("#annT").value.trim(),body=box.querySelector("#annB").value.trim(),tg=box.querySelector("#annTg").checked;
      if(!body){toast(I18N.t("Write your message first"));return}
@@ -4828,8 +4835,11 @@ async function bootDemo(){const D=demoData();S._demo=true;
   await enter({id:"demo",email:"demo@tradeversity",role:"student",name:"Demo Trader",telegram:"@demo_trader",status:"approved",tgOk:true,emailOk:true});
   try{const g=$("#gate");if(g)g.classList.add("gone")}catch(e){}
   /* visitor preview link (jointradeversity.com/preview): a small banner says it is sample data */
-  if(new URLSearchParams(location.search).get("visit")==="1"){const b=document.createElement("div");b.id="visitBar";
-    b.innerHTML=`<span>👀 <b>${esc(I18N.t("Visitor preview"))}</b> · <span>${esc(I18N.t("Sample data, nothing is saved."))}</span></span><a href="${location.pathname}?auth=signup">${esc(I18N.t("Join free"))} →</a><button type="button" aria-label="Close">✕</button>`;
+  if(new URLSearchParams(location.search).get("visit")==="1"){const ev=new URLSearchParams(location.search).get("e")||"",exp=ev?parseInt(ev,36)*1000:0;
+    /* visitor links last 48 hours: an expired or missing expiry goes back to the preview page, which says so */
+    if(!exp||Date.now()>=exp){location.replace("preview/index.html?e="+encodeURIComponent(ev));return}
+    const hl=Math.max(1,Math.round((exp-Date.now())/3600e3));const b=document.createElement("div");b.id="visitBar";
+    b.innerHTML=`<span>👀 <b>${esc(I18N.t("Visitor preview"))}</b> · <span>${esc(I18N.t("Sample data, nothing is saved."))}</span> <small class="mut" data-notr>· ${hl}h</small></span><a href="${location.pathname}?auth=signup">${esc(I18N.t("Join free"))} →</a><button type="button" aria-label="Close">✕</button>`;
     document.body.appendChild(b);b.querySelector("button").onclick=()=>b.remove()}
   window.__demoReady=true}
 
