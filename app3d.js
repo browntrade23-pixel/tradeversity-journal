@@ -123,3 +123,50 @@ export function firmGalaxy(el,firms,onFirm){const B=base(el,{h:small()?300:360,p
 
 
 
+
+/* 8. GALAXY BACKGROUND (Prop firm tracker): full-page spiral galaxy that turns slowly, nebula clouds,
+   twinkling stars, shooting stars, parallax with the mouse and the scroll. Fixed behind the page content. */
+export function galaxyBackground(el){
+  const r=new THREE.WebGLRenderer({antialias:false,alpha:true,powerPreference:"high-performance"});
+  const ph=small(),N=ph?9000:22000,dpr=Math.min(devicePixelRatio,ph?1.3:1.6);r.setPixelRatio(dpr);r.setSize(innerWidth,innerHeight);el.innerHTML="";el.appendChild(r.domElement);
+  const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,400);cam.position.set(0,6,16);cam.lookAt(0,0,0);
+  const rnd=(a=1)=>(Math.random()*2-1)*a;
+  /* the spiral galaxy: gold core, indigo / blue / magenta arms */
+  const pos=new Float32Array(N*3),col=new Float32Array(N*3),sd=new Float32Array(N),c=new THREE.Color(),core=new THREE.Color("#ffd27a"),mid=new THREE.Color("#ff9e5e"),arm=new THREE.Color("#7c8bff"),edge=new THREE.Color("#2aa8ff"),mag=new THREE.Color("#d16bff");
+  for(let i=0;i<N;i++){const arms=4,a0=(i%arms)*Math.PI*2/arms,t=Math.pow(Math.random(),.62),R=t*13,spin=R*.55,scat=(1-t*.35)*1.15;
+    const a=a0+spin+rnd(.38*(1-t*.4));pos[i*3]=Math.cos(a)*R+rnd(scat*.5);pos[i*3+1]=rnd(.55*(1-t))*(1+Math.random());pos[i*3+2]=Math.sin(a)*R+rnd(scat*.5);
+    c.copy(core).lerp(mid,Math.min(1,t*2.2)).lerp(arm,Math.max(0,t*1.6-.35)).lerp(t>.8?edge:arm,Math.max(0,t-.7)*2);if(Math.random()<.08)c.lerp(mag,.7);if(Math.random()<.03)c.set("#ffffff");
+    col.set([c.r,c.g,c.b],i*3);sd[i]=Math.random()}
+  const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));g.setAttribute("color",new THREE.BufferAttribute(col,3));g.setAttribute("seed",new THREE.BufferAttribute(sd,1));
+  const mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,vertexColors:true,uniforms:{uT:{value:0},uS:{value:(ph?46:58)*dpr}},
+    vertexShader:`attribute float seed;uniform float uT;uniform float uS;varying vec3 vC;varying float vA;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;
+      vA=.55+.45*sin(uT*(1.5+seed*3.)+seed*60.);gl_PointSize=uS*(.25+seed*.75)/-mv.z;}`,
+    fragmentShader:`varying vec3 vC;varying float vA;void main(){vec2 p=gl_PointCoord-.5;float d=length(p);if(d>.5)discard;float a=pow(1.-d*2.,1.8);gl_FragColor=vec4(vC*(.7+a*.8),a*vA*.95);}`});
+  const gal=new THREE.Points(g,mat),galaxy=new THREE.Group();galaxy.add(gal);galaxy.rotation.x=.95;galaxy.rotation.z=-.22;galaxy.position.y=-1;scene.add(galaxy);
+  /* bright core glow + nebula clouds */
+  const glow=(color,size,op)=>{const s=document.createElement("canvas");s.width=s.height=128;const x=s.getContext("2d"),gr=x.createRadialGradient(64,64,0,64,64,64);
+    gr.addColorStop(0,"rgba(255,255,255,1)");gr.addColorStop(.25,"rgba(255,255,255,.45)");gr.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=gr;x.fillRect(0,0,128,128);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(s),color,transparent:true,opacity:op,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(size,size,1);return sp};
+  galaxy.add(glow("#ffd27a",9,1));galaxy.add(glow("#ff9e5e",18,.45));galaxy.add(glow("#7c8bff",34,.18));
+  const neb=[];[["#3a48e0",30,.3,[-14,2,-18]],["#d16bff",24,.22,[16,-3,-22]],["#2aa8ff",26,.2,[6,8,-26]],["#f5b942",18,.14,[-10,-6,-14]],["#7c8bff",34,.16,[2,-10,-30]]].forEach(([cl,s,o,p])=>{const n=glow(cl,s,o);n.position.set(...p);n.userData={p,o};neb.push(n);scene.add(n)});
+  /* deep starfield (parallax) */
+  const SN=ph?1500:3500,sp=new Float32Array(SN*3),ss=new Float32Array(SN),sc=new Float32Array(SN*3);for(let i=0;i<SN;i++){const u=Math.random()*2-1,a=Math.random()*Math.PI*2,R=60+Math.random()*90,q=Math.sqrt(1-u*u);
+    sp.set([R*q*Math.cos(a),R*u,R*q*Math.sin(a)],i*3);ss[i]=Math.random();const k=Math.random();c.set(k<.15?"#ffd9a0":k<.4?"#a9b8ff":"#ffffff");sc.set([c.r,c.g,c.b],i*3)}
+  const sg=new THREE.BufferGeometry();sg.setAttribute("position",new THREE.BufferAttribute(sp,3));sg.setAttribute("color",new THREE.BufferAttribute(sc,3));sg.setAttribute("seed",new THREE.BufferAttribute(ss,1));
+  const stars=new THREE.Points(sg,mat.clone());stars.material.uniforms={uT:mat.uniforms.uT,uS:{value:(ph?90:120)*dpr}};scene.add(stars);
+  /* shooting stars */
+  const shoot=[];for(let i=0;i<3;i++){const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(-2.4,0,0)]);
+    const ln=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0,blending:THREE.AdditiveBlending}));ln.userData={t:-Math.random()*6};shoot.push(ln);scene.add(ln)}
+  let mx=0,my=0;const mv=e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5};addEventListener("pointermove",mv,{passive:true});
+  const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()};addEventListener("resize",rs);
+  const clock=new THREE.Clock();let last=0,cx=0,cy=6;
+  (function loop(){if(!el.isConnected){removeEventListener("pointermove",mv);removeEventListener("resize",rs);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose();return}
+    requestAnimationFrame(loop);if(document.hidden)return;const t=clock.getElapsedTime(),dt=Math.min(.05,t-last);last=t;mat.uniforms.uT.value=t;
+    galaxy.rotation.y=t*.035;stars.rotation.y=t*.006;
+    const sy=Math.min(1,scrollY/1600);cx+=((mx*3)-cx)*.03;cy+=((6-sy*5+my*-2)-cy)*.03;cam.position.set(cx,cy,16-sy*3);cam.lookAt(0,-sy*1.5,0);
+    neb.forEach((n,i)=>{n.position.x=n.userData.p[0]+Math.sin(t*.07+i)*2.5;n.position.y=n.userData.p[1]+Math.cos(t*.05+i)*1.5;n.material.opacity=n.userData.o*(.75+.25*Math.sin(t*.3+i*2))});
+    shoot.forEach(s=>{const u=s.userData;u.t+=dt;if(u.t<0)return;if(u.t===dt||!u.on){u.on=true;s.position.set(rnd(25),8+Math.random()*8,-20-Math.random()*10);s.rotation.z=-.35-Math.random()*.3}
+      const p=u.t/1.1;s.position.x+=dt*22*Math.cos(s.rotation.z);s.position.y+=dt*22*Math.sin(s.rotation.z);s.material.opacity=p<1?Math.sin(p*Math.PI)*.9:0;if(p>=1){u.t=-3-Math.random()*7;u.on=false}});
+    r.render(scene,cam)})();
+  return {r}}
+

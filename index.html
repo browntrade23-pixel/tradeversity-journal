@@ -1561,6 +1561,15 @@ nav.tabs .tool-tab{animation:toolIn .38s cubic-bezier(.2,.9,.3,1) both}
 @keyframes toolIn{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
 html[dir=rtl] nav.tabs .tool-tab{animation-name:toolInR}@keyframes toolInR{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
 </style>
+<style>
+/* Prop firm tracker: full-page 3D galaxy background */
+#galBg{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(1200px 700px at 50% 35%,#0b0f2a 0%,#03040a 70%)}
+#galBg canvas{display:block;width:100%!important;height:100%!important}
+html.gal-on #app::before{opacity:0}
+html.gal-on #view .pf-item,html.gal-on #view .card,html.gal-on #view .rtabs button,html.gal-on #view .pf-tools .i{backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+html.gal-on #view .pf-item{background:rgba(10,12,22,.55)}html.gal-on #view .card{background:rgba(12,14,24,.6)}html.gal-on #view .pf-mini{background:rgba(8,10,18,.5)}
+html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9)}
+</style>
 </head>
 <body>
 
@@ -2107,7 +2116,11 @@ setInterval(ntfRefresh,30000);
 async function rqReadyLoad(){if(!S.me||S.me.role!=="admin"||!API||!API.listProfiles)return;
   try{const P=await API.listProfiles();S._rqReady=P.filter(p=>p.role!=="admin"&&p.status==="pending"&&p.tgOk&&p.emailOk!==false).map(p=>({id:p.id,name:p.name}));ntfRefresh()}catch(e){}}
 setInterval(rqReadyLoad,180000);
-function render(){const _tr=document.getElementById("pfTray");if(_tr&&S.view!=="propfirms")_tr.className="";document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
+function galaxyBg(){const on=S.view==="propfirms"&&!!S.me;let g=document.getElementById("galBg");document.documentElement.classList.toggle("gal-on",on&&!!g);
+  if(!on){if(g)g.remove();document.documentElement.classList.remove("gal-on");return}
+  if(!g){g=document.createElement("div");g.id="galBg";g.setAttribute("aria-hidden","true");$("#app").prepend(g);
+    A3().then(m=>{if(!g.isConnected)return;try{m.galaxyBackground(g);document.documentElement.classList.add("gal-on")}catch(e){g.remove()}}).catch(()=>g.remove())}}
+function render(){setTimeout(galaxyBg,0);const _tr=document.getElementById("pfTray");if(_tr&&S.view!=="propfirms")_tr.className="";document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
   const fn={today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
   v.innerHTML=h+'<div id="vb"></div>';Promise.resolve(fn($("#vb"))).then(()=>bindNotify(v)).catch(()=>{});
@@ -3111,7 +3124,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   a3Mount(st.days,"s",el);
 }
 /* ============ IN-APP 3D (app3d.js, loaded only where shown; the flat version stays if 3D can't run) ============ */
-let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=4"));
+let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=6"));
 function mount3d(id,fn,...args){setTimeout(()=>{const el=document.getElementById(id);if(!el||el.dataset.a3)return;el.dataset.a3="1";
   A3().then(m=>{if(!el.isConnected)return;try{m[fn](el,...args)}catch(e){console.warn("3D",e)}}).catch(e=>console.warn("3D off",e))},40)}
 function newsClockState(){const now=Date.now(),reds=S.newsLoaded?newsFor(todayStr()).filter(n=>n.impact==="High"):[],W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,t,a:t-5*60000,b:t+5*60000}});
@@ -4649,6 +4662,8 @@ let __a3=false;const __a3t=setInterval(()=>{const a=document.getElementById("aut
   import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))},250)</script>
 </body>
 </html>
+
+
 
 
 
