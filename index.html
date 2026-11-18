@@ -818,7 +818,7 @@ html[lang=ar] .foot.founder span,html[lang=ar] .foot.founder b,html[lang=ar] .fo
   #app .topin .brand{flex:1 1 auto;min-width:0}
   #app .topin .spacer,#app .founder-chip,#whoChip{display:none}
   #app #logout{order:1}
-  #app .theme-slot,#app #langTop{order:2}
+  #app .theme-slot,#app .disp-w,#app #langTop{order:2}
   #app #langTop .langSel{max-width:130px}
   #app main#view{overflow-x:hidden}
 }
@@ -1598,6 +1598,10 @@ html.visit #logout{display:none!important}
 .cmdk-i.on,.cmdk-i:hover{background:rgba(58,72,224,.22)}.cmdk-ic{width:22px;text-align:center}
 html[data-theme=light] .cmdk-box{background:#fff;border-color:#d7dcf5}html[data-theme=light] .cmdk-i.on{background:#eef0ff}
 .adm-sum-t{white-space:pre-wrap;font:13px/1.5 ui-monospace,Consolas,monospace;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;margin:0 0 10px}
+.disp-w{position:relative;flex:none}.disp-pop{position:absolute;right:0;top:calc(100% + 10px);z-index:200;min-width:240px;padding:12px;border-radius:14px;background:#0d1020;border:1px solid rgba(110,124,245,.45);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.disp-pop .dp-row{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}.disp-pop .dp-row>small{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--muted);text-transform:uppercase}.dp-bg button{font-size:12px;padding:6px 10px}.dp-note{display:block;font-size:11px}
+html[data-theme=light] .disp-pop{background:#fff;border-color:#d7dcf5}
+html[lang=ar] .disp-pop{right:auto;left:0}
 .hd-ic{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:inherit;font-size:15px;line-height:1;cursor:pointer;display:inline-grid;place-items:center;padding:0}
 .hd-ic:hover{border-color:rgba(110,124,245,.55);background:rgba(58,72,224,.14)}
 html[data-theme=light] .hd-ic{border-color:var(--line);background:#fff}
@@ -1733,13 +1737,10 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
     <div class="topin">
       <div class="brand"><div class="logo" role="img" aria-label="The Effective Journal by Tradeversity — founder Brown Algo"></div><div>The Effective Journal<small>BY TRADEVERSITY</small></div></div>
       <div class="spacer"></div>
-      <span id="socHead" class="soc icons"></span>
-      <span class="theme-slot"></span>
       <button type="button" class="hd-ic" id="cmdBtn" title="Search (Ctrl+K)" aria-label="Search">🔍</button>
-      <button type="button" class="hd-ic" id="bgBtn" title="Background" aria-label="Background">✨</button>
+      <span class="disp-w"><button type="button" class="hd-ic" id="dispBtn" title="Display" aria-label="Display" aria-expanded="false">⚙️</button><div class="disp-pop hidden" id="dispPop" role="dialog" aria-label="Display"><div class="dp-row"><small>Theme</small><span class="theme-slot"></span></div><div class="dp-row"><small>Background</small><div class="seg dp-bg" id="bgSeg"><button type="button" data-bg="3d">✨ <span>3D</span></button><button type="button" data-bg="light">🖼 <span>Light</span></button><button type="button" data-bg="off">⬛ <span>Off</span></button></div></div><small class="mut dp-note">Light = still image, saves battery.</small></div></span>
       <span id="langTop"></span>
-      <span class="chip founder-chip" title="Founder"><span>Founder</span> <b>BROWN ALGO</b></span>
-      <span class="chip" id="whoChip" data-notr></span>
+     <span class="chip" id="whoChip" data-notr></span>
       <button class="btn sm inst-btn hidden" id="instBtn" type="button">📲 <span>Install app</span></button>
       <button class="ntf-bell" id="ntfBell" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="ntf-badge hidden" id="ntfBadge"></span></button>
       <button class="btn sm ghost" id="logout">Log out</button>
@@ -2190,11 +2191,11 @@ const BGM={key:"tv_bg",
   set(m){try{localStorage.setItem(this.key,m)}catch(e){}const g=document.getElementById("galBg");if(g)g.remove();this.btn();galaxyBg();
     toast(I18N.t(m==="3d"?"Background: 3D":m==="light"?"Background: Light (still image, saves battery)":"Background: Off"))},
   next(){const o=["3d","light","off"],m=this.mode();this.set(o[(o.indexOf(m)+1)%3])},
-  btn(){const b=$("#bgBtn");if(!b)return;const m=this.mode();b.textContent=m==="3d"?"✨":m==="light"?"🖼":"⬛";b.title=I18N.t(m==="3d"?"Background: 3D":m==="light"?"Background: Light":"Background: Off")+" · "+I18N.t("tap to change")}};
+  btn(){$$("#bgSeg [data-bg]").forEach(x=>x.classList.toggle("on",x.dataset.bg===this.mode()));const b=$("#bgBtn");if(!b)return;const m=this.mode();b.textContent=m==="3d"?"✨":m==="light"?"🖼":"⬛";b.title=I18N.t(m==="3d"?"Background: 3D":m==="light"?"Background: Light":"Background: Off")+" · "+I18N.t("tap to change")}};
 window.__bgState=window.__bgState||{};
 function bgStateNews(){try{const s=newsClockState();window.__bgState.redSoon=!!(s&&(s.inWindow||(s.mins>0&&s.mins<=5)))}catch(e){window.__bgState.redSoon=false}}
 function galaxyBg(){const m=BGM.mode(),light=document.documentElement.getAttribute("data-theme")==="light";
-  const kind=S.me&&!S.page&&!S.dayPage&&m!=="off"&&!light?(BG3D[S.view]||BG2D[S.view]||null):null,still=m==="light";let g=document.getElementById("galBg");
+  const kind=S.me&&!S.page&&!S.dayPage&&m!=="off"&&!light?(BG3D[S.view]||BG2D[S.view]||null):null,still=m==="light"||(innerWidth<821&&["stats","risk","plan"].includes(S.view));   /* phones: busy pages get the still image */let g=document.getElementById("galBg");
   if(S.view==="today"){try{const sc=dayScore(todayStr());window.__bgState.score=sc.active?sc.score:null}catch(e){}}
   if(S.view==="news")bgStateNews();
   if(S.view==="journal"){/* mood tide: mix the colours of the emotions logged today, or on the last day with emotions */
@@ -2724,8 +2725,7 @@ function vToday(el){
     <button class="btn" type="button" data-td="plan">🧭 <span>${nd===t?"Plan today":"Plan the next session"}</span></button>
     <button class="btn" type="button" data-td="notrade">🚫 <span>No trades today</span></button>
    </div>
-   ${weekReviewCard()}
-   ${weekCard()}
+   ${weekReviewCard()||weekCard()}
    ${badgeCard(B)}
   </div>`;
   $$("[data-td]",el).forEach(b=>b.onclick=async()=>{const a=b.dataset.td;
@@ -3271,10 +3271,11 @@ function weekReviewCard(){const wd=new Date().getDay();if(!(wd===5||wd===6||wd==
   let saved=null;try{saved=JSON.parse(localStorage.getItem(wrKey(w.from))||"null")}catch(e){}
   const tr=[...w.ts].map(x=>[x,tradeNet(x)]).sort((a,b)=>b[1]-a[1]),bt=tr[0],wt=tr[tr.length-1],broke=w.ts.filter(x=>x.followed==="No").length;
   const Q=[["good","What worked this week?"],["stop","What will I stop doing?"],["focus","My one focus for next week"]];
-  return `<div class="card wr-card" id="wrCard"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:6px"><h3 style="margin:0">📝 <span>Weekly review</span></h3><span class="mut" style="font-size:12px" data-notr>${esc(fmtDate(w.from))} → ${esc(fmtDate(w.to))}</span></div>
+  return `<div class="card wr-card" id="wrCard"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:6px"><h3 style="margin:0">📝 <span>Your week</span> <span class="mut" style="font-size:12px;font-weight:500;text-transform:none;letter-spacing:0" data-notr>· ${esc(fmtDate(w.from))} → ${esc(fmtDate(w.to))}</span></h3><button class="btn sm" type="button" data-td="share">📸 <span>Share my week</span></button></div>
    <div class="wr-k"><div><small>Trades</small><b class="mono" data-notr>${w.ts.length}</b></div><div><small>Net P&L</small><b class="mono ${cls(w.st.net)}">${smoney(w.st.net)}</b></div>
     <div><small>Best trade</small><b class="mono pos" data-notr>${bt?smoney(bt[1]):"—"}</b></div><div><small>Worst trade</small><b class="mono ${wt&&wt[1]<0?"neg":""}" data-notr>${wt?smoney(wt[1]):"—"}</b></div>
     <div><small>Rules broken</small><b class="mono ${broke?"neg":"pos"}" data-notr>${broke}</b></div><div><small>Average score</small><b class="mono" data-notr>${w.avg}</b></div></div>
+   ${w.worst?`<p class="td-emo">💸 <span>The emotion that cost you the most this week:</span> <b data-notr>${esc(I18N.t(w.worst[0]))}</b> <b class="mono neg">${money(w.worst[1])}</b></p>`:`<p class="td-emo">💚 <span>No losing trade with a bad emotion this week. Keep it up.</span></p>`}
    ${saved?`<div class="wr-done">✅ <b>Review saved</b>${Q.map(([k,l])=>saved[k]?`<p><small class="mut">${l}</small><br><span data-notr>${esc(saved[k])}</span></p>`:"").join("")}<button class="btn sm" type="button" id="wrEdit">✎ <span>Edit</span></button></div>`
     :`<p class="mut" style="font-size:13px;margin:8px 0"><span>2 minutes to answer, and next week is better.</span></p>${Q.map(([k,l])=>`<label class="f">${l}<textarea class="i" data-wr="${k}" maxlength="400" style="min-height:52px"></textarea></label>`).join("")}<button class="btn pri" type="button" id="wrSave" style="margin-top:8px">💾 <span>Save my review</span></button>`}</div>`}
 function bindWeekReview(){const c=$("#wrCard");if(!c)return;const w=weekStats();if(!w)return;
@@ -3303,7 +3304,12 @@ function openCmd(){if(!S.me||$("#cmdK"))return;const ov=document.createElement("
   document.addEventListener("keydown",key,true);q.oninput=()=>{sel=0;draw()};L.onclick=e=>{const b=e.target.closest("[data-i]");if(b)run(Number(b.dataset.i))};ov.onclick=e=>{if(e.target===ov)close()};
   draw();setTimeout(()=>q.focus(),20)}
 document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"||e.key==="K")){if(!S.me)return;e.preventDefault();openCmd()}});
-(function(){const c=$("#cmdBtn"),b=$("#bgBtn");if(c)c.onclick=openCmd;if(b)b.onclick=()=>BGM.next();BGM.btn()})();
+(function(){const c=$("#cmdBtn"),b=$("#bgBtn");if(c)c.onclick=openCmd;if(b)b.onclick=()=>BGM.next();
+  /* ⚙️ Display: theme + background in one small menu */
+  const d=$("#dispBtn"),p=$("#dispPop");if(d&&p){d.onclick=e=>{e.stopPropagation();const on=p.classList.toggle("hidden");d.setAttribute("aria-expanded",String(!on))};
+    p.onclick=e=>e.stopPropagation();document.addEventListener("click",()=>{p.classList.add("hidden");d.setAttribute("aria-expanded","false")});
+    $$("#bgSeg [data-bg]").forEach(x=>x.onclick=()=>BGM.set(x.dataset.bg))}
+  BGM.btn()})();
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const today=todayStr(),d7=new Date();d7.setDate(d7.getDate()-6);const d7s=ymd(d7),sid=new Set(students.map(s=>s.id));
   const tw=trades.filter(t=>sid.has(t.user_id)&&t.date>=d7s&&t.date<=today),act=new Set(tw.map(t=>t.user_id)).size,net=tw.reduce((a,t)=>a+tradeNet(t),0);
@@ -3312,7 +3318,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-18za";
+const APP_VER="2026-11-18zb";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4646,7 +4652,7 @@ const SOCIAL=[
 ];
 function socialHTML(keys){return SOCIAL.filter(s=>!keys||keys.includes(s.key)).map(s=>`<a class="tg-link ${s.cls||""}" data-k="${s.key}" href="${s.href}" target="_blank" rel="noopener" title="${s.label}" aria-label="${s.label}">${s.icon}<span>${s.label}</span></a>`).join("")}
 $("#socTop").innerHTML=socialHTML();$("#socBottom").innerHTML=socialHTML();
-$("#socHead").innerHTML=socialHTML();$("#socFoot").innerHTML=socialHTML();
+{const sh=$("#socHead");if(sh)sh.innerHTML=socialHTML()}$("#socFoot").innerHTML=socialHTML();
 $("#socGate").innerHTML=socialHTML(["results","telegram"]);
 
 /* ============ About us ============
