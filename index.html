@@ -3150,7 +3150,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
 function a3Mtn(days){if(Object.keys(days).length<2)return "";
   return `<div class="card a3-card" style="margin-bottom:12px"><h3 style="margin:0 0 8px">🏔 <span>Equity mountain</span></h3><div id="a3_s" class="a3-box"></div><p class="mut a3-hint"><span>Drag to rotate · tap a day to open it</span></p></div>`}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-18f";
+const APP_VER="2026-11-18g";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3832,8 +3832,7 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
    <div class="pf-tools"><input class="i" id="pfQ" placeholder="Search a prop firm…" value="${esc(S._pfQ||"")}" data-noswipe>
     <label class="pf-dz"><input type="checkbox" id="pfDz" ${dzOnly?"checked":""}> <span>🇩🇿 Only firms open to Algeria</span></label>
     <label class="pf-dz"><input type="checkbox" id="pfFav" ${S._pfFavOnly?"checked":""}> <span>⭐ My favourites</span></label>
-    <button type="button" class="btn sm pri" id="pfQuizB">🧭 <span>Find my prop firm</span></button><button type="button" class="btn sm ${S._pfGal?"pri":""}" id="pfGalB">🌌 <span>Galaxy view</span></button></div>
-   ${S._pfGal?`<div class="card a3-card pf-gal"><div id="a3Gal" class="a3-box"></div><p class="mut a3-hint"><span>Green = open to Algeria · teal = probably · grey = ask support · red = restricted · gold ring = discount code. Drag to rotate, tap a planet to open the firm.</span></p></div>`:""}
+    <button type="button" class="btn sm pri" id="pfQuizB">🧭 <span>Find my prop firm</span></button></div>
    <div class="pf-legend">${Object.values(PFDZ).map(d=>`<span class="dz-b ${d[2]}">${d[0]} <span>${d[1]}</span></span>`).join("")}</div>
    <div class="pf-bar"><span class="mut">${list.length} <span>firms</span></span></div>
    <div class="pf-list">${list.length?list.map(f=>{const L=f.name.replace(/^The /,"").charAt(0).toUpperCase();const h=L!==letter?(letter=L,`<div class="pf-letter"><span>${L}</span></div>`):"";
@@ -3855,8 +3854,6 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
   /* each firm opens / closes its own rules; remembered while you browse */
   $$("details[data-pfr]",el).forEach(d=>d.ontoggle=()=>{S._pfOpen=S._pfOpen||{};S._pfOpen[d.dataset.pfr]=d.open});
   $("#pfFav",el).onchange=e=>{S._pfFavOnly=e.target.checked;render()};$("#pfQuizB",el).onclick=pfQuiz;
-  $("#pfGalB",el).onclick=()=>{S._pfGal=!S._pfGal;render()};
-  if(S._pfGal)mount3d("a3Gal","firmGalaxy",list.map(f=>{const k=Object.keys(COUPONS).find(c=>COUPONS[c][f.id]);return {id:f.id,name:f.name,dz:f.dz,deal:k?`-${COUPONS[k][f.id].pct}% ${k}`:"",score:f.name.length}}),id=>{S._pfId=id;S._couponTried=false;render();window.scrollTo(0,0)});
   $$("[data-pfav]",el).forEach(b=>b.onclick=()=>{const F=pfFavs(),id=b.dataset.pfav,i=F.indexOf(id);if(i>=0)F.splice(i,1);else F.push(id);try{localStorage.setItem(pfFavKey,JSON.stringify(F))}catch(e){}settingsPush();render()});
   $$("[data-pcmp]",el).forEach(b=>b.onclick=()=>{const C=S._pfCmp,id=b.dataset.pcmp,i=C.indexOf(id);if(i>=0)C.splice(i,1);else{if(C.length>=3){toast(I18N.t("You can compare up to 3 firms"));return}C.push(id)}render()});
   let tray=$("#pfTray");if(!tray){tray=document.createElement("div");tray.id="pfTray";document.body.appendChild(tray)}
