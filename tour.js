@@ -32,6 +32,14 @@ html[lang=ar] .tour-cap b{font-family:Cairo,Inter,sans-serif;font-size:18px}
 const L=()=>{const l=(window.I18N&&I18N.lang)||"en";return ["en","fr","ar"].includes(l)?l:"en"};
 /* the scenes: what the app does + the caption */
 const SC=[
+ {d:6000,c:{en:"Your day at a glance: discipline score, streaks and a live background.",fr:"Votre journée en un coup d'œil : score de discipline, séries et un fond animé.",ar:"يومك في لمحة: نقاط الانضباط، السلاسل وخلفية حيّة."},
+  run:async T=>{T.x('go("today")');T.top();await T.wait(1500);await T.scrollTo("#view .td-score",true)}},
+ {d:7500,c:{en:"Start my session: red news, your plan, your risk and your limits on one screen.",fr:"Démarrer ma session : news rouges, plan, risque et limites sur un seul écran.",ar:"ابدأ جلستي: الأخبار الحمراء، خطتك، مخاطرتك وحدودك في شاشة واحدة."},
+  run:async T=>{T.x('if(S.view!=="today")go("today")');T.top();await T.wait(300);await T.tap('[data-td="session"]',true);await T.wait(2200);
+    try{const b=T.q(".modal .ss-chk");if(b)b.scrollIntoView({block:"center",behavior:"smooth"})}catch(e){}await T.wait(900);
+    for(const k of ["news","plan","risk","limit"]){const c=T.q(`[data-ss="${k}"]`);if(c){c.checked=true;c.dispatchEvent(new w.Event("change",{bubbles:true}))}await T.wait(250)}}},
+ {d:6000,c:{en:"Prop firm limits: a warning at 70% and 90% of your daily loss and drawdown.",fr:"Limites de la prop firm : alerte à 70 % et 90 % de la perte journalière et du drawdown.",ar:"حدود شركة التمويل: تنبيه عند 70% و90% من الخسارة اليومية والتراجع."},
+  run:async T=>{T.x("closeModal()");T.x('if(S.view!=="today")go("today")');await T.wait(400);await T.scrollTo("#view .lim-card",true)}},
  {d:4200,c:{en:"Your trading journal, in your pocket.",fr:"Votre journal de trading, dans votre poche.",ar:"يوميات التداول في جيبك."},
   run:async T=>{T.x('go("journal")');T.top()}},
  {d:9000,c:{en:"Log a trade in seconds: P&L, commissions, emotions and your chart.",fr:"Ajoutez un trade en quelques secondes : P&L, commissions, émotions et votre graphique.",ar:"سجّل صفقة في ثوانٍ: الربح، العمولات، المشاعر وصورة الشارت."},
@@ -54,8 +62,12 @@ const SC=[
   run:async T=>{T.x('S._newsTab="today";go("news")');T.top();await T.wait(1800);T.x("openNewsInfo(S.news[0])")}},
  {d:6500,c:{en:"Notifications: red news in 5 minutes, journal and plan reminders.",fr:"Notifications : news rouge dans 5 minutes, rappels journal et plan.",ar:"الإشعارات: خبر أحمر بعد 5 دقائق، تذكير اليوميات والخطة."},
   run:async T=>{T.x("closeModal()");T.top();await T.wait(500);await T.tap("#ntfBell");T.x('document.getElementById("ntfBell").click()')}},
+ {d:7000,c:{en:"Search anything: type “risk NQ 20” and the calculator is ready.",fr:"Cherchez tout : tapez « risk NQ 20 » et le calculateur est prêt.",ar:"ابحث عن أي شيء: اكتب «risk NQ 20» وتجهز الحاسبة."},
+  run:async T=>{T.x('document.getElementById("ntfPanel")&&document.getElementById("ntfPanel").classList.add("hidden")');T.top();await T.wait(300);
+    await T.tap("#cmdBtn",true);await T.wait(700);await T.type("#cmdQ","risk NQ 20");await T.wait(1600);
+    T.x('document.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter"}))')}},
  {d:6000,c:{en:"Risk calculator: how many contracts for your stop.",fr:"Calculateur de risque : combien de contrats pour votre stop.",ar:"حاسبة المخاطرة: كم عقداً تأخذ حسب وقف الخسارة."},
-  run:async T=>{T.x('document.getElementById("ntfPanel").classList.add("hidden");go("risk")');T.top();await T.wait(900);await T.scrollTo("#view .card",true)}},
+  run:async T=>{T.x('const p=document.getElementById("ntfPanel");p&&p.classList.add("hidden");if(S.view!=="risk")go("risk")');T.top();await T.wait(900);await T.scrollTo("#view .card",true)}},
  {d:7500,c:{en:"Prop firm tracker: rules by account size, prices and BROWN23 discounts.",fr:"Prop firm tracker : règles par taille de compte, prix et réductions BROWN23.",ar:"متتبع شركات التمويل: القواعد حسب حجم الحساب، الأسعار وخصومات BROWN23."},
   run:async T=>{T.x('S._pfId="bulenox";S._pfSz=null;go("propfirms");S._pfId="bulenox";render()');T.top();await T.wait(1200);await T.scrollTo("#szCard",true)}},
  {d:5500,c:{en:"And our free ICT indicator for TradingView.",fr:"Et notre indicateur ICT gratuit pour TradingView.",ar:"ومؤشر ICT المجاني على TradingView."},
@@ -111,6 +123,8 @@ function open(){if(ov)return;if(!document.getElementById("tourCss")){const st=do
   ov.addEventListener("click",e=>{if(e.target===ov)close()});
   ifr=ov.querySelector("iframe");playing=true;idx=0;
   const wait=async()=>{for(let i=0;i<80;i++){try{w=ifr.contentWindow;if(w&&w.__demoReady)break}catch(e){}await sleep(150)}
+    /* inside the demo: no welcome tour on top, and the animated section backgrounds on */
+    T.x('try{localStorage.setItem(tourKey(),"1");localStorage.setItem("tv_bg","3d");const x=document.querySelector(".tour-x,#tourSkip");x&&x.click()}catch(e){}');
     const ld=ov&&ov.querySelector(".tour-load");if(ld)ld.remove();if(ov){setPlay();show(0);requestAnimationFrame(anim)}};
   wait()}
 window.Tour={open,close,go:i=>show(i)};
