@@ -88,6 +88,18 @@ export function sectionBg(el,kind,opts={}){
       x.fillStyle="#03050b";x.fillRect(0,0,W,H);x.globalCompositeOperation="lighter";x.lineWidth=Math.max(1,1.4*SC*2);
       for(let k=0;k<7;k++){const yb=H*(.2+k*.1),cc=k%2?mix(c,C("#5b6cf0"),.5):c;x.strokeStyle=rgba(cc,.16+.05*Math.sin(t+k));x.beginPath();
         for(let i=0;i<=120;i++){const xx=i/120*W,y=yb+Math.sin(i/120*6.3*(1+k*.15)+t*(.5+k*.05)+k)*H*amp+Math.sin(i/120*23+t*1.7+k*3)*H*amp*chaos;i?x.lineTo(xx,y):x.moveTo(xx,y)}x.stroke()}}
+    else if(kind==="tide"){
+      /* Journal: slow soft waves coloured by the emotions logged today (or on the last trading day):
+         calm / disciplined = blue · fear / hesitation = purple · impatience / FOMO / greed / revenge = orange */
+      const tgt=s.mood?C(s.mood):C("#4a5be0"),c=ease(tgt,.02),c2=mix(c,C("#0b1030"),.45);
+      x.fillStyle="#03040a";x.fillRect(0,0,W,H);
+      for(const p of stars){x.fillStyle=`rgba(210,220,255,${.1+.1*Math.sin(t*1.1+p.p)})`;x.fillRect(p.x*W,p.y*H*.7,p.r*SC,p.r*SC)}
+      x.globalCompositeOperation="lighter";
+      const gl=x.createRadialGradient(W*.5,H*1.05,0,W*.5,H*1.05,Math.max(W,H)*.75);gl.addColorStop(0,rgba(c,.16));gl.addColorStop(1,rgba(c,0));x.fillStyle=gl;x.fillRect(0,0,W,H);
+      for(let k=0;k<5;k++){const base=H*(.58+k*.085),amp=H*(.035+k*.008),sp=.18+k*.05,cc=k%2?c2:c;
+        const g=x.createLinearGradient(0,base-amp*2,0,H);g.addColorStop(0,rgba(cc,.0));g.addColorStop(.12,rgba(cc,.1-k*.012));g.addColorStop(1,rgba(cc,.02));x.fillStyle=g;
+        x.beginPath();x.moveTo(0,H);for(let i=0;i<=80;i++){const xx=i/80*W,y=base+Math.sin(i/80*6.3*(1+k*.22)+t*sp+k*1.7)*amp+Math.sin(i/80*15+t*sp*1.9+k)*amp*.3;x.lineTo(xx,y)}x.lineTo(W,H);x.closePath();x.fill();
+        x.strokeStyle=rgba(mix(cc,[255,255,255],.35),.1-k*.012);x.lineWidth=Math.max(1,SC*1.4);x.beginPath();for(let i=0;i<=80;i++){const xx=i/80*W,y=base+Math.sin(i/80*6.3*(1+k*.22)+t*sp+k*1.7)*amp+Math.sin(i/80*15+t*sp*1.9+k)*amp*.3;i?x.lineTo(xx,y):x.moveTo(xx,y)}x.stroke()}}
     else if(kind==="stars"){
       /* Journal: each trade of the last 30 days is a star, the stars of one day form a small constellation.
          plan followed = white-blue, plan broken = faint red, winning trade = a little bigger and brighter. New trades fly in. */
