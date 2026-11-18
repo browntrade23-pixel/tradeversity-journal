@@ -1337,6 +1337,59 @@ html:not([data-theme=light]) :is(.mk-chip.on,.st-tab.on){border-color:rgba(110,1
 /* KPI numbers a little bigger, Bulenox-like bold headline numbers */
 .kpi .v{font-size:27px}
 </style>
+<style>
+/* ===== TODAY home screen ===== */
+.td{display:grid;gap:14px}
+.td-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding:6px 2px}
+.td-hi{font-size:clamp(24px,3.4vw,34px);font-weight:900;letter-spacing:-.6px}
+.td-date{font-size:13px;margin-top:2px}
+.td-q{max-width:460px;font-size:13.5px;color:var(--muted);font-style:italic;border-inline-start:3px solid var(--gold);padding:4px 12px}
+.td-q small{font-style:normal;color:var(--gold);font-weight:700;letter-spacing:.06em}
+.td-cool{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:14px;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.5)}
+.td-cool-i{font-size:28px}.td-cool b{display:block;color:var(--red);font-size:16px}.td-cool small{color:var(--text);opacity:.85}
+.td-win{padding:12px 16px;border-radius:14px;background:rgba(38,166,154,.12);border:1px solid rgba(38,166,154,.5);font-size:15px}
+.td-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.td h3{margin:0 0 10px;font-size:15px}
+.td-sc-top{display:flex;gap:14px;align-items:center}.td-sc-top p{margin:4px 0 0;font-size:13px}
+.td-ring{width:96px;height:96px;flex:none}.td-ring circle{fill:none;stroke-width:9}.td-rbg{stroke:var(--line)}
+.td-rfg{stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 1s ease}
+.td-ring text{font:900 28px Inter,sans-serif;fill:var(--text)}
+.td-parts{display:grid;gap:6px;margin-top:12px}
+.td-pt{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:7px 10px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-size:13.5px;opacity:.75}
+.td-pt.ok{opacity:1;border-color:rgba(38,166,154,.45)}.td-pt b{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted)}.td-pt.ok b{color:var(--green)}
+.td-st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.td-fl{text-align:center;padding:10px 6px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
+.td-flame{font-size:22px;display:block}.td-fl b{display:block;font-size:26px;font-weight:900;margin:2px 0}.td-fl small{font-size:11.5px;color:var(--muted);line-height:1.3;display:block}
+.td-wkstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}
+.td-d{text-align:center;padding:6px 2px;border-radius:9px;border:1px solid var(--line);background:var(--panel2)}
+.td-d small{display:block;font-size:10px;color:var(--muted)}.td-d b{font-size:13px;font-family:"JetBrains Mono",monospace}
+.td-d.g{border-color:rgba(38,166,154,.6);background:rgba(38,166,154,.12)}.td-d.y{border-color:rgba(245,185,66,.6);background:rgba(245,185,66,.1)}.td-d.r{border-color:rgba(239,83,80,.6);background:rgba(239,83,80,.1)}
+.td-d.now{outline:2px solid var(--gold);outline-offset:1px}
+.td-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:8px 0 4px;font-size:14px}.td-row.sm{font-size:12.5px;color:var(--muted);margin-top:10px}
+.td-bar{height:8px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}.td-bar i{display:block;height:100%;background:var(--gold);border-radius:9px}
+.td-bar.bad i,.td-bar.loss.bad i{background:var(--red)}.td-bar.loss i{background:#ff9800}.td-bar.goal i{background:var(--green)}
+.td-hint{font-size:12px;margin:10px 0 0}
+.td-bias{display:flex;flex-wrap:wrap;gap:6px}.td-lv{font-size:12.5px;color:var(--muted);margin:8px 0 0;white-space:pre-line}
+.td-news{margin-top:10px}
+.td-acts{display:flex;flex-wrap:wrap;gap:10px}.td-acts .btn{flex:1;min-width:150px;justify-content:center}
+.td-big{font-size:16px;padding:14px 22px}
+.td-wk{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.td-wk div{padding:10px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}.td-wk small{display:block;font-size:11.5px;color:var(--muted)}.td-wk b{font-size:16px}
+.td-emo{margin:10px 0 0;font-size:13.5px}
+/* pre-trade checklist */
+.pre-chk{display:grid;gap:8px;padding:12px 14px;border-radius:14px;border:1px dashed color-mix(in srgb,var(--gold) 60%,transparent);background:color-mix(in srgb,var(--gold) 6%,var(--panel2))}
+.pc-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13.5px;flex-wrap:wrap}
+.pc-seg button[data-v=yes].on{background:var(--green)!important;color:#04210f!important}.pc-seg button[data-v=no].on{background:var(--red)!important;color:#fff!important}
+.pc-warn{color:var(--red);font-size:12.5px;line-height:1.45}
+/* floating + (phones) */
+#fab{display:none}
+@media(max-width:820px){
+  #fab{display:grid;place-items:center;position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:45;width:58px;height:58px;border-radius:50%;border:0;font-size:30px;font-weight:700;cursor:pointer;
+    background:linear-gradient(180deg,#ffd27a,#f5b942);color:#1b1305;box-shadow:0 12px 30px -6px rgba(245,185,66,.75)}
+  #fab.hidden{display:none}html[dir=rtl] #fab{right:auto;left:16px}
+  .td-grid{grid-template-columns:1fr}.td-wk{grid-template-columns:repeat(2,minmax(0,1fr))}.td-acts .btn{min-width:calc(50% - 5px)}.td-big{min-width:100%!important}
+}
+</style>
 </head>
 <body>
 
@@ -1746,7 +1799,7 @@ async function enter(u){
   S.me=u;$("#auth").classList.add("hidden");$("#app").classList.remove("hidden");
   $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;
   if(u.role==="admin"){S.view="admin";await loadSubject(u,false);go("admin")}
-  else{await loadSubject(u,false);go(location.hash.slice(1)||"journal")}
+  else{await loadSubject(u,false);go(location.hash.slice(1)||"today")}
   S._commR=null;settingsPull();rqReadyLoad();
 }
 async function loadSubject(u,readonly){
@@ -1758,6 +1811,7 @@ async function loadSubject(u,readonly){
 /* ============ nav ============ */
 /* crisp line icons (24×24, drawn with the current text colour) */
 const ICON={
+  today:'<path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5v10h12v-10"/><path d="M10 19.5v-5h4v5"/>',
   journal:'<path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v14.5H7.5A2.5 2.5 0 0 0 5 20z"/><path d="M5 20a1.5 1.5 0 0 0 1.5 1.5H19v-4"/><path d="M9 7.5h6M9 11h4"/>',
   stats:'<path d="M3.5 20.5h17"/><rect x="5" y="13" width="3.2" height="5" rx="1"/><rect x="10.4" y="10" width="3.2" height="8" rx="1"/><rect x="15.8" y="11.5" width="3.2" height="6.5" rx="1"/><path d="M4.5 9 9.5 5l4 3 6-4.5"/><path d="M16.5 3.5h3v3"/>',
   news:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M12.8 11.5 10.5 15h3l-2.3 3.5"/>',
@@ -1773,7 +1827,7 @@ const ICON={
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
   system:'<rect x="3" y="4" width="18" height="12.5" rx="2"/><path d="M8.5 20.5h7M12 16.5v4"/>'};
 const ico=(k,cls)=>`<svg class="ico ${cls||""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
-const VIEWS=[["journal","Journal"],["stats","Statistics"],["news","News"],["plan","Tomorrow's plan"],["risk","Risk calculator"],["consistency","Consistency rule"],["propfirms","Prop firm tracker"],["indicator","Free ICT indicator"],["about","About us"]];
+const VIEWS=[["today","Today"],["journal","Journal"],["stats","Statistics"],["news","News"],["plan","Tomorrow's plan"],["risk","Risk calculator"],["consistency","Consistency rule"],["propfirms","Prop firm tracker"],["indicator","Free ICT indicator"],["about","About us"]];
 function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button data-v="${k}" class="${c||""} ${S.view===k?"on":""}"><span class="tico t-${k}">${ico(k)}</span><span>${l}</span></button>`;
   if(S.me.role==="admin")h+=tab("admin","Admin dashboard","admin");
   if(S.readonly)h+=tab("student","Student file","admin");
@@ -1782,7 +1836,7 @@ function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button da
   const on=$("button.on",t);if(on&&t.scrollWidth>t.clientWidth)t.scrollTo({left:on.offsetLeft-(t.clientWidth-on.offsetWidth)/2,behavior:"smooth"});
   renderBottomNav()}
 /* phones: app-style bottom bar with the 5 main tabs + "More" */
-const BNAV_MAIN=[["journal","Journal"],["stats","Stats"],["news","News"],["plan","Plan"],["risk","Risk"]];
+const BNAV_MAIN=[["today","Today"],["journal","Journal"],["stats","Stats"],["news","News"],["plan","Plan"]];
 function renderBottomNav(){let b=$("#bnav");if(!b){b=document.createElement("nav");b.id="bnav";b.setAttribute("aria-label","Main");$("#app").appendChild(b)}
   const all=$$("#tabs button").map(x=>[x.dataset.v,x.querySelector("span:last-child").textContent]);const mainKeys=BNAV_MAIN.map(m=>m[0]);
   const more=all.filter(([k])=>!mainKeys.includes(k)),inMore=more.some(([k])=>k===S.view);
@@ -1804,7 +1858,7 @@ document.addEventListener("click",e=>{const s=$("#bnSheet");if(s&&!s.classList.c
     const rtl=document.documentElement.dir==="rtl",step=(dx<0)!==rtl?1:-1,n=order[i+step];if(!n)return;
     go(n);const v=$("#view");v.classList.remove("sw-n","sw-p");void v.offsetWidth;v.classList.add(step>0?"sw-n":"sw-p")},{passive:true});
 })();
-function go(v){if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";
+function go(v){if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";if(v==="today"&&S.readonly)v="journal";
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
   S.view=v;S.page=null;S.dayPage=null;S._fromDay=null;S._pfId=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
@@ -1868,9 +1922,12 @@ async function rqReadyLoad(){if(!S.me||S.me.role!=="admin"||!API||!API.listProfi
 setInterval(rqReadyLoad,180000);
 function render(){renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
-  const fn={journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
+  const fn={today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
   v.innerHTML=h+'<div id="vb"></div>';Promise.resolve(fn($("#vb"))).then(()=>bindNotify(v)).catch(()=>{});
-  if(S.readonly)$("#backAdmin").onclick=()=>go("admin");}
+  if(S.readonly)$("#backAdmin").onclick=()=>go("admin");
+  /* phones: floating + to log a trade from any student page */
+  let fab=$("#fab");if(!fab){fab=document.createElement("button");fab.id="fab";fab.type="button";fab.setAttribute("aria-label","Log a trade");fab.innerHTML="＋";fab.onclick=()=>editTrade(null);document.body.appendChild(fab)}
+  fab.classList.toggle("hidden",!S.me||S.readonly||S.view==="admin"||$("#app").classList.contains("hidden"));}
 
 /* ============ filters ============ */
 function accounts(){return [...new Set(S.trades.map(t=>t.account).filter(Boolean))].sort()}
@@ -2195,6 +2252,88 @@ function coachCard(){
 }
 function bindCoach(){const b=$("#qNext");if(b)b.onclick=()=>{const cur=$("#qText").dataset.en||$("#qText").textContent;let q;do{q=QUOTES[Math.floor(Math.random()*QUOTES.length)]}while(q===cur&&QUOTES.length>1);$("#qText").textContent=q;$("#qText").dataset.en=q}}
 
+/* ============ TODAY (home screen) + daily discipline score ============
+   Score 0-100 for a day, 5 parts x 20: plan written · within max trades · max loss and stops respected ·
+   plan followed · journaled (notes / emotions on the trades, the end-of-day review, or a rest / no-trade day). */
+const planOn=d=>(S.plans||[]).find(p=>p.date===d);
+function dayLimits(d){const p=planOn(d)||{};return {p,maxT:num(p.maxTrades)>0?num(p.maxTrades):DISC.maxPerDay,maxL:num(p.maxLoss)>0?num(p.maxLoss):0,target:num(p.target)>0?num(p.target):0}}
+let _judged=null,_judgedKey="";
+function judgedMap(){const k=S.trades.length+":"+S.trades.map(t=>t.id+t.followed+t.pnl).join("").length;if(k!==_judgedKey){_judged=judgeTrades(S.trades).out;_judgedKey=k}return _judged}
+function dayScore(d){const ts=S.trades.filter(t=>t.date===d),L=dayLimits(d),p=L.p,J=judgedMap(),net=ts.reduce((s,t)=>s+tradeNet(t),0),rest=!!(p.rest||p.noTrade);
+  const planned=!!planOn(d)&&(rest||num(p.maxLoss)>0||Object.keys(p.bias||{}).length>0||!!(p.htf||p.levels||p.model||"").trim());
+  const stopBroken=ts.some(t=>{const j=J.get(t.id);return j&&j.why==="stop"});
+  const journaled=rest||!!(p.review||"").trim()||!!p.followed||(ts.length>0&&ts.every(t=>(t.notes||"").trim()||(t.feeling||"").trim()||(t.emotions||[]).length));
+  const parts=[["🧭","Plan written",planned],["🎯","Within max trades",ts.length<=L.maxT],["🛡","Max loss and stops respected",!(L.maxL&&net<=-L.maxL)&&!stopBroken],
+    ["✅","Plan followed",!ts.some(t=>t.followed==="No")],["📓","Journaled",journaled]];
+  return {score:parts.filter(x=>x[2]).length*20,parts,count:ts.length,net,L,rest,active:ts.length>0||!!planOn(d)}}
+/* journaling streak: trading days in a row with trades, a review, or a rest / no-trade day (weekends and US market holidays are skipped) */
+function journalStreak(){const ok=d=>{const p=planOn(d)||{};return S.trades.some(t=>t.date===d)||!!(p.rest||p.noTrade||p.followed||(p.review||"").trim())};
+  const closed=d=>US_HOL.some(h=>h[0]===d&&h[2]==="closed");let d=todayStr(),n=0;
+  const wd=x=>{const [y,m,dd]=x.split("-").map(Number);return new Date(y,m-1,dd).getDay()};
+  if(!ok(d))d=addWeekday(d,-1);else n=0;
+  for(let g=0;g<400;g++){if(wd(d)%6===0||closed(d)){d=addWeekday(d,-1);continue}if(!ok(d))break;n++;d=addWeekday(d,-1)}return n}
+/* stop for today: max trades reached or max daily loss hit */
+function coolDown(d){const ts=S.trades.filter(t=>t.date===d),L=dayLimits(d),net=ts.reduce((s,t)=>s+tradeNet(t),0);
+  if(L.maxL&&net<=-L.maxL)return {why:"loss",n:ts.length,L,net};if(ts.length>=L.maxT)return {why:"trades",n:ts.length,L,net};return null}
+function ring(score){const c=2*Math.PI*46,col=score>=80?"var(--green)":score>=60?"var(--gold)":"var(--red)";
+  return `<svg class="td-ring" viewBox="0 0 110 110"><circle cx="55" cy="55" r="46" class="td-rbg"/><circle cx="55" cy="55" r="46" class="td-rfg" style="stroke:${col};stroke-dasharray:${c};stroke-dashoffset:${c*(1-score/100)}"/><text x="55" y="61" text-anchor="middle">${score}</text></svg>`}
+/* this week (Monday to today): P&L, win rate, average score, best day, emotion that cost the most */
+function weekCard(){const t=todayStr(),[y,m,dd]=t.split("-").map(Number),mon=new Date(y,m-1,dd);mon.setDate(mon.getDate()-((mon.getDay()+6)%7));const from=ymd(mon);
+  const ts=S.trades.filter(x=>x.date>=from&&x.date<=t);if(!ts.length)return "";const st=calc(ts);
+  const days=[...new Set(ts.map(x=>x.date))].sort(),sc=days.map(d=>dayScore(d).score),avg=Math.round(sc.reduce((a,b)=>a+b,0)/sc.length);
+  const byDay={};ts.forEach(x=>byDay[x.date]=(byDay[x.date]||0)+tradeNet(x));const best=Object.entries(byDay).sort((a,b)=>b[1]-a[1])[0];
+  const emo={};ts.forEach(x=>{const n=tradeNet(x);if(n<0)(x.emotions||[]).filter(e=>EMO_BAD.includes(e)).forEach(e=>emo[e]=(emo[e]||0)+n)});const worst=Object.entries(emo).sort((a,b)=>a[1]-b[1])[0];
+  return `<div class="card td-week"><h3>📅 <span>This week</span></h3><div class="td-wk">
+    <div><small>Net P&L</small><b class="mono ${cls(st.net)}">${smoney(st.net)}</b></div><div><small>Win rate</small><b class="mono" data-notr>${(isFinite(st.wr)?st.wr*100:0).toFixed(0)}%</b></div>
+    <div><small>Average score</small><b class="mono" data-notr>${avg}</b></div><div><small>Best day</small><b class="mono pos" data-notr>${best?esc(fmtDate(best[0]).split(",")[0])+" "+smoney(best[1]):"—"}</b></div></div>
+    ${worst?`<p class="td-emo">💸 <span>The emotion that cost you the most this week:</span> <b data-notr>${esc(I18N.t(worst[0]))}</b> <b class="mono neg">${money(worst[1])}</b></p>`:`<p class="td-emo">💚 <span>No losing trade with a bad emotion this week. Keep it up.</span></p>`}</div>`}
+function vToday(el){
+  if(S.readonly)return vJournal(el);
+  const t=todayStr(),sc=dayScore(t),L=sc.L,p=L.p,ds=discStreak(S.trades,S.plans),js=journalStreak(),cd=coolDown(t),nd=nextTradingDay();
+  const hr=new Date().getHours(),hello=hr<12?"Good morning":hr<18?"Good afternoon":"Good evening",name=esc(((S.me&&S.me.name)||"").split(" ")[0]);
+  const q=QUOTES[(new Date().getDate()+new Date().getMonth()*31)%QUOTES.length];
+  const lossUsed=L.maxL?Math.max(0,-sc.net)/L.maxL:0,tgtUsed=L.target?Math.max(0,sc.net)/L.target:0;
+  const biasTxt=Object.entries(p.bias||{}).filter(([,v])=>v).map(([k,v])=>`<span class="tag ${/bull/i.test(v)?"long":/bear/i.test(v)?"short":""}" data-notr>${esc(k)} · ${esc(I18N.t(v))}</span>`).join(" ");
+  const week=[];{let d=t;for(let i=0;i<7;i++){week.unshift(d);d=addWeekday(d,-1)}}
+  el.innerHTML=`<div class="td">
+   <div class="td-hero"><div><div class="td-hi"><span>${hello}</span>${name?`, <b data-notr>${name}</b>`:""} 👋</div><div class="td-date mut" data-notr>${esc(fmtDate(t))}</div></div>
+    <div class="td-q">“<span>${esc(q)}</span>” <small>— BROWN ALGO</small></div></div>
+   ${cd?`<div class="td-cool"><span class="td-cool-i">🛑</span><div><b>${cd.why==="loss"?"Max daily loss reached":"Max trades reached for today"}</b><small>${cd.why==="loss"?"You hit your daily loss limit. Close the platform, protect the account, come back tomorrow.":"Your plan is done for today. Closing the platform is the trade now."}</small></div></div>`:""}
+   ${sc.net>0&&L.target&&sc.net>=L.target?`<div class="td-win">🎉 <b>Daily target reached!</b> <span>Lock it in: no more trades today.</span></div>`:""}
+   <div class="td-grid">
+    <div class="card td-score"><div class="td-sc-top">${ring(sc.score)}<div><h3>Today's discipline score</h3><p class="mut">${sc.score>=80?"Excellent. This is how funded traders work.":sc.score>=60?"Good. Fix the red points below.":"Follow the checklist below to raise it."}</p></div></div>
+     <div class="td-parts">${sc.parts.map(([ic,l,ok])=>`<div class="td-pt ${ok?"ok":""}"><span>${ok?"✅":ic}</span><span>${l}</span><b>${ok?"+20":"0"}</b></div>`).join("")}</div></div>
+    <div class="card td-streaks"><h3>🔥 <span>Your streaks</span></h3>
+     <div class="td-st"><div class="td-fl"><span class="td-flame">🔥</span><b class="mono" data-notr>${ds.streak}</b><small>disciplined days in a row</small></div>
+      <div class="td-fl"><span class="td-flame">📓</span><b class="mono" data-notr>${js}</b><small>days journaled in a row</small></div>
+      <div class="td-fl"><span class="td-flame">🏆</span><b class="mono" data-notr>${ds.best}</b><small>best discipline streak</small></div></div>
+     <div class="td-wkstrip">${week.map(d=>{const s=dayScore(d),f=d===t;return `<div class="td-d ${s.active?(s.score>=80?"g":s.score>=60?"y":"r"):"n"} ${f?"now":""}" title="${esc(fmtDate(d))}"><small data-notr>${esc(fmtDate(d).split(",")[0].slice(0,3))}</small><b data-notr>${s.active?s.score:"·"}</b></div>`}).join("")}</div></div>
+    <div class="card td-limits"><h3>📊 <span>Today</span></h3>
+     <div class="td-row"><span>Trades today</span><b class="mono ${cd&&cd.why==="trades"?"neg":""}" data-notr>${sc.count} / ${L.maxT}</b></div><div class="td-bar ${sc.count>=L.maxT?"bad":""}"><i style="width:${Math.min(100,sc.count/L.maxT*100)}%"></i></div>
+     <div class="td-row"><span>P&L today</span><b class="mono ${cls(sc.net)}">${smoney(sc.net)}</b></div>
+     ${L.maxL?`<div class="td-row sm"><span>Daily loss limit</span><span class="mono" data-notr>${money(-L.maxL)}</span></div><div class="td-bar loss ${lossUsed>=.8?"bad":""}"><i style="width:${Math.min(100,lossUsed*100)}%"></i></div>`:""}
+     ${L.target?`<div class="td-row sm"><span>Daily target</span><span class="mono" data-notr>${money(L.target)}</span></div><div class="td-bar goal"><i style="width:${Math.min(100,tgtUsed*100)}%"></i></div>`:""}
+     ${!L.maxL?`<p class="mut td-hint">Set your max daily loss in today's plan to see the meter.</p>`:""}</div>
+    <div class="card td-plan"><h3>🧭 <span>Today's plan</span></h3>
+     ${planOn(t)?(p.rest||p.noTrade?`<p>😴 <span>Rest / no-trade day. It counts for your streak.</span></p>`:`<div class="td-bias">${biasTxt||`<span class="mut">No bias written.</span>`}</div>
+       <div class="td-row sm"><span>Max trades</span><b class="mono" data-notr>${L.maxT}</b></div>${L.maxL?`<div class="td-row sm"><span>Max daily loss</span><b class="mono" data-notr>${money(L.maxL)}</b></div>`:""}${(p.levels||"").trim()?`<p class="td-lv" data-notr>${esc(p.levels).slice(0,140)}</p>`:""}`)
+       :`<p class="mut">No plan for today yet. A trader without a plan is a gambler.</p><button class="btn sm pri" type="button" data-td="planToday">🧭 <span>Write today's plan</span></button>`}
+     <div class="td-news" id="coachNews">${coachNewsHTML()}</div></div>
+   </div>
+   <div class="td-acts">
+    <button class="btn pri td-big" type="button" data-td="trade">＋ <span>Log a trade</span></button>
+    <button class="btn" type="button" data-td="eod">🌙 <span>End-of-day review</span></button>
+    <button class="btn" type="button" data-td="plan">🧭 <span>${nd===t?"Plan today":"Plan the next session"}</span></button>
+    <button class="btn" type="button" data-td="notrade">🚫 <span>No trades today</span></button>
+   </div>
+   ${weekCard()}
+  </div>`;
+  $$("[data-td]",el).forEach(b=>b.onclick=async()=>{const a=b.dataset.td;
+    if(a==="trade")editTrade(null);
+    else if(a==="eod"){S._eodOpen=true;go("journal");setTimeout(()=>{const e=$("#eodBox");if(e){e.open=true;e.scrollIntoView({behavior:"smooth",block:"center"})}},200)}
+    else if(a==="plan"){S._planDate=nd;go("plan")}else if(a==="planToday"){S._planDate=t;go("plan")}
+    else if(a==="notrade"){S._ntdDate=t;go("journal");setTimeout(()=>{const n=$("#ntdSet");if(n)n.scrollIntoView({behavior:"smooth",block:"center"})},200)}})}
+
 /* ===== No-trade days: saved on that day's plan (noTrade:true). They count as $0 days in the statistics. ===== */
 function noTradeDates(){let ds=(S.plans||[]).filter(p=>p.noTrade).map(p=>p.date);
   if(S.range&&S.range!=="all"){const d=new Date();d.setDate(d.getDate()-Number(S.range)+1);const c=ymd(d);ds=ds.filter(x=>x>=c)}return ds}
@@ -2360,6 +2499,8 @@ function compress(file,maxW=1280,maxBytes=170000){return new Promise((res,rej)=>
   res(out)};img.onerror=rej;img.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
 
 function editTrade(t0){
+  /* cool-down: max trades or max daily loss reached today */
+  if(!t0&&!S._cdOk&&!S.readonly){const cd=coolDown(todayStr());if(cd){confirmBox(I18N.t(cd.why==="loss"?"You reached your max daily loss today. The disciplined move is to stop trading. Log a trade you already took?":"You reached your max trades for today. The disciplined move is to stop trading. Log a trade you already took?"),()=>{S._cdOk=1;setTimeout(()=>{editTrade(null);S._cdOk=0},50)});return}}
   const isNew=!t0;const t=t0?JSON.parse(JSON.stringify(t0)):{id:uuid(),user_id:S.subject.id,date:todayStr(),time:"",account:S.acct!=="all"?S.acct:(accounts()[0]||""),symbol:"MNQ",side:"Long",qty:1,entry:"",exit:"",stop:"",target:"",pnl:"",fees:"",setup:"",session:"NY AM",emotions:[],feeling:"",followed:"Yes",rating:3,shots:[],remark:"",notes:""};
   const syms=Object.keys(MK);
   /* personal or prop firm account: new trades copy the last choice used on this account */
@@ -2369,6 +2510,9 @@ function editTrade(t0){
     +(t.firm&&!PFL.some(x=>x.name===t.firm)&&!/personal/i.test(t.firm)?`<option selected>${esc(t.firm)}</option>`:"");
   openModal(`<div class="mhead"><h2>${isNew?"New trade":"Edit trade"}</h2><button class="x" id="mx">×</button></div>
   <form id="tf" class="grid">
+   ${isNew?`<div class="pre-chk" id="preChk"><b>✋ <span>Before you log it, be honest:</span></b>
+    ${[["setup","It was an A+ setup from my plan"],["limits","I stayed within my max trades and max loss"],["news","Not within 5 minutes of red news"]].map(([k,l])=>`<div class="pc-row"><span>${l}</span><div class="seg pc-seg" data-pc="${k}"><button type="button" data-v="yes">✔ <span>Yes</span></button><button type="button" data-v="no">✖ <span>No</span></button></div></div>`).join("")}
+    <small class="pc-warn hidden" id="pcWarn">⚠️ <span>A "No" means this trade broke your plan: it will be saved as "Followed my plan: No" and count against your discipline score. Being honest is how you improve.</span></small></div>`:""}
    <div class="grid g4">
     <label class="f">Date<input class="i" type="date" name="date" value="${esc(t.date)}" required></label>
     <label class="f">Time<input class="i" type="time" name="time" value="${esc(t.time)}"></label>
@@ -2418,6 +2562,8 @@ function editTrade(t0){
     const L=$("#tQtyL"),q=$("#tQty");if(L&&L.textContent!==I18N.t(lots?"Lot size":"Contracts")){L.textContent=I18N.t(lots?"Lot size":"Contracts");q.step=lots?"0.01":"1";q.placeholder=lots?"e.g. 0.50":"e.g. 2"}};
   const live=()=>{read();const n=tradeNet(t),r=tradeRisk(t),R=tradeR(t),cm=commOf(t);$("#live").innerHTML=`<span>Net P&L <b class="${cls(n)}">${smoney(n)}</b></span>${cm?`<span>${I18N.t("Commission")} <b class="neg">${money(-cm)}</b> <small class="mut" data-notr>(${esc(t.firm)})</small></span>`:""}<span>Risk <b>${money(r)}</b></span><span>R multiple <b>${isFinite(R)?R.toFixed(2)+"R":"—"}</b></span><span>Result <b>${resultOf(t)}</b></span>`};
   f.addEventListener("input",live);f.addEventListener("change",live);live();
+  const pc={};$$("#preChk .pc-seg").forEach(s=>$$("button",s).forEach(b=>b.onclick=()=>{pc[s.dataset.pc]=b.dataset.v;$$("button",s).forEach(x=>x.classList.toggle("on",x===b));
+    const bad=Object.values(pc).includes("no");$("#pcWarn").classList.toggle("hidden",!bad);if(bad){const fs=f.querySelector("[name=followed]");if(fs)fs.value="No"}}));
   $("#tAType").onchange=e=>{const pe=e.target.value==="personal";$("#tFirmL").classList.toggle("hidden",pe);$("#tCommL").classList.toggle("hidden",pe);live()};
   $$("#rate button").forEach(b=>b.onclick=()=>{t.rating=Number(b.dataset.v);$$("#rate button").forEach(x=>x.classList.toggle("on",x===b))});
   $$("#emo .pill").forEach(p=>p.onclick=()=>{const e=p.dataset.e;t.emotions=t.emotions||[];if(t.emotions.includes(e))t.emotions=t.emotions.filter(x=>x!==e);else t.emotions.push(e);p.classList.toggle("on")});
@@ -3870,6 +4016,8 @@ async function bootDemo(){const D=demoData();S._demo=true;
 <script type="module">import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))</script>
 </body>
 </html>
+
+
 
 
 

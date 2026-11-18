@@ -822,7 +822,32 @@ const T={
 "I'm not trading this day. A planned rest day counts for the discipline streak.":["Je ne trade pas ce jour-là. Un jour de repos prévu compte pour la série de discipline.","لن أتداول في هذا اليوم. يوم الراحة المخطط يُحتسب في سلسلة الانضباط."],
 "Tap a word with a ? to see what it means.":["Touchez un mot avec un ? pour voir ce qu'il veut dire.","اضغط على أي كلمة عليها ? لترى معناها."],
 "Type":["Type","النوع"],"Tick":["Tick","التيك"],"Ticks per":["Ticks par","تيكات لكل"],"point":["point","نقطة"],"Pip":["Pip","البيب"],"$ / pip":["$ / pip","$ / بيب"],"$ / point":["$ / point","$ / نقطة"],"$ / tick":["$ / tick","$ / تيك"],"micros":["micros","ميكرو"],"mini":["mini","ميني"],"Mini":["Mini","ميني"],"Micro":["Micro","ميكرو"],
-"1D":["1J","يوم"],"7D":["7J","7 أيام"],"30D":["30J","30 يوماً"],"90D":["90J","90 يوماً"]
+"1D":["1J","يوم"],"7D":["7J","7 أيام"],"30D":["30J","30 يوماً"],"90D":["90J","90 يوماً"],
+// Today home screen + daily discipline score
+"Today":["Aujourd'hui","اليوم"],"Good morning":["Bonjour","صباح الخير"],"Good afternoon":["Bon après-midi","مساء الخير"],"Good evening":["Bonsoir","مساء الخير"],
+"Max daily loss reached":["Perte journalière max atteinte","تم بلوغ أقصى خسارة يومية"],"Max trades reached for today":["Nombre max de trades atteint aujourd'hui","تم بلوغ أقصى عدد صفقات اليوم"],
+"You hit your daily loss limit. Close the platform, protect the account, come back tomorrow.":["Vous avez atteint votre limite de perte journalière. Fermez la plateforme, protégez le compte, revenez demain.","وصلت إلى حد خسارتك اليومي. أغلق المنصة، احمِ الحساب، وعُد غداً."],
+"Your plan is done for today. Closing the platform is the trade now.":["Votre plan est terminé pour aujourd'hui. Fermer la plateforme, c'est le bon trade maintenant.","خطتك انتهت لهذا اليوم. إغلاق المنصة هو الصفقة الصحيحة الآن."],
+"Daily target reached!":["Objectif journalier atteint !","تم بلوغ الهدف اليومي!"],"Lock it in: no more trades today.":["Sécurisez-le : plus de trades aujourd'hui.","احفظه: لا مزيد من الصفقات اليوم."],
+"Today's discipline score":["Score de discipline du jour","نقاط انضباط اليوم"],"Excellent. This is how funded traders work.":["Excellent. C'est comme ça que travaillent les traders financés.","ممتاز. هكذا يعمل المتداولون الممولون."],
+"Good. Fix the red points below.":["Bien. Corrigez les points en rouge ci-dessous.","جيد. صحّح النقاط الناقصة أدناه."],"Follow the checklist below to raise it.":["Suivez la liste ci-dessous pour l'améliorer.","اتبع القائمة أدناه لرفعها."],
+"Plan written":["Plan écrit","الخطة مكتوبة"],"Within max trades":["Dans le nombre max de trades","ضمن أقصى عدد صفقات"],"Max loss and stops respected":["Perte max et stops respectés","أقصى خسارة ووقف الخسارة محترمان"],
+"Plan followed":["Plan suivi","الخطة متبعة"],"Journaled":["Journal rempli","تم التدوين"],"Your streaks":["Vos séries","سلاسلك"],
+"disciplined days in a row":["jours disciplinés d'affilée","أيام منضبطة متتالية"],"days journaled in a row":["jours de journal d'affilée","أيام تدوين متتالية"],"best discipline streak":["meilleure série de discipline","أفضل سلسلة انضباط"],
+"Trades today":["Trades aujourd'hui","صفقات اليوم"],"P&L today":["P&L du jour","ربح/خسارة اليوم"],"Daily target":["Objectif journalier","الهدف اليومي"],
+"Set your max daily loss in today's plan to see the meter.":["Indiquez votre perte journalière max dans le plan du jour pour voir la jauge.","حدّد أقصى خسارة يومية في خطة اليوم لترى المؤشر."],
+"Today's plan":["Plan du jour","خطة اليوم"],"Rest / no-trade day. It counts for your streak.":["Jour de repos / sans trade. Il compte pour votre série.","يوم راحة / بلا تداول. يُحتسب في سلسلتك."],
+"No bias written.":["Aucun biais écrit.","لا يوجد اتجاه مكتوب."],"Max trades":["Trades max","أقصى عدد صفقات"],"Max daily loss":["Perte journalière max","أقصى خسارة يومية"],
+"No plan for today yet. A trader without a plan is a gambler.":["Pas encore de plan aujourd'hui. Un trader sans plan est un joueur de casino.","لا خطة لليوم بعد. المتداول بلا خطة مقامر."],
+"Write today's plan":["Écrire le plan du jour","اكتب خطة اليوم"],"Log a trade":["Ajouter un trade","سجّل صفقة"],"Plan today":["Planifier aujourd'hui","خطط لليوم"],"Plan the next session":["Planifier la prochaine séance","خطط للجلسة القادمة"],
+"This week":["Cette semaine","هذا الأسبوع"],"Average score":["Score moyen","متوسط النقاط"],"Best day":["Meilleur jour","أفضل يوم"],
+"The emotion that cost you the most this week:":["L'émotion qui vous a coûté le plus cette semaine :","الشعور الذي كلّفك أكثر هذا الأسبوع:"],
+"No losing trade with a bad emotion this week. Keep it up.":["Aucun trade perdant avec une mauvaise émotion cette semaine. Continuez.","لا صفقة خاسرة بشعور سيئ هذا الأسبوع. واصل."],
+"Before you log it, be honest:":["Avant de l'ajouter, soyez honnête :","قبل التسجيل، كن صادقاً:"],"It was an A+ setup from my plan":["C'était un setup A+ de mon plan","كان إعداداً ممتازاً (A+) من خطتي"],
+"I stayed within my max trades and max loss":["Je suis resté dans mes trades max et ma perte max","التزمت بأقصى عدد صفقات وأقصى خسارة"],"Not within 5 minutes of red news":["Pas dans les 5 minutes d'une news rouge","ليس خلال 5 دقائق من خبر أحمر"],
+"A \"No\" means this trade broke your plan: it will be saved as \"Followed my plan: No\" and count against your discipline score. Being honest is how you improve.":["Un « Non » veut dire que ce trade a cassé votre plan : il sera enregistré comme « Plan suivi : Non » et comptera contre votre score de discipline. L'honnêteté, c'est comme ça qu'on progresse.","«لا» تعني أن هذه الصفقة خالفت خطتك: ستُحفظ كـ«اتبعت خطتي: لا» وتُحتسب ضد نقاط انضباطك. الصدق هو طريق التحسن."],
+"You reached your max daily loss today. The disciplined move is to stop trading. Log a trade you already took?":["Vous avez atteint votre perte journalière max. Le bon réflexe est d'arrêter de trader. Ajouter un trade déjà pris ?","وصلت إلى أقصى خسارة يومية. التصرف المنضبط هو التوقف عن التداول. هل تسجّل صفقة أخذتها بالفعل؟"],
+"You reached your max trades for today. The disciplined move is to stop trading. Log a trade you already took?":["Vous avez atteint votre nombre max de trades aujourd'hui. Le bon réflexe est d'arrêter de trader. Ajouter un trade déjà pris ?","وصلت إلى أقصى عدد صفقات اليوم. التصرف المنضبط هو التوقف عن التداول. هل تسجّل صفقة أخذتها بالفعل؟"]
 };
 
 /* text with numbers / names inside  →  [regex, French, Arabic] */
