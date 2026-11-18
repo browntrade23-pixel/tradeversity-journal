@@ -1570,6 +1570,16 @@ html.gal-on #view .pf-item,html.gal-on #view .card,html.gal-on #view .rtabs butt
 html.gal-on #view .pf-item{background:rgba(10,12,22,.55)}html.gal-on #view .card{background:rgba(12,14,24,.6)}html.gal-on #view .pf-mini{background:rgba(8,10,18,.5)}
 html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9)}
 </style>
+<style>
+/* per-firm Show rules / Hide rules */
+.pf-rules>summary{list-style:none;display:inline-flex;align-items:center;margin:2px 12px 8px;padding:7px 14px;border-radius:99px;border:1px solid rgba(245,185,66,.5);background:rgba(245,185,66,.1);color:var(--gold);font:700 12.5px Inter,sans-serif;cursor:pointer;transition:background .2s,transform .15s}
+.pf-rules>summary::-webkit-details-marker{display:none}.pf-rules>summary::marker{content:""}.pf-rules>summary::before,[dir=rtl] .pf-rules>summary::before{content:none!important}
+.pf-rules>summary:hover{background:rgba(245,185,66,.2);transform:translateY(-1px)}
+.pf-rules .pfr-hide{display:none}.pf-rules[open] .pfr-show{display:none}.pf-rules[open] .pfr-hide{display:inline}
+.pf-rules[open]>summary{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--line2)}
+.pf-rules[open]>.pf-grid,.pf-rules[open]>.pf-mini{animation:pfrIn .3s ease}@keyframes pfrIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@media(max-width:820px){.pf-rules>summary{min-height:40px}}
+</style>
 </head>
 <body>
 
@@ -3798,13 +3808,13 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
     <button type="button" class="btn sm pri" id="pfQuizB">🧭 <span>Find my prop firm</span></button><button type="button" class="btn sm ${S._pfGal?"pri":""}" id="pfGalB">🌌 <span>Galaxy view</span></button></div>
    ${S._pfGal?`<div class="card a3-card pf-gal"><div id="a3Gal" class="a3-box"></div><p class="mut a3-hint"><span>Green = open to Algeria · teal = probably · grey = ask support · red = restricted · gold ring = discount code. Drag to rotate, tap a planet to open the firm.</span></p></div>`:""}
    <div class="pf-legend">${Object.values(PFDZ).map(d=>`<span class="dz-b ${d[2]}">${d[0]} <span>${d[1]}</span></span>`).join("")}</div>
-   <div class="pf-bar"><span class="mut">${list.length} <span>firms</span></span><button type="button" class="btn sm" id="pfAll">${S._pfShut?"▾ <span>Show all rules</span>":"▴ <span>Hide all rules</span>"}</button></div>
+   <div class="pf-bar"><span class="mut">${list.length} <span>firms</span></span></div>
    <div class="pf-list">${list.length?list.map(f=>{const L=f.name.replace(/^The /,"").charAt(0).toUpperCase();const h=L!==letter?(letter=L,`<div class="pf-letter"><span>${L}</span></div>`):"";
      const mini=(ic,t,items,cl)=>items&&items.length?`<div class="pf-mini ${cl}"><h4>${ic} <span>${t}</span></h4><ul>${items.map(pfLi).join("")}</ul></div>`:"";
      f=Object.assign({},f,pfLoc(f));
      return `${h}<div class="pf-item ${f.type}"><button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b>${cpBadge(f.id)}<span class="pf-szp" data-notr>${f.sizes.map(s=>sizeChip(f,s)).join("")}</span></span>${dzBadge(f)}<span class="pf-go">›</span></button>
       <div class="pf-acts"><button type="button" class="pf-a ${favs.includes(f.id)?"on":""}" data-pfav="${f.id}">${favs.includes(f.id)?"★":"☆"} <span>${favs.includes(f.id)?"Favourite":"Add to favourites"}</span></button><button type="button" class="pf-a ${cmp.includes(f.id)?"on":""}" data-pcmp="${f.id}">⇄ <span>${cmp.includes(f.id)?"In comparison":"Compare"}</span></button></div>
-      <details class="pf-rules"${S._pfShut?"":" open"}><summary><span>Rules &amp; hidden rules</span></summary>
+      <details class="pf-rules" data-pfr="${f.id}"${(S._pfOpen||{})[f.id]?" open":""}><summary><span class="pfr-show">📖 <span>Show rules</span> ▾</span><span class="pfr-hide">▴ <span>Hide rules</span></span></summary>
        <div class="pf-grid">${mini("📝","Evaluation: rules",f.eval,"r")}${mini("🕵️","Evaluation: hidden rules",f.evalH,"h")}${mini("🏦","Funded: rules",f.funded,"r f")}${mini("🕵️","Funded: hidden rules",f.fundedH,"h")}</div>
        ${mini("💸","Withdrawal conditions",f.payout,"p")}</details></div>`}).join("")
      :`<div class="card empty">No prop firm found.</div>`}</div>
@@ -3815,7 +3825,8 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
   $$("[data-pf]",el).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.pf;S._couponTried=false;render();window.scrollTo(0,0)});
   const qi=$("#pfQ",el);qi.oninput=()=>{S._pfQ=qi.value;const p=qi.selectionStart;render();const n=$("#pfQ");n.focus();n.setSelectionRange(p,p)};
   $("#pfDz",el).onchange=e=>{S._pfDz=e.target.checked;render()};
-  $("#pfAll",el).onclick=()=>{S._pfShut=!S._pfShut;render()};
+  /* each firm opens / closes its own rules; remembered while you browse */
+  $$("details[data-pfr]",el).forEach(d=>d.ontoggle=()=>{S._pfOpen=S._pfOpen||{};S._pfOpen[d.dataset.pfr]=d.open});
   $("#pfFav",el).onchange=e=>{S._pfFavOnly=e.target.checked;render()};$("#pfQuizB",el).onclick=pfQuiz;
   $("#pfGalB",el).onclick=()=>{S._pfGal=!S._pfGal;render()};
   if(S._pfGal)mount3d("a3Gal","firmGalaxy",list.map(f=>{const k=Object.keys(COUPONS).find(c=>COUPONS[c][f.id]);return {id:f.id,name:f.name,dz:f.dz,deal:k?`-${COUPONS[k][f.id].pct}% ${k}`:"",score:f.name.length}}),id=>{S._pfId=id;S._couponTried=false;render();window.scrollTo(0,0)});
@@ -4662,6 +4673,8 @@ let __a3=false;const __a3t=setInterval(()=>{const a=document.getElementById("aut
   import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))},250)</script>
 </body>
 </html>
+
+
 
 
 
