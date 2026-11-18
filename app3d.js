@@ -239,3 +239,57 @@ export function galaxyBackground(el,kind="galaxy",opts={}){
     if(opts.still&&++stillN>4){stopped=true;const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose()}},3000)}})();
   return {r}}
 
+/* 9. CONSISTENCY RULE BACKGROUND (3D): glass light pillars like daily profits on a dark reflective floor.
+   Consistent = even teal pillars under the rule line. Not consistent = one pillar rises in amber above the line.
+   Soft on purpose: low light, slow camera drift. opts.still = draw once (Light mode). */
+export function pillarsBackground(el,opts={}){
+  const ph=small(),r=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"}),dpr=Math.min(devicePixelRatio,ph?1.4:1.75);
+  r.setPixelRatio(dpr);r.setSize(innerWidth,innerHeight);r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=.9;el.innerHTML="";el.appendChild(r.domElement);
+  const scene=new THREE.Scene();scene.fog=new THREE.Fog(0x03050b,12,30);
+  const cam=new THREE.PerspectiveCamera(ph?52:42,innerWidth/innerHeight,.1,100);
+  const TEAL=new THREE.Color("#2ad1c9"),IND=new THREE.Color("#5b6cf0"),AMB=new THREE.Color("#ff9a3d");
+  scene.add(new THREE.AmbientLight(0x8090c0,.35));
+  const key=new THREE.DirectionalLight(0xbfd4ff,.9);key.position.set(-6,10,8);scene.add(key);
+  const rim=new THREE.PointLight(0x2ad1c9,2.2,26,1.4);rim.position.set(0,7,-7);scene.add(rim);
+  const warm=new THREE.PointLight(0xff9a3d,0,14,1.6);warm.position.set(2.2,6,2);scene.add(warm);
+  /* reflective dark floor + faint grid */
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.MeshStandardMaterial({color:0x05070f,metalness:.85,roughness:.32}));floor.rotation.x=-Math.PI/2;scene.add(floor);
+  const grid=new THREE.GridHelper(40,40,0x2b3566,0x161c38);grid.material.transparent=true;grid.material.opacity=.22;grid.position.y=.002;scene.add(grid);
+  /* the pillars */
+  const n=ph?9:13,gap=ph?1.25:1.3,w=ph?.68:.7,big=Math.floor(n*.62),P=[];
+  const hs=i=>{const x=Math.sin(i*12.9898)*43758.5453;return x-Math.floor(x)};
+  for(let i=0;i<n;i++){const x=(i-(n-1)/2)*gap,z=-Math.pow((i-(n-1)/2)/(n/2),2)*1.6,base=1.5+hs(i)*.9;
+    const mat=new THREE.MeshStandardMaterial({color:i%2?IND:TEAL,emissive:i%2?IND:TEAL,emissiveIntensity:.22,metalness:.15,roughness:.18,transparent:true,opacity:.42,depthWrite:false});
+    const geo=new THREE.BoxGeometry(w,1,w);geo.translate(0,.5,0);const m=new THREE.Mesh(geo,mat);m.position.set(x,0,z);scene.add(m);
+    const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:i%2?IND:TEAL,transparent:true,opacity:.45}));m.add(edges);
+    const cap=new THREE.Mesh(new THREE.PlaneGeometry(w,w),new THREE.MeshBasicMaterial({color:TEAL,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false}));cap.rotation.x=-Math.PI/2;cap.position.set(x,base,z);scene.add(cap);
+    /* soft reflection-like glow on the floor under each pillar */
+    const pool=new THREE.Mesh(new THREE.CircleGeometry(w*1.3,24),new THREE.MeshBasicMaterial({color:i%2?IND:TEAL,transparent:true,opacity:.08,blending:THREE.AdditiveBlending,depthWrite:false}));pool.rotation.x=-Math.PI/2;pool.position.set(x,.01,z);scene.add(pool);
+    P.push({m,mat,edges,cap,pool,base,h:base,i})}
+  /* the rule line: no pillar should cross it */
+  const RL=3.05,lineGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-(n/2)*gap,0,0),new THREE.Vector3((n/2)*gap,0,0)]);
+  const rule=new THREE.Line(lineGeo,new THREE.LineDashedMaterial({color:TEAL,dashSize:.28,gapSize:.2,transparent:true,opacity:.45}));rule.computeLineDistances();rule.position.set(0,RL,0);scene.add(rule);
+  const sheet=new THREE.Mesh(new THREE.PlaneGeometry(n*gap,3.6),new THREE.MeshBasicMaterial({color:TEAL,transparent:true,opacity:.025,side:THREE.DoubleSide,depthWrite:false}));sheet.rotation.x=-Math.PI/2;sheet.position.set(0,RL,-.6);scene.add(sheet);
+  /* floating motes */
+  const MN=ph?60:120,mp=new Float32Array(MN*3);for(let i=0;i<MN;i++){mp.set([(Math.random()-.5)*18,Math.random()*7,(Math.random()-.5)*8-1],i*3)}
+  const mg=new THREE.BufferGeometry();mg.setAttribute("position",new THREE.BufferAttribute(mp,3));
+  const motes=new THREE.Points(mg,new THREE.PointsMaterial({color:0x9fe8e4,size:ph?.05:.045,transparent:true,opacity:.35,depthWrite:false,blending:THREE.AdditiveBlending}));scene.add(motes);
+  const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()};addEventListener("resize",rs);
+  let mx=0;const mv=e=>{mx=e.clientX/innerWidth-.5};addEventListener("pointermove",mv,{passive:true});
+  const clock=new THREE.Clock();let last=0,cx=0,stopped=false,stillN=0,amberK=(window.__bgState||{}).cons===-1?1:0;
+  const ST=()=>window.__bgState||{};
+  (function loop(){if(stopped)return;if(!el.isConnected){removeEventListener("resize",rs);removeEventListener("pointermove",mv);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});r.dispose();return}
+    requestAnimationFrame(loop);if(document.hidden)return;const t=opts.still?6:clock.getElapsedTime(),dt=opts.still?1:Math.min(.05,t-last);last=t;
+    const bad=ST().cons===-1;amberK+=((bad?1:0)-amberK)*Math.min(1,dt*1.5);
+    P.forEach(p=>{const target=(p.i===big?p.base+(4.9-p.base)*amberK:p.base)*(1+.03*Math.sin(t*.6+p.i*1.7));p.h+=(target-p.h)*Math.min(1,dt*4);
+      p.m.scale.y=p.h;p.cap.position.y=p.h;
+      const amberThis=p.i===big?amberK:0,c=(p.i%2?IND:TEAL).clone().lerp(AMB,amberThis);
+      p.mat.color.copy(c);p.mat.emissive.copy(c);p.mat.emissiveIntensity=.2+.15*amberThis;p.edges.material.color.copy(c);p.cap.material.color.copy(c);p.pool.material.color.copy(c);p.pool.material.opacity=.08+.06*amberThis});
+    const rc=TEAL.clone().lerp(AMB,amberK*.8);rule.material.color.copy(rc);sheet.material.color.copy(rc);warm.intensity=4*amberK;
+    const pos=mg.attributes.position.array;for(let i=0;i<MN;i++){pos[i*3+1]+=dt*.12;if(pos[i*3+1]>7)pos[i*3+1]=0}mg.attributes.position.needsUpdate=true;
+    /* slow camera drift + a little scroll and mouse parallax */
+    const mxS=Math.max(1,document.documentElement.scrollHeight-innerHeight),sf=Math.min(1,Math.max(0,scrollY/mxS));cx+=(mx*1.2-cx)*Math.min(1,dt*1.5);
+    const a=Math.sin(t*.07)*.3+cx*.25+sf*.25,R=ph?14.5:12;cam.position.set(Math.sin(a)*R,(ph?4.8:3.9)+sf*1.0,Math.cos(a)*R);cam.lookAt(0,ph?2.8:2.5,-.4);
+    r.render(scene,cam);
+    if(opts.still&&++stillN>3){stopped=true;const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});r.dispose()}},3000)}})();
+  return {r}}
