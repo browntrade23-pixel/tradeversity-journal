@@ -46,12 +46,13 @@ export function sectionBg(el,kind,opts={}){
     for(let yy=step/2;yy<H;yy+=step)for(let xx=step/2;xx<W;xx+=step){if(d[((yy|0)*W+(xx|0))*4+3]>0)pts.push([xx,yy,(xx/W)*360-180,80-((yy-H*.1)/(H*.8))*138])}
     map={pts,step,P}};
   function frame(t){const s=ST();x.globalCompositeOperation="source-over";x.clearRect(0,0,W,H);
-    if(kind==="aurora"){
-      const sc=s.score,tgt=sc==null?C("#5b6cf0"):sc>=80?C("#12e07a"):sc>=60?C("#f5b942"):C("#ff2d55"),c=ease(tgt,.03),c2=mix(c,C("#5b6cf0"),.55);
+    if(kind==="aurora"||kind==="aurora2"){
+      /* aurora2 = Tomorrow's plan: same northern lights as Today, soft violet and teal, about half as bright */
+      const p2=kind==="aurora2",sc=s.score,tgt=p2?C("#8a6cff"):sc==null?C("#5b6cf0"):sc>=80?C("#12e07a"):sc>=60?C("#f5b942"):C("#ff2d55"),c=ease(tgt,.03),c2=mix(c,p2?C("#2ad1c9"):C("#5b6cf0"),.55),soft=p2?.5:1;
       x.fillStyle="#04050b";x.fillRect(0,0,W,H);x.globalCompositeOperation="lighter";
       for(let k=0;k<3;k++){const base=H*(.18+k*.11),amp=H*(.05+k*.02),len=H*(.32-k*.05),cc=k===1?c2:c;
-        for(let xx=0;xx<=W;xx+=3){const y=base+Math.sin(xx/W*6.3*(1+k*.4)+t*(.25+k*.08)+k)*amp+Math.sin(xx/W*17+t*.6+k*2)*amp*.25;
-          const a=(.12+.08*Math.sin(xx/W*9+t*.7+k))*(k===2?.6:1);const g=x.createLinearGradient(0,y,0,y+len);g.addColorStop(0,rgba(cc,0));g.addColorStop(.15,rgba(cc,a));g.addColorStop(1,rgba(cc,0));x.fillStyle=g;x.fillRect(xx,y,3,len)}}
+        for(let xx=0;xx<=W;xx+=3){const y=base+Math.sin(xx/W*6.3*(1+k*.4)+t*(.25+k*.08)*(p2?.6:1)+k)*amp+Math.sin(xx/W*17+t*.6+k*2)*amp*.25;
+          const a=(.12+.08*Math.sin(xx/W*9+t*.7+k))*(k===2?.6:1)*soft;const g=x.createLinearGradient(0,y,0,y+len);g.addColorStop(0,rgba(cc,0));g.addColorStop(.15,rgba(cc,a));g.addColorStop(1,rgba(cc,0));x.fillStyle=g;x.fillRect(xx,y,3,len)}}
       x.globalCompositeOperation="source-over";for(const p of stars){x.fillStyle=`rgba(255,255,255,${.25+.25*Math.sin(t*1.3+p.p)})`;x.fillRect(p.x*W,p.y*H,p.r*SC*1.4,p.r*SC*1.4)}}
     else if(kind==="map"){if(!map)buildMap();
       x.fillStyle="#03050b";x.fillRect(0,0,W,H);
