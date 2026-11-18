@@ -309,20 +309,20 @@ export function earthBackground(el,opts={}){
   const sunDir=()=>{const d=new Date(),utc=d.getUTCHours()+d.getUTCMinutes()/60,doy=Math.floor((d-new Date(Date.UTC(d.getUTCFullYear(),0,0)))/864e5),lon=(12-utc)*15*Math.PI/180,lat=-23.44*Math.cos(2*Math.PI*(doy+10)/365)*Math.PI/180;
     return new THREE.Vector3(Math.cos(lat)*Math.sin(lon+Math.PI/2),Math.sin(lat),Math.cos(lat)*Math.cos(lon+Math.PI/2))};
   const R=6,earth=new THREE.Group();scene.add(earth);
-  const U={dayMap:{value:day},nightMap:{value:night},specMap:{value:spec},sun:{value:sunDir()},soft:{value:.62}};
+  const U={dayMap:{value:day},nightMap:{value:night},specMap:{value:spec},sun:{value:sunDir()},soft:{value:.5}};
   const mat=new THREE.ShaderMaterial({uniforms:U,
     vertexShader:`varying vec2 vUv;varying vec3 vN;varying vec3 vV;void main(){vUv=uv;vN=normalize(mat3(modelMatrix)*normal);vec4 w=modelMatrix*vec4(position,1.);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}`,
     fragmentShader:`uniform sampler2D dayMap;uniform sampler2D nightMap;uniform sampler2D specMap;uniform vec3 sun;uniform float soft;varying vec2 vUv;varying vec3 vN;varying vec3 vV;
       void main(){float d=dot(normalize(vN),normalize(sun));float k=smoothstep(-.12,.28,d);
-        vec3 dayC=texture2D(dayMap,vUv).rgb*(.18+.95*max(d,0.));float sp=texture2D(specMap,vUv).r;vec3 h=normalize(normalize(sun)+vV);dayC+=vec3(.55,.7,1.)*pow(max(dot(normalize(vN),h),0.),40.)*sp*.35*k;
-        vec3 nightC=texture2D(nightMap,vUv).rgb*vec3(1.,.82,.55)*1.25;
-        vec3 c=mix(nightC,dayC,k);float fr=pow(1.-max(dot(normalize(vN),vV),0.),3.);c+=vec3(.25,.45,1.)*fr*(.18+.28*k);
+        vec3 dayC=texture2D(dayMap,vUv).rgb*(.18+.95*max(d,0.));float sp=texture2D(specMap,vUv).r;vec3 h=normalize(normalize(sun)+vV);dayC+=vec3(1.)*pow(max(dot(normalize(vN),h),0.),60.)*sp*.18*k;
+        vec3 nightC=texture2D(nightMap,vUv).rgb*vec3(1.,.88,.7)*.75;
+        vec3 c=mix(nightC,dayC,k);float fr=pow(1.-max(dot(normalize(vN),vV),0.),3.);c+=vec3(.55,.7,1.)*fr*(.08+.16*k);
         gl_FragColor=vec4(c*soft,1.);}`});
   const globe=new THREE.Mesh(new THREE.SphereGeometry(R,ph?64:96,ph?48:72),mat);earth.add(globe);
   const cl=new THREE.Mesh(new THREE.SphereGeometry(R*1.012,ph?64:96,ph?48:72),new THREE.MeshLambertMaterial({map:clouds,transparent:true,opacity:.28,depthWrite:false}));earth.add(cl);
   const sunL=new THREE.DirectionalLight(0xffffff,1.6);scene.add(sunL);scene.add(new THREE.AmbientLight(0x223355,.25));
   /* atmosphere halo */
-  const AU={c:{value:new THREE.Color("#4d8bff")},s:{value:.32}};
+  const AU={c:{value:new THREE.Color("#8fb4ff")},s:{value:.2}};
   const atm=new THREE.Mesh(new THREE.SphereGeometry(R*1.12,64,48),new THREE.ShaderMaterial({uniforms:AU,side:THREE.BackSide,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,
     vertexShader:`varying vec3 vN;varying vec3 vV;void main(){vN=normalize(mat3(modelMatrix)*normal);vec4 w=modelMatrix*vec4(position,1.);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}`,
     fragmentShader:`uniform vec3 c;uniform float s;varying vec3 vN;varying vec3 vV;void main(){float i=pow(max(.72-dot(vN,vV),0.),2.6);gl_FragColor=vec4(c,1.)*i*s;}`}));earth.add(atm);
@@ -348,8 +348,8 @@ export function earthBackground(el,opts={}){
     /* sun follows the globe's turn so the real day/night line stays true on the map */
     const s=sunDir().applyAxisAngle(new THREE.Vector3(0,1,0),globe.rotation.y).applyAxisAngle(new THREE.Vector3(0,0,1),earth.rotation.z);U.sun.value.copy(s);sunL.position.copy(s).multiplyScalar(50);
     openT-=dt;if(openT<=0){openT=20;SES.forEach(x=>x.on=openNow(x))}
-    SES.forEach((x,i)=>{const tgt=x.on?.75+.25*Math.sin(t*2+i):.12;x.sp.material.opacity+=(tgt-x.sp.material.opacity)*Math.min(1,dt*2);const sc=x.on?1.1+.25*Math.sin(t*2+i):.6;x.sp.scale.set(sc,sc,1)});
-    const rs2=!!(window.__bgState||{}).redSoon;red+=((rs2?1:0)-red)*Math.min(1,dt*1.5);AU.c.value.set("#4d8bff").lerp(new THREE.Color("#ff2d55"),red*(.6+.4*Math.sin(t*3.2)));AU.s.value=.32+.3*red;
+    SES.forEach(x=>{x.sp.visible=false});
+    /* natural colours only: no colour changes */
     const mxS=Math.max(1,document.documentElement.scrollHeight-innerHeight),sf=Math.min(1,Math.max(0,scrollY/mxS));
     cx+=(mx*.8-cx)*Math.min(1,dt*1.5);cy+=(-my*.5-cy)*Math.min(1,dt*1.5);cam.position.set(cx,cy+sf*1.5,22-sf*2);cam.lookAt(cx*.3,sf*.6,0);
     r.render(scene,cam);
