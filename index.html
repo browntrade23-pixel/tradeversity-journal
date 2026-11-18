@@ -2701,14 +2701,12 @@ function vJournal(el){
      ${S.readonly?"":kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):st.pf===Infinity?"∞":"—","gross win ÷ gross loss")}
      ${kpi("Avg R",isFinite(st.avgR)?st.avgR.toFixed(2)+"R":"—","from trades with a stop")}
    </div>
-   ${S.readonly?"":a3Card(withNoTrade(calc(allF)).days,"j")}
    ${(()=>{if(!jfOn())noTradeDates().filter(d=>!byDay[d]).forEach(d=>byDay[d]=[]);return ""})()}
    ${Object.keys(byDay).length?Object.keys(byDay).sort().reverse().map(d=>{const dn=byDay[d].reduce((a,t)=>a+tradeNet(t),0);
      if(!byDay[d].length)return `<div class="day"><div class="dayh"><span>${fmtDate(d)}</span><span class="mono mut">$0.00</span></div><div class="ntd-row">🚫 <span>No trades this day</span> <small class="mut">· ${esc(I18N.t("counted as a $0 day"))}</small></div></div>`;
      const di=Object.keys(byDay).sort().reverse().indexOf(d),fold=!jfOn()&&di>=5&&!(S._unfold&&S._unfold[d]),sc=S.readonly?null:dayScore(d);
      return `<div class="day ${fold?"fold":""}"><div class="dayh" data-day="${d}"><span>${fmtDate(d)} <small class="mut day-n">· <span data-notr>${byDay[d].length}</span> <span>${byDay[d].length===1?"trade":"trades"}</span></small>${sc?` <span class="day-sc ${sc.score>=80?"g":sc.score>=60?"y":"r"}" title="${esc(I18N.t("Discipline score"))}" data-notr>${sc.score}</span>`:""}</span><span class="mono ${cls(dn)}">${smoney(dn)} <span class="day-tg">▾</span></span></div>${byDay[d].map(tcard).join("")}</div>`}).join("")
    :`<div class="card empty">No trades yet. ${S.readonly?"":"Add your first trade or import a CSV from your broker."}</div>`}`;
-  if($("#a3_j"))a3Mount(withNoTrade(calc(allF)).days,"j",el);
   bindFilters();bindJf();bindCoach();bindEod();bindStart();bindImpFiles(el);bindNoTrade();if($("#addT"))$("#addT").onclick=()=>editTrade(null);if($("#qLog"))$("#qLog").onclick=quickLog;
   if($("#impBody"))vImport($("#impBody"),true);
   if($("#impT"))$("#impT").onclick=()=>{const b=$("#impBox");b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
@@ -3126,7 +3124,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   ${edgeCard(ts)}
   ${commCard(ts)}
   ${insights(ts).length?`<div class="card" style="margin-bottom:12px"><h3>What your journal says</h3>${insights(ts).map(([i,t])=>`<div class="insight"><span class="ic">${i}</span><span>${t}</span></div>`).join("")}</div>`:""}
-  ${a3Card(st.days,"s")}
+  ${a3Mtn(st.days)}
   <div class="card" style="margin-bottom:12px"><h3>Equity curve</h3>${equityChart(st.curve)}</div>
   <div class="grid g2" style="margin-bottom:12px"><div class="card"><h3>Daily P&L</h3>${dailyBars(st.days)}</div><div class="card"><h3>Calendar</h3>${calendar(st.days,true)}<p class="mut" style="font-size:12px;margin:8px 0 0">👆 <span>Click a day to see its trades, screenshots and journal.</span></p></div></div>
   <div class="grid g2">
@@ -3145,10 +3143,13 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   $("#calP").onclick=()=>shift(-1);$("#calN").onclick=()=>shift(1);
   $$(".cal .c[data-day]",el).forEach(c=>c.onclick=()=>{$("#tip").style.display="none";S.dayPage=c.dataset.day;render();window.scrollTo(0,0)});
   bindStatTabs();bindComm(el);
-  a3Mount(st.days,"s",el);
+  if($("#a3_s"))mount3d("a3_s","equityMountain",st.days,d=>{S.dayPage=d;render();window.scrollTo(0,0)});
 }
+/* Statistics: 3D equity mountain only (no 3D calendar); shown from 2 trading days */
+function a3Mtn(days){if(Object.keys(days).length<2)return "";
+  return `<div class="card a3-card" style="margin-bottom:12px"><h3 style="margin:0 0 8px">🏔 <span>Equity mountain</span></h3><div id="a3_s" class="a3-box"></div><p class="mut a3-hint"><span>Drag to rotate · tap a day to open it</span></p></div>`}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-18c";
+const APP_VER="2026-11-18d";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
