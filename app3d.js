@@ -3,6 +3,8 @@
    Every design: drag to rotate where it makes sense, tap callbacks, stops and frees memory when its element leaves the page. */
 import * as THREE from "three";
 const small=()=>innerWidth<821;
+/* phones: pause 3D while the page is being scrolled (smooth scrolling) and draw every other frame */
+let _fs=0;const busy=()=>small()&&(performance.now()-(window.__scrollT||0)<160||(++_fs%2===1));
 const C={up:new THREE.Color("#26a69a"),dn:new THREE.Color("#ef5350"),gold:new THREE.Color("#f5b942"),gold2:new THREE.Color("#ffd27a"),ind:new THREE.Color("#3a48e0"),ind2:new THREE.Color("#7c8bff"),grey:new THREE.Color("#3a4152"),white:new THREE.Color("#ffffff"),teal:new THREE.Color("#2ec5c9")};
 
 function base(el,{h=260,fov=45,pos=[0,0,10],look=[0,0,0],drag=true}={}){
@@ -21,7 +23,7 @@ function base(el,{h=260,fov=45,pos=[0,0,10],look=[0,0,0],drag=true}={}){
   const ro=new ResizeObserver(()=>{const w2=el.clientWidth;if(!w2)return;r.setSize(w2,h);cam.aspect=w2/h;cam.updateProjectionMatrix()});ro.observe(el);
   const clock=new THREE.Clock();let tick=()=>{};
   (function loop(){if(!el.isConnected){ro.disconnect();scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)[].concat(o.material).forEach(mt=>{if(mt.map)mt.map.dispose();mt.dispose()})});r.dispose();return}
-    requestAnimationFrame(loop);if(document.hidden)return;tick(clock.getElapsedTime(),st);r.render(scene,cam)})();
+    requestAnimationFrame(loop);if(document.hidden||busy())return;tick(clock.getElapsedTime(),st);r.render(scene,cam)})();
   return {r,scene,cam,grp,st,cv,pick,onTap,setTick:f=>tick=f}}
 const overlay=(el,html,cls)=>{const d=document.createElement("div");d.className="a3-ov "+(cls||"");d.innerHTML=html;el.appendChild(d);return d};
 function glowSprite(color,size){const c=document.createElement("canvas");c.width=c.height=64;const x=c.getContext("2d"),g=x.createRadialGradient(32,32,0,32,32,32);
@@ -209,7 +211,7 @@ export function galaxyBackground(el,kind="galaxy",opts={}){
   const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()};addEventListener("resize",rs);
   const clock=new THREE.Clock(),T0=performance.now()-(opts.still?9999:0);let stillN=0;let last=0,cx=0,cy=6,sfs=0,vel=0,lastY=scrollY,spin=0,settled=false;
   let stopped=false;(function loop(){if(stopped)return;if(!el.isConnected){removeEventListener("pointermove",mv);removeEventListener("resize",rs);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose();return}
-    requestAnimationFrame(loop);if(document.hidden)return;const t=clock.getElapsedTime(),dt=Math.min(.05,t-last);last=t;mat.uniforms.uT.value=t;
+    requestAnimationFrame(loop);if(document.hidden||busy())return;const t=clock.getElapsedTime(),dt=Math.min(.05,t-last);last=t;mat.uniforms.uT.value=t;
     /* scroll position (smoothed) drives the camera / rotation; scroll speed shakes the particles loose */
     const mxS=Math.max(1,document.documentElement.scrollHeight-innerHeight),sf=Math.min(1,Math.max(0,scrollY/mxS));sfs+=(sf-sfs)*Math.min(1,dt*3);
     const dy=scrollY-lastY;lastY=scrollY;const inst=dt>0?Math.min(1.4,Math.abs(dy)/innerHeight/dt*.35):0;vel+=(inst-vel)*Math.min(1,dt*(inst>vel?6:2.2));
@@ -279,7 +281,7 @@ export function pillarsBackground(el,opts={}){
   const clock=new THREE.Clock();let last=0,cx=0,stopped=false,stillN=0,amberK=(window.__bgState||{}).cons===-1?1:0;
   const ST=()=>window.__bgState||{};
   (function loop(){if(stopped)return;if(!el.isConnected){removeEventListener("resize",rs);removeEventListener("pointermove",mv);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});r.dispose();return}
-    requestAnimationFrame(loop);if(document.hidden)return;const t=opts.still?6:clock.getElapsedTime(),dt=opts.still?1:Math.min(.05,t-last);last=t;
+    requestAnimationFrame(loop);if(document.hidden||busy())return;const t=opts.still?6:clock.getElapsedTime(),dt=opts.still?1:Math.min(.05,t-last);last=t;
     const bad=ST().cons===-1;amberK+=((bad?1:0)-amberK)*Math.min(1,dt*1.5);
     P.forEach(p=>{const target=(p.i===big?p.base+(4.9-p.base)*amberK:p.base)*(1+.03*Math.sin(t*.6+p.i*1.7));p.h+=(target-p.h)*Math.min(1,dt*4);
       p.m.scale.y=p.h;p.cap.position.y=p.h;
@@ -343,7 +345,7 @@ export function earthBackground(el,opts={}){
   /* the globe is turned so the sun-lit side faces the viewer a little; it then turns slowly */
   globe.rotation.y=-1.2;
   (function loop(){if(stopped)return;if(!el.isConnected){removeEventListener("resize",rs);removeEventListener("pointermove",mv);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){["map","dayMap"].forEach(k=>{});o.material.dispose()}});[day,night,clouds,spec,glowTex].forEach(t=>t.dispose());r.dispose();return}
-    requestAnimationFrame(loop);if(document.hidden)return;const t=opts.still?3:clock.getElapsedTime(),dt=opts.still?1:Math.min(.05,t-last);last=t;
+    requestAnimationFrame(loop);if(document.hidden||busy())return;const t=opts.still?3:clock.getElapsedTime(),dt=opts.still?1:Math.min(.05,t-last);last=t;
     globe.rotation.y+=dt*.012;cl.rotation.y=globe.rotation.y+t*.004;
     /* sun follows the globe's turn so the real day/night line stays true on the map */
     const s=sunDir().applyAxisAngle(new THREE.Vector3(0,1,0),globe.rotation.y).applyAxisAngle(new THREE.Vector3(0,0,1),earth.rotation.z);U.sun.value.copy(s);sunL.position.copy(s).multiplyScalar(50);
@@ -361,7 +363,7 @@ function softGlowTex(){const s=document.createElement("canvas");s.width=s.height
 function softLoop(el,r,scene,cam,opts,frame,cleanup){const clock=new THREE.Clock();let last=0,stopped=false,n=0;
   const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()};addEventListener("resize",rs);
   const free=()=>{removeEventListener("resize",rs);cleanup&&cleanup();scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose()};
-  (function loop(){if(stopped)return;if(!el.isConnected){free();return}requestAnimationFrame(loop);if(document.hidden)return;
+  (function loop(){if(stopped)return;if(!el.isConnected){free();return}requestAnimationFrame(loop);if(document.hidden||busy())return;
     const t=opts.still?4:clock.getElapsedTime(),dt=opts.still?1:Math.min(.05,t-last);last=t;frame(t,dt);r.render(scene,cam);
     if(opts.still&&++n>4){stopped=true;const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);free()}},3000)}})()}
 function softRenderer(el){const ph=small(),r=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"});r.setPixelRatio(Math.min(devicePixelRatio,ph?1.4:1.75));r.setSize(innerWidth,innerHeight);

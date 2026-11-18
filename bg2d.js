@@ -161,5 +161,5 @@ export function sectionBg(el,kind,opts={}){
   size();addEventListener("resize",size);
   if(opts.still){frame(performance.now()/1000);
     const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);removeEventListener("resize",size);return}frame(performance.now()/1000)},30000);return {}}
-  let last=0;(function loop(now){if(!el.isConnected){removeEventListener("resize",size);return}requestAnimationFrame(loop);if(document.hidden||now-last<33)return;last=now;frame(now/1000)})(0);
+  let last=0;(function loop(now){if(!el.isConnected){removeEventListener("resize",size);return}requestAnimationFrame(loop);if(document.hidden||now-last<33||(innerWidth<821&&performance.now()-(window.__scrollT||0)<160))return;last=now;frame(now/1000)})(0);
   return {}}
