@@ -103,7 +103,7 @@ export function trophyRoom(el,badges,onBadge){const per=small()?4:7,rws=Math.cei
 export function newsClock(el,getState){const B=base(el,{h:small()?170:180,pos:[0,0,5],drag:false});
   B.grp.add(new THREE.Mesh(new THREE.TorusGeometry(1.5,.07,12,120),new THREE.MeshBasicMaterial({color:0x232b45})));
   for(let i=0;i<12;i++){const a=i/12*Math.PI*2,tk=new THREE.Mesh(new THREE.BoxGeometry(.04,.22,.04),new THREE.MeshBasicMaterial({color:0x3a4a7a}));tk.position.set(Math.sin(a)*1.85,Math.cos(a)*1.85,0);tk.rotation.z=-a;B.grp.add(tk)}
-  let arc=null;const glow=glowSprite(C.gold,3.2);B.grp.add(glow);const ov=overlay(el,"","clock");let lastP=-1,lastS="";
+  let arc=null;const glow=glowSprite(C.gold,3.2);B.grp.add(glow);const ov=overlay(el,"","clock");try{ov.innerHTML=getState().label}catch(e){}   /* the countdown shows at once, before the first 3D frame */let lastP=-1,lastS="";
   B.setTick(t=>{const s=getState(),p=s.inWindow?1:Math.max(0,Math.min(1,1-s.mins/60)),col=s.inWindow?C.dn:p>.9?C.dn.clone().lerp(C.gold,.4):C.gold;
     if(Math.abs(p-lastP)>.004||s.label!==lastS){if(arc){B.grp.remove(arc);arc.geometry.dispose()}arc=new THREE.Mesh(new THREE.TorusGeometry(1.5,.12,14,140,Math.max(.001,p*Math.PI*2)),new THREE.MeshBasicMaterial({color:col}));
       arc.rotation.z=Math.PI/2;arc.scale.x=-1;B.grp.add(arc);lastP=p;lastS=s.label;ov.innerHTML=s.label}
