@@ -1565,6 +1565,7 @@ html[dir=rtl] nav.tabs .tool-tab{animation-name:toolInR}@keyframes toolInR{from{
 /* Prop firm tracker: full-page 3D galaxy background */
 #galBg{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(1200px 700px at 50% 35%,#0b0f2a 0%,#03040a 70%)}
 #galBg canvas{display:block;width:100%!important;height:100%!important}
+#galBg[data-k="galaxy"]::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,.28) 0%,rgba(0,0,0,.5) 60%,rgba(0,0,0,.68) 100%)}
 html.gal-on #app::before{opacity:0}
 html.gal-on #view .pf-item,html.gal-on #view .card,html.gal-on #view .rtabs button,html.gal-on #view .pf-tools .i{backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
 html.gal-on #view .pf-item{background:rgba(10,12,22,.55)}html.gal-on #view .card{background:rgba(12,14,24,.6)}html.gal-on #view .pf-mini{background:rgba(8,10,18,.5)}
@@ -2137,7 +2138,7 @@ async function rqReadyLoad(){if(!S.me||S.me.role!=="admin"||!API||!API.listProfi
 setInterval(rqReadyLoad,180000);
 /* one 3D background per section: galaxy (prop firms), bullish candles (journal), Fibonacci circles (stats),
    bearish candles (risk), Fibonacci retracement (plan) */
-const BG3D={propfirms:"galaxy",journal:"bull",stats:"fibc",risk:"bear",plan:"fibr"};
+const BG3D={propfirms:"galaxy",stats:"fibc"};   /* candle backgrounds (journal / risk / plan) removed on request */
 function galaxyBg(){const kind=S.me&&!S.page?BG3D[S.view]:null;let g=document.getElementById("galBg");
   if(g&&g.dataset.k!==kind){g.remove();g=null}
   if(!kind){document.documentElement.classList.remove("gal-on");return}
@@ -3149,7 +3150,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
 function a3Mtn(days){if(Object.keys(days).length<2)return "";
   return `<div class="card a3-card" style="margin-bottom:12px"><h3 style="margin:0 0 8px">🏔 <span>Equity mountain</span></h3><div id="a3_s" class="a3-box"></div><p class="mut a3-hint"><span>Drag to rotate · tap a day to open it</span></p></div>`}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-18e";
+const APP_VER="2026-11-18f";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
