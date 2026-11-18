@@ -1,7 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+/* 3D welcome page first for logged-out visitors on the bare address. Never for: logged-in users (saved session),
+   links with ?params or #hash (share, demo, auth=..., email confirm / password reset), or the installed app. */
+(function(){try{if(location.search||location.hash)return;if(matchMedia("(display-mode: standalone)").matches||navigator.standalone)return;
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i)||"";if(k.startsWith("sb-")&&k.includes("auth-token"))return}
+  location.replace("welcome.html")}catch(e){}})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Effective Journal — by Tradeversity</title>
 <link rel="icon" type="image/png" href="brand/logo-192.png?v=hq">
@@ -286,6 +293,11 @@ html[data-theme=light] .ctile.min{--cc:#b7791f}html[data-theme=light] .cchip.min
 #auth{min-height:100vh;display:grid;place-items:center;padding:56px 20px 24px;position:relative;overflow:hidden;isolation:isolate;
   background:radial-gradient(1100px 700px at 75% 20%,rgba(190,198,214,.10),transparent 60%),linear-gradient(#07080c,#030304)}
 #auth>.authbox,#auth>#gate{grid-area:1/1}
+/* 3D particle background (auth3d.js); the night scene is only the fallback when 3D cannot run */
+#auth3d{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+html.auth3d #auth{background:radial-gradient(800px 560px at 70% 25%,rgba(58,72,224,.22),transparent 70%),radial-gradient(700px 500px at 25% 85%,rgba(245,185,66,.10),transparent 70%),#030407}
+html.auth3d #rain,html.auth3d #auth .fog,html.auth3d #auth .flash,html.auth3d #night,html.auth3d #auth .ground,html.auth3d #gate{display:none!important}
+html.auth3d .authbox #authCard,html.auth3d .authbox #waitBox{background:rgba(10,12,18,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 #auth{grid-template-columns:minmax(0,1fr)}
 #auth>.authbox,#auth>#gate{min-width:0;max-width:min(420px,100%)}
 #auth .authbox .grid,#auth .authbox [class*="g3"]{min-width:0}
@@ -3771,7 +3783,10 @@ function openGate(instant){const g=$("#gate"),b=$(".authbox");if(!g||g.classList
 $("#gateBtn").onclick=()=>openGate(false);
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&!$("#auth").classList.contains("hidden")&&!$("#gate").classList.contains("gone")){e.preventDefault();openGate(false)}});
 (function(){let seen=false;try{seen=sessionStorage.getItem("tvj_gate")==="1"}catch(e){}
-  if(seen||/access_token|type=recovery|error_description/.test(location.hash))openGate(true)})();
+  if(seen||/access_token|type=recovery|error_description/.test(location.hash))openGate(true);
+  /* coming from the 3D welcome page: open the login or sign-up form directly */
+  const want=new URLSearchParams(location.search).get("auth");
+  if(want==="login"||want==="signup"){openGate(true);if(want==="signup")setTimeout(()=>{const t=$("#tabSignup");if(t)t.click()},0)}})();
 const _showWaiting=showWaiting;showWaiting=u=>{openGate(true);_showWaiting(u)};
 
 /* gold rain, slanted like the logo photo */
@@ -3782,7 +3797,7 @@ const _showWaiting=showWaiting;showWaiting=u=>{openGate(true);_showWaiting(u)};
   function draw(){x.clearRect(0,0,W,H);x.lineCap="round";
     for(const d of drops){x.strokeStyle=`rgba(214,220,232,${d.a})`;x.lineWidth=d.w;x.beginPath();x.moveTo(d.x,d.y);x.lineTo(d.x-d.l*.2,d.y+d.l);x.stroke();
       d.y+=d.v;d.x-=d.v*.2;if(d.y>H+30||d.x<-30)Object.assign(d,mk(true))}}
-  function loop(){if(!$("#auth").classList.contains("hidden")&&!document.hidden)draw();requestAnimationFrame(loop)}
+  function loop(){if(!$("#auth").classList.contains("hidden")&&!document.hidden&&!document.documentElement.classList.contains("auth3d"))draw();requestAnimationFrame(loop)}
   addEventListener("resize",size);size();if(reduced)draw();else loop()})();
 
 /* ============ theme: dark / light / same as device ============ */
@@ -3850,5 +3865,14 @@ async function bootDemo(){const D=demoData();S._demo=true;
   }catch(e){console.error(e);{document.body.insertAdjacentHTML("afterbegin",`<div class="banner" style="margin:12px">Couldn't reach the server: ${esc(e.message||e)}. Check CONFIG in index.html.</div>`)}showAuth()}
 })();
 </script>
+<!-- 3D particles behind login / sign-up (falls back to the night scene if 3D is not supported) -->
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"}}</script>
+<script type="module">import("./auth3d.js?v=5").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))</script>
 </body>
 </html>
+
+
+
+
+
+

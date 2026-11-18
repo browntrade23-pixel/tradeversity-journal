@@ -1,0 +1,338 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Effective Journal — by Tradeversity</title>
+<meta name="description" content="The trading journal built for prop firm traders: journal, statistics, prop firm rules, news alerts, risk tools. By Tradeversity.">
+<meta name="theme-color" content="#030407">
+<link rel="icon" href="brand/logo-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@500;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#f5b942;--g2:#ffd27a;--ind:#3a48e0;--ind2:#7c8bff;--tx:#f5f7fa;--mut:#a0a6b8;--bg:#030407}
+html{scroll-behavior:smooth;background:var(--bg);overflow-x:hidden}
+body{font-family:Inter,system-ui,sans-serif;color:var(--tx);background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+html[lang=ar] body{font-family:Cairo,Inter,sans-serif}
+a{color:inherit;text-decoration:none}
+#bg{position:fixed;inset:0;z-index:0;display:block;width:100%;height:100%}
+#fallback{position:fixed;inset:0;z-index:0;background:radial-gradient(700px 500px at 70% 30%,rgba(58,72,224,.35),transparent 70%),radial-gradient(600px 400px at 30% 80%,rgba(245,185,66,.18),transparent 70%),var(--bg)}
+.vig{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 50%,rgba(0,0,0,.7) 100%)}
+/* top bar */
+.nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:12px;padding:14px clamp(16px,4vw,44px);background:linear-gradient(180deg,rgba(3,4,7,.85),rgba(3,4,7,0));backdrop-filter:blur(2px)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.2px}
+.brand i{width:36px;height:36px;border-radius:50%;background:url(brand/logo-192.png) center/cover;box-shadow:0 0 0 2px rgba(245,185,66,.8),0 0 18px rgba(245,185,66,.4)}
+.brand small{display:block;font-size:9.5px;letter-spacing:3px;color:var(--g);font-weight:700}
+.sp{flex:1}
+.lang{display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.lang button{border:0;background:none;color:var(--mut);font:700 12px Inter,sans-serif;padding:6px 10px;border-radius:999px;cursor:pointer}
+.lang button.on{background:var(--ind);color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:999px;font-weight:800;font-size:15px;cursor:pointer;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:var(--tx);transition:transform .2s,box-shadow .2s,background .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px);background:rgba(58,72,224,.25);border-color:rgba(124,139,255,.6)}
+.btn.pri{background:linear-gradient(180deg,var(--g2),var(--g));color:#1b1305;border:0;box-shadow:0 10px 34px -8px rgba(245,185,66,.7)}
+.btn.pri:hover{box-shadow:0 14px 44px -6px rgba(245,185,66,.9)}
+.btn.sm{padding:9px 16px;font-size:13px}
+/* progress dots */
+.dots{position:fixed;right:clamp(10px,2vw,26px);top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:10px}
+html[dir=rtl] .dots{right:auto;left:clamp(10px,2vw,26px)}
+.dots a{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.22);transition:all .3s}
+.dots a.on{background:var(--g);box-shadow:0 0 12px var(--g);transform:scale(1.35)}
+/* sections */
+main{position:relative;z-index:5}
+section{min-height:100vh;display:flex;align-items:center;padding:110px clamp(18px,6vw,90px) 70px;position:relative}
+.wrap{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:center}
+section.r .txt{grid-column:2}section.r .shot{grid-column:1;grid-row:1}
+.txt{max-width:560px;min-width:0}
+.txt h1,.txt h2,.txt .lead,.feats li{text-shadow:0 2px 16px rgba(3,4,7,.9),0 0 34px rgba(3,4,7,.85)}
+.txt h1 em,.txt h2 em{text-shadow:none;filter:drop-shadow(0 2px 10px rgba(3,4,7,.9))}
+.wrap>*{min-width:0}.strip{max-width:100%}
+.kick{display:inline-flex;align-items:center;gap:10px;font-size:12.5px;font-weight:800;letter-spacing:4px;color:var(--g);text-transform:uppercase}
+.kick:before{content:"";width:26px;height:2px;background:var(--g);border-radius:2px}
+html[lang=ar] .kick{letter-spacing:0;font-size:14px}
+h1,h2{font-weight:900;letter-spacing:-1.5px;line-height:1.02;margin:14px 0 16px}
+h1{font-size:clamp(44px,7.4vw,92px)}
+h2{font-size:clamp(34px,5vw,62px)}
+html[lang=ar] h1,html[lang=ar] h2{letter-spacing:0;line-height:1.25}
+h1 em,h2 em{font-style:normal;background:linear-gradient(180deg,var(--g2),var(--g));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(16px,1.6vw,19px);line-height:1.6;color:#c9cede;max-width:520px}
+.feats{list-style:none;display:grid;gap:10px;margin:22px 0 0}
+.feats li{display:flex;gap:12px;align-items:flex-start;font-size:15.5px;line-height:1.45;color:#dfe3ee}
+.feats li b{color:#fff}
+.feats i{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;font-style:normal;font-size:15px;background:rgba(245,185,66,.12);border:1px solid rgba(245,185,66,.35)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.stats3{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.stats3 div{padding:12px 16px;border-radius:14px;background:rgba(10,12,18,.55);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(8px);min-width:120px}
+.stats3 b{display:block;font-size:26px;font-weight:900;color:var(--g)}
+.stats3 span{font-size:12.5px;color:var(--mut)}
+/* floating phone with a real screenshot */
+.shot{display:flex;justify-content:center;perspective:1200px}
+.phone{width:min(300px,70vw);aspect-ratio:390/844;border-radius:42px;padding:10px;background:linear-gradient(145deg,#3a3d4a,#101118 40%,#07080b);box-shadow:0 0 0 1.5px rgba(255,255,255,.14),0 40px 90px -20px rgba(245,185,66,.4),0 0 120px -10px rgba(58,72,224,.35);transform:rotateY(-14deg) rotateX(6deg);transition:transform .8s cubic-bezier(.2,.9,.3,1)}
+section.r .phone{transform:rotateY(14deg) rotateX(6deg)}
+.phone:hover{transform:rotateY(0) rotateX(0)}
+.phone div{width:100%;height:100%;border-radius:33px;background:#050608 top/100% auto no-repeat}
+.reveal{opacity:0;transform:translateY(40px);filter:blur(6px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.9,.3,1),filter .9s ease}
+.in .reveal{opacity:1;transform:none;filter:none}
+.in .reveal:nth-child(2){transition-delay:.08s}.in .reveal:nth-child(3){transition-delay:.16s}.in .reveal:nth-child(4){transition-delay:.24s}.in .reveal:nth-child(5){transition-delay:.32s}
+/* hero */
+#hero .wrap{grid-template-columns:1fr}
+#hero .txt{max-width:760px}
+.scroll{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);font-size:11px;letter-spacing:4px;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:8px}
+.scroll:after{content:"";width:1.5px;height:38px;background:linear-gradient(var(--g),transparent);animation:sc 1.8s ease-in-out infinite}
+@keyframes sc{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+/* results strip */
+.strip{margin-top:26px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.strip .tr{display:flex;gap:12px;width:max-content;animation:mq 60s linear infinite}
+html[dir=rtl] .strip .tr{animation-direction:reverse}
+.strip img{height:150px;border-radius:12px;border:1px solid rgba(245,185,66,.35);box-shadow:0 10px 30px -10px rgba(0,0,0,.9)}
+@keyframes mq{to{transform:translateX(-50%)}}
+#results .wrap,#join .wrap{grid-template-columns:minmax(0,1fr)}
+#results .txt{padding-top:200px}
+#results .txt,#join .txt{width:100%;max-width:900px;margin:0 auto;text-align:center}
+#results .kick,#join .kick{justify-content:center}
+#results .lead,#join .lead{margin:0 auto}
+#join .cta,#results .cta{justify-content:center}
+.foot{position:relative;z-index:5;text-align:center;padding:30px 20px 40px;color:#6b7891;font-size:13px}
+.foot a{color:var(--mut);margin:0 8px}
+/* phones */
+@media(max-width:860px){
+  section{min-height:auto;padding:96px 20px 60px;align-items:flex-end}
+  section:first-of-type{min-height:100vh}
+  .wrap{grid-template-columns:1fr;gap:26px}
+  section.r .txt,section.r .shot{grid-column:1;grid-row:auto}
+  .shot{order:2}
+  .phone,section.r .phone{transform:rotateY(0) rotateX(4deg);width:min(260px,72vw)}
+  .dots{display:none}
+  .brand span{display:none}
+  .nav .btn.sm.hide-m{display:none}
+  .txt{padding-top:34vh}
+  #hero .txt{padding-top:30vh}
+  #results .txt,#join .txt{padding-top:30vh}
+  .strip img{height:110px}
+  .txt h1,.txt h2,.txt .lead,.feats li{text-shadow:0 2px 14px rgba(3,4,7,.95),0 0 30px rgba(3,4,7,.9)}
+  .txt h1 em,.txt h2 em{text-shadow:none;filter:drop-shadow(0 2px 10px rgba(3,4,7,.9))}
+}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;filter:none;transition:none}.strip .tr{animation:none}.scroll:after{animation:none}}
+</style>
+</head>
+<body>
+<div id="fallback"></div>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="vig"></div>
+
+<header class="nav">
+  <a class="brand" href="#hero"><i></i><span>The Effective Journal<small>BY TRADEVERSITY</small></span></a>
+  <div class="sp"></div>
+  <div class="lang" role="group" aria-label="Language"><button data-l="en">EN</button><button data-l="fr">FR</button><button data-l="ar">ع</button></div>
+  <a class="btn sm hide-m" href="index.html?auth=login" data-t="login">Log in</a>
+  <a class="btn sm pri" href="index.html?auth=signup" data-t="join">Join free</a>
+</header>
+<nav class="dots" aria-label="Sections"></nav>
+
+<main>
+<section id="hero" data-shape="tvchart"><div class="wrap"><div class="txt">
+  <div class="kick reveal" data-t="hero_k">Tradeversity</div>
+  <h1 class="reveal" data-t="hero_h">The <em>Effective</em> Journal</h1>
+  <p class="lead reveal" data-t="hero_p">The trading journal built for prop firm traders. Journal every trade, know your real numbers, never break a rule, and get funded.</p>
+  <div class="cta reveal"><a class="btn pri" href="index.html?auth=signup" data-t="join2">Join free</a><a class="btn" href="index.html?auth=login" data-t="login">Log in</a></div>
+  <div class="stats3 reveal"><div><b data-t="yrs_n">~7</b><span data-t="yrs">years in the markets</span></div><div><b>350+</b><span data-t="stu">students</span></div><div><b>3</b><span data-t="langs">languages · EN FR AR</span></div></div>
+</div></div><div class="scroll" data-t="scroll">SCROLL</div></section>
+
+<section id="journal" data-shape="trades"><div class="wrap"><div class="txt">
+  <div class="kick reveal" data-t="j_k">Trading journal</div>
+  <h2 class="reveal" data-t="j_h">Every trade. <em>In your pocket.</em></h2>
+  <p class="lead reveal" data-t="j_p">Log a trade in seconds: P&amp;L, commissions of your prop firm, emotions, rating and your chart screenshot.</p>
+  <ul class="feats reveal">
+    <li><i>📸</i><span data-t="j_1">Chart screenshots and notes on every trade</span></li>
+    <li><i>💸</i><span data-t="j_2">Commissions of your prop firm calculated, or "already included"</span></li>
+    <li><i>✎</i><span data-t="j_3">Edit any trade, anytime · no-trade days count as $0</span></li>
+    <li><i>📏</i><span data-t="j_4">Contracts for futures, lot size for CFD and personal accounts</span></li>
+  </ul></div>
+  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/trade.jpg)"></div></div></div></div></section>
+
+<section id="stats" class="r" data-shape="pnl"><div class="wrap"><div class="txt">
+  <div class="kick reveal" data-t="s_k">Statistics</div>
+  <h2 class="reveal" data-t="s_h">Know your <em>real numbers.</em></h2>
+  <p class="lead reveal" data-t="s_p">Your P&amp;L calendar, win rate, profit factor, expectancy, streaks, best and worst day. All calculated for you.</p>
+  <ul class="feats reveal">
+    <li><i>📂</i><span data-t="s_1">Import the CSV of any prop firm: Tradovate, NinjaTrader, MT5</span></li>
+    <li><i>🏢</i><span data-t="s_2">Prop firm, platform and commissions detected</span></li>
+    <li><i>📅</i><span data-t="s_3">Green and red days at a glance on the calendar</span></li>
+    <li><i>🔗</i><span data-t="s_4">Share your results with a link or a QR code, view only</span></li>
+  </ul></div>
+  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/stats.jpg)"></div></div></div></div></section>
+
+<section id="rules" data-shape="levels"><div class="wrap"><div class="txt">
+  <div class="kick reveal" data-t="r_k">Prop firm rules</div>
+  <h2 class="reveal" data-t="r_h">Pick your firm. <em>The rules fill in.</em></h2>
+  <p class="lead reveal" data-t="r_p">Choose futures or CFD, your prop firm, plan and size. Profit target, daily loss and max drawdown appear by themselves.</p>
+  <ul class="feats reveal">
+    <li><i>📉</i><span data-t="r_1">Trailing or end-of-day drawdown set automatically</span></li>
+    <li><i>🎓</i><span data-t="r_2">Evaluation or Funded: the right rules for each</span></li>
+    <li><i>🎯</i><span data-t="r_3">Live meters: profit target, daily loss limit, max drawdown</span></li>
+    <li><i>⚠️</i><span data-t="r_4">Telegram alert at 80% and 100% of your daily loss</span></li>
+  </ul></div>
+  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/rules-auto.jpg)"></div></div></div></div></section>
+
+<section id="firms" class="r" data-shape="wall"><div class="wrap"><div class="txt">
+  <div class="kick reveal" data-t="f_k">Prop firm tracker</div>
+  <h2 class="reveal" data-t="f_h">45 prop firms. <em>No secrets.</em></h2>
+  <p class="lead reveal" data-t="f_p">Rules and hidden rules of every futures and CFD prop firm, prices for every size, payouts and Algeria availability.</p>
+  <ul class="feats reveal">
+    <li><i>🕵️</i><span data-t="f_1">Hidden rules exposed before you buy</span></li>
+    <li><i>🇩🇿</i><span data-t="f_2">Which firms accept traders from Algeria</span></li>
+    <li><i>🏷️</i><span data-t="f_3">Discounts up to <b>-89%</b> with code <b>BROWN23</b></span></li>
+    <li><i>🔄</i><span data-t="f_4">Updated twice a month</span></li>
+  </ul></div>
+  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/propfirms.jpg)"></div></div></div></div></section>
+
+<section id="news" data-shape="spike"><div class="wrap"><div class="txt">
+  <div class="kick reveal" data-t="n_k">News alerts</div>
+  <h2 class="reveal" data-t="n_h">Red news? <em>You know first.</em></h2>
+  <p class="lead reveal" data-t="n_p">Every red and orange folder USD news with a countdown in New York and Algeria time, and what each news means.</p>
+  <ul class="feats reveal">
+    <li><i>⏰</i><span data-t="n_1">Telegram alert 5 minutes before red news</span></li>
+    <li><i>📖</i><span data-t="n_2">What it is and how it usually moves the market</span></li>
+    <li><i>🔔</i><span data-t="n_3">Notifications: today's news, journal and plan reminders</span></li>
+    <li><i>🌍</i><span data-t="n_4">In English, Français and العربية</span></li>
+  </ul></div>
+  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/news.jpg)"></div></div></div></div></section>
+
+<section id="tools" class="r" data-shape="position"><div class="wrap"><div class="txt">
+  <div class="kick reveal" data-t="t_k">Trading tools</div>
+  <h2 class="reveal" data-t="t_h">Size every trade <em>right.</em></h2>
+  <p class="lead reveal" data-t="t_p">Contracts or lots for your stop, on futures or CFD. Know if you pass the consistency rule before you trade.</p>
+  <ul class="feats reveal">
+    <li><i>🧮</i><span data-t="t_1">Risk calculator: NQ, ES, YM, GC, gold, forex, indices, BTC</span></li>
+    <li><i>⚖️</i><span data-t="t_2">Consistency rule calculator, filled from your journal</span></li>
+    <li><i>🗓️</i><span data-t="t_3">Tomorrow's plan: bias, key levels, max loss</span></li>
+    <li><i>📈</i><span data-t="t_4">Free ICT indicator for TradingView</span></li>
+  </ul></div>
+  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/risk.jpg)"></div></div></div></div></section>
+
+<section id="results" data-shape="breakout"><div class="wrap"><div class="txt">
+  <div class="kick reveal" data-t="a_k">About Tradeversity</div>
+  <h2 class="reveal" data-t="a_h">Real students. <em>Real results.</em></h2>
+  <p class="lead reveal" data-t="a_p">A trading mentorship founded by Brown Algo and ZNtrading: a precise scalping system, a clear daily bias, a written plan, strict risk and an honest journal.</p>
+  <div class="strip reveal"><div class="tr" id="strip"></div></div>
+  <div class="cta reveal"><a class="btn" href="https://t.me/tradeversity_feedbackresult" target="_blank" rel="noopener" data-t="res_btn">See all results on Telegram</a></div>
+</div></div></section>
+
+<section id="join" data-shape="reversal"><div class="wrap"><div class="txt">
+  <div class="kick reveal" data-t="z_k">Start today</div>
+  <h2 class="reveal" data-t="z_h">Journal. Plan. <em>Get funded.</em></h2>
+  <p class="lead reveal" data-t="z_p">Free for Tradeversity students. Create your account, verify your email and Telegram, and get access.</p>
+  <div class="cta reveal"><a class="btn pri" href="index.html?auth=signup" data-t="join2">Join free</a><a class="btn" href="index.html?auth=login" data-t="login">Log in</a></div>
+</div></div></section>
+</main>
+<footer class="foot"><div>© <span id="yr"></span> Tradeversity · <span data-t="founder">Founder</span> · BROWN ALGO</div></footer>
+
+<script>
+/* ---------- texts: English / Français / العربية ---------- */
+const T={
+fr:{login:"Se connecter",join:"Rejoindre",join2:"Rejoindre gratuitement",scroll:"DÉFILER",hero_k:"Tradeversity",hero_h:"Le Journal <em>Efficace</em>",hero_p:"Le journal de trading conçu pour les traders de prop firms. Notez chaque trade, connaissez vos vrais chiffres, ne cassez jamais une règle et soyez financé.",yrs_n:"~7",yrs:"ans sur les marchés",stu:"étudiants",langs:"langues · EN FR AR",
+j_k:"Journal de trading",j_h:"Chaque trade. <em>Dans votre poche.</em>",j_p:"Ajoutez un trade en quelques secondes : P&L, commissions de votre prop firm, émotions, note et capture du graphique.",j_1:"Captures de graphique et notes sur chaque trade",j_2:"Commissions de votre prop firm calculées, ou « déjà incluses »",j_3:"Modifiez n'importe quel trade · un jour sans trade compte pour 0 $",j_4:"Contrats pour les futures, taille de lot pour CFD et comptes perso",
+s_k:"Statistiques",s_h:"Connaissez vos <em>vrais chiffres.</em>",s_p:"Calendrier P&L, win rate, profit factor, espérance, séries, meilleur et pire jour. Tout est calculé pour vous.",s_1:"Importez le CSV de n'importe quelle prop firm : Tradovate, NinjaTrader, MT5",s_2:"Prop firm, plateforme et commissions détectées",s_3:"Jours verts et rouges en un coup d'œil",s_4:"Partagez vos résultats par lien ou QR code, en lecture seule",
+r_k:"Règles des prop firms",r_h:"Choisissez votre firme. <em>Les règles se remplissent.</em>",r_p:"Futures ou CFD, votre prop firm, le plan et la taille. Objectif, perte journalière et drawdown max apparaissent tout seuls.",r_1:"Drawdown trailing ou fin de journée réglé automatiquement",r_2:"Évaluation ou Funded : les bonnes règles pour chacun",r_3:"Jauges en direct : objectif, perte journalière, drawdown max",r_4:"Alerte Telegram à 80 % et 100 % de votre perte journalière",
+f_k:"Prop firm tracker",f_h:"45 prop firms. <em>Aucun secret.</em>",f_p:"Règles et règles cachées de chaque prop firm futures et CFD, prix pour chaque taille, paiements et disponibilité en Algérie.",f_1:"Les règles cachées révélées avant d'acheter",f_2:"Les firmes qui acceptent les traders d'Algérie",f_3:"Réductions jusqu'à <b>-89 %</b> avec le code <b>BROWN23</b>",f_4:"Mis à jour deux fois par mois",
+n_k:"Alertes news",n_h:"News rouge ? <em>Vous le savez en premier.</em>",n_p:"Chaque news USD dossier rouge et orange avec compte à rebours en heure de New York et d'Algérie, et ce que signifie chaque news.",n_1:"Alerte Telegram 5 minutes avant une news rouge",n_2:"Ce que c'est et comment ça fait bouger le marché",n_3:"Notifications : news du jour, rappels journal et plan",n_4:"En English, Français et العربية",
+t_k:"Outils de trading",t_h:"La bonne taille <em>à chaque trade.</em>",t_p:"Contrats ou lots selon votre stop, en futures ou CFD. Sachez si vous passez la règle de consistance avant de trader.",t_1:"Calculateur de risque : NQ, ES, YM, GC, or, forex, indices, BTC",t_2:"Calculateur de règle de consistance, rempli depuis votre journal",t_3:"Plan de demain : biais, niveaux clés, perte max",t_4:"Indicateur ICT gratuit pour TradingView",
+a_k:"À propos de Tradeversity",a_h:"De vrais étudiants. <em>De vrais résultats.</em>",a_p:"Un mentorat de trading fondé par Brown Algo et ZNtrading : un système de scalping précis, un biais journalier clair, un plan écrit, un risque strict et un journal honnête.",res_btn:"Voir tous les résultats sur Telegram",
+z_k:"Commencez aujourd'hui",z_h:"Journal. Plan. <em>Financé.</em>",z_p:"Gratuit pour les étudiants Tradeversity. Créez votre compte, vérifiez votre e-mail et Telegram, et obtenez l'accès.",founder:"Fondateur"},
+ar:{login:"تسجيل الدخول",join:"انضم",join2:"انضم مجاناً",scroll:"مرّر",hero_k:"Tradeversity",hero_h:"اليوميات <em>الفعّالة</em>",hero_p:"يوميات التداول المصممة لمتداولي شركات التمويل. سجّل كل صفقة، اعرف أرقامك الحقيقية، لا تكسر أي قاعدة، واحصل على التمويل.",yrs_n:"~7",yrs:"سنوات في الأسواق",stu:"طالب",langs:"لغات · EN FR AR",
+j_k:"يوميات التداول",j_h:"كل صفقة. <em>في جيبك.</em>",j_p:"سجّل صفقة في ثوانٍ: الربح والخسارة، عمولات شركة التمويل، المشاعر، التقييم وصورة الشارت.",j_1:"صور الشارت والملاحظات لكل صفقة",j_2:"عمولات شركة التمويل تُحسب تلقائياً، أو «مشمولة مسبقاً»",j_3:"عدّل أي صفقة في أي وقت · يوم بلا تداول يُحسب 0$",j_4:"عقود للعقود الآجلة، وحجم اللوت لحسابات CFD والحسابات الشخصية",
+s_k:"الإحصائيات",s_h:"اعرف <em>أرقامك الحقيقية.</em>",s_p:"تقويم الأرباح، نسبة النجاح، معامل الربح، التوقع، السلاسل، أفضل وأسوأ يوم. كل شيء يُحسب لك.",s_1:"استورد ملف CSV من أي شركة تمويل: Tradovate وNinjaTrader وMT5",s_2:"اكتشاف شركة التمويل والمنصة والعمولات",s_3:"الأيام الخضراء والحمراء في لمحة على التقويم",s_4:"شارك نتائجك برابط أو رمز QR، للعرض فقط",
+r_k:"قواعد شركات التمويل",r_h:"اختر شركتك. <em>القواعد تُملأ وحدها.</em>",r_p:"اختر العقود الآجلة أو CFD، شركة التمويل، الخطة والحجم. هدف الربح وحد الخسارة اليومي وأقصى سحب تظهر تلقائياً.",r_1:"نوع السحب (متحرك أو نهاية اليوم) يُضبط تلقائياً",r_2:"تقييم أو حساب ممول: القواعد الصحيحة لكل منهما",r_3:"مؤشرات مباشرة: هدف الربح، حد الخسارة اليومي، أقصى سحب",r_4:"تنبيه تيليغرام عند 80% و100% من خسارتك اليومية",
+f_k:"متتبع شركات التمويل",f_h:"45 شركة تمويل. <em>بلا أسرار.</em>",f_p:"القواعد والقواعد الخفية لكل شركة تمويل للعقود الآجلة وCFD، الأسعار لكل حجم، السحوبات وتوفرها في الجزائر.",f_1:"كشف القواعد الخفية قبل الشراء",f_2:"الشركات التي تقبل المتداولين من الجزائر",f_3:"خصومات تصل إلى <b>‎-89%</b> بالكود <b>BROWN23</b>",f_4:"تحديث مرتين في الشهر",
+n_k:"تنبيهات الأخبار",n_h:"خبر أحمر؟ <em>تعرف أولاً.</em>",n_p:"كل أخبار الدولار ذات الملف الأحمر والبرتقالي مع عدّ تنازلي بتوقيت نيويورك والجزائر، ومعنى كل خبر.",n_1:"تنبيه تيليغرام قبل الخبر الأحمر بـ5 دقائق",n_2:"ما هو الخبر وكيف يحرّك السوق عادة",n_3:"إشعارات: أخبار اليوم، تذكير اليوميات والخطة",n_4:"بالإنجليزية والفرنسية والعربية",
+t_k:"أدوات التداول",t_h:"الحجم الصحيح <em>لكل صفقة.</em>",t_p:"عقود أو لوتات حسب وقف الخسارة، للعقود الآجلة أو CFD. اعرف إن كنت تجتاز قاعدة الاتساق قبل أن تتداول.",t_1:"حاسبة المخاطرة: NQ وES وYM وGC، الذهب، الفوركس، المؤشرات، BTC",t_2:"حاسبة قاعدة الاتساق، تُملأ من يومياتك",t_3:"خطة الغد: الاتجاه، المستويات المهمة، أقصى خسارة",t_4:"مؤشر ICT مجاني على TradingView",
+a_k:"عن Tradeversity",a_h:"طلاب حقيقيون. <em>نتائج حقيقية.</em>",a_p:"برنامج تدريب على التداول أسسه Brown Algo وZNtrading: نظام سكالبينغ دقيق، اتجاه يومي واضح، خطة مكتوبة، مخاطرة صارمة ويوميات صادقة.",res_btn:"شاهد كل النتائج على تيليغرام",
+z_k:"ابدأ اليوم",z_h:"يوميات. خطة. <em>تمويل.</em>",z_p:"مجاني لطلاب Tradeversity. أنشئ حسابك، تحقق من بريدك وتيليغرام، واحصل على الوصول.",founder:"المؤسس"}};
+const EN={};document.querySelectorAll("[data-t]").forEach(e=>EN[e.dataset.t]=e.innerHTML);
+function setLang(l){if(!["en","fr","ar"].includes(l))l="en";const d=l==="en"?EN:Object.assign({},EN,T[l]);
+  document.querySelectorAll("[data-t]").forEach(e=>{const v=d[e.dataset.t];if(v!=null)e.innerHTML=v});
+  document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr";
+  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.l===l));
+  try{localStorage.setItem("tvj_lang",l)}catch(e){}}
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+setLang((()=>{try{const v=localStorage.getItem("tvj_lang");if(v)return v}catch(e){}const n=(navigator.language||"en").slice(0,2).toLowerCase();return ["fr","ar"].includes(n)?n:"en"})());
+document.getElementById("yr").textContent=new Date().getFullYear();
+/* results strip (student certificates and payouts) */
+const RES=["09","48","01","08","50","36","12","51","20","02","55","10","24","38","14","19","49","03","16","41"];
+const imgs=RES.map(n=>`<img src="results/thumbs/result-${n}.jpg" alt="Student result" loading="lazy">`).join("");document.getElementById("strip").innerHTML=imgs+imgs;
+/* section dots + reveal on scroll */
+const secs=[...document.querySelectorAll("main section")];
+document.querySelector(".dots").innerHTML=secs.map(s=>`<a href="#${s.id}" aria-label="${s.id}"></a>`).join("");
+const dots=[...document.querySelectorAll(".dots a")];
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");dots.forEach((d,i)=>d.classList.toggle("on",secs[i]===e.target))}}),{threshold:.35});
+secs.forEach(s=>io.observe(s));
+</script>
+
+<!-- 3D particles: one shape per section, morphing as you scroll -->
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from "three";
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const canvas=document.getElementById("bg");
+let renderer;try{renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:true,powerPreference:"high-performance"})}catch(e){canvas.remove();throw e}
+const small=innerWidth<860;
+const N=small?9000:15000;
+renderer.setPixelRatio(Math.min(devicePixelRatio,small?1.5:1.75));
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(55,1,.1,100);camera.position.set(0,0,8.5);
+import {buildShapes} from "./trade3d-shapes.js?v=2";
+const rnd=(a=1)=>(Math.random()*2-1)*a;
+const S=buildShapes(THREE,N);   /* TradingView-style chart scenes: candles, levels, P&L bars, position tool... */
+/* points */
+const geo=new THREE.BufferGeometry(),pos=new Float32Array(N*3),col=new Float32Array(N*3),seed=new Float32Array(N);
+for(let i=0;i<N;i++)seed[i]=Math.random();
+geo.setAttribute("position",new THREE.BufferAttribute(pos,3));geo.setAttribute("color",new THREE.BufferAttribute(col,3));geo.setAttribute("seed",new THREE.BufferAttribute(seed,1));
+const mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,vertexColors:true,
+  uniforms:{uSize:{value:(small?30:34)*renderer.getPixelRatio()},uTime:{value:0},uAlpha:{value:small?.95:1}},
+  vertexShader:`attribute float seed;uniform float uSize;uniform float uTime;varying vec3 vC;varying float vA;
+    void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;
+      float tw=.65+.35*sin(uTime*2.+seed*40.);vA=tw;gl_PointSize=uSize*(.35+seed*.65)/-mv.z;}`,
+  fragmentShader:`uniform float uAlpha;varying vec3 vC;varying float vA;void main(){vec2 c=gl_PointCoord-.5;float d=length(c);if(d>.5)discard;float a=smoothstep(.5,0.,d);gl_FragColor=vec4(vC*(.6+a*.8),a*vA*uAlpha);}`});
+const pts=new THREE.Points(geo,mat);const grp=new THREE.Group();grp.add(pts);scene.add(grp);
+/* background stars */
+const sg=new THREE.BufferGeometry(),sp=new Float32Array(1500*3);for(let i=0;i<1500;i++){sp[i*3]=rnd(30);sp[i*3+1]=rnd(18);sp[i*3+2]=-8-Math.random()*20}
+sg.setAttribute("position",new THREE.BufferAttribute(sp,3));scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0x8090ff,size:.035,transparent:true,opacity:.6})));
+/* scroll -> which shapes and how far between them */
+const secs=[...document.querySelectorAll("main section")],keys=secs.map(s=>s.dataset.shape);
+/* where each shape sits: beside the text on desktop (around the phone), above the text on phones */
+const LAY={hero:{x:2.1,y:0,s:1.1,ry:-.38},results:{x:0,y:2.05,s:.7,ry:0},join:{x:0,y:-.1,s:1.15,ry:0}};
+const lay=secs.map(s=>LAY[s.id]||(s.classList.contains("r")?{x:-2.3,y:0,s:1.25,ry:.3}:{x:2.3,y:0,s:1.25,ry:-.3}));
+const layM=secs.map(s=>s.id==="results"?{x:0,y:3.2,s:.62,ry:0}:{x:0,y:2.6,s:.74,ry:0});
+function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.position.z=w<860?11:8.5;camera.updateProjectionMatrix()}
+addEventListener("resize",size);size();
+const smooth=t=>t*t*(3-2*t);
+function state(){const v=scrollY+innerHeight/2;let i=0;const cs=secs.map(s=>s.offsetTop+s.offsetHeight/2);
+  while(i<cs.length-1&&v>=cs[i+1])i++;if(v<cs[0])return {a:0,b:0,t:0};if(i>=cs.length-1)return {a:cs.length-1,b:cs.length-1,t:0};
+  const raw=(v-cs[i])/(cs[i+1]-cs[i]);return {a:i,b:i+1,t:smooth(Math.min(1,Math.max(0,(raw-.25)/.5)))}}
+let mx=0,my=0;addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
+const clock=new THREE.Clock();let cur=state(),offX=2.3,offY=0,offS=.95,offR=-.42;
+function frame(){const t=clock.getElapsedTime();const s=state();cur=s;
+  const A=S[keys[s.a]],B=S[keys[s.b]],k=s.t,burst=Math.sin(k*Math.PI)*(small?1.1:1.4);
+  for(let i=0;i<N;i++){const j=i*3,sd=seed[i];
+    pos[j]=A.p[j]+(B.p[j]-A.p[j])*k+burst*Math.sin(sd*61.3)*(.6+sd);
+    pos[j+1]=A.p[j+1]+(B.p[j+1]-A.p[j+1])*k+burst*Math.cos(sd*17.9)*(.6+sd);
+    pos[j+2]=A.p[j+2]+(B.p[j+2]-A.p[j+2])*k+burst*Math.sin(sd*93.7);
+    col[j]=A.c[j]+(B.c[j]-A.c[j])*k;col[j+1]=A.c[j+1]+(B.c[j+1]-A.c[j+1])*k;col[j+2]=A.c[j+2]+(B.c[j+2]-A.c[j+2])*k}
+  geo.attributes.position.needsUpdate=true;geo.attributes.color.needsUpdate=true;
+  /* place the shape beside the text (desktop) or above it (phone) */
+  const L=innerWidth<860?layM:lay,la=L[s.a],lb=L[s.b],tx=la.x+(lb.x-la.x)*k,ty=la.y+(lb.y-la.y)*k,ts=la.s+(lb.s-la.s)*k;
+  const tr=la.ry+(lb.ry-la.ry)*k;offX+=(tx-offX)*.08;offY+=(ty-offY)*.08;offS+=(ts-offS)*.08;offR+=(tr-offR)*.08;grp.position.set(offX,offY,0);grp.scale.setScalar(offS);
+  /* charts face the middle of the screen, swaying gently like a 3D trading screen */
+  grp.rotation.y=offR+(reduce?0:Math.sin(t*.35)*.12)+mx*.35;grp.rotation.x=-.08+(reduce?0:Math.sin(t*.27)*.05)+my*.2;grp.rotation.z=0;
+  mat.uniforms.uTime.value=t;renderer.render(scene,camera);if(!reduce)requestAnimationFrame(frame)}
+document.getElementById("fallback").style.opacity=".35";
+if(reduce){addEventListener("scroll",()=>requestAnimationFrame(frame),{passive:true});frame()}else frame();
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
