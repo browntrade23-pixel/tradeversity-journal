@@ -1390,6 +1390,29 @@ html:not([data-theme=light]) :is(.mk-chip.on,.st-tab.on){border-color:rgba(110,1
   .td-grid{grid-template-columns:1fr}.td-wk{grid-template-columns:repeat(2,minmax(0,1fr))}.td-acts .btn{min-width:calc(50% - 5px)}.td-big{min-width:100%!important}
 }
 </style>
+<style>
+/* ===== ADMIN organized dashboard ===== */
+.adm{display:grid;gap:12px;margin:6px 0 14px}
+.adm-tabs{display:flex;flex-wrap:wrap;gap:4px;width:100%}.adm-tabs button{flex:1;min-width:120px;white-space:nowrap}
+.adm-n{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--gold);color:#1b1305;font-size:11px;font-weight:800}
+.adm-sec{display:none}.adm-sec.on{display:grid;gap:12px}.adm-sec .card{margin-bottom:0!important}
+.adm-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.adm-inbox h3,.adm .card h3{margin:0 0 10px;font-size:15px}
+.adm-it{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);margin-top:8px}
+.adm-it.hot{border-color:rgba(239,83,80,.55);background:rgba(239,83,80,.08)}.adm-it.warn{border-color:rgba(245,185,66,.55);background:rgba(245,185,66,.07)}
+.adm-ic{font-size:22px;text-align:center}.adm-ppl{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.adm-p{display:inline-flex;gap:4px;align-items:center;padding:2px 8px;border-radius:99px;background:var(--panel);border:1px solid var(--line);font-size:12px}.adm-p a{text-decoration:none}
+.adm-empty{padding:14px;text-align:center;color:var(--muted)}
+.adm-bars{display:flex;align-items:flex-end;gap:5px;height:120px;padding-top:14px}
+.adm-bars .ab{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;position:relative}
+.adm-bars .ab i{display:block;width:100%;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#7c8bff,#3a48e0)}.adm-bars.gold .ab i{background:linear-gradient(180deg,#ffd27a,#f5b942)}
+.adm-bars .ab small{position:absolute;top:-14px;font-size:10px;color:var(--muted)}
+.adm-bl{display:flex;justify-content:space-between;font-size:11px;margin-top:6px}
+.adm-health{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.adm-h{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--panel2)}.adm-h b{display:block;font-size:13.5px}.adm-h small{font-size:12px}
+@media(max-width:1100px){.adm-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.adm-health{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.adm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.adm-health{grid-template-columns:1fr}.adm-tabs button{min-width:calc(50% - 4px)}.adm-it{grid-template-columns:28px 1fr}.adm-it .btn{grid-column:1/-1}}
+</style>
 </head>
 <body>
 
@@ -3793,7 +3816,82 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
   $("#aq",el).oninput=e=>{const q=e.target.value.toLowerCase();$$("#aT tr[data-q]").forEach(tr=>tr.classList.toggle("hidden",!tr.dataset.q.includes(q)))};
   $$("#aT tr[data-id]").forEach(tr=>tr.onclick=async()=>{const s=students.find(x=>x.id===tr.dataset.id);await loadSubject(s,true);S.view="student";render();window.scrollTo(0,0)});
   $("#aExp").onclick=()=>{const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;saveFile(`tradeversity-students-${todayStr()}.csv`,["name,email,telegram,joined,trades,broke_plan,journaled_today,plan_today,plan_tomorrow,last_trade",...rows.map(r=>[r.s.name,r.s.email,r.s.telegram,(r.s.created_at||"").slice(0,10),r.c.n,r.brk,r.jT?"yes":"no",r.pT?"yes":"no",r.pN?"yes":"no",r.last].map(q).join(","))].join("\n"),"text/csv")};
+  admOrganize(el,{profs,trades,plans,clicks,students,pending,disc,wkRows,rows});
 }
+
+/* ============ ADMIN: organized dashboard (tabs + overview) ============
+   Overview = 6 key numbers, "Needs you" inbox by priority, activity and sign-up charts, weak spots, health.
+   The other cards of the admin page are moved into tabs: Requests, Discipline, Students, Affiliates, Settings. */
+function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,disc,wkRows,rows}=D;
+  const today=todayStr(),d7=new Date();d7.setDate(d7.getDate()-6);const d7s=ymd(d7);const sid=new Set(students.map(s=>s.id));
+  const ready=pending.filter(p=>p.tgOk&&p.emailOk!==false),waitV=pending.filter(p=>!(p.tgOk&&p.emailOk!==false));
+  const tw=trades.filter(t=>sid.has(t.user_id)&&t.date>=d7s&&t.date<=today);
+  const breaks=wkRows.reduce((a,r)=>a+r.broke+r.mlh,0);
+  const clk30=(clicks||[]).filter(c=>c.kind==="link"&&Date.now()-new Date(c.created_at).getTime()<=30*864e5).length;
+  const nJ=disc.filter(r=>r.journaled).length;
+  /* max daily loss hit today / overtrading today / inactive 7+ days */
+  const lossToday=students.filter(s=>{const p=plans.find(x=>x.user_id===s.id&&x.date===today);if(!p||!(num(p.maxLoss)>0))return false;
+    return trades.filter(t=>t.user_id===s.id&&t.date===today).reduce((a,t)=>a+tradeNet(t),0)<=-num(p.maxLoss)});
+  const overT=disc.filter(r=>r.over).map(r=>r.s);
+  const lastAct=s=>{const a=trades.filter(t=>t.user_id===s.id).map(t=>t.date),b=plans.filter(p=>p.user_id===s.id).map(p=>p.date);return [...a,...b].sort().pop()||""};
+  const inactive=students.filter(s=>lastAct(s)<d7s);
+  const tg=s=>(s.telegram||"").replace(/^@/,"").replace(/^https?:\/\/t\.me\//,"").trim();
+  const ppl=list=>list.slice(0,8).map(s=>`<span class="adm-p"><b data-notr>${esc(s.name||"—")}</b>${tg(s)?`<a href="https://t.me/${encodeURIComponent(tg(s))}" target="_blank" rel="noopener" title="Telegram">💬</a>`:""}</span>`).join("")+(list.length>8?`<span class="mut">+${list.length-8}</span>`:"");
+  const inbox=[];
+  if(ready.length)inbox.push(["🎉","hot",`<b data-notr>${ready.length}</b> <span>${ready.length===1?"student verified, ready to approve":"students verified, ready to approve"}</span>`,ppl(ready),"requests","Open requests"]);
+  if(lossToday.length)inbox.push(["🛑","hot",`<b data-notr>${lossToday.length}</b> <span>hit their max daily loss today</span>`,ppl(lossToday),"discipline","See discipline"]);
+  if(overT.length)inbox.push(["⛔","warn",`<b data-notr>${overT.length}</b> <span>overtrading today (more than 2 trades)</span>`,ppl(overT),"discipline","See discipline"]);
+  if(waitV.length)inbox.push(["⏳","",`<b data-notr>${waitV.length}</b> <span>waiting for verification (email or Telegram)</span>`,ppl(waitV),"requests","Open requests"]);
+  if(inactive.length)inbox.push(["😴","",`<b data-notr>${inactive.length}</b> <span>inactive for 7+ days: send them a message</span>`,ppl(inactive),"students","Open students"]);
+  if(students.length&&nJ<students.length&&new Date().getHours()>=17)inbox.push(["📓","",`<b data-notr>${students.length-nJ}</b> <span>haven't journaled today</span>`,"","discipline","See discipline"]);
+  /* charts: active students per day (14 days) and sign-ups per week (8 weeks) */
+  const days14=[];{const x=new Date();x.setDate(x.getDate()-13);for(let i=0;i<14;i++){days14.push(ymd(x));x.setDate(x.getDate()+1)}}
+  const act=days14.map(d=>new Set([...trades.filter(t=>t.date===d&&sid.has(t.user_id)).map(t=>t.user_id),...plans.filter(p=>p.date===d&&sid.has(p.user_id)&&((p.review||"").trim()||p.followed||p.noTrade)).map(p=>p.user_id)]).size);
+  const wk8=[];{const x=new Date();x.setDate(x.getDate()-((x.getDay()+6)%7)-7*7);for(let i=0;i<8;i++){const a=ymd(x);x.setDate(x.getDate()+7);wk8.push([a,ymd(x)])}}
+  const sign=wk8.map(([a,b])=>profs.filter(p=>p.role!=="admin"&&(p.created_at||"").slice(0,10)>=a&&(p.created_at||"").slice(0,10)<b).length);
+  const bars=(vals,labels,cls)=>{const m=Math.max(1,...vals);return `<div class="adm-bars ${cls||""}">${vals.map((v,i)=>`<div class="ab" title="${esc(labels[i])}: ${v}"><i style="height:${Math.max(3,v/m*100)}%"></i><small data-notr>${v||""}</small></div>`).join("")}</div><div class="adm-bl mut"><span data-notr>${esc(labels[0])}</span><span data-notr>${esc(labels[labels.length-1])}</span></div>`};
+  const newsN=(S.news||[]).length,pfu=(window.PF_UPDATES||[])[0];
+  const hl=(ok,t,s)=>`<div class="adm-h ${ok?"ok":"warn"}"><span>${ok?"🟢":"🟠"}</span><div><b>${t}</b><small class="mut">${s}</small></div></div>`;
+  const tabs=[["overview","📊","Overview"],["requests","🔔","Requests",pending.length],["discipline","📅","Discipline"],["students","👥","Students",students.length],["affiliates","🔗","Affiliates"],["settings","⚙️","Settings & updates"]];
+  const cur=S._admTab||"overview";
+  const box=document.createElement("div");box.className="adm";
+  box.innerHTML=`<div class="adm-tabs seg">${tabs.map(([k,ic,l,n])=>`<button type="button" data-at="${k}" class="${k===cur?"on":""}">${ic} <span>${l}</span>${n?` <span class="adm-n" data-notr>${n}</span>`:""}</button>`).join("")}</div>
+   <div class="adm-sec" data-sec="overview">
+    <div class="adm-kpis">
+     ${kpi("Students",`<span data-notr>${students.length}</span>`,`<span data-notr>${rows.filter(r=>r.active).length}</span> <span>active this week</span>`)}
+     ${kpi("Ready to approve",`<span class="${ready.length?"warn":""}" data-notr>${ready.length}</span>`,`<span data-notr>${waitV.length}</span> <span>waiting for verification</span>`)}
+     ${kpi("Journaled today",`<span class="${students.length&&nJ===students.length?"pos":nJ?"warn":"neg"}" data-notr>${nJ} / ${students.length}</span>`,esc(fmtDate(today)))}
+     ${kpi("Trades this week",`<span data-notr>${tw.length}</span>`,`<span class="${cls(tw.reduce((a,t)=>a+tradeNet(t),0))}" data-notr>${smoney(tw.reduce((a,t)=>a+tradeNet(t),0),0)}</span>`)}
+     ${kpi("Rule breaks this week",`<span class="${breaks?"neg":"pos"}" data-notr>${breaks}</span>`,"<span>broke the plan or hit max loss</span>")}
+     ${kpi("Link clicks · 30 days",`<span data-notr>${clk30}</span>`,"<span>affiliate & BROWN23</span>")}
+    </div>
+    <div class="card adm-inbox"><h3>📥 <span>Needs you</span></h3>
+     ${inbox.length?inbox.map(([ic,lv,t,p,tab,btn])=>`<div class="adm-it ${lv}"><span class="adm-ic">${ic}</span><div class="adm-tx"><div>${t}</div>${p?`<div class="adm-ppl">${p}</div>`:""}</div><button type="button" class="btn sm" data-at="${tab}">${btn} ›</button></div>`).join(""):`<div class="adm-empty">✅ <span>All clear. Nothing needs you right now.</span></div>`}</div>
+    <div class="grid g2">
+     <div class="card"><h3>📈 <span>Active students per day</span> <small class="mut">· <span>last 14 days</span></small></h3>${bars(act,days14.map(d=>fmtDate(d).split(",")[0]+" "+d.slice(8)))}</div>
+     <div class="card"><h3>🆕 <span>New sign-ups per week</span> <small class="mut">· <span>last 8 weeks</span></small></h3>${bars(sign,wk8.map(w=>fmtDate(w[0])),"gold")}</div>
+    </div>
+    <div class="card"><h3>🩺 <span>Health</span></h3><div class="adm-health">
+     ${hl(newsN>0,I18N.t("News feed"),newsN?`<span data-notr>${newsN}</span> <span>events loaded</span>`:"<span>No news loaded. Check the econ-news job.</span>")}
+     ${hl(!!S.me.tgOk,I18N.t("Your Telegram"),S.me.tgOk?"<span>Connected: weekly summary every Sunday 20:00</span>":"<span>Not connected: open Settings & updates to connect it</span>")}
+     ${hl(!!pfu,I18N.t("Prop firm tracker"),pfu?`<span>Last update</span> <span data-notr>${esc(fmtDate(pfu.date))}</span>`:"<span>No update log yet</span>")}
+     ${hl(!ready.length,I18N.t("Approvals"),ready.length?`<span data-notr>${ready.length}</span> <span>waiting for you</span>`:"<span>Nobody waiting</span>")}
+    </div></div>
+   </div>
+   <div class="adm-sec" data-sec="requests"></div><div class="adm-sec" data-sec="discipline"></div><div class="adm-sec" data-sec="students"></div>
+   <div class="adm-sec" data-sec="affiliates"></div><div class="adm-sec" data-sec="settings"></div>`;
+  const sub=el.querySelector(".sub");(sub||el.firstChild).after(box);
+  const put=(node,sec)=>{if(node&&node!==box&&!box.contains(node))box.querySelector(`[data-sec="${sec}"]`).appendChild(node)};
+  const cardOf=sel=>{const n=el.querySelector(sel);return n&&(n.closest("details.card,.card")||n)};
+  put(el.querySelector("#ntfBox"),"settings");put(el.querySelector(".pfu-card"),"settings");
+  put(cardOf("#reqT")||cardOf(".rq-grp"),"requests");put(cardOf("#rejT"),"requests");
+  put(el.querySelector(".wk-card"),"discipline");put(el.querySelector("#discCard"),"discipline");
+  put(el.querySelector(".aff-card"),"affiliates");
+  [...el.querySelectorAll(":scope > .card, :scope > .grid")].forEach(n=>{if(n.querySelector("#aT"))put(n,"students");else if(/Group weak spots/.test(n.textContent))put(n,"overview");else if(n.classList.contains("grid")&&n.querySelector(".kpi"))n.remove()});
+  if(!box.querySelector('[data-sec="requests"]').children.length)box.querySelector('[data-sec="requests"]').innerHTML=`<div class="card adm-empty">✅ <span>No pending requests.</span></div>`;
+  if(!box.querySelector('[data-sec="affiliates"]').children.length)box.querySelector('[data-sec="affiliates"]').innerHTML=`<div class="card adm-empty"><span>No clicks recorded yet.</span></div>`;
+  const show=k=>{S._admTab=k;$$(".adm-tabs [data-at]",box).forEach(b=>b.classList.toggle("on",b.dataset.at===k));$$(".adm-sec",box).forEach(s=>s.classList.toggle("on",s.dataset.sec===k))};
+  $$("[data-at]",box).forEach(b=>b.onclick=()=>{show(b.dataset.at);window.scrollTo({top:0,behavior:"smooth"})});show(cur)}
 
 /* ============ social links ============ */
 const SOCIAL=[
@@ -4016,6 +4114,7 @@ async function bootDemo(){const D=demoData();S._demo=true;
 <script type="module">import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))</script>
 </body>
 </html>
+
 
 
 
