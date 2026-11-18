@@ -1535,6 +1535,23 @@ img.cover{cursor:zoom-in}
 .pf-gal{margin:12px 0}
 @media(max-width:820px){.nclock-w{grid-template-columns:1fr}.td-orbw,.td-orbw .a3-box{width:130px}}
 </style>
+<style>
+.adm-orb{display:grid;grid-template-columns:170px 1fr;gap:14px;align-items:center}.adm-orb .a3-box{width:170px}.a3-wait{font-size:13.5px}
+@media(max-width:620px){.adm-orb{grid-template-columns:120px 1fr}.adm-orb .a3-box{width:120px}}
+</style>
+<style>
+/* menu bar arrows */
+.tabs-wrap{position:relative;max-width:1200px;margin:0 auto}
+.tabs-wrap nav.tabs{scroll-behavior:smooth}
+.tabs-arr{position:absolute;top:2px;z-index:3;width:34px;height:34px;border-radius:50%;border:1px solid rgba(245,185,66,.55);background:rgba(14,16,24,.95);color:var(--gold);font:700 20px/1 Inter,sans-serif;
+  cursor:pointer;display:none;place-items:center;box-shadow:0 6px 18px -4px rgba(0,0,0,.8);transition:transform .15s,background .2s}
+.tabs-arr:hover{transform:scale(1.08);background:rgba(245,185,66,.18)}.tabs-arr.on{display:grid}.tabs-arr.l{left:2px}.tabs-arr.r{right:2px}
+html[dir=rtl] .tabs-arr.l{left:auto;right:2px}html[dir=rtl] .tabs-arr.r{right:auto;left:2px}html[dir=rtl] .tabs-arr{transform:scaleX(-1)}
+.tabs-wrap.fade-l nav.tabs{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 56px);mask-image:linear-gradient(90deg,transparent 0,#000 56px)}
+.tabs-wrap.fade-r nav.tabs{-webkit-mask-image:linear-gradient(270deg,transparent 0,#000 56px);mask-image:linear-gradient(270deg,transparent 0,#000 56px)}
+.tabs-wrap.fade-l.fade-r nav.tabs{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 56px,#000 calc(100% - 56px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 56px,#000 calc(100% - 56px),transparent 100%)}
+@media(max-width:820px){.tabs-arr{display:none!important}}
+</style>
 </head>
 <body>
 
@@ -1647,7 +1664,7 @@ img.cover{cursor:zoom-in}
       <button class="ntf-bell" id="ntfBell" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="ntf-badge hidden" id="ntfBadge"></span></button>
       <button class="btn sm ghost" id="logout">Log out</button>
     </div>
-    <nav class="tabs" id="tabs"></nav>
+    <div class="tabs-wrap" id="tabsWrap"><button type="button" class="tabs-arr l" id="tabsL" aria-label="Previous sections">‹</button><nav class="tabs" id="tabs"></nav><button type="button" class="tabs-arr r" id="tabsR" aria-label="More sections">›</button></div>
   </header>
   <main id="view"></main>
   <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div id="socFoot" class="soc"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>
@@ -1988,7 +2005,16 @@ function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button da
   $$("button[data-v]",tm).forEach(b=>b.onclick=()=>{tm.classList.add("hidden");go(b.dataset.v)});
   $("#toolsBtn").onclick=e=>{e.stopPropagation();const r=e.currentTarget.getBoundingClientRect();tm.style.top=(r.bottom+6)+"px";tm.style.left=Math.max(8,Math.min(r.left,innerWidth-250))+"px";tm.classList.toggle("hidden")};
   const on=$("button.on",t);if(on&&t.scrollWidth>t.clientWidth)t.scrollTo({left:on.offsetLeft-(t.clientWidth-on.offsetWidth)/2,behavior:"smooth"});
-  renderBottomNav()}
+  renderBottomNav();tabsArrows()}
+/* PC menu bar: ‹ › arrows appear when the sections don't fit; smooth scroll, mouse wheel scrolls sideways */
+function tabsArrows(){const t=$("#tabs"),L=$("#tabsL"),R=$("#tabsR"),w=$("#tabsWrap");if(!t||!L||!R)return;
+  const upd=()=>{const max=t.scrollWidth-t.clientWidth,rtl=document.documentElement.dir==="rtl",x=Math.abs(t.scrollLeft),over=max>4;
+    const atStart=x<=4,atEnd=x>=max-4;L.classList.toggle("on",over&&(rtl?!atEnd:!atStart));R.classList.toggle("on",over&&(rtl?!atStart:!atEnd));
+    w.classList.toggle("fade-l",over&&!(rtl?atEnd:atStart));w.classList.toggle("fade-r",over&&!(rtl?atStart:atEnd))};
+  if(!t.dataset.arr){t.dataset.arr="1";const step=d=>t.scrollBy({left:d*Math.max(160,t.clientWidth*.6),behavior:"smooth"});
+    L.onclick=()=>step(-1);R.onclick=()=>step(1);t.addEventListener("scroll",upd,{passive:true});addEventListener("resize",upd);
+    t.addEventListener("wheel",e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)&&t.scrollWidth>t.clientWidth){e.preventDefault();t.scrollBy({left:e.deltaY,behavior:"smooth"})}},{passive:false})}
+  upd();setTimeout(upd,300)}
 /* phones: app-style bottom bar with the 5 main tabs + "More" */
 const BNAV_MAIN=[["today","Today"],["journal","Journal"],["stats","Stats"],["news","News"],["plan","Plan"]];
 function renderBottomNav(){let b=$("#bnav");if(!b){b=document.createElement("nav");b.id="bnav";b.setAttribute("aria-label","Main");$("#app").appendChild(b)}
@@ -3058,7 +3084,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   ${insights(ts).length?`<div class="card" style="margin-bottom:12px"><h3>What your journal says</h3>${insights(ts).map(([i,t])=>`<div class="insight"><span class="ic">${i}</span><span>${t}</span></div>`).join("")}</div>`:""}
   ${Object.keys(st.days).length>=2?`<div class="card a3-card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><h3 style="margin:0">✨ <span>3D view</span></h3>
     <div class="seg" id="a3StatsTab"><button type="button" data-a3s="mtn" class="${S._a3s!=="cal"?"on":""}">🏔 <span>Equity mountain</span></button><button type="button" data-a3s="cal" class="${S._a3s==="cal"?"on":""}">📅 <span>3D calendar</span></button></div></div>
-    <div id="a3Stats" class="a3-box"></div><p class="mut a3-hint"><span>Drag to rotate · tap a day to open it</span></p></div>`:""}
+    <div id="a3Stats" class="a3-box"></div><p class="mut a3-hint"><span>Drag to rotate · tap a day to open it</span></p></div>`:`<div class="card a3-card a3-wait" style="margin-bottom:12px">🏔 <b>3D view</b> <span class="mut">· <span>Your 3D equity mountain and 3D calendar appear after 2 trading days in this account.</span></span></div>`}
   <div class="card" style="margin-bottom:12px"><h3>Equity curve</h3>${equityChart(st.curve)}</div>
   <div class="grid g2" style="margin-bottom:12px"><div class="card"><h3>Daily P&L</h3>${dailyBars(st.days)}</div><div class="card"><h3>Calendar</h3>${calendar(st.days,true)}<p class="mut" style="font-size:12px;margin:8px 0 0">👆 <span>Click a day to see its trades, screenshots and journal.</span></p></div></div>
   <div class="grid g2">
@@ -4289,6 +4315,9 @@ function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,dis
   const bars=(vals,labels,cls)=>{const m=Math.max(1,...vals);return `<div class="adm-bars ${cls||""}">${vals.map((v,i)=>`<div class="ab" title="${esc(labels[i])}: ${v}"><i style="height:${Math.max(3,v/m*100)}%"></i><small data-notr>${v||""}</small></div>`).join("")}</div><div class="adm-bl mut"><span data-notr>${esc(labels[0])}</span><span data-notr>${esc(labels[labels.length-1])}</span></div>`};
   const newsN=(S.news||[]).length,pfu=(window.PF_UPDATES||[])[0];
   const hl=(ok,t,s)=>`<div class="adm-h ${ok?"ok":"warn"}"><span>${ok?"🟢":"🟠"}</span><div><b>${t}</b><small class="mut">${s}</small></div></div>`;
+  const classAvg=(()=>{const sc=(from)=>{const out=[];students.forEach(s=>{const TR=trades.filter(t=>t.user_id===s.id),PL=plans.filter(p=>p.user_id===s.id),J=judgeTrades(TR).out;
+      const ds=[...new Set([...TR.map(t=>t.date),...PL.map(p=>p.date)])].filter(d=>d>=from&&d<=today);if(ds.length)out.push(ds.map(d=>scoreFor(d,TR,PL,J).score).reduce((a,b)=>a+b,0)/ds.length)});return out};
+    let a=sc(today),t=true;if(!a.length){a=sc(d7s);t=false}return {v:a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0,n:a.length,today:t}})();
   const tabs=[["overview","📊","Overview"],["requests","🔔","Requests",pending.length],["discipline","📅","Discipline"],["students","👥","Students",students.length],["affiliates","🔗","Affiliates"],["settings","⚙️","Settings & updates"]];
   const cur=S._admTab||"overview";
   const box=document.createElement("div");box.className="adm";
@@ -4302,6 +4331,9 @@ function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,dis
      ${kpi("Rule breaks this week",`<span class="${breaks?"neg":"pos"}" data-notr>${breaks}</span>`,"<span>broke the plan or hit max loss</span>")}
      ${kpi("Link clicks · 30 days",`<span data-notr>${clk30}</span>`,"<span>affiliate & BROWN23</span>")}
     </div>
+    <div class="card adm-orb"><div id="a3AdmOrb" class="a3-box"><div class="a3-flat"><b data-notr>${classAvg.v}</b><small>${esc(I18N.t("class score"))}</small></div></div>
+     <div><h3 style="margin:0 0 6px">🔮 <span>Class discipline</span></h3><p class="mut" style="margin:0;font-size:13px"><span>${classAvg.today?"Average discipline score of the students active today":"Average discipline score of the last 7 days"}</span> · <b data-notr>${classAvg.n}</b> <span>students</span></p>
+     <p class="mut" style="margin:6px 0 0;font-size:12px"><span>Green and calm = the class follows its plans. Red and agitated = rules are being broken.</span></p></div></div>
     <div class="card adm-inbox"><h3>📥 <span>Needs you</span></h3>
      ${inbox.length?inbox.map(([ic,lv,t,p,tab,btn])=>`<div class="adm-it ${lv}"><span class="adm-ic">${ic}</span><div class="adm-tx"><div>${t}</div>${p?`<div class="adm-ppl">${p}</div>`:""}</div><button type="button" class="btn sm" data-at="${tab}">${btn} ›</button></div>`).join(""):`<div class="adm-empty">✅ <span>All clear. Nothing needs you right now.</span></div>`}</div>
     <div class="card adm-ann"><h3>📣 <span>Announcement to all students</span></h3>
@@ -4362,6 +4394,7 @@ function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,dis
        :`<div class="adm-empty"><span>Not enough activity yet this month.</span></div>`}`;
    box.querySelector('[data-sec="discipline"]').prepend(card);
    const cp=card.querySelector("#lbCopy");if(cp)cp.onclick=()=>{const t=`🏆 ${I18N.t("Discipline leaderboard")} · ${mName}\n`+lb.slice(0,3).map((r,i)=>`${["🥇","🥈","🥉"][i]} ${r.s.name} — ${r.avg}/100`).join("\n")+`\n\n${I18N.t("Discipline is the edge nobody can copy.")} — BROWN ALGO`;copyText(t)}}
+  mount3d("a3AdmOrb","disciplineOrb",classAvg.v,I18N.t("class score"));
   const show=k=>{S._admTab=k;$$(".adm-tabs [data-at]",box).forEach(b=>b.classList.toggle("on",b.dataset.at===k));$$(".adm-sec",box).forEach(s=>s.classList.toggle("on",s.dataset.sec===k))};
   $$("[data-at]",box).forEach(b=>b.onclick=()=>{show(b.dataset.at);window.scrollTo({top:0,behavior:"smooth"})});show(cur)}
 
@@ -4604,6 +4637,8 @@ let __a3=false;const __a3t=setInterval(()=>{const a=document.getElementById("aut
   import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))},250)</script>
 </body>
 </html>
+
+
 
 
 
