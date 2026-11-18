@@ -1459,6 +1459,25 @@ img.cover{cursor:zoom-in}
 @media(max-width:820px){.mc-g{grid-template-columns:repeat(2,minmax(0,1fr))}.pr-g{grid-template-columns:repeat(2,minmax(0,1fr))}.pr-parts{grid-template-columns:1fr}.edge-r{grid-template-columns:1fr auto;}.edge-r .edge-d{grid-column:1/-1}}
 @media print{#tabs,#bnav,#fab,header,.top,.nav,.btn,.foot,footer,#ntfBell,.promo,.soc,.tg-links,#langAuth{display:none!important}body{background:#fff!important}}
 </style>
+<style>
+/* news week strip + no-trade windows, risk tools */
+.ntw{padding:12px 14px;border-radius:14px;margin-bottom:10px;border:1px solid var(--line);background:var(--panel2)}
+.ntw.bad{border-color:rgba(239,83,80,.6);background:rgba(239,83,80,.1)}.ntw.warn{border-color:rgba(245,185,66,.5);background:rgba(245,185,66,.07)}.ntw.ok{border-color:rgba(38,166,154,.5);background:rgba(38,166,154,.08)}
+.ntw-h{font-size:15px}.ntw-l{display:grid;gap:4px;margin-top:8px;font-size:13px}.ntw-l .past{opacity:.45;text-decoration:line-through}
+.nw-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.nw-d{display:grid;justify-items:center;gap:2px;padding:10px 4px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;font:inherit}
+.nw-d small{font-size:11px;color:var(--muted)}.nw-d b{font-size:18px}.nw-d span{display:inline-flex;gap:4px;align-items:center;font-size:12px}
+.nw-d.red{border-color:rgba(239,83,80,.5)}.nw-d.now{outline:2px solid var(--gold);outline-offset:1px}
+.nw-red{display:inline-flex;gap:6px;align-items:center;font-size:13px;margin:0 0 10px}
+.red-only .nrow:has(.fold.org){display:none}
+.rk-tools{margin:10px 0 12px;padding:12px 14px}.rk-pre{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.rk-l{font-size:12.5px;font-weight:700}
+.rk-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;border:1px solid rgba(245,185,66,.5);background:rgba(245,185,66,.1);color:var(--text);font:600 13px Inter,sans-serif;cursor:pointer}
+.rk-chip i{font-style:normal;opacity:.6;padding:0 2px}.rk-chip i:hover{opacity:1;color:var(--red)}
+.rk-acc{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;font-size:13px}.rk-acc select{width:auto}
+.rk-chk{margin-top:8px;padding:10px 12px;border-radius:12px;font-size:13.5px;border:1px solid var(--line)}
+.rk-chk.ok{border-color:rgba(38,166,154,.5);background:rgba(38,166,154,.08)}.rk-chk.warn{border-color:rgba(245,185,66,.5);background:rgba(245,185,66,.08)}.rk-chk.bad{border-color:rgba(239,83,80,.55);background:rgba(239,83,80,.1)}
+@media(max-width:620px){.nw-strip{gap:4px}.nw-d b{font-size:15px}}
+</style>
 </head>
 <body>
 
@@ -2044,7 +2063,7 @@ function newsWeekEnd(){const d=new Date();d.setDate(d.getDate()+(6-d.getDay()));
 async function loadNews(){try{if(!API||!API.news)return;const a=new Date();a.setDate(a.getDate()-45);  /* history for the discipline streak (red news days) */const b=new Date();b.setDate(b.getDate()+10);
   S.news=await API.news(a.toISOString(),b.toISOString());S.newsLoaded=true;setTimeout(ntfRefresh,0);
   const nb=$("#newsBox");if(nb){nb.outerHTML=newsBox(nb.dataset.date,nb.dataset.ins==="1");const ta=$("#pNews");if(ta&&!ta.value.trim()&&!ta.disabled)ta.value=newsText(nb.dataset.date);bindNewsIns(nb.dataset.date)}
-  const cn=$("#coachNews");if(cn)cn.innerHTML=coachNewsHTML();refreshNewsPanel();
+  const cn=$("#coachNews");if(cn)cn.innerHTML=coachNewsHTML();refreshNewsPanel();const nt=$("#newsTop");if(nt){nt.innerHTML=noTradeWindowsHTML()+newsWeekHTML();bindNewsTop($("#view"))}
   const ra=$("#redAlert");if(ra)ra.outerHTML=redAlert(ra.dataset.date,ra.dataset.when);
   if(S.view==="journal"&&$(".coach")&&!S.page)render()  /* news days can extend the discipline streak */
   }catch(e){console.warn("news",e)}}
@@ -2165,13 +2184,30 @@ function newsPanel(){const tab=S._newsTab||"today";const tabs=[["yday","Yesterda
     <div id="newsBody">${newsPanelBody(tab)}</div></div>`}
 function bindNewsPanel(){$$("#newsTabs button").forEach(b=>b.onclick=()=>{S._newsTab=b.dataset.t;$$("#newsTabs button").forEach(x=>x.classList.toggle("on",x===b));$("#newsBody").innerHTML=newsPanelBody(S._newsTab)})}
 function refreshNewsPanel(){const ne=$("#nextEv");if(ne)ne.innerHTML=nextEventHTML();const nb=$("#newsBody");if(nb)nb.innerHTML=newsPanelBody(S._newsTab||"today")}
-setInterval(()=>{const ne=$("#nextEv");if(ne&&!document.hidden)ne.innerHTML=nextEventHTML()},30000);
+setInterval(()=>{const ne=$("#nextEv");if(ne&&!document.hidden)ne.innerHTML=nextEventHTML();const nt=$("#newsTop");if(nt&&!document.hidden){nt.innerHTML=noTradeWindowsHTML()+newsWeekHTML();bindNewsTop($("#view"))}},30000);
+/* this week at a glance (Mon-Fri) + today's no-trade windows (5 minutes before / after each red news) */
+function newsWeekHTML(){if(!S.newsLoaded)return "";const t=todayStr(),[y,m,dd]=t.split("-").map(Number),mon=new Date(y,m-1,dd);mon.setDate(mon.getDate()-((mon.getDay()+6)%7));
+  const days=[];for(let i=0;i<5;i++){const x=new Date(mon);x.setDate(mon.getDate()+i);days.push(ymd(x))}
+  return `<div class="nw-strip">${days.map(d=>{const ev=newsFor(d),r=ev.filter(n=>n.impact==="High").length,o=ev.length-r,h=holidaysFor(d).length;
+    return `<button type="button" class="nw-d ${d===t?"now":""} ${r?"red":""}" data-nwd="${d}"><small data-notr>${esc(fmtDate(d).split(",")[0])}</small><b data-notr>${d.slice(8)}</b><span>${r?`<i class="fold red"></i><span data-notr>${r}</span>`:""}${o?` <i class="fold org"></i><span data-notr>${o}</span>`:""}${!r&&!o?(h?"🏦":"<span class='mut'>—</span>"):""}</span></button>`}).join("")}</div>`}
+function noTradeWindowsHTML(){if(!S.newsLoaded)return "";const now=Date.now(),reds=newsFor(todayStr()).filter(n=>n.impact==="High");
+  if(!reds.length)return `<div class="ntw ok">✅ <b>No red news today.</b> <span>Normal trading conditions (still follow your plan).</span></div>`;
+  const W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,a:t-5*60000,b:t+5*60000}}),inW=W.find(w=>now>=w.a&&now<=w.b),next=W.find(w=>w.a>now);
+  const fm=(ms,tz)=>new Date(ms).toLocaleTimeString("en-GB",{timeZone:tz,hour:"2-digit",minute:"2-digit"});
+  return `<div class="ntw ${inW?"bad":"warn"}"><div class="ntw-h">${inW?`🚫 <b>No trading right now</b> <span>· red news window</span>`:next?`⏳ <b>Next no-trade window in</b> <b class="mono" data-notr>${Math.max(1,Math.round((next.a-now)/60000))} min</b>`:`✅ <b>Today's red news are done.</b>`}</div>
+   <div class="ntw-l">${W.map(w=>`<span class="${now>w.b?"past":""}"><b class="mono" data-notr>${fm(w.a,NY)}–${fm(w.b,NY)} NY · ${fm(w.a,DZ)}–${fm(w.b,DZ)} DZ</b> <span data-notr>${esc(w.n.title)}</span></span>`).join("")}</div></div>`}
 function vNews(el){
   const uh=upcomingHolidays(6);
-  el.innerHTML=`<h1>📰 USD news</h1><p class="sub">Red and orange folder USD events from Forex Factory, in New York and Algeria (DZ) time. Plan around them.</p>${newsPanel()}
+  el.innerHTML=`<h1>📰 USD news</h1><p class="sub">Red and orange folder USD events from Forex Factory, in New York and Algeria (DZ) time. Plan around them.</p>
+   <div id="newsTop">${noTradeWindowsHTML()}${newsWeekHTML()}</div>
+   <label class="nw-red"><input type="checkbox" id="redOnly" ${S._redOnly?"checked":""}> <span>Red folder only</span></label>
+   ${newsPanel()}
    <div class="card"><h3>🏦 Upcoming US holidays</h3>${uh.map(x=>`<div class="nrow hol click ${x.kind}" data-hk="${x.kind}" data-ht="${esc(x.title)}"><span class="hol-ic">🏦</span><span class="mono nt" data-notr>${esc(fmtDate(x.date))}</span><b class="ntitle" data-notr>${esc(x.title)}</b><span class="hol-note">${HOL_NOTE[x.kind]}</span><span class="hol-in"><span>in</span> <b class="mono" data-notr>${daysUntil(x.date)}</b> <span>days</span></span></div>`).join("")||`<div class="mut nb-e">No holidays listed.</div>`}</div>`;
-  bindNewsPanel();if(!S.newsLoaded)loadNews();
+  bindNewsPanel();if(!S.newsLoaded)loadNews();bindNewsTop(el);
 }
+function bindNewsTop(el){const ro=$("#redOnly",el),nb=$("#newsPanel",el);const ap=()=>{if(nb)nb.classList.toggle("red-only",!!S._redOnly)};ap();
+  if(ro)ro.onchange=()=>{S._redOnly=ro.checked;ap()};
+  $$("[data-nwd]",el).forEach(b=>b.onclick=()=>{const d=b.dataset.nwd,t=todayStr();S._newsTab=d===t?"today":d===addWeekday(t,-1)?"yday":d===addWeekday(t,1)?"tmrw":"week";const tb=$(`#newsTabs [data-t="${S._newsTab}"]`);if(tb)tb.click();$("#newsPanel").scrollIntoView({behavior:"smooth",block:"start"})})}
 
 /* ============ student file (admin, read-only) ============ */
 function vStudent(el){const u=S.subject,ts=[...S.trades].sort((a,b)=>byDT(b,a)),st=calc(ts),d=discStreak(S.trades,S.plans);
@@ -2961,6 +2997,23 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   $$(".cal .c[data-day]",el).forEach(c=>c.onclick=()=>{$("#tip").style.display="none";S.dayPage=c.dataset.day;render();window.scrollTo(0,0)});
   bindStatTabs();bindComm(el);
 }
+/* ============ RISK: presets + check against my prop firm rules ============ */
+const rpreKey=k=>"tv_rpre_"+k+"_"+((S.me&&S.me.id)||"x");
+function riskPresets(k){try{return JSON.parse(localStorage.getItem(rpreKey(k))||"[]")||[]}catch(e){return []}}
+function riskTools(kind,st){if(S.readonly)return "";const P=riskPresets(kind),R=rulesAll(),acs=Object.keys(R).filter(a=>R[a]&&(num(R[a].daily)>0||num(R[a].maxDD)>0));
+  const usd=st.mode==="%"?num(st.bal)*num(st.risk)/100:num(st.risk),ra=S._rChk&&acs.includes(S._rChk)?S._rChk:acs[0];
+  let chk="";if(ra&&usd>0){const r=R[ra],dl=num(r.daily),dd=num(r.maxDD),lv=dl?(usd>dl*.5?"bad":usd>dl*.25?"warn":"ok"):(dd&&usd>dd*.2?"warn":"ok");
+    chk=`<div class="rk-chk ${lv}">${lv==="bad"?"🛑":lv==="warn"?"⚠️":"✅"} <span><span>Risk per trade</span> <b class="mono" data-notr>${money(usd,0)}</b>${dl?` = <b class="mono" data-notr>${Math.round(usd/dl*100)}%</b> <span>of your daily loss limit</span> <span class="mono" data-notr>(${money(dl,0)})</span> → <b data-notr>${Math.max(1,Math.floor(dl/usd))}</b> <span>losses in a row hit it</span>`:""}${dd?`<span class="mut"> · <span data-notr>${Math.round(usd/dd*100)}%</span> <span>of your max drawdown</span></span>`:""}.</span></div>`}
+  return `<div class="card rk-tools"><div class="rk-pre"><span class="mut rk-l">⭐ <span>Presets</span></span>${P.map((p,i)=>`<button type="button" class="rk-chip" data-rpre="${kind}:${i}"><span data-notr>${esc(p.name)}</span><i data-rdel="${kind}:${i}" title="Delete">×</i></button>`).join("")||`<span class="mut" style="font-size:12px"><span>Save your usual account and risk to load them in one tap.</span></span>`}
+    <button type="button" class="btn sm" data-rsave="${kind}">＋ <span>Save these settings</span></button></div>
+   ${acs.length?`<div class="rk-acc"><span>Check against my prop firm rules:</span><select class="i" data-rchk>${acs.map(a=>`<option ${a===ra?"selected":""}>${esc(a)}</option>`).join("")}</select></div>${chk}`:`<p class="mut" style="font-size:12px;margin:8px 0 0"><span>Set your prop firm rules in Statistics to check your risk against your daily loss limit.</span></p>`}</div>`}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-rdel],[data-rpre],[data-rsave]");if(!t||S.view!=="risk")return;
+  const [kind,ix]=(t.dataset.rdel||t.dataset.rpre||t.dataset.rsave).split(":"),key=kind==="cfd"?"_cfd":"_risk",P=riskPresets(kind);
+  if(t.dataset.rdel!=null){e.stopPropagation();P.splice(Number(ix),1);try{localStorage.setItem(rpreKey(kind),JSON.stringify(P))}catch(_){}render();return}
+  if(t.dataset.rpre!=null){const p=P[Number(ix)];if(p){S[key]=JSON.parse(JSON.stringify(p.st));render();toast(I18N.t("Preset loaded"))}return}
+  const nm=prompt(I18N.t("Preset name (e.g. Apex 50K · $250)"),"");if(!nm)return;P.unshift({name:nm.slice(0,30),st:JSON.parse(JSON.stringify(S[key]||{}))});try{localStorage.setItem(rpreKey(kind),JSON.stringify(P.slice(0,8)))}catch(_){}render();toast(I18N.t("Preset saved"))});
+document.addEventListener("change",e=>{const s=e.target.closest&&e.target.closest("[data-rchk]");if(!s)return;S._rChk=s.value;render()});
+
 /* ============ PLAN: templates + plan vs result ============ */
 const tplKey=()=>"tv_plantpl_"+((S.me&&S.me.id)||"x");
 function planTpls(){try{return JSON.parse(localStorage.getItem(tplKey())||"[]")||[]}catch(e){return []}}
@@ -3305,7 +3358,7 @@ function calcSaveAll(){try{[["risk",S._risk],["cfd",S._cfd],["cons",S._cons],["r
 let _calcT=0;["input","change","click"].forEach(ev=>document.addEventListener(ev,()=>{if(!S.me||!["risk","consistency"].includes(S.view))return;clearTimeout(_calcT);_calcT=setTimeout(calcSaveAll,400)},true));
 const bindRiskTabs=()=>$$(".rtabs [data-rt]").forEach(b=>b.onclick=()=>{S._rtab=b.dataset.rt;render()});
 function vRisk(el){if(S._rtab==null)S._rtab=calcLoad("rtab")||"fut";if(S._rtab==="cfd")return vRiskCfd(el);const st=S._risk||(S._risk=calcLoad("risk")||{grp:"Nasdaq",bal:50000,mode:"$",risk:250,stopMode:"pts",stop:20,entry:"",stopPx:"",rr:2,fees:""});
-  el.innerHTML=`<h1>Risk calculator</h1>${riskTabs()}<p class="sub">How many contracts can I take for this stop? Every market is different, so the calculator uses each one's dollar value per point.</p>
+  el.innerHTML=`<h1>Risk calculator</h1>${riskTabs()}${riskTools("fut",st)}<p class="sub">How many contracts can I take for this stop? Every market is different, so the calculator uses each one's dollar value per point.</p>
   <div class="grid g2">
    <div class="card grid">
     <div><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">Market</div><div class="seg" id="rGrp" style="flex-wrap:wrap">${Object.keys(GROUPS).map(g=>`<button data-g="${g}" class="${st.grp===g?"on":""}">${g}</button>`).join("")}</div></div>
@@ -3374,7 +3427,7 @@ const CFD={
   BTCUSD:{name:"Bitcoin",grp:"Crypto",size:"1 BTC",pip:1,pv:1,dg:1}};
 function vRiskCfd(el){const st=S._cfd||(S._cfd=calcLoad("cfd")||{sym:"XAUUSD",bal:10000,mode:"%",risk:1,stopMode:"pips",stop:50,entry:"",stopPx:"",rr:2,comm:"",pv:{}});
   const m=CFD[st.sym],pv=num(st.pv[st.sym])>0?num(st.pv[st.sym]):m.pv;
-  el.innerHTML=`<h1>Risk calculator</h1>${riskTabs()}<p class="sub">How many lots can I take for this stop? The calculator uses the dollar value of one pip for 1.00 lot on each market.</p>
+  el.innerHTML=`<h1>Risk calculator</h1>${riskTabs()}${riskTools("cfd",st)}<p class="sub">How many lots can I take for this stop? The calculator uses the dollar value of one pip for 1.00 lot on each market.</p>
   <div class="grid g2">
    <div class="card grid">
     <div><div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">Market</div><div class="seg" id="cfSym" style="flex-wrap:wrap">${Object.keys(CFD).map(k=>`<button data-s="${k}" class="${st.sym===k?"on":""}" data-notr>${k}</button>`).join("")}</div></div>
@@ -3436,6 +3489,7 @@ function vRiskCfd(el){const st=S._cfd||(S._cfd=calcLoad("cfd")||{sym:"XAUUSD",ba
 /* ============ CONSISTENCY ============ */
 function vConsistency(el){const c=S._cons||(S._cons=calcLoad("cons")||{size:50000,target:3000,pct:30,acct:"all",days:["",""],checked:false});
   if(!Array.isArray(c.days))c.days=["",""];
+  if(!S.readonly&&!S._consAuto&&S.trades.length&&c.days.every(v=>String(v).trim()==="")){S._consAuto=true;setTimeout(()=>{const b=$("#cFill");if(b)b.click()},60)}
   const SIZES_C=[25000,50000,75000,100000,150000,200000];
   const kTxt=v=>num(v)>=1000?`$${+(num(v)/1000).toFixed(1)}K`:money(num(v),0);
   el.innerHTML=`<h1>Consistency rule calculator</h1><p class="sub">Most prop firms say your best day can't be more than <b>X%</b> of your total profit. Enter your daily P/L and check if you pass.</p>
@@ -4368,6 +4422,9 @@ async function bootDemo(){const D=demoData();S._demo=true;
 <script type="module">import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))</script>
 </body>
 </html>
+
+
+
 
 
 
