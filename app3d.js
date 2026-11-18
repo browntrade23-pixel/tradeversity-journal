@@ -355,3 +355,93 @@ export function earthBackground(el,opts={}){
     r.render(scene,cam);
     if(opts.still&&++stillN>8){stopped=true;const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);r.dispose()}},3000)}})();
   return {r}}
+
+/* shared helpers for the soft 3D section backgrounds */
+function softGlowTex(){const s=document.createElement("canvas");s.width=s.height=64;const x=s.getContext("2d"),g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,"rgba(255,255,255,1)");g.addColorStop(.35,"rgba(255,255,255,.4)");g.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(s)}
+function softLoop(el,r,scene,cam,opts,frame,cleanup){const clock=new THREE.Clock();let last=0,stopped=false,n=0;
+  const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()};addEventListener("resize",rs);
+  const free=()=>{removeEventListener("resize",rs);cleanup&&cleanup();scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose()};
+  (function loop(){if(stopped)return;if(!el.isConnected){free();return}requestAnimationFrame(loop);if(document.hidden)return;
+    const t=opts.still?4:clock.getElapsedTime(),dt=opts.still?1:Math.min(.05,t-last);last=t;frame(t,dt);r.render(scene,cam);
+    if(opts.still&&++n>4){stopped=true;const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);free()}},3000)}})()}
+function softRenderer(el){const ph=small(),r=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"});r.setPixelRatio(Math.min(devicePixelRatio,ph?1.4:1.75));r.setSize(innerWidth,innerHeight);
+  r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=.85;el.innerHTML="";el.appendChild(r.domElement);return r}
+
+/* 11. CONSISTENCY RULE BACKGROUND (3D): balance stones stacked over calm dark water.
+   Consistent = the stack is balanced and still. One day too big = the top stone slides off-balance, soft amber glow under it. */
+export function stonesBackground(el,opts={}){
+  const ph=small(),r=softRenderer(el),scene=new THREE.Scene();scene.fog=new THREE.Fog(0x03050b,10,26);
+  const cam=new THREE.PerspectiveCamera(ph?50:38,innerWidth/innerHeight,.1,100);
+  scene.add(new THREE.HemisphereLight(0x9fb4ff,0x05070c,.55));
+  const key=new THREE.DirectionalLight(0xfff1dc,1.4);key.position.set(-5,8,6);scene.add(key);
+  const rim=new THREE.DirectionalLight(0x2ad1c9,.9);rim.position.set(4,3,-6);scene.add(rim);
+  const amber=new THREE.PointLight(0xff9a3d,0,6,1.8);scene.add(amber);
+  /* calm water */
+  const water=new THREE.Mesh(new THREE.PlaneGeometry(80,80),new THREE.MeshStandardMaterial({color:0x04070d,metalness:.9,roughness:.18}));water.rotation.x=-Math.PI/2;scene.add(water);
+  const G=new THREE.Group();scene.add(G);G.position.set(ph?0:3.4,0,0);
+  /* natural stones: squashed spheres with small random bumps */
+  const stone=(rx,ry,rz,seed,col)=>{const g=new THREE.SphereGeometry(1,48,32),p=g.attributes.position,v=new THREE.Vector3();
+    for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i);const n=Math.sin(v.x*3.1+seed)*Math.cos(v.y*2.7+seed*1.3)*Math.sin(v.z*3.3+seed*.7);v.multiplyScalar(1+n*.045);p.setXYZ(i,v.x*rx,v.y*ry,v.z*rz)}
+    g.computeVertexNormals();return new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:col,roughness:.62,metalness:.04,emissive:0xff9a3d,emissiveIntensity:0}))};
+  const SP=[[1.25,.42,1.05,"#2b303b"],[1.0,.38,.86,"#353a46"],[.82,.33,.72,"#2e3340"],[.64,.29,.56,"#3a404c"],[.48,.24,.42,"#323744"]];
+  let y=.25;const S=SP.map(([rx,ry,rz,c],i)=>{const m=stone(rx,ry,rz,i*2.3+1,c);y+=ry*.92;m.position.set((i%2?.05:-.04),y,(i%2?-.03:.04));m.rotation.y=i*.9;y+=ry*.92;G.add(m);return {m,base:m.position.clone(),rot:m.rotation.clone()}});
+  const top=S[S.length-1];amber.position.set(G.position.x,top.base.y-.2,0);
+  /* soft ripples around the base */
+  const rings=[0,1,2].map(i=>{const m=new THREE.Mesh(new THREE.RingGeometry(1,1.03,96),new THREE.MeshBasicMaterial({color:0x9fd8ff,transparent:true,opacity:0,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.set(G.position.x,.01,0);scene.add(m);return {m,ph:i/3}});
+  /* mist */
+  const gt=softGlowTex(),mist=[0,1,2,3].map(i=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:gt,color:0x8fa8ff,transparent:true,opacity:.03,depthWrite:false}));s.scale.set(10,2.6,1);s.position.set(G.position.x-4+i*2.6,.7,-5-i*.4);scene.add(s);return s});
+  let bad=(window.__bgState||{}).cons===-1?1:0;
+  softLoop(el,r,scene,cam,opts,(t,dt)=>{
+    const isBad=(window.__bgState||{}).cons===-1;bad+=((isBad?1:0)-bad)*Math.min(1,dt*1.2);
+    G.position.y=Math.sin(t*.5)*.04;G.rotation.y=Math.sin(t*.12)*.25;
+    top.m.position.set(top.base.x+.48*bad,top.base.y-.06*bad+Math.sin(t*1.1)*.02*bad,top.base.z);top.m.rotation.z=top.rot.z-.38*bad;top.m.material.emissiveIntensity=.12*bad;
+    S[S.length-2].m.rotation.z=S[S.length-2].rot.z-.06*bad;amber.intensity=3*bad;
+    rings.forEach(o=>{const k=((t*.18+o.ph)%1),s=1.6+k*5;o.m.scale.set(s,s,1);o.m.material.opacity=.07*(1-k)*(1-.5*bad)});
+    mist.forEach((s,i)=>{s.position.x=G.position.x-4+i*2.6+Math.sin(t*.07+i)*1.2});
+    cam.position.set(ph?0:.6,(ph?3.6:2.9),ph?11.5:10.5);cam.lookAt(ph?0:1.6,ph?1.9:1.6,0)},()=>gt.dispose());
+  return {r}}
+
+/* 12. JOURNAL BACKGROUND (3D): a softly lit open notebook. A page turns by itself every few seconds;
+   gold dust in the air; the warm light grows with the journaling streak (days in a row). */
+export function bookBackground(el,opts={}){
+  const ph=small(),r=softRenderer(el),scene=new THREE.Scene();scene.fog=new THREE.Fog(0x04050a,9,24);
+  const cam=new THREE.PerspectiveCamera(ph?48:36,innerWidth/innerHeight,.1,100);
+  scene.add(new THREE.HemisphereLight(0x9fb0ff,0x07080d,.45));
+  const key=new THREE.DirectionalLight(0xfff0d8,1.1);key.position.set(-3,9,5);scene.add(key);
+  const warm=new THREE.PointLight(0xffc56b,2,9,1.6);scene.add(warm);
+  /* the page: faint ruled lines, red margin, handwriting-like strokes and a small chart sketch */
+  const pageTex=(seed)=>{const c=document.createElement("canvas");c.width=512;c.height=700;const x=c.getContext("2d");x.fillStyle="#d8d0bd";x.fillRect(0,0,512,700);
+    x.strokeStyle="rgba(70,110,200,.28)";x.lineWidth=2;for(let yy=90;yy<680;yy+=30){x.beginPath();x.moveTo(20,yy);x.lineTo(500,yy);x.stroke()}
+    x.strokeStyle="rgba(200,60,70,.35)";x.beginPath();x.moveTo(70,0);x.lineTo(70,700);x.stroke();
+    let s=seed;const R=()=>{s=(s*9301+49297)%233280;return s/233280};x.strokeStyle="rgba(40,40,60,.55)";x.lineWidth=2.4;x.lineCap="round";
+    for(let yy=84;yy<640;yy+=30){if(R()<.18)continue;let xx=84;const end=200+R()*290;x.beginPath();x.moveTo(xx,yy);while(xx<end){const w=8+R()*16;x.quadraticCurveTo(xx+w/2,yy-6-R()*8,xx+w,yy-R()*3);xx+=w+(R()<.18?14:2)}x.stroke()}
+    if(seed%2){x.strokeStyle="rgba(30,140,110,.6)";x.lineWidth=3;x.beginPath();let px=300,py=560;x.moveTo(px,py);for(let i=0;i<9;i++){px+=20;py-=6+R()*14-(i%3===2?14:0);x.lineTo(px,py)}x.stroke()}
+    const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t};
+  const W=2.4,H=3.2,B=new THREE.Group();scene.add(B);B.position.set(ph?0:2.9,0,0);B.rotation.x=-.05;
+  const tx=[pageTex(3),pageTex(8),pageTex(13)];
+  const pageMat=t=>new THREE.MeshStandardMaterial({map:t,color:0x77716a,roughness:.92,metalness:0,side:THREE.DoubleSide});
+  /* two page blocks, slightly tilted towards the spine */
+  const block=(side)=>{const g=new THREE.BoxGeometry(W,.14,H);const m=new THREE.Mesh(g,[new THREE.MeshStandardMaterial({color:0x5c574e}),new THREE.MeshStandardMaterial({color:0x5c574e}),pageMat(side>0?tx[0]:tx[1]),new THREE.MeshStandardMaterial({color:0x3a3530}),new THREE.MeshStandardMaterial({color:0x5c574e}),new THREE.MeshStandardMaterial({color:0x5c574e})]);
+    m.position.set(side*W/2,.07,0);m.rotation.z=-side*.05;B.add(m);return m};
+  const L=block(-1),Rb=block(1);
+  const cover=new THREE.Mesh(new THREE.BoxGeometry(W*2+.24,.06,H+.2),new THREE.MeshStandardMaterial({color:0x1d2338,roughness:.6,metalness:.2}));cover.position.y=-.02;B.add(cover);
+  const ribbon=new THREE.Mesh(new THREE.PlaneGeometry(.1,1.0),new THREE.MeshStandardMaterial({color:0x8a6a2a,emissive:0x3a2808,emissiveIntensity:.2,side:THREE.DoubleSide}));ribbon.rotation.x=-Math.PI/2;ribbon.position.set(.05,.15,H/2+.3);B.add(ribbon);
+  /* the turning page: a strip that bends as it turns around the spine */
+  const SEG=28,pg=new THREE.PlaneGeometry(W,H,SEG,1);const page=new THREE.Mesh(pg,pageMat(tx[2]));page.position.y=.16;B.add(page);
+  const pos=pg.attributes.position,setPage=(p)=>{const th=p*Math.PI,k=Math.sin(p*Math.PI)*1.1,ds=W/SEG;let px=0,py=0;const X=[0],Y=[0];
+    for(let i=1;i<=SEG;i++){const a=th-k*(i/SEG)*(p<.5?1:-1)*.6;px+=Math.cos(a)*ds;py+=Math.sin(a)*ds;X.push(px);Y.push(py)}
+    for(let i=0;i<pos.count;i++){const col=i%(SEG+1),row=Math.floor(i/(SEG+1));pos.setXYZ(i,X[col],Y[col]*.9+.002,row===0?-H/2:H/2)}pos.needsUpdate=true;pg.computeVertexNormals()};
+  setPage(0);
+  /* gold dust */
+  const DN=ph?50:90,dp=new Float32Array(DN*3);for(let i=0;i<DN;i++)dp.set([B.position.x+(Math.random()-.5)*8,Math.random()*5,(Math.random()-.5)*5],i*3);
+  const dg=new THREE.BufferGeometry();dg.setAttribute("position",new THREE.BufferAttribute(dp,3));scene.add(new THREE.Points(dg,new THREE.PointsMaterial({color:0xffd27a,size:ph?.05:.04,transparent:true,opacity:.45,depthWrite:false,blending:THREE.AdditiveBlending})));
+  let texI=0;
+  softLoop(el,r,scene,cam,opts,(t,dt)=>{
+    const st=Math.max(0,Math.min(12,(window.__bgState||{}).jstreak||0))/12;warm.intensity=1.2+3*st;warm.position.set(B.position.x+.3,2.4+Math.sin(t*.6)*.1,1.2);
+    /* one page turn every 7 s (2.4 s to turn), right to left */
+    const cyc=t%7,p=opts.still?.35:Math.max(0,Math.min(1,(cyc-4.6)/2.4)),e=p*p*(3-2*p);setPage(e);
+    if(cyc<dt*1.5&&!opts.still){texI=(texI+1)%3;page.material.map=tx[texI];page.material.needsUpdate=true}
+    B.rotation.y=Math.sin(t*.1)*.12;B.position.y=Math.sin(t*.45)*.03;
+    const a=dg.attributes.position.array;for(let i=0;i<DN;i++){a[i*3+1]+=dt*.08;if(a[i*3+1]>5)a[i*3+1]=0}dg.attributes.position.needsUpdate=true;
+    cam.position.set(ph?0:.8,ph?6.6:5.4,ph?9.5:8.2);cam.lookAt(ph?0:1.7,0,.2)},()=>tx.forEach(x=>x.dispose()));
+  return {r}}
