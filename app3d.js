@@ -163,6 +163,7 @@ export function galaxyBackground(el,kind="galaxy"){
       const j=i%FIB.length,R=FIB[j]*5.9,a=Math.random()*Math.PI*2;c.set(FC[j]);if(Math.random()<.1)c.lerp(W,.4);return [Math.cos(a)*R+rnd(.035),Math.sin(a)*R+rnd(.035),rnd(.06)]})};
   const CN=ph?30:40;
   const T=kind==="bull"?chart(market(CN,.55,7),false):kind==="bear"?chart(market(CN,-.55,11),false):kind==="fibr"?chart(market(CN,.5,23),true):kind==="fibc"?fibCircles():galaxyShape();
+  if(kind==="galaxy")for(let i=0;i<N;i++){const j=i*3,R=Math.hypot(T.p[j],T.p[j+2]),f=R<3?.35+R*.12:.68;T.c[j]*=f;T.c[j+1]*=f;T.c[j+2]*=f}   /* softer galaxy: dim the bright core most */
   /* particles start scattered far away and fly in */
   const start=new Float32Array(N*3),cur=new Float32Array(N*3),sd=new Float32Array(N);
   for(let i=0;i<N;i++){const u=Math.random()*2-1,a=Math.random()*Math.PI*2,R=18+Math.random()*22,q=Math.sqrt(1-u*u);start.set([R*q*Math.cos(a),R*u,R*q*Math.sin(a)],i*3);sd[i]=Math.random()}
@@ -178,7 +179,7 @@ export function galaxyBackground(el,kind="galaxy"){
   const glow=(color,size,op)=>{const s=document.createElement("canvas");s.width=s.height=128;const x=s.getContext("2d"),gr=x.createRadialGradient(64,64,0,64,64,64);
     gr.addColorStop(0,"rgba(255,255,255,1)");gr.addColorStop(.25,"rgba(255,255,255,.45)");gr.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=gr;x.fillRect(0,0,128,128);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(s),color,transparent:true,opacity:op,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(size,size,1);return sp};
-  const cg=kind==="galaxy"?[glow("#ffd27a",9,1),glow("#ff9e5e",18,.45),glow("#7c8bff",34,.18)]:kind==="fibc"?[glow("#f5b942",7,.5),glow("#7c8bff",22,.15)]:[];cg.forEach(x=>{x.userData.o=x.material.opacity;grp.add(x)});
+  const cg=kind==="galaxy"?[glow("#ffd27a",6,.38),glow("#ff9e5e",13,.16),glow("#7c8bff",30,.08)]:kind==="fibc"?[glow("#f5b942",7,.5),glow("#7c8bff",22,.15)]:[];cg.forEach(x=>{x.userData.o=x.material.opacity;grp.add(x)});
   const NEB={galaxy:[["#3a48e0",30,.3,[-14,2,-18]],["#d16bff",24,.22,[16,-3,-22]],["#2aa8ff",26,.2,[6,8,-26]],["#f5b942",18,.14,[-10,-6,-14]],["#7c8bff",34,.16,[2,-10,-30]]],
     bull:[["#12e07a",30,.16,[-12,-4,-22]],["#2aa8ff",28,.16,[14,6,-26]],["#3a48e0",34,.2,[0,10,-30]]],
     bear:[["#ff2d55",30,.15,[12,4,-22]],["#7a3cff",28,.16,[-14,-5,-26]],["#3a48e0",34,.2,[0,10,-30]]],
