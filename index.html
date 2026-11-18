@@ -1497,6 +1497,28 @@ img.cover{cursor:zoom-in}
 .ab-story,.ab-faq{margin:14px 0}
 @media(max-width:820px){.ab-tl{grid-template-columns:1fr 1fr}}@media(max-width:520px){.ab-tl{grid-template-columns:1fr}}
 </style>
+<style>
+/* comfort pass: phone tap targets, readable small text, prop firm width, Tools menu, welcome tour */
+.pf-list>*{min-width:0}.pf-item{min-width:0;max-width:100%}.pf-szp{flex-wrap:wrap}
+.tools-btn .tools-car{font-size:11px;opacity:.7;margin-inline-start:2px}
+.tools-menu{position:fixed;z-index:80;display:grid;gap:2px;min-width:230px;padding:6px;border-radius:14px;background:var(--panel);border:1px solid var(--line2);box-shadow:0 20px 50px -10px rgba(0,0,0,.8)}
+.tools-menu.hidden{display:none}.tools-menu button{display:flex;gap:10px;align-items:center;padding:10px 12px;border:0;border-radius:10px;background:none;color:var(--text);font:600 14px Inter,sans-serif;cursor:pointer;text-align:start}
+.tools-menu button:hover,.tools-menu button.on{background:var(--panel2)}.tools-menu .tico{width:22px;height:22px;display:grid;place-items:center}
+@media(max-width:820px){
+  #view .btn.sm,.pf-a,.rk-chip,#view .seg button,.adm-tabs button{min-height:40px}
+  #view .btn.sm{padding:9px 14px}#view button.btn.sm:not(:has(span)),#view [data-tedit],.td-acts .btn{min-width:40px}
+  #view small,#view .mut{font-size:max(12px,1em)}.td-d small,.bdg small,.adm-bars small{font-size:11px}
+  #view input.i,#view select.i,#view textarea.i{font-size:16px}  /* no zoom-in when typing on iPhone */
+}
+.tour2{position:fixed;inset:0;z-index:500}
+.t2-dim{position:absolute;inset:0;background:rgba(3,4,7,.72)}
+.t2-hole{position:absolute;border-radius:14px;box-shadow:0 0 0 9999px rgba(3,4,7,.72),0 0 0 3px var(--gold),0 0 30px 6px rgba(245,185,66,.5);pointer-events:none;transition:all .3s cubic-bezier(.2,.9,.3,1)}
+.t2-card{position:absolute;z-index:2;left:50%;transform:translateX(-50%);width:min(380px,calc(100vw - 24px));padding:18px;border-radius:18px;background:#10131c;border:1px solid rgba(245,185,66,.5);box-shadow:0 24px 60px -10px rgba(0,0,0,.9);animation:t2in .3s ease}
+.t2-card b{display:block;font-size:17px;margin:4px 0}.t2-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}.t2-ic{font-size:28px}
+.t2-dots{display:flex;gap:5px;margin:12px 0}.t2-dots i{width:7px;height:7px;border-radius:50%;background:var(--line2)}.t2-dots i.on{background:var(--gold);width:18px;border-radius:9px}
+.t2-btns{display:flex;gap:8px;align-items:center}.t2-btns span{flex:1}
+@keyframes t2in{from{opacity:0;margin-top:10px}to{opacity:1;margin-top:0}}
+</style>
 </head>
 <body>
 
@@ -1907,7 +1929,7 @@ async function enter(u){
   S.me=u;$("#auth").classList.add("hidden");$("#app").classList.remove("hidden");
   $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;
   if(u.role==="admin"){S.view="admin";await loadSubject(u,false);go("admin")}
-  else{await loadSubject(u,false);go(location.hash.slice(1)||"today")}
+  else{await loadSubject(u,false);go(location.hash.slice(1)||"today");setTimeout(maybeTour,1500)}
   S._commR=null;settingsPull();rqReadyLoad();
 }
 async function loadSubject(u,readonly){
@@ -1941,20 +1963,27 @@ const VIEWS=[["today","Today"],["journal","Journal"],["stats","Statistics"],["ne
 function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button data-v="${k}" class="${c||""} ${S.view===k?"on":""}"><span class="tico t-${k}">${ico(k)}</span><span>${l}</span></button>`;
   if(S.me.role==="admin")h+=tab("admin","Admin dashboard","admin");
   if(S.readonly)h+=tab("student","Student file","admin");
-  VIEWS.forEach(([k,l])=>{if(S.readonly&&k==="import")return;h+=tab(k,l)});
-  t.innerHTML=h;$$("button",t).forEach(b=>b.onclick=()=>go(b.dataset.v));
+  const MAIN=["today","journal","stats","news","plan"],tools=VIEWS.filter(([k])=>!MAIN.includes(k)),onT=tools.find(([k])=>k===S.view);
+  VIEWS.forEach(([k,l])=>{if(MAIN.includes(k))h+=tab(k,l)});
+  h+=`<button type="button" id="toolsBtn" class="tools-btn ${onT?"on":""}"><span class="tico">🧰</span><span>${onT?onT[1]:"Tools"}</span><span class="tools-car">▾</span></button>`;
+  t.innerHTML=h;$$("button[data-v]",t).forEach(b=>b.onclick=()=>go(b.dataset.v));
+  let tm=$("#toolsMenu");if(!tm){tm=document.createElement("div");tm.id="toolsMenu";tm.className="tools-menu hidden";document.body.appendChild(tm)}
+  tm.innerHTML=tools.map(([k,l])=>`<button type="button" data-v="${k}" class="${S.view===k?"on":""}"><span class="tico t-${k}">${ico(k)}</span><span>${l}</span></button>`).join("");
+  $$("button[data-v]",tm).forEach(b=>b.onclick=()=>{tm.classList.add("hidden");go(b.dataset.v)});
+  $("#toolsBtn").onclick=e=>{e.stopPropagation();const r=e.currentTarget.getBoundingClientRect();tm.style.top=(r.bottom+6)+"px";tm.style.left=Math.max(8,Math.min(r.left,innerWidth-250))+"px";tm.classList.toggle("hidden")};
   const on=$("button.on",t);if(on&&t.scrollWidth>t.clientWidth)t.scrollTo({left:on.offsetLeft-(t.clientWidth-on.offsetWidth)/2,behavior:"smooth"});
   renderBottomNav()}
 /* phones: app-style bottom bar with the 5 main tabs + "More" */
 const BNAV_MAIN=[["today","Today"],["journal","Journal"],["stats","Stats"],["news","News"],["plan","Plan"]];
 function renderBottomNav(){let b=$("#bnav");if(!b){b=document.createElement("nav");b.id="bnav";b.setAttribute("aria-label","Main");$("#app").appendChild(b)}
-  const all=$$("#tabs button").map(x=>[x.dataset.v,x.querySelector("span:last-child").textContent]);const mainKeys=BNAV_MAIN.map(m=>m[0]);
+  const all=[...$$("#tabs button[data-v]"),...$$("#toolsMenu button[data-v]")].map(x=>[x.dataset.v,x.querySelector("span:last-child").textContent]);const mainKeys=BNAV_MAIN.map(m=>m[0]);
   const more=all.filter(([k])=>!mainKeys.includes(k)),inMore=more.some(([k])=>k===S.view);
   b.innerHTML=BNAV_MAIN.map(([k,l])=>`<button type="button" data-v="${k}" class="${S.view===k?"on":""}"><span class="bn-ic t-${k}">${ico(k)}</span><span class="bn-l">${l}</span></button>`).join("")+
     `<button type="button" id="bnMore" class="${inMore?"on":""}"><span class="bn-ic"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span><span class="bn-l">More</span></button>
     <div class="bn-sheet hidden" id="bnSheet">${more.map(([k,l])=>`<button type="button" data-v="${k}" class="${S.view===k?"on":""}"><span class="bn-ic t-${k}">${ico(k)}</span><span>${l}</span></button>`).join("")}</div>`;
   $$("button[data-v]",b).forEach(x=>x.onclick=()=>{$("#bnSheet").classList.add("hidden");go(x.dataset.v)});
   $("#bnMore").onclick=e=>{e.stopPropagation();$("#bnSheet").classList.toggle("hidden")}}
+document.addEventListener("click",e=>{const tm=$("#toolsMenu");if(tm&&!e.target.closest("#toolsMenu,#toolsBtn"))tm.classList.add("hidden")});
 document.addEventListener("click",e=>{const s=$("#bnSheet");if(s&&!s.classList.contains("hidden")&&!e.target.closest("#bnav"))s.classList.add("hidden")});
 /* phones: swipe left / right on the page to move to the next / previous tab */
 (()=>{let sx=0,sy=0,st=0,ok=false;
@@ -1964,7 +1993,7 @@ document.addEventListener("click",e=>{const s=$("#bnSheet");if(s&&!s.classList.c
   document.addEventListener("touchend",e=>{if(!ok)return;ok=false;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
     if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*1.8||Date.now()-st>800)return;
     if(window.getSelection&&String(window.getSelection()).length)return;
-    const order=$$("#tabs button").map(b=>b.dataset.v),i=order.indexOf(S.view);if(i<0)return;
+    const order=[...$$("#tabs button[data-v]"),...$$("#toolsMenu button[data-v]")].map(b=>b.dataset.v),i=order.indexOf(S.view);if(i<0)return;
     const rtl=document.documentElement.dir==="rtl",step=(dx<0)!==rtl?1:-1,n=order[i+step];if(!n)return;
     go(n);const v=$("#view");v.classList.remove("sw-n","sw-p");void v.offsetWidth;v.classList.add(step>0?"sw-n":"sw-p")},{passive:true});
 })();
@@ -2445,7 +2474,7 @@ function badgeCard(B){const n=B.filter(b=>b.ok).length;
 function celebrate(B,targetHit){setTimeout(()=>{let old=null;try{old=JSON.parse(localStorage.getItem(badgeKey())||"null")}catch(e){}
   const now=B.filter(b=>b.ok).map(b=>b.id),merged=[...new Set([...(old||[]),...now])];
   if(old){const fresh=now.filter(id=>!old.includes(id));if(fresh.length){confetti();const b=B.find(x=>x.id===fresh[0]);toast(`🏅 ${I18N.t("New badge")}: ${b.ic} ${I18N.t(b.n)}`)}}
-  try{localStorage.setItem(badgeKey(),JSON.stringify(merged))}catch(e){}
+  try{const was=localStorage.getItem(badgeKey());localStorage.setItem(badgeKey(),JSON.stringify(merged));if(was!==JSON.stringify(merged))settingsPush()}catch(e){}
   if(targetHit){const k="tv_cf_tgt_"+((S.me&&S.me.id)||"")+todayStr();try{if(!localStorage.getItem(k)){localStorage.setItem(k,"1");confetti()}}catch(e){}}},450)}
 /* 📸 "My week" image to share (Instagram story size) */
 async function shareWeek(){const w=weekStats();if(!w)return;const c=document.createElement("canvas"),W=1080,H=1350;c.width=W;c.height=H;const x=c.getContext("2d");
@@ -2502,7 +2531,7 @@ function vToday(el){
     celebrate(B,tHit);return}
   el.innerHTML=`<div class="td">
    <div class="td-hero"><div><div class="td-hi"><span>${hello}</span>${name?`, <b data-notr>${name}</b>`:""} 👋</div><div class="td-date mut" data-notr>${esc(fmtDate(t))}</div></div>
-    <div class="td-hr"><div class="td-q">“<span>${esc(q)}</span>” <small>— BROWN ALGO</small></div><button class="btn sm" type="button" id="tdFocusOn">🎯 <span>Focus mode</span></button></div></div>
+    <div class="td-hr"><div class="td-q">“<span>${esc(q)}</span>” <small>— BROWN ALGO</small></div><button class="btn sm" type="button" id="tdFocusOn">🎯 <span>Focus mode</span></button><button class="btn sm" type="button" id="tdTour" title="Platform tour">❓ <span>Tour</span></button></div></div>
    ${cd?`<div class="td-cool"><span class="td-cool-i">🛑</span><div><b>${cd.why==="loss"?"Max daily loss reached":"Max trades reached for today"}</b><small>${cd.why==="loss"?"You hit your daily loss limit. Close the platform, protect the account, come back tomorrow.":"Your plan is done for today. Closing the platform is the trade now."}</small></div></div>`:""}
    ${tHit?`<div class="td-win">🎉 <b>Daily target reached!</b> <span>Lock it in: no more trades today.</span></div>`:""}
    <div class="td-grid">
@@ -2541,7 +2570,7 @@ function vToday(el){
     else if(a==="plan"){S._planDate=nd;go("plan")}else if(a==="planToday"){S._planDate=t;go("plan")}
     else if(a==="notrade"){S._ntdDate=t;go("journal");setTimeout(()=>{const n=$("#ntdSet");if(n)n.scrollIntoView({behavior:"smooth",block:"center"})},200)}
     else if(a==="share")shareWeek()});
-  $("#tdFocusOn").onclick=()=>setFocus(true);
+  $("#tdFocusOn").onclick=()=>setFocus(true);$("#tdTour").onclick=startTour;
   celebrate(B,tHit)}
 
 /* ===== No-trade days: saved on that day's plan (noTrade:true). They count as $0 days in the statistics. ===== */
@@ -2855,9 +2884,19 @@ function rulesAll(){try{return JSON.parse(localStorage.getItem(rulesKey()))||{}}
 function rulesSave(acct,r){const a=rulesAll();if(r)a[acct]=r;else delete a[acct];try{localStorage.setItem(rulesKey(),JSON.stringify(a))}catch(e){}settingsPush()}
 /* prop firm rules + commission rates are saved in the student's account (Supabase user_settings), so they follow him on every device.
    This device keeps a copy; on login the account copy wins, and an old device-only copy is uploaded once. */
+/* device-only things that should follow the student on phone and PC: favourites, risk presets, plan templates, badges, tour */
+function extrasGet(){let badges=[];try{badges=JSON.parse(localStorage.getItem(badgeKey())||"[]")||[]}catch(e){}
+  let tour=false;try{tour=!!localStorage.getItem(tourKey())}catch(e){}
+  return {pffav:pfFavs(),rpre:{fut:riskPresets("fut"),cfd:riskPresets("cfd")},tpl:planTpls(),badges,tour}}
+function extrasApply(x){if(!x)return;const uni=(a,b,k)=>{const out=[...(a||[])];(b||[]).forEach(v=>{if(!out.some(o=>k?o[k]===v[k]:o===v))out.push(v)});return out};
+  try{localStorage.setItem(pfFavKey,JSON.stringify(uni(pfFavs(),x.pffav)));
+    ["fut","cfd"].forEach(k=>localStorage.setItem(rpreKey(k),JSON.stringify(uni(riskPresets(k),(x.rpre||{})[k],"name").slice(0,8))));
+    localStorage.setItem(tplKey(),JSON.stringify(uni(planTpls(),x.tpl,"name").slice(0,8)));
+    let b=[];try{b=JSON.parse(localStorage.getItem(badgeKey())||"[]")||[]}catch(e){}localStorage.setItem(badgeKey(),JSON.stringify(uni(b,x.badges)));
+    if(x.tour)localStorage.setItem(tourKey(),"1")}catch(e){}}
 function settingsPush(){if(!API||!API.saveSettings||!S.me)return;clearTimeout(settingsPush._t);
   settingsPush._t=setTimeout(()=>{let comm={};try{comm=JSON.parse(localStorage.getItem(calcKey("comm")))||{}}catch(e){}
-    API.saveSettings({rules:rulesAll(),comm,notify:notifyGet(),lang:(window.I18N&&I18N.lang)||"en"}).catch(()=>toast(I18N.t("Couldn't save your settings online. They are kept on this device.")))},600)}
+    API.saveSettings({rules:rulesAll(),comm,notify:notifyGet(),lang:(window.I18N&&I18N.lang)||"en",extras:extrasGet()}).catch(()=>toast(I18N.t("Couldn't save your settings online. They are kept on this device.")))},600)}
 /* ---------- Telegram reminders (sent by the bot, see supabase/functions/tg-reminders) ---------- */
 const NOTIFY_DEF={news:true,plan:true,loss:true};
 const notifyGet=()=>Object.assign({},NOTIFY_DEF,S._notify||{});
@@ -2879,7 +2918,7 @@ function bindNotify(el){const box=$("#ntfBox",el);if(!box)return;box.ontoggle=()
   $$("[data-ntftest]",box).forEach(b=>b.onclick=async()=>{b.disabled=true;try{const r=await tgFn("test="+b.dataset.ntftest);
     toast(r&&r.ok?I18N.t("Sent. Check your Telegram."):I18N.t(r&&r.error==="no_telegram"?"Connect your Telegram first.":"Couldn't send. Press Start in the bot, then try again."))}catch(e){toast(I18N.t("Couldn't send. Press Start in the bot, then try again."))}b.disabled=false})}
 async function settingsPull(){if(!API||!API.getSettings||!S.me)return;try{const d=await API.getSettings();
-  if(d&&d.notify)S._notify=d.notify;const nb=$("#ntfBox");if(nb){const v=nb.closest("#view")||document;nb.outerHTML=notifyCard(S.me.role==="admin");bindNotify(v)}
+  if(d&&d.notify)S._notify=d.notify;if(d&&d.extras){extrasApply(d.extras);setTimeout(settingsPush,1200);if(["today","propfirms","risk","plan"].includes(S.view))render()}const nb=$("#ntfBox");if(nb){const v=nb.closest("#view")||document;nb.outerHTML=notifyCard(S.me.role==="admin");bindNotify(v)}
   if(!d||d.lang!==((window.I18N&&I18N.lang)||"en"))setTimeout(settingsPush,1500);   /* the bot writes in the student's language */
   const hasCloud=d&&(Object.keys(d.rules||{}).length||Object.keys(d.comm||{}).length);
   if(hasCloud){localStorage.setItem(rulesKey(),JSON.stringify(d.rules||{}));localStorage.setItem(calcKey("comm"),JSON.stringify(d.comm||{}));S._commR=null;if(S.view==="stats")render()}
@@ -3016,6 +3055,35 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   $$(".cal .c[data-day]",el).forEach(c=>c.onclick=()=>{$("#tip").style.display="none";S.dayPage=c.dataset.day;render();window.scrollTo(0,0)});
   bindStatTabs();bindComm(el);
 }
+/* ============ WELCOME TOUR (first login, phone and PC) ============
+   Short spotlight tour on the real buttons: bottom bar on phones, top menu on PC. Shown once (synced), replay from Today. */
+const tourKey=()=>"tv_tour_"+((S.me&&S.me.id)||"x");
+function tourSteps(){const ph=innerWidth<821,nav=k=>ph?`#bnav [data-v="${k}"]`:`#tabs [data-v="${k}"]`;
+  return [[null,"👋","Welcome to The Effective Journal","A 30-second tour of your trading platform. You can skip it anytime."],
+    [nav("today"),"🏠","Today: your home","Your discipline score, streaks, today's plan, your limits and the red news. Start every session here."],
+    [ph?"#fab":'[data-td="trade"]',"＋","Log a trade","Tap here after each trade. ⚡ Quick log takes a few taps; add screenshots and notes later."],
+    [nav("journal"),"📓","Journal","Every trade with your notes, emotions and screenshots. Search, filter, edit anytime."],
+    [nav("stats"),"📊","Statistics","Win rate, profit factor, calendar, what makes you money and what costs you money. Import CSV files here."],
+    [nav("plan"),"🧭","Plan tomorrow","Bias, key levels, max loss and max trades. A trader without a plan is a gambler."],
+    [nav("news"),"📰","Red news","Countdown, no-trade windows and what each news means."],
+    [ph?"#bnMore":"#toolsBtn","🧰","Tools","Risk calculator, consistency rule, prop firm tracker with discounts, and our free ICT indicator."],
+    ["#ntfBell","🔔","Notifications","Red news, journal and plan reminders, and announcements from Brown Algo."],
+    [null,"🚀","You're ready","Turn on the Telegram reminders in Tomorrow's plan, then log your first trade. Discipline is the edge nobody can copy."]]}
+function startTour(){if(S.readonly||!S.me)return;if(S.view!=="today")go("today");let i=0;const steps=tourSteps();
+  document.querySelectorAll(".tour2").forEach(x=>x.remove());const ov=document.createElement("div");ov.className="tour2";document.body.appendChild(ov);
+  const done=()=>{ov.remove();removeEventListener("resize",draw);try{localStorage.setItem(tourKey(),"1")}catch(e){}settingsPush()};
+  function draw(){const [sel,ic,t,d]=steps[i],el=sel&&document.querySelector(sel),r=el&&el.offsetParent!==null?el.getBoundingClientRect():null;
+    if(r&&(r.top<0||r.bottom>innerHeight))el.scrollIntoView({block:"center"});const R=r&&el.getBoundingClientRect();
+    const hole=R?`<div class="t2-hole" style="left:${R.left-6}px;top:${R.top-6}px;width:${R.width+12}px;height:${R.height+12}px"></div>`:`<div class="t2-dim"></div>`;
+    const below=R&&R.top<innerHeight/2,cardPos=R?(below?`top:${Math.min(innerHeight-230,R.bottom+14)}px`:`bottom:${Math.min(innerHeight-60,innerHeight-R.top+14)}px`):"top:50%;transform:translate(-50%,-50%)";
+    ov.innerHTML=`${hole}<div class="t2-card" style="${cardPos}"><div class="t2-ic">${ic}</div><b>${esc(I18N.t(t))}</b><p>${esc(I18N.t(d))}</p>
+      <div class="t2-dots">${steps.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("")}</div>
+      <div class="t2-btns"><button type="button" class="btn sm" data-t2="skip">${esc(I18N.t(i===steps.length-1?"Close":"Skip"))}</button><span></span>${i?`<button type="button" class="btn sm" data-t2="back">‹ ${esc(I18N.t("Back"))}</button>`:""}<button type="button" class="btn sm pri" data-t2="next">${esc(I18N.t(i===steps.length-1?"Start":i?"Next":"Start the tour"))} ›</button></div></div>`;
+    ov.querySelector('[data-t2="next"]').onclick=()=>{if(i<steps.length-1){i++;draw()}else done()};
+    ov.querySelector('[data-t2="skip"]').onclick=done;const bk=ov.querySelector('[data-t2="back"]');if(bk)bk.onclick=()=>{i--;draw()}}
+  addEventListener("resize",draw);setTimeout(draw,250)}
+function maybeTour(){try{if(S.readonly||!S.me||S.me.role==="admin"||localStorage.getItem(tourKey()))return}catch(e){return}setTimeout(()=>{try{if(!localStorage.getItem(tourKey()))startTour()}catch(e){}},1800)}
+
 /* ============ RISK: presets + check against my prop firm rules ============ */
 const rpreKey=k=>"tv_rpre_"+k+"_"+((S.me&&S.me.id)||"x");
 function riskPresets(k){try{return JSON.parse(localStorage.getItem(rpreKey(k))||"[]")||[]}catch(e){return []}}
@@ -3028,9 +3096,9 @@ function riskTools(kind,st){if(S.readonly)return "";const P=riskPresets(kind),R=
    ${acs.length?`<div class="rk-acc"><span>Check against my prop firm rules:</span><select class="i" data-rchk>${acs.map(a=>`<option ${a===ra?"selected":""}>${esc(a)}</option>`).join("")}</select></div>${chk}`:`<p class="mut" style="font-size:12px;margin:8px 0 0"><span>Set your prop firm rules in Statistics to check your risk against your daily loss limit.</span></p>`}</div>`}
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-rdel],[data-rpre],[data-rsave]");if(!t||S.view!=="risk")return;
   const [kind,ix]=(t.dataset.rdel||t.dataset.rpre||t.dataset.rsave).split(":"),key=kind==="cfd"?"_cfd":"_risk",P=riskPresets(kind);
-  if(t.dataset.rdel!=null){e.stopPropagation();P.splice(Number(ix),1);try{localStorage.setItem(rpreKey(kind),JSON.stringify(P))}catch(_){}render();return}
+  if(t.dataset.rdel!=null){e.stopPropagation();P.splice(Number(ix),1);try{localStorage.setItem(rpreKey(kind),JSON.stringify(P))}catch(_){}settingsPush();render();return}
   if(t.dataset.rpre!=null){const p=P[Number(ix)];if(p){S[key]=JSON.parse(JSON.stringify(p.st));render();toast(I18N.t("Preset loaded"))}return}
-  const nm=prompt(I18N.t("Preset name (e.g. Apex 50K · $250)"),"");if(!nm)return;P.unshift({name:nm.slice(0,30),st:JSON.parse(JSON.stringify(S[key]||{}))});try{localStorage.setItem(rpreKey(kind),JSON.stringify(P.slice(0,8)))}catch(_){}render();toast(I18N.t("Preset saved"))});
+  const nm=prompt(I18N.t("Preset name (e.g. Apex 50K · $250)"),"");if(!nm)return;P.unshift({name:nm.slice(0,30),st:JSON.parse(JSON.stringify(S[key]||{}))});try{localStorage.setItem(rpreKey(kind),JSON.stringify(P.slice(0,8)))}catch(_){}settingsPush();render();toast(I18N.t("Preset saved"))});
 document.addEventListener("change",e=>{const s=e.target.closest&&e.target.closest("[data-rchk]");if(!s)return;S._rChk=s.value;render()});
 
 /* ============ PLAN: templates + plan vs result ============ */
@@ -3344,7 +3412,7 @@ function vPlan(el){
   $("#pDate").onchange=e=>{const v=e.target.value;if(v&&v!==cur){S._planDate=v;S._planCopy=null;render()}};
   if($("#pCopy"))$("#pCopy").onclick=()=>{const last=S.plans.filter(x=>x.date<cur&&!x.rest&&!x.noTrade).sort((a,b)=>a.date<b.date?1:-1)[0]||S.plans.filter(x=>!x.rest&&!x.noTrade).sort((a,b)=>a.date<b.date?1:-1)[0];if(!last){toast(I18N.t("No previous plan to copy yet"));return}S._planCopy=last;render();toast(I18N.t("Plan copied. Check it, then save."))};
   if($("#pTpl"))$("#pTpl").onchange=e=>{const t=planTpls()[Number(e.target.value)];if(!t)return;S._planCopy={...t.plan,date:"tpl"};render();toast(I18N.t("Template applied. Check it, then save."))};
-  if($("#pSaveTpl"))$("#pSaveTpl").onclick=()=>{const nm=prompt(I18N.t("Template name (e.g. NQ London + NY)"),"");if(!nm)return;const T=planTpls();const {date,user_id,followed,review,noTrade,rest,...plan}=saved;T.unshift({name:nm.slice(0,40),plan});try{localStorage.setItem(tplKey(),JSON.stringify(T.slice(0,8)))}catch(e){}toast(I18N.t("Template saved"));render()};
+  if($("#pSaveTpl"))$("#pSaveTpl").onclick=()=>{const nm=prompt(I18N.t("Template name (e.g. NQ London + NY)"),"");if(!nm)return;const T=planTpls();const {date,user_id,followed,review,noTrade,rest,...plan}=saved;T.unshift({name:nm.slice(0,40),plan});try{localStorage.setItem(tplKey(),JSON.stringify(T.slice(0,8)))}catch(e){}settingsPush();toast(I18N.t("Template saved"));render()};
   const charts=[...(p.charts||[])];
   const drawCharts=()=>{const box=$("#pCharts");
     box.innerHTML=charts.length?charts.map((s,i)=>`<div class="pchart"><img src="${s}" alt="Plan chart ${i+1}" data-z="${i}">${S.readonly?"":`<button type="button" data-i="${i}" aria-label="Remove">×</button>`}</div>`).join(""):(S.readonly?`<div class="empty mut">No chart image</div>`:"");
@@ -3660,7 +3728,7 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
   $("#pfDz",el).onchange=e=>{S._pfDz=e.target.checked;render()};
   $("#pfAll",el).onclick=()=>{S._pfShut=!S._pfShut;render()};
   $("#pfFav",el).onchange=e=>{S._pfFavOnly=e.target.checked;render()};$("#pfQuizB",el).onclick=pfQuiz;
-  $$("[data-pfav]",el).forEach(b=>b.onclick=()=>{const F=pfFavs(),id=b.dataset.pfav,i=F.indexOf(id);if(i>=0)F.splice(i,1);else F.push(id);try{localStorage.setItem(pfFavKey,JSON.stringify(F))}catch(e){}render()});
+  $$("[data-pfav]",el).forEach(b=>b.onclick=()=>{const F=pfFavs(),id=b.dataset.pfav,i=F.indexOf(id);if(i>=0)F.splice(i,1);else F.push(id);try{localStorage.setItem(pfFavKey,JSON.stringify(F))}catch(e){}settingsPush();render()});
   $$("[data-pcmp]",el).forEach(b=>b.onclick=()=>{const C=S._pfCmp,id=b.dataset.pcmp,i=C.indexOf(id);if(i>=0)C.splice(i,1);else{if(C.length>=3){toast(I18N.t("You can compare up to 3 firms"));return}C.push(id)}render()});
   let tray=$("#pfTray");if(!tray){tray=document.createElement("div");tray.id="pfTray";document.body.appendChild(tray)}
   tray.className=S._pfCmp.length&&S.view==="propfirms"&&!S._pfId?"on":"";tray.innerHTML=`<span>⇄ <b data-notr>${S._pfCmp.length}/3</b> <span>${esc(I18N.t("firms to compare"))}</span></span><button type="button" class="btn sm pri" id="pfCmpGo">${esc(I18N.t("Compare"))}</button><button type="button" class="btn sm" id="pfCmpX">✕</button>`;
@@ -4491,9 +4559,14 @@ async function bootDemo(){const D=demoData();S._demo=true;
 </script>
 <!-- 3D particles behind login / sign-up (falls back to the night scene if 3D is not supported) -->
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"}}</script>
-<script type="module">import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))</script>
+<script type="module">/* load the 3D background only when the login / sign-up page is on screen (logged-in students never download it) */
+let __a3=false;const __a3t=setInterval(()=>{const a=document.getElementById("auth");if(__a3||!a||a.classList.contains("hidden"))return;__a3=true;clearInterval(__a3t);
+  import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))},250)</script>
 </body>
 </html>
+
+
+
 
 
 
