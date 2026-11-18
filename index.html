@@ -1478,6 +1478,25 @@ img.cover{cursor:zoom-in}
 .rk-chk.ok{border-color:rgba(38,166,154,.5);background:rgba(38,166,154,.08)}.rk-chk.warn{border-color:rgba(245,185,66,.5);background:rgba(245,185,66,.08)}.rk-chk.bad{border-color:rgba(239,83,80,.55);background:rgba(239,83,80,.1)}
 @media(max-width:620px){.nw-strip{gap:4px}.nw-d b{font-size:15px}}
 </style>
+<style>
+/* prop firms: favourites, compare, quiz · indicator steps · about story + FAQ */
+.pf-acts{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 8px}
+.pf-a{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:99px;padding:4px 10px;font:600 12px Inter,sans-serif;cursor:pointer}
+.pf-a.on{color:var(--gold);border-color:rgba(245,185,66,.55);background:rgba(245,185,66,.1)}
+#pfTray{display:none}#pfTray.on{display:flex;gap:10px;align-items:center;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:46;padding:10px 14px;border-radius:99px;background:rgba(14,16,24,.95);border:1px solid rgba(245,185,66,.55);box-shadow:0 14px 40px -10px rgba(0,0,0,.9);font-size:13.5px;white-space:nowrap}
+@media(min-width:821px){#pfTray.on{bottom:24px}}
+.pf-cmp td,.pf-cmp th{vertical-align:top;min-width:150px;font-size:13px}.pf-cmp th{text-align:start}.pf-cmp th b{display:block;margin-top:4px}
+.qz-q{display:grid;gap:6px;margin-top:12px}.qz-q .seg{flex-wrap:wrap}.qz-res{display:grid;gap:8px}
+.qz-r{display:flex;gap:10px;align-items:center;text-align:start;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;font:inherit}
+.qz-r>span:nth-child(2){flex:1;display:grid;gap:3px}.qz-r small{font-size:12px}
+
+
+.ab-tl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.ab-st{display:flex;gap:10px;padding:12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
+.ab-ic{font-size:24px}.ab-st p{margin:4px 0 0;font-size:12.5px}
+.ab-q{border-bottom:1px solid var(--line);padding:10px 0}.ab-q summary{cursor:pointer;font-weight:700}.ab-q p{margin:8px 0 0;color:var(--muted);font-size:14px;line-height:1.55}
+.ab-story,.ab-faq{margin:14px 0}
+@media(max-width:820px){.ab-tl{grid-template-columns:1fr 1fr}}@media(max-width:520px){.ab-tl{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 
@@ -2013,7 +2032,7 @@ setInterval(ntfRefresh,30000);
 async function rqReadyLoad(){if(!S.me||S.me.role!=="admin"||!API||!API.listProfiles)return;
   try{const P=await API.listProfiles();S._rqReady=P.filter(p=>p.role!=="admin"&&p.status==="pending"&&p.tgOk&&p.emailOk!==false).map(p=>({id:p.id,name:p.name}));ntfRefresh()}catch(e){}}
 setInterval(rqReadyLoad,180000);
-function render(){document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
+function render(){const _tr=document.getElementById("pfTray");if(_tr&&S.view!=="propfirms")_tr.className="";document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
   const fn={today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
   v.innerHTML=h+'<div id="vb"></div>';Promise.resolve(fn($("#vb"))).then(()=>bindNotify(v)).catch(()=>{});
@@ -3579,10 +3598,38 @@ function pfLoc(f){const P=window.PropFirms,L=(window.PropFirmsI18n||{})[window.I
   ["eval","evalH","funded","fundedH","payout"].forEach(k=>{o[k]=(f[k]||[]).map(([key,txt],i)=>[lab[key]||key,(tf[k]&&tf[k][i])||txt])});return o}
 function pfCommon(){const P=window.PropFirms,L=(window.PropFirmsI18n||{})[window.I18N?I18N.lang:"en"];return P.common.map((c,i)=>L&&L.common[i]?[c[0],L.common[i][0],L.common[i][1]]:c)}
 const pfLi=([lb,tx])=>`<li data-notr><b class="pf-lb">${esc(lb)}</b><span>${esc(tx)}</span></li>`;
+/* ⭐ favourites + ⇄ compare (up to 3) + 🧭 find my firm */
+const pfFavKey="tv_pffav";
+function pfFavs(){try{return JSON.parse(localStorage.getItem(pfFavKey)||"[]")||[]}catch(e){return []}}
+function pfVal(f,sec,key){const L=pfLoc(f)[sec]||[],i=(f[sec]||[]).findIndex(x=>x[0]===key);return i>=0&&L[i]?L[i][1]:"—"}
+function pfCompare(){const P=window.PropFirms,ids=S._pfCmp||[],F=ids.map(id=>P.firms.find(x=>x.id===id)).filter(Boolean);if(F.length<2){toast(I18N.t("Pick at least 2 firms to compare"));return}
+  const rows=[["Type",f=>f.type==="cfd"?"💹 CFD":"📈 Futures"],["Algeria",f=>(PFDZ[f.dz]||PFDZ.check)[0]+" "+I18N.t((PFDZ[f.dz]||PFDZ.check)[1])],["From",f=>{const v=pfFrom(f.id);return v?money(v,0):"—"}],
+    ["Discount",f=>cpBadge(f.id)||"—"],["Sizes",f=>f.sizes.join(" · ")],["Profit target",f=>pfVal(f,"eval","t")],["Drawdown",f=>pfVal(f,"eval","dd")],["Daily loss",f=>pfVal(f,"eval","dl")],
+    ["Consistency (evaluation)",f=>pfVal(f,"eval","cons")],["Consistency (funded)",f=>pfVal(f,"funded","cons")],["Profit split",f=>pfVal(f,"payout","split")],["Minimum payout",f=>pfVal(f,"payout","min")],["Payout timing",f=>pfVal(f,"payout","freq")]];
+  openModal(`<div class="mhead"><h2>⇄ <span>Compare prop firms</span></h2><button class="x" id="mx">×</button></div>
+   <div class="tw"><table class="t pf-cmp"><tr><th></th>${F.map(f=>`<th>${pfLogo(f)}<b data-notr>${esc(f.name)}</b></th>`).join("")}</tr>
+   ${rows.map(([l,fn])=>`<tr><td><b>${esc(I18N.t(l))}</b></td>${F.map(f=>`<td data-notr>${l==="Discount"?fn(f):esc(fn(f))}</td>`).join("")}</tr>`).join("")}
+   <tr><td></td>${F.map(f=>`<td><button class="btn sm pri" type="button" data-cmpopen="${f.id}">${esc(I18N.t("Open"))} ›</button></td>`).join("")}</tr></table></div>
+   <p class="mut" style="font-size:12px;margin:10px 0 0"><span>Rules checked in November 2026 from public sources. Always confirm on the firm's official website before buying.</span></p>`);
+  $("#mx").onclick=closeModal;$$("[data-cmpopen]").forEach(b=>b.onclick=()=>{closeModal();S._pfId=b.dataset.cmpopen;render();window.scrollTo(0,0)})}
+function pfQuiz(){const P=window.PropFirms,A={type:S._pfType||"futures",budget:"any",dz:"yes",dd:"any"};
+  const q=(k,t,opts)=>`<div class="qz-q"><b>${esc(I18N.t(t))}</b><div class="seg" data-qz="${k}">${opts.map(([v,l])=>`<button type="button" data-v="${v}" class="${A[k]===v?"on":""}">${esc(I18N.t(l))}</button>`).join("")}</div></div>`;
+  const results=()=>{let L=P.firms.filter(f=>f.type===A.type);if(A.dz==="yes")L=L.filter(f=>f.dz==="yes"||f.dz==="likely");
+    if(A.budget!=="any")L=L.filter(f=>{const v=pfFrom(f.id);return v!=null&&v<=Number(A.budget)});
+    if(A.dd==="eod")L=L.filter(f=>/end.?of.?day|eod|static/i.test((f.eval||[]).map(x=>x[1]).join(" ")));
+    L=L.map(f=>({f,p:pfFrom(f.id)})).sort((a,b)=>(!!cpBadge(b.f.id)-!!cpBadge(a.f.id))||((a.p??1e9)-(b.p??1e9))).slice(0,6);
+    return L.length?L.map(({f,p})=>`<button type="button" class="qz-r" data-qzopen="${f.id}">${pfLogo(f)}<span><b data-notr>${esc(f.name)}</b>${cpBadge(f.id)}<small class="mut">${p?`<span>From</span> <span data-notr>${money(p,0)}</span> · `:""}<span data-notr>${esc(pfVal(f,"eval","dd"))}</span></small></span><span class="pf-go">›</span></button>`).join("")
+      :`<p class="mut">${esc(I18N.t("No firm matches all your answers. Try a bigger budget or any drawdown type."))}</p>`};
+  openModal(`<div class="mhead"><h2>🧭 <span>Find my prop firm</span></h2><button class="x" id="mx">×</button></div>
+   ${q("type","What do you trade?",[["futures","📈 Futures"],["cfd","💹 CFD"]])}${q("budget","Your budget for one account",[["100","≤ $100"],["200","≤ $200"],["any","Any"]])}
+   ${q("dd","Drawdown type",[["eod","End of day / static"],["any","Any"]])}${q("dz","I live in Algeria",[["yes","Yes"],["no","No"]])}
+   <h3 style="margin:14px 0 8px">✨ <span>Best matches</span></h3><div id="qzRes" class="qz-res">${results()}</div>`);
+  const bind=()=>$$("[data-qzopen]").forEach(b=>b.onclick=()=>{closeModal();S._pfId=b.dataset.qzopen;render();window.scrollTo(0,0)});bind();$("#mx").onclick=closeModal;
+  $$("[data-qz]").forEach(s=>$$("button",s).forEach(b=>b.onclick=()=>{A[s.dataset.qz]=b.dataset.v;$$("button",s).forEach(x=>x.classList.toggle("on",x===b));$("#qzRes").innerHTML=results();bind()}))}
 function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class="card empty">Loading…</div>';return}
   if(S._pfId){const f=P.firms.find(x=>x.id===S._pfId);if(f)return vPropFirm(el,f);S._pfId=null}
-  const type=S._pfType||"futures",q=(S._pfQ||"").trim().toLowerCase(),dzOnly=!!S._pfDz;
-  const list=P.firms.filter(f=>f.type===type&&(!q||f.name.toLowerCase().includes(q))&&(!dzOnly||f.dz==="yes"||f.dz==="likely"));
+  const type=S._pfType||"futures",q=(S._pfQ||"").trim().toLowerCase(),dzOnly=!!S._pfDz,favs=pfFavs(),cmp=S._pfCmp||(S._pfCmp=[]);
+  const list=P.firms.filter(f=>f.type===type&&(!q||f.name.toLowerCase().includes(q))&&(!dzOnly||f.dz==="yes"||f.dz==="likely")&&(!S._pfFavOnly||favs.includes(f.id)));
   const cnt=t=>P.firms.filter(f=>f.type===t).length,cntDz=t=>P.firms.filter(f=>f.type===t&&f.dz==="yes").length;
   let letter="";
   el.innerHTML=`<h1>Prop firm tracker</h1><p class="sub">Rules, hidden rules, payouts and Algeria availability of ${P.firms.length} prop firms. Tap a firm to see everything.</p>
@@ -3590,13 +3637,16 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
     <button type="button" data-pft="futures" class="${type==="futures"?"on":""}"><span class="rt-ic">📈</span><span class="rt-tx"><b>Futures prop firms</b><small>${cnt("futures")} <span>firms</span> · ${cntDz("futures")} 🇩🇿</small></span></button>
     <button type="button" data-pft="cfd" class="${type==="cfd"?"on":""}"><span class="rt-ic">💹</span><span class="rt-tx"><b>CFD prop firms</b><small>${cnt("cfd")} <span>firms</span> · ${cntDz("cfd")} 🇩🇿</small></span></button></div>
    <div class="pf-tools"><input class="i" id="pfQ" placeholder="Search a prop firm…" value="${esc(S._pfQ||"")}" data-noswipe>
-    <label class="pf-dz"><input type="checkbox" id="pfDz" ${dzOnly?"checked":""}> <span>🇩🇿 Only firms open to Algeria</span></label></div>
+    <label class="pf-dz"><input type="checkbox" id="pfDz" ${dzOnly?"checked":""}> <span>🇩🇿 Only firms open to Algeria</span></label>
+    <label class="pf-dz"><input type="checkbox" id="pfFav" ${S._pfFavOnly?"checked":""}> <span>⭐ My favourites</span></label>
+    <button type="button" class="btn sm pri" id="pfQuizB">🧭 <span>Find my prop firm</span></button></div>
    <div class="pf-legend">${Object.values(PFDZ).map(d=>`<span class="dz-b ${d[2]}">${d[0]} <span>${d[1]}</span></span>`).join("")}</div>
    <div class="pf-bar"><span class="mut">${list.length} <span>firms</span></span><button type="button" class="btn sm" id="pfAll">${S._pfShut?"▾ <span>Show all rules</span>":"▴ <span>Hide all rules</span>"}</button></div>
    <div class="pf-list">${list.length?list.map(f=>{const L=f.name.replace(/^The /,"").charAt(0).toUpperCase();const h=L!==letter?(letter=L,`<div class="pf-letter"><span>${L}</span></div>`):"";
      const mini=(ic,t,items,cl)=>items&&items.length?`<div class="pf-mini ${cl}"><h4>${ic} <span>${t}</span></h4><ul>${items.map(pfLi).join("")}</ul></div>`:"";
      f=Object.assign({},f,pfLoc(f));
      return `${h}<div class="pf-item ${f.type}"><button type="button" class="pf-row" data-pf="${f.id}">${pfLogo(f)}<span class="pf-tx"><b data-notr>${esc(f.name)}</b>${cpBadge(f.id)}<span class="pf-szp" data-notr>${f.sizes.map(s=>sizeChip(f,s)).join("")}</span></span>${dzBadge(f)}<span class="pf-go">›</span></button>
+      <div class="pf-acts"><button type="button" class="pf-a ${favs.includes(f.id)?"on":""}" data-pfav="${f.id}">${favs.includes(f.id)?"★":"☆"} <span>${favs.includes(f.id)?"Favourite":"Add to favourites"}</span></button><button type="button" class="pf-a ${cmp.includes(f.id)?"on":""}" data-pcmp="${f.id}">⇄ <span>${cmp.includes(f.id)?"In comparison":"Compare"}</span></button></div>
       <details class="pf-rules"${S._pfShut?"":" open"}><summary><span>Rules &amp; hidden rules</span></summary>
        <div class="pf-grid">${mini("📝","Evaluation: rules",f.eval,"r")}${mini("🕵️","Evaluation: hidden rules",f.evalH,"h")}${mini("🏦","Funded: rules",f.funded,"r f")}${mini("🕵️","Funded: hidden rules",f.fundedH,"h")}</div>
        ${mini("💸","Withdrawal conditions",f.payout,"p")}</details></div>`}).join("")
@@ -3608,7 +3658,13 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
   $$("[data-pf]",el).forEach(b=>b.onclick=()=>{S._pfId=b.dataset.pf;S._couponTried=false;render();window.scrollTo(0,0)});
   const qi=$("#pfQ",el);qi.oninput=()=>{S._pfQ=qi.value;const p=qi.selectionStart;render();const n=$("#pfQ");n.focus();n.setSelectionRange(p,p)};
   $("#pfDz",el).onchange=e=>{S._pfDz=e.target.checked;render()};
-  $("#pfAll",el).onclick=()=>{S._pfShut=!S._pfShut;render()}}
+  $("#pfAll",el).onclick=()=>{S._pfShut=!S._pfShut;render()};
+  $("#pfFav",el).onchange=e=>{S._pfFavOnly=e.target.checked;render()};$("#pfQuizB",el).onclick=pfQuiz;
+  $$("[data-pfav]",el).forEach(b=>b.onclick=()=>{const F=pfFavs(),id=b.dataset.pfav,i=F.indexOf(id);if(i>=0)F.splice(i,1);else F.push(id);try{localStorage.setItem(pfFavKey,JSON.stringify(F))}catch(e){}render()});
+  $$("[data-pcmp]",el).forEach(b=>b.onclick=()=>{const C=S._pfCmp,id=b.dataset.pcmp,i=C.indexOf(id);if(i>=0)C.splice(i,1);else{if(C.length>=3){toast(I18N.t("You can compare up to 3 firms"));return}C.push(id)}render()});
+  let tray=$("#pfTray");if(!tray){tray=document.createElement("div");tray.id="pfTray";document.body.appendChild(tray)}
+  tray.className=S._pfCmp.length&&S.view==="propfirms"&&!S._pfId?"on":"";tray.innerHTML=`<span>⇄ <b data-notr>${S._pfCmp.length}/3</b> <span>${esc(I18N.t("firms to compare"))}</span></span><button type="button" class="btn sm pri" id="pfCmpGo">${esc(I18N.t("Compare"))}</button><button type="button" class="btn sm" id="pfCmpX">✕</button>`;
+  $("#pfCmpGo").onclick=pfCompare;$("#pfCmpX").onclick=()=>{S._pfCmp=[];render()}}
 function vPropFirm(el,f){const d=PFDZ[f.dz]||PFDZ.check;f=Object.assign({},f,pfLoc(f));
   const sec=(ic,t,items,cl)=>items&&items.length?`<div class="card pf-sec ${cl||""}"><h3>${ic} ${t}</h3><ul>${items.map(pfLi).join("")}</ul></div>`:"";
   el.innerHTML=`<div class="page pf-page">
@@ -4238,6 +4294,20 @@ function resultsBtn(){return `<a class="tg-link res" href="${ABOUT.channel}" tar
 /* ▶ phone tour video of the platform (tour.js) */
 function tourBtn(){return `<button type="button" class="tour-btn" data-tour><span class="tour-play">▶</span><span><b>Watch the platform tour</b><small>1 minute · on a phone</small></span></button>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tour]");if(b&&window.Tour){e.preventDefault();Tour.open()}});
+/* About: our story (timeline) + FAQ */
+document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#indCopy")&&window.INDICATOR&&INDICATOR.url)copyText(INDICATOR.url)});
+function aboutExtra(){const tl=[["📈",`${ABOUT.yearsPrefix?ABOUT.yearsPrefix+" ":""}${ABOUT.years} years in the markets`,"Brown Algo and ZNtrading trade futures with a precise scalping system."],
+    ["🎓","Tradeversity is born","A mentorship and bootcamp: clear daily bias, written plan, strict risk, honest journal."],
+    ["👥",`${ABOUT.students} students`,"Students from Algeria and beyond, with certificates and payouts shared on Telegram."],
+    ["📓","The Effective Journal","Our own platform: journal, statistics, prop firm rules, news alerts and risk tools, in 3 languages."]];
+  const faq=[["How do I join?","Create a free account, verify your email and your Telegram, then Brown Algo approves you. You get a notification when you are accepted."],
+    ["Is the journal free?","Yes. The Effective Journal is free for Tradeversity students."],
+    ["Why do you ask for my Telegram?","To keep the community private and to send you reminders: red news 5 minutes before, plan for tomorrow, and daily loss alerts. You can turn each reminder off."],
+    ["Who can see my journal?","Only you, and Brown Algo to coach you. When you share your results with a link or a QR code, people see only daily totals: no trade details, notes or screenshots."],
+    ["Does it work on my phone?","Yes. Open the site on your phone and install it like an app (Install app button). It works in English, Français and العربية."],
+    ["Which prop firms can I track?","45 futures and CFD prop firms, with their rules, hidden rules, payouts, Algeria availability and our discount codes."]];
+  return `<div class="card ab-story"><h3>🧭 <span>Our story</span></h3><div class="ab-tl">${tl.map(([ic,t,d])=>`<div class="ab-st"><span class="ab-ic">${ic}</span><div><b>${esc(t)}</b><p class="mut">${esc(d)}</p></div></div>`).join("")}</div></div>
+   <div class="card ab-faq"><h3>❓ <span>Questions</span></h3>${faq.map(([q,a])=>`<details class="ab-q"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>`}
 function vAbout(el){el.classList.add("about-v");
   el.innerHTML=`<div class="about-hero"><div class="logo lg" role="img" aria-label="Tradeversity"></div><div><h1>About <span data-notr>TRADEVERSITY</span></h1>
     <p class="sub" style="max-width:640px">Tradeversity is a trading mentorship and bootcamp not like the standard simple trading courses we see everyday and community founded by <b>Brown Algo</b> and <b>ZNtrading</b>. We teach a precise scalping trading system with clean entries and confirmations using our experience and advanced technicals at the charts, of course with rule-based way to trade having and preparing a clear daily bias, a written plan, strict risk, and an honest journal.</p></div></div>
@@ -4247,6 +4317,7 @@ function vAbout(el){el.classList.add("about-v");
      <div class="card"><h3>What we believe</h3><div class="insight"><span class="ic">🎯</span><span>Discipline over excitement: 2 trades max per day, only A+ setups.</span></div><div class="insight"><span class="ic">🛡️</span><span>Protect the account first. A respected loss is part of the job.</span></div><div class="insight"><span class="ic">📓</span><span>Every trade is journaled, every day is planned and reviewed.</span></div></div>
      <div class="card"><h3>Results</h3><p class="mut" style="margin-top:0">Results made by us and our students are shared on our Telegram channel, with full transparency.</p>${resultsBtn()}</div>
    </div>
+   ${aboutExtra()}
    ${RESULTS.length?`<div class="card"><h3>Student results</h3>${resultsStripHTML("big")}${resultsStripHTML("big rev")}<p class="mut" style="font-size:12px;margin:10px 0 0">Click a result to enlarge it.</p></div>`:""}`;
 }
 function fillAbout(){$$("[data-about-mini]").forEach(e=>e.innerHTML=`<span>${ABOUT.yearsPrefix?`<span>${ABOUT.yearsPrefix}</span> `:""}<b data-notr>${ABOUT.years}</b> <span>years in the markets</span></span><span class="sep">·</span><span><b data-notr>${ABOUT.students}</b> <span>students</span></span><span class="sep">·</span><span>real results</span>`);
@@ -4293,7 +4364,8 @@ function vIndicator(el){const has=!!INDICATOR.url;
       <li>📐 <span>RTH gap with fib lines</span></li>
       <li>📅 <span>PDH/PDL, PWH/PWL, PMH/PML and the NWOG</span></li>
      </ul>
-     ${has?`<a class="btn pri ind-go" href="${INDICATOR.url}" target="_blank" rel="noopener">📈 <span>Open on TradingView</span></a>`:`<button class="btn ind-go" disabled>⏳ <span>TradingView link coming soon</span></button>`}
+     ${has?`<div class="row" style="gap:8px;flex-wrap:wrap"><a class="btn pri ind-go" href="${INDICATOR.url}" target="_blank" rel="noopener">📈 <span>Open on TradingView</span></a><button class="btn" type="button" id="indCopy">📋 <span>Copy the link</span></button></div>`:`<button class="btn ind-go" disabled>⏳ <span>TradingView link coming soon</span></button>`}
+
     </div></div>
    <div class="card"><h3>How to add it to your chart</h3>
     <ol class="ind-steps">
@@ -4422,6 +4494,9 @@ async function bootDemo(){const D=demoData();S._demo=true;
 <script type="module">import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))</script>
 </body>
 </html>
+
+
+
 
 
 
