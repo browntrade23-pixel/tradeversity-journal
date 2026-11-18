@@ -124,6 +124,26 @@ Deno.serve(async (req) => {
   if (!TOKEN) return json({ ok: false, error: "TELEGRAM_BOT_TOKEN secret is missing" }, 500);
   const url = new URL(req.url);
 
+  // delete a user for good (POST ?deleteUser=<id>, admin only): their trades, plans, settings, shares, profile and login.
+  // Never an admin account, never yourself. Runs here on the server because it needs the service key (never in the website).
+  const delId = url.searchParams.get("deleteUser");
+  if (delId) {
+    if (req.method !== "POST") return json({ ok: false, error: "post_only" }, 405);
+    const jwt = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+    const { data: u } = await sb.auth.getUser(jwt);
+    if (!u?.user) return json({ ok: false, error: "not_logged_in" }, 401);
+    const { data: me } = await sb.from("profiles").select("role").eq("id", u.user.id).single();
+    if (me?.role !== "admin") return json({ ok: false, error: "admin_only" }, 403);
+    if (delId === u.user.id) return json({ ok: false, error: "cannot_delete_yourself" }, 400);
+    const { data: target } = await sb.from("profiles").select("id,role").eq("id", delId).maybeSingle();
+    if (target?.role === "admin") return json({ ok: false, error: "cannot_delete_admin" }, 403);
+    for (const t of ["trades", "plans", "user_settings", "shares", "aff_clicks"]) { await sb.from(t).delete().eq("user_id", delId); }
+    await sb.from("profiles").delete().eq("id", delId);
+    const { error } = await sb.auth.admin.deleteUser(delId);
+    if (error && !/not.?found/i.test(error.message)) return json({ ok: false, error: error.message }, 500);
+    return json({ ok: true });
+  }
+
   // announcement from the admin (POST ?announce=1 {title, body}): saved in public.announcements (shown in the app's bell)
   // and sent on Telegram to every approved student connected to the bot. ?announce=delete&id=... removes one.
   const ann = url.searchParams.get("announce");

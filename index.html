@@ -1588,8 +1588,8 @@ html.visit #logout{display:none!important}
 .wm-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.wm-feed{min-height:300px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.07)}
 .wm-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:2px;color:#ff4d6a}.wm-live i{width:8px;height:8px;border-radius:50%;background:#ff2d55;box-shadow:0 0 0 0 rgba(255,45,85,.6);animation:wmL 1.6s infinite}@keyframes wmL{70%{box-shadow:0 0 0 8px rgba(255,45,85,0)}}
 .bin-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}@media(max-width:520px){.bin-row{flex-wrap:wrap}.bin-acts{width:100%;justify-content:stretch}.bin-acts .btn{flex:1}}
-.acc-list{display:grid;gap:6px;max-height:440px;overflow:auto}.acc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border:1px solid var(--line2);border-radius:12px;background:rgba(255,255,255,.02)}.acc-who{display:flex;flex-direction:column;min-width:0}.acc-who small{font-size:12px;overflow-wrap:anywhere}.acc-row .btn{flex:none}
-@media(max-width:520px){.acc-row{flex-wrap:wrap}.acc-row .btn{width:100%}#accQ{width:100%!important}}
+.acc-list{display:grid;gap:6px;max-height:440px;overflow:auto}.acc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border:1px solid var(--line2);border-radius:12px;background:rgba(255,255,255,.02)}.acc-who{display:flex;flex-direction:column;min-width:0}.acc-who small{font-size:12px;overflow-wrap:anywhere}.acc-row .btn{flex:none}.acc-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:520px){.acc-row{flex-wrap:wrap}.acc-acts{width:100%}.acc-acts .btn{flex:1}#accQ{width:100%!important}}
 /* Pack B: prop firm limits, start my session, weekly review, Ctrl+K, admin summary */
 .lim-card{margin:12px 0}.lim-acc{padding:8px 0;border-top:1px solid rgba(255,255,255,.06)}.lim-acc:first-of-type{border-top:0}
 .lim-an{font-size:13px;margin-bottom:6px}.lim-r{margin:6px 0 10px}.lim-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
@@ -3338,7 +3338,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-18zj";
+const APP_VER="2026-11-18zk";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3529,7 +3529,21 @@ function bindStatTabs(){
     $("#stImp").onclick=()=>{closeModal();const b=$("#impBox");if(!b)return;b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
     $("#stMan").onclick=()=>{const n=$("#stName").value.trim();if(!n){$("#stName").focus();toast("Write a name for the account first");return}closeModal();S.acct=n;render();editTrade(null)}};
 }
-/* Recycle bin: deleted statistics are kept 7 days in this browser (IndexedDB, screenshots included) */
+/* admin: delete a user for good (account + trades + plans + settings + shares). Needs the server function, never the website alone. */
+function deleteUserBox(s,done){
+  openModal(`<h3 style="margin-top:0">🗑 <span>Delete this user for good?</span></h3>
+   <p style="margin:0 0 6px"><b data-notr>${esc(s.name||"—")}</b> <span class="mut" data-notr>${esc(s.email||"")}</span></p>
+   <p class="mut" style="font-size:13px"><span>Their account, all their trades, plans, settings and shared links are deleted. This cannot be undone.</span></p>
+   <p class="mut" style="font-size:13px;margin-bottom:6px"><span>To just take away their access and keep their data, use "Remove access" instead.</span></p>
+   <label class="f"><span>Type DELETE to confirm</span><input class="i" id="duIn" autocomplete="off" placeholder="DELETE"></label>
+   <div class="row" style="justify-content:flex-end;gap:8px;margin-top:12px"><button class="btn" id="duNo">Cancel</button><button class="btn danger" id="duYes" disabled>🗑 <span>Delete for good</span></button></div>`);
+  const inp=$("#duIn"),yes=$("#duYes");$("#duNo").onclick=closeModal;inp.oninput=()=>{yes.disabled=inp.value.trim().toUpperCase()!=="DELETE"};setTimeout(()=>inp.focus(),50);
+  yes.onclick=async()=>{yes.disabled=true;yes.textContent="…";
+    try{const{data}=await Cloud.sb.auth.getSession();const tok=data&&data.session&&data.session.access_token;
+      const r=await (await fetch(CONFIG.SUPABASE_URL+"/functions/v1/tg-reminders?deleteUser="+encodeURIComponent(s.id),{method:"POST",headers:{Authorization:"Bearer "+tok,apikey:CONFIG.SUPABASE_ANON_KEY}})).json();
+      if(!r.ok)throw new Error(r.error==="cannot_delete_admin"?I18N.t("An admin account can't be deleted."):r.error||"error");
+      closeModal();toast(I18N.t("User deleted for good"));done&&done()}
+    catch(e){yes.disabled=false;yes.textContent=I18N.t("Delete for good");toast(I18N.t("Couldn't delete")+": "+(e.message||e))}}}/* Recycle bin: deleted statistics are kept 7 days in this browser (IndexedDB, screenshots included) */
 const Bin={DAYS:7,_db:null,
   db(){return this._db||(this._db=new Promise((res,rej)=>{const r=indexedDB.open("tv_bin",1);r.onupgradeneeded=()=>r.result.createObjectStore("bins",{keyPath:"id"});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))},
   async tx(mode,fn){const d=await this.db();return new Promise((res,rej)=>{const t=d.transaction("bins",mode),s=t.objectStore("bins");const out=fn(s);t.oncomplete=()=>res(out&&out.result!==undefined?out.result:undefined);t.onerror=()=>rej(t.error)})},
@@ -4475,7 +4489,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
        <button class="btn sm" data-open="journal">📓 Journal</button><button class="btn sm" data-open="plan">🧭 Plan</button><button class="btn sm" data-open="stats">📊 Stats</button>
        ${tgUser(r.s)?`<a class="btn sm" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" title="Message on Telegram">💬</a>`:""}</div></td></tr>`;
   const reqRow=(p,rej)=>`<tr data-pid="${p.id}"><td><b data-notr>${esc(p.name||"—")}</b>${contactLinks(p)}</td><td data-notr>${p.tgOk?`<span class="dyes">✅ <span>Telegram verified</span></span>`:`<span class="dno">⚠️ <span>Telegram not verified</span></span>`}<br>${p.emailOk===false?`<span class="dno">⚠️ <span>Email not verified</span></span>`:p.emailOk?`<span class="dyes">✅ <span>Email verified</span></span>`:""}</td><td class="mut" data-notr>${p.created_at?esc(fmtDate(p.created_at.slice(0,10))):""}</td>
-     <td><div class="row" style="justify-content:flex-end">${rej?"":`<button class="btn sm danger" data-act="rejected">✖ Reject</button>`}${(()=>{const ok=p.tgOk&&p.emailOk!==false;
+     <td><div class="row" style="justify-content:flex-end">${rej?`<button class="btn sm danger" data-delu="${p.id}">🗑 <span>Delete</span></button>`:`<button class="btn sm danger" data-act="rejected">✖ Reject</button>`}${(()=>{const ok=p.tgOk&&p.emailOk!==false;
        return `<button class="btn sm pri" data-act="approved" ${ok?"":`disabled title="${esc(I18N.t("Can be approved after the student verifies Telegram and email"))}"`}>${ok?"✔ <span>Approve</span>":"🔒 <span>Waiting for verification</span>"}</button>`})()}</div></td></tr>`;
   el.innerHTML=`<h1>👑 Admin dashboard</h1><p class="sub">All your Tradeversity students in one place. Click a student to open their journal, stats and plans (read-only).</p>
    ${notifyCard(true)}
@@ -4506,8 +4520,8 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    </div>
    ${emoAll.length?`<div class="card" style="margin-bottom:12px"><h3>Group weak spots</h3>${emoAll.map(r=>`<div class="insight"><span class="ic">⚠️</span><span><b>${esc(r.k)}</b> trades across students: <b class="neg">${money(r.net,0)}</b> over ${r.n} trades (${pct(r.wr,0)} win). Good topic for the next live.</span></div>`).join("")}</div>`:""}
    <div class="card acc-card"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px"><h3 style="margin:0">✅ <span>Accepted users</span> <span class="adm-n" data-notr>${students.length}</span></h3><input class="i" id="accQ" placeholder="Search name, email, Telegram" style="width:220px"></div>
-    <p class="mut" style="font-size:12px;margin:0 0 10px"><span>Remove a user to take away their access right away. Their journal stays saved, and you can approve them again from Rejected requests.</span></p>
-    <div class="acc-list">${students.length?[...students].sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(s=>`<div class="acc-row" data-accid="${s.id}" data-q="${esc(((s.name||"")+" "+(s.email||"")+" "+(s.telegram||"")+" "+tgUser(s)).toLowerCase().replace(/@/g,""))}"><div class="acc-who"><b data-notr>${esc(s.name||"—")}</b><small class="mut" data-notr>${esc(s.email||"")}${tgUser(s)?` · @${esc(tgUser(s))}`:""}${s.created_at?` · <span>Joined</span> ${esc(fmtDate(s.created_at.slice(0,10)))}`:""}</small></div><button type="button" class="btn sm danger" data-remove="${s.id}">✖ <span>Remove</span></button></div>`).join(""):`<div class="mut">No accepted users yet.</div>`}</div></div>
+    <p class="mut" style="font-size:12px;margin:0 0 10px"><span>Remove access: the user can't open the journal, their data stays and you can approve them again from Rejected requests. Delete: the account and all its data are erased for good.</span></p>
+    <div class="acc-list">${students.length?[...students].sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(s=>`<div class="acc-row" data-accid="${s.id}" data-q="${esc(((s.name||"")+" "+(s.email||"")+" "+(s.telegram||"")+" "+tgUser(s)).toLowerCase().replace(/@/g,""))}"><div class="acc-who"><b data-notr>${esc(s.name||"—")}</b><small class="mut" data-notr>${esc(s.email||"")}${tgUser(s)?` · @${esc(tgUser(s))}`:""}${s.created_at?` · <span>Joined</span> ${esc(fmtDate(s.created_at.slice(0,10)))}`:""}</small></div><div class="acc-acts"><button type="button" class="btn sm" data-remove="${s.id}">✖ <span>Remove access</span></button><button type="button" class="btn sm danger" data-delu="${s.id}">🗑 <span>Delete</span></button></div></div>`).join(""):`<div class="mut">No accepted users yet.</div>`}</div></div>
    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">Students</h3><div class="row"><input class="i" id="aq" placeholder="Search name, email, Telegram" style="width:240px"><button class="btn sm" id="aExp">Export CSV</button></div></div>
    <div class="tw"><table class="t" id="aT"><tr><th>Name (username)</th><th>Email</th><th>Telegram username</th><th>Trades</th><th>Broke plan</th><th>Weak spot</th><th>Journaled today</th><th>Plan today</th><th>Plan tomorrow</th></tr>
    ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b data-notr>${esc(r.s.name||"—")}</b> <span class="tag">👤 Open</span></td><td data-notr><a class="lnk" href="mailto:${esc(r.s.email||"")}" onclick="event.stopPropagation()">${esc(r.s.email||"—")}</a></td><td class="mono" data-notr>${tgUser(r.s)?`${r.s.tgOk?"✅":"⚠️"} <a class="lnk" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">@${esc(tgUser(r.s))}</a>`:"—"}</td><td class="mono">${r.c.n}</td>
@@ -4532,6 +4546,8 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
     S.view=v;render();window.scrollTo(0,0)});
   /* accepted users: search + remove (status -> rejected: no access, data kept, can be approved again) */
   const accQ=$("#accQ",el);if(accQ)accQ.oninput=e=>{const q=e.target.value.toLowerCase().replace(/@/g,"").trim();$$(".acc-row",el).forEach(r=>r.classList.toggle("hidden",!r.dataset.q.includes(q)))};
+  /* delete a user for good: done by the server function (admin only); you must type DELETE to confirm */
+  $$("[data-delu]",el).forEach(b=>b.onclick=ev=>{ev.stopPropagation();const s=students.find(x=>x.id===b.dataset.delu)||profs.find(x=>x.id===b.dataset.delu);if(!s)return;deleteUserBox(s,()=>vAdmin(el))});
   $$("[data-remove]",el).forEach(b=>b.onclick=()=>{const s=students.find(x=>x.id===b.dataset.remove);if(!s)return;
     confirmBox(`${I18N.t("Remove")} ${s.name||s.email||""}? ${I18N.t("They lose access to the journal right away. Their data stays saved, and you can approve them again from Rejected requests.")}`,async()=>{b.disabled=true;
       try{await API.setStatus(s.id,"rejected");toast(I18N.t("User removed"));vAdmin(el)}catch(e){b.disabled=false;toast(I18N.t("Couldn't remove")+": "+(e.message||e))}})});
