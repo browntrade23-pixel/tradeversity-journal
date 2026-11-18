@@ -1,4 +1,4 @@
-﻿/* In-app 3D designs (Three.js, loaded only on the page that shows them).
+/* In-app 3D designs (Three.js, loaded only on the page that shows them).
    equityMountain · disciplineOrb · streakFlame · calendar3d · trophyRoom · newsClock · firmGalaxy
    Every design: drag to rotate where it makes sense, tap callbacks, stops and frees memory when its element leaves the page. */
 import * as THREE from "three";
@@ -124,65 +124,77 @@ export function firmGalaxy(el,firms,onFirm){const B=base(el,{h:small()?300:360,p
 
 
 
-/* 8. GALAXY BACKGROUND (Prop firm tracker): full-page spiral galaxy that turns slowly, nebula clouds,
-   twinkling stars, shooting stars, parallax with the mouse and the scroll. Fixed behind the page content. */
-export function galaxyBackground(el){
-  const r=new THREE.WebGLRenderer({antialias:false,alpha:true,powerPreference:"high-performance"});
-  const ph=small(),N=ph?9000:22000,dpr=Math.min(devicePixelRatio,ph?1.3:1.6);r.setPixelRatio(dpr);r.setSize(innerWidth,innerHeight);el.innerHTML="";el.appendChild(r.domElement);
+/* 8. SECTION 3D BACKGROUNDS (one design per section):
+   galaxy = Prop firm tracker, bull = Journal, fibc = Statistics, bear = Risk calculator, fibr = Tomorrow's plan.
+   The particles fly in and assemble the design, then it turns / zooms smoothly with the page scroll;
+   a fast scroll shakes the particles loose and they settle back. */
+export function galaxyBackground(el,kind="galaxy"){
+  const r=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"});
+  const ph=small(),isChart=kind==="bull"||kind==="bear"||kind==="fibr",N=kind==="galaxy"?(ph?9000:22000):(ph?7000:15000),dpr=Math.min(devicePixelRatio,ph?1.3:1.6);
+  r.setPixelRatio(dpr);r.setSize(innerWidth,innerHeight);el.innerHTML="";el.appendChild(r.domElement);
   const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,400);cam.position.set(0,6,16);cam.lookAt(0,0,0);
-  const rnd=(a=1)=>(Math.random()*2-1)*a;
-  /* the spiral galaxy: gold core, indigo / blue / magenta arms */
-  const pos=new Float32Array(N*3),col=new Float32Array(N*3),sd=new Float32Array(N),c=new THREE.Color(),core=new THREE.Color("#ffd27a"),mid=new THREE.Color("#ff9e5e"),arm=new THREE.Color("#7c8bff"),edge=new THREE.Color("#2aa8ff"),mag=new THREE.Color("#d16bff");
-  for(let i=0;i<N;i++){const arms=4,a0=(i%arms)*Math.PI*2/arms,t=Math.pow(Math.random(),.62),R=t*13,spin=R*.55,scat=(1-t*.35)*1.15;
-    const a=a0+spin+rnd(.38*(1-t*.4));pos[i*3]=Math.cos(a)*R+rnd(scat*.5);pos[i*3+1]=rnd(.55*(1-t))*(1+Math.random());pos[i*3+2]=Math.sin(a)*R+rnd(scat*.5);
-    c.copy(core).lerp(mid,Math.min(1,t*2.2)).lerp(arm,Math.max(0,t*1.6-.35)).lerp(t>.8?edge:arm,Math.max(0,t-.7)*2);if(Math.random()<.08)c.lerp(mag,.7);if(Math.random()<.03)c.set("#ffffff");
-    col.set([c.r,c.g,c.b],i*3);sd[i]=Math.random()}
-  const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));g.setAttribute("color",new THREE.BufferAttribute(col,3));g.setAttribute("seed",new THREE.BufferAttribute(sd,1));
-  const mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,vertexColors:true,uniforms:{uT:{value:0},uS:{value:(ph?46:58)*dpr}},
+  const rnd=(a=1)=>(Math.random()*2-1)*a,c=new THREE.Color(),W=new THREE.Color("#ffffff");
+  const mk=fn=>{const P=new Float32Array(N*3),Q=new Float32Array(N*3);for(let i=0;i<N;i++){const v=fn(i);P.set(v,i*3);Q.set([c.r,c.g,c.b],i*3)}return {p:P,c:Q}};
+  const UPC=new THREE.Color("#12e07a"),DNC=new THREE.Color("#ff2d55"),GRIDC=new THREE.Color("#3a4a7a"),GOLD=new THREE.Color("#f5b942");
+  /* --- the designs --- */
+  const galaxyShape=()=>{const core=new THREE.Color("#ffd27a"),mid=new THREE.Color("#ff9e5e"),arm=new THREE.Color("#7c8bff"),edge=new THREE.Color("#2aa8ff"),mag=new THREE.Color("#d16bff");
+    return mk(i=>{const arms=4,a0=(i%arms)*Math.PI*2/arms,t=Math.pow(Math.random(),.62),R=t*13,scat=(1-t*.35)*1.15,a=a0+R*.55+rnd(.38*(1-t*.4));
+      c.copy(core).lerp(mid,Math.min(1,t*2.2)).lerp(arm,Math.max(0,t*1.6-.35)).lerp(t>.8?edge:arm,Math.max(0,t-.7)*2);if(Math.random()<.08)c.lerp(mag,.7);if(Math.random()<.03)c.set("#ffffff");
+      return [Math.cos(a)*R+rnd(scat*.5),rnd(.55*(1-t))*(1+Math.random()),Math.sin(a)*R+rnd(scat*.5)]})};
+  /* real-looking price action (like a TradingView chart): impulse legs and pullbacks, volatility that comes in waves,
+     each candle opens at the previous close, wicks from rejections */
+  const market=(n,trend,seed)=>{let s=seed>>>0;const R=()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296},G=()=>(R()+R()+R()-1.5)*1.15;
+    let p=0,vol=1,leg=0,dir=-1;return Array.from({length:n},()=>{if(--leg<=0){dir=-dir;leg=dir>0?4+Math.floor(R()*5):2+Math.floor(R()*3)}
+      vol=Math.max(.45,Math.min(1.9,vol*.8+(.5+R()*1.1)*.2+(R()<.08?.7:0)));const o=p,cl=o+(dir>0?trend:-trend*.6)*vol+G()*vol*.7;p=cl;
+      return {o,c:cl,h:Math.max(o,cl)+Math.abs(G())*vol*.45,l:Math.min(o,cl)-Math.abs(G())*vol*.45}})};
+  const chart=(cs,withFib)=>{let lo=Infinity,hi=-Infinity;cs.forEach(k=>{lo=Math.min(lo,k.l);hi=Math.max(hi,k.h)});const n=cs.length,X=i=>-10.5+i*(21/(n-1)),Y=v=>-4.6+(v-lo)/((hi-lo)||1)*9.2,bw=Math.min(.3,21/(n-1)*.36);
+    const lv=[0,.236,.382,.5,.618,.786,1];
+    const out=mk(i=>{const rr=Math.random();
+      if(rr<.1){c.copy(GRIDC).multiplyScalar(.7);return Math.random()<.5?[-10+Math.round(Math.random()*20),-5+Math.random()*10,-1.2]:[-10+Math.random()*20,-5+Math.round(Math.random()*5)*2,-1.2]}
+      if(withFib&&rr<.24){const L=lv[Math.floor(Math.random()*lv.length)];c.copy(L===.618||L===.5?GOLD:L===0||L===1?W:new THREE.Color("#7c8bff"));return [-10+Math.random()*20,-4.6+L*9.2+rnd(.02),-.6]}
+      const k=cs[i%n],x=X(i%n);c.copy(k.c>=k.o?UPC:DNC);if(Math.random()<.15)c.lerp(W,.4);
+      if(Math.random()<.2)return [x+rnd(.025),Y(k.l)+Math.random()*(Y(k.h)-Y(k.l)),rnd(.025)];
+      /* particles sit on the faces of the candle body so it reads as a solid 3D block */
+      const b0=Y(Math.min(k.o,k.c)),b1=Math.max(Y(Math.max(k.o,k.c)),b0+.06),f=Math.floor(Math.random()*3),u=rnd(bw),w=rnd(bw),yy=b0+Math.random()*(b1-b0),sg=Math.random()<.5?-1:1;
+      return f===0?[x+sg*bw,yy,w]:f===1?[x+u,yy,sg*bw]:[x+u,sg>0?b1:b0,w]});
+    out.k=cs.map((k,i)=>({x:X(i),o:Y(k.o),c:Y(k.c),h:Y(k.h),l:Y(k.l)}));out.bw=bw;out.Y=Y;return out};
+  const fibCircles=()=>{const FIB=[.236,.382,.5,.618,.786,1,1.272,1.618],FC=["#7c8bff","#2aa8ff","#ffffff","#f5b942","#2aa8ff","#ffffff","#d16bff","#f5b942"];
+    return mk(i=>{if(i%5===0){const th=Math.random()*Math.PI*4.2,rr=.35*Math.exp(.306*th);c.copy(GOLD).lerp(new THREE.Color("#ffd27a"),Math.random());return [rr*Math.cos(th)+rnd(.04),rr*Math.sin(th)+rnd(.04),rnd(.06)]}
+      const j=i%FIB.length,R=FIB[j]*5.9,a=Math.random()*Math.PI*2;c.set(FC[j]);if(Math.random()<.1)c.lerp(W,.4);return [Math.cos(a)*R+rnd(.035),Math.sin(a)*R+rnd(.035),rnd(.06)]})};
+  const CN=ph?30:40;
+  const T=kind==="bull"?chart(market(CN,.55,7),false):kind==="bear"?chart(market(CN,-.55,11),false):kind==="fibr"?chart(market(CN,.5,23),true):kind==="fibc"?fibCircles():galaxyShape();
+  /* particles start scattered far away and fly in */
+  const start=new Float32Array(N*3),cur=new Float32Array(N*3),sd=new Float32Array(N);
+  for(let i=0;i<N;i++){const u=Math.random()*2-1,a=Math.random()*Math.PI*2,R=18+Math.random()*22,q=Math.sqrt(1-u*u);start.set([R*q*Math.cos(a),R*u,R*q*Math.sin(a)],i*3);sd[i]=Math.random()}
+  cur.set(start);
+  const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(cur,3));g.setAttribute("color",new THREE.BufferAttribute(T.c,3));g.setAttribute("seed",new THREE.BufferAttribute(sd,1));
+  const mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,vertexColors:true,uniforms:{uT:{value:0},uS:{value:(ph?46:58)*dpr*(isChart?.85:1)}},
     vertexShader:`attribute float seed;uniform float uT;uniform float uS;varying vec3 vC;varying float vA;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;
       vA=.55+.45*sin(uT*(1.5+seed*3.)+seed*60.);gl_PointSize=uS*(.25+seed*.75)/-mv.z;}`,
     fragmentShader:`varying vec3 vC;varying float vA;void main(){vec2 p=gl_PointCoord-.5;float d=length(p);if(d>.5)discard;float a=pow(1.-d*2.,1.8);gl_FragColor=vec4(vC*(.7+a*.8),a*vA*.95);}`});
-  const gal=new THREE.Points(g,mat),galaxy=new THREE.Group();galaxy.add(gal);galaxy.rotation.x=.95;galaxy.rotation.z=-.22;galaxy.position.y=-1;scene.add(galaxy);
-  /* bright core glow + nebula clouds */
+  const pts=new THREE.Points(g,mat),grp=new THREE.Group();grp.add(pts);scene.add(grp);
+  if(kind==="galaxy"){grp.rotation.x=.95;grp.rotation.z=-.22;grp.position.y=-1}else if(kind==="fibc"){grp.rotation.x=.08}else{grp.rotation.x=.06}
+  /* glows + nebula clouds */
   const glow=(color,size,op)=>{const s=document.createElement("canvas");s.width=s.height=128;const x=s.getContext("2d"),gr=x.createRadialGradient(64,64,0,64,64,64);
     gr.addColorStop(0,"rgba(255,255,255,1)");gr.addColorStop(.25,"rgba(255,255,255,.45)");gr.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=gr;x.fillRect(0,0,128,128);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(s),color,transparent:true,opacity:op,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(size,size,1);return sp};
-  const cg=[glow("#ffd27a",9,1),glow("#ff9e5e",18,.45),glow("#7c8bff",34,.18)];cg.forEach(x=>{x.userData.o=x.material.opacity;galaxy.add(x)});
-  const neb=[];[["#3a48e0",30,.3,[-14,2,-18]],["#d16bff",24,.22,[16,-3,-22]],["#2aa8ff",26,.2,[6,8,-26]],["#f5b942",18,.14,[-10,-6,-14]],["#7c8bff",34,.16,[2,-10,-30]]].forEach(([cl,s,o,p])=>{const n=glow(cl,s,o);n.position.set(...p);n.userData={p,o};neb.push(n);scene.add(n)});
-  /* scroll morph (like the reference): the same particles break apart and re-form into a glowing sphere,
-     a ring galaxy and a ringed planet as you scroll down the page, then back when you scroll up */
-  const shapes=[{p:pos.slice(),c:col.slice()}],mk=fn=>{const P=new Float32Array(N*3),Q=new Float32Array(N*3);for(let i=0;i<N;i++){const v=fn(i);P.set(v,i*3);Q.set([c.r,c.g,c.b],i*3)}return {p:P,c:Q}};
-  /* financial markets in 3D: candlestick charts (bullish / bearish), Fibonacci circles, Fibonacci retracement */
-  const UPC=new THREE.Color("#26a69a"),DNC=new THREE.Color("#ef5350"),GRIDC=new THREE.Color("#3a4a7a"),GOLD=new THREE.Color("#f5b942");
-  const walk=(n,drift,vol,seed)=>{let s=seed>>>0;const R=()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296};let p=0;return Array.from({length:n},()=>{const o=p,cl=p+drift+(R()*2-1)*vol;p=cl;return {o,c:cl,h:Math.max(o,cl)+R()*vol*.7,l:Math.min(o,cl)-R()*vol*.7}})};
-  const chart=(cs,withFib)=>{let lo=Infinity,hi=-Infinity;cs.forEach(k=>{lo=Math.min(lo,k.l);hi=Math.max(hi,k.h)});const n=cs.length,X=i=>-10.5+i*(21/(n-1)),Y=v=>-4.6+(v-lo)/((hi-lo)||1)*9.2;
-    const ma=[];let sm=0;cs.forEach((k,i)=>{sm+=k.c;if(i>=6)sm-=cs[i-6].c;ma.push(Y(sm/Math.min(i+1,6)))});
-    const lv=[0,.236,.382,.5,.618,.786,1];
-    const out=mk(i=>{const r=Math.random();
-      if(r<.12){c.copy(GRIDC).multiplyScalar(.7);const gx=Math.random()<.5;return gx?[-10+Math.round(Math.random()*20),-5+Math.random()*10,-1.2]:[-10+Math.random()*20,-5+Math.round(Math.random()*5)*2,-1.2]}
-      if(r<.2){const t=Math.random()*(n-1),ia=Math.floor(t),f=t-ia;c.copy(GOLD);return [X(t),ma[ia]+(ma[Math.min(n-1,ia+1)]-ma[ia])*f+rnd(.03),rnd(.05)]}
-      if(withFib&&r<.32){const L=lv[Math.floor(Math.random()*lv.length)],y=-4.6+L*9.2;c.copy(L===.618||L===.5?GOLD:L===0||L===1?new THREE.Color("#ffffff"):new THREE.Color("#7c8bff"));return [-10+Math.random()*20,y+rnd(.02),-.6]}
-      const k=cs[i%n],up=k.c>=k.o,x=X(i%n);c.copy(up?UPC:DNC);if(Math.random()<.12)c.lerp(new THREE.Color("#ffffff"),.35);
-      if(Math.random()<.22)return [x+rnd(.02),Y(k.l)+Math.random()*(Y(k.h)-Y(k.l)),rnd(.02)];
-      const b0=Y(Math.min(k.o,k.c)),b1=Math.max(Y(Math.max(k.o,k.c)),b0+.08);return [x+rnd(.27),b0+Math.random()*(b1-b0),rnd(.27)]});
-    out.ma=ma.map((y,i)=>[X(i),y]);out.up=cs[n-1].c>=cs[0].o;return out};
-  shapes.push(chart(walk(26,.36,1.15,7),false));                    /* bullish chart */
-  const FIB=[.236,.382,.5,.618,.786,1,1.272,1.618],FC=["#7c8bff","#2aa8ff","#ffffff","#f5b942","#2aa8ff","#ffffff","#d16bff","#f5b942"];
-  shapes.push(mk(i=>{if(i%5===0){const th=Math.random()*Math.PI*4.2,rr=.35*Math.exp(.306*th);c.copy(GOLD).lerp(new THREE.Color("#ffd27a"),Math.random());return [rr*Math.cos(th)+rnd(.04),rr*Math.sin(th)+rnd(.04),rnd(.06)]}
-    const j=i%FIB.length,R=FIB[j]*5.9,a=Math.random()*Math.PI*2;c.set(FC[j]);if(Math.random()<.1)c.lerp(new THREE.Color("#ffffff"),.4);return [Math.cos(a)*R+rnd(.035),Math.sin(a)*R+rnd(.035),rnd(.06)]}));   /* Fibonacci circles + golden spiral */
-  shapes.push(chart(walk(26,-.36,1.15,11),false));                  /* bearish chart */
-  shapes.push(chart(walk(26,.3,1.05,23),true));                    /* Fibonacci retracement on an uptrend */  const TILT=[.95,.04,.08,.04,.04],SPIN=[1,0,0,0,0],ROTZ=[-.22,0,0,0,0],FSPIN=[0,0,1,0,0],cur=pos,ccur=col;let prog=0,tilt=.95,spinA=0;
-  /* floating 3D price tickers (prices move a little every few seconds) */
-  const TK=[["NQ",21345.5,.012],["ES",5987.25,.008],["XAUUSD",2384.6,.006],["BTC",96850,.025],["EURUSD",1.0842,.002],["US30",44120,.007],["GBPUSD",1.2718,.002],["CL",71.42,.01]];
-  const tick=[],mkTex=(txt,up)=>{const cv=document.createElement("canvas");cv.width=512;cv.height=128;const x=cv.getContext("2d");x.font="700 54px JetBrains Mono, Consolas, monospace";
-    x.textBaseline="middle";x.shadowColor=up?"rgba(38,166,154,.9)":"rgba(239,83,80,.9)";x.shadowBlur=18;x.fillStyle=up?"#5ff0d9":"#ff8a85";x.fillText(txt,16,66);return new THREE.CanvasTexture(cv)};
-  const tickTxt=o=>{const ch=(Math.random()*2-1)*o.v*100;o.p*=1+ch/100;const d=o.p>100?1:4;return [`${o.s} ${o.p.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})} ${ch>=0?"▲":"▼"}${Math.abs(ch).toFixed(2)}%`,ch>=0]};
-  [...TK,["BROWN23",-89,0]].forEach((t,i)=>{const o={s:t[0],p:t[1],v:t[2]};const [txt,up]=t[0]==="BROWN23"?["BROWN23 −89% 🏷",true]:tickTxt(o);
-    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:mkTex(txt,up),transparent:true,depthWrite:false,opacity:0}));const s=ph?4:5.6;sp.scale.set(s,s/4,1);
-    sp.position.set(rnd(15),rnd(8),-4-Math.random()*12);sp.userData={o,ph:Math.random()*6,v:.25+Math.random()*.35,brown:t[0]==="BROWN23"};tick.push(sp);scene.add(sp)});
-  let tickT=0;
-  /* live price pulse running along the moving average of the chart on screen */
-  const pulse=glow("#ffffff",1.4,0),pulse2=glow("#f5b942",3.2,0);galaxy.add(pulse);galaxy.add(pulse2);
+  const cg=kind==="galaxy"?[glow("#ffd27a",9,1),glow("#ff9e5e",18,.45),glow("#7c8bff",34,.18)]:kind==="fibc"?[glow("#f5b942",7,.5),glow("#7c8bff",22,.15)]:[];cg.forEach(x=>{x.userData.o=x.material.opacity;grp.add(x)});
+  const NEB={galaxy:[["#3a48e0",30,.3,[-14,2,-18]],["#d16bff",24,.22,[16,-3,-22]],["#2aa8ff",26,.2,[6,8,-26]],["#f5b942",18,.14,[-10,-6,-14]],["#7c8bff",34,.16,[2,-10,-30]]],
+    bull:[["#12e07a",30,.16,[-12,-4,-22]],["#2aa8ff",28,.16,[14,6,-26]],["#3a48e0",34,.2,[0,10,-30]]],
+    bear:[["#ff2d55",30,.15,[12,4,-22]],["#7a3cff",28,.16,[-14,-5,-26]],["#3a48e0",34,.2,[0,10,-30]]],
+    fibc:[["#f5b942",26,.14,[-12,4,-20]],["#d16bff",28,.18,[14,-4,-24]],["#2aa8ff",30,.16,[0,-10,-28]]],
+    fibr:[["#f5b942",28,.14,[-13,5,-22]],["#12e07a",26,.12,[13,-5,-24]],["#7c8bff",34,.18,[0,-10,-30]]]}[kind]||[];
+  const neb=NEB.map(([cl,s,o,p])=>{const n=glow(cl,s,o);n.position.set(...p);n.userData={p,o};scene.add(n);return n});
+  /* solid 3D candles (TradingView colours, lit so the sides look 3D) + a live last candle with its price line */
+  let cm=null;
+  if(isChart){scene.add(new THREE.AmbientLight(0xffffff,1.1));const dl=new THREE.DirectionalLight(0xffffff,2.6);dl.position.set(6,9,12);scene.add(dl);const dl2=new THREE.DirectionalLight(0x8fa0ff,1.1);dl2.position.set(-8,-3,6);scene.add(dl2);
+    const n=T.k.length,BOX=new THREE.BoxGeometry(1,1,1),mb=new THREE.MeshStandardMaterial({roughness:.28,metalness:.25,transparent:true,opacity:0}),mw=mb.clone();
+    const body=new THREE.InstancedMesh(BOX,mb,n),wick=new THREE.InstancedMesh(BOX,mw,n),m4=new THREE.Matrix4(),q=new THREE.Quaternion(),v=new THREE.Vector3(),s=new THREE.Vector3();
+    const set=(i,k)=>{const b0=Math.min(k.o,k.c),b1=Math.max(Math.max(k.o,k.c),b0+.06);v.set(k.x,(b0+b1)/2,0);s.set(T.bw*2,b1-b0,T.bw*2);m4.compose(v,q,s);body.setMatrixAt(i,m4);
+      v.set(k.x,(k.l+k.h)/2,0);s.set(.06,Math.max(.01,k.h-k.l),.06);m4.compose(v,q,s);wick.setMatrixAt(i,m4);const cl=k.c>=k.o?UPC:DNC;body.setColorAt(i,cl);wick.setColorAt(i,cl)};
+    T.k.forEach((k,i)=>set(i,k));const cGrp=new THREE.Group();cGrp.add(body,wick);
+    const pl=new THREE.Mesh(new THREE.BoxGeometry(22,.025,.025),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false}));cGrp.add(pl);
+    const lk=T.k[n-1];cm={cGrp,body,wick,set,pl,mats:[mb,mw],lk,base:{...lk},n};grp.add(cGrp)}
   /* deep starfield (parallax) */
   const SN=ph?1500:3500,sp=new Float32Array(SN*3),ss=new Float32Array(SN),sc=new Float32Array(SN*3);for(let i=0;i<SN;i++){const u=Math.random()*2-1,a=Math.random()*Math.PI*2,R=60+Math.random()*90,q=Math.sqrt(1-u*u);
     sp.set([R*q*Math.cos(a),R*u,R*q*Math.sin(a)],i*3);ss[i]=Math.random();const k=Math.random();c.set(k<.15?"#ffd9a0":k<.4?"#a9b8ff":"#ffffff");sc.set([c.r,c.g,c.b],i*3)}
@@ -193,35 +205,33 @@ export function galaxyBackground(el){
     const ln=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0,blending:THREE.AdditiveBlending}));ln.userData={t:-Math.random()*6};shoot.push(ln);scene.add(ln)}
   let mx=0,my=0;const mv=e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5};addEventListener("pointermove",mv,{passive:true});
   const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()};addEventListener("resize",rs);
-  const clock=new THREE.Clock();let last=0,cx=0,cy=6;
+  const clock=new THREE.Clock(),T0=performance.now();let last=0,cx=0,cy=6,sfs=0,vel=0,lastY=scrollY,spin=0,settled=false;
   (function loop(){if(!el.isConnected){removeEventListener("pointermove",mv);removeEventListener("resize",rs);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose();return}
     requestAnimationFrame(loop);if(document.hidden)return;const t=clock.getElapsedTime(),dt=Math.min(.05,t-last);last=t;mat.uniforms.uT.value=t;
-    /* morph with the scroll, smoothed so it glides on PC and with touch scrolling on phones */
-    const mxS=Math.max(1,document.documentElement.scrollHeight-innerHeight),target=Math.min(1,Math.max(0,scrollY/mxS))*(shapes.length-1);prog+=(target-prog)*Math.min(1,dt*3.2);
-    const A=Math.min(shapes.length-1,Math.floor(prog)),B=Math.min(shapes.length-1,A+1),fr=prog-A,k=fr*fr*(3-2*fr),burst=Math.sin(k*Math.PI)*(ph?1.8:2.4),sa=shapes[A],sb=shapes[B];
-    for(let i=0;i<N;i++){const j=i*3,s=sd[i];cur[j]=sa.p[j]+(sb.p[j]-sa.p[j])*k+burst*Math.sin(s*61.3)*(.6+s);cur[j+1]=sa.p[j+1]+(sb.p[j+1]-sa.p[j+1])*k+burst*Math.cos(s*17.9)*(.6+s);cur[j+2]=sa.p[j+2]+(sb.p[j+2]-sa.p[j+2])*k+burst*Math.sin(s*93.7);
-      ccur[j]=sa.c[j]+(sb.c[j]-sa.c[j])*k;ccur[j+1]=sa.c[j+1]+(sb.c[j+1]-sa.c[j+1])*k;ccur[j+2]=sa.c[j+2]+(sb.c[j+2]-sa.c[j+2])*k}
-    g.attributes.position.needsUpdate=true;g.attributes.color.needsUpdate=true;
-    const gw=Math.max(0,1-prog*1.2);cg.forEach(x=>x.material.opacity=x.userData.o*gw);
-    tilt+=((TILT[A]+(TILT[B]-TILT[A])*k)-tilt)*Math.min(1,dt*3);galaxy.rotation.x=tilt;const sw=SPIN[A]+(SPIN[B]-SPIN[A])*k;spinA+=dt*.06*sw;galaxy.rotation.y=spinA*(sw>.02?1:0)+Math.sin(t*.25)*.18*(1-sw);const fz=FSPIN[A]+(FSPIN[B]-FSPIN[A])*k;galaxy.rotation.z=(ROTZ[A]+(ROTZ[B]-ROTZ[A])*k)+fz*t*.12;stars.rotation.y=t*.006+prog*.15;
-    cx+=((mx*3)-cx)*Math.min(1,dt*1.8);cy+=((5.5+my*-2)-cy)*Math.min(1,dt*1.8);cam.position.set(cx,cy,16);cam.lookAt(0,-.5,0);
-    /* tickers drift up and fade in depth; prices refresh every ~4 s */
-    tickT+=dt;const refresh=tickT>4;if(refresh)tickT=0;
-    tick.forEach((s,i)=>{const u=s.userData;s.position.y+=dt*u.v*.6;s.position.x+=Math.sin(t*.2+u.ph)*dt*.15;if(s.position.y>9){s.position.y=-9;s.position.x=rnd(15);s.position.z=-4-Math.random()*12}
-      s.material.opacity=Math.min(.85,Math.max(0,(9-Math.abs(s.position.y))/4))*(.55+.45*Math.sin(t*.8+u.ph));
-      if(refresh&&!u.brown&&i%2===(Math.floor(t)%2)){const [txt,up]=tickTxt(u.o);s.material.map.dispose();s.material.map=mkTex(txt,up);s.material.needsUpdate=true}});
-    const act=k<.5?sa:sb,cw=1-Math.abs(.5-k)*0;if(act.ma){const m=act.ma,q=(t*.09)%1,fi=q*(m.length-1),i0=Math.floor(fi),f2=fi-i0,px=m[i0][0]+(m[Math.min(m.length-1,i0+1)][0]-m[i0][0])*f2,py=m[i0][1]+(m[Math.min(m.length-1,i0+1)][1]-m[i0][1])*f2;
-      pulse.position.set(px,py,.1);pulse2.position.copy(pulse.position);const vis=Math.max(0,1-burst/1.2)*Math.sin(q*Math.PI);pulse.material.opacity=vis;pulse2.material.opacity=vis*.5;pulse2.material.color.set(act.up?"#26a69a":"#ef5350")}
-    else{pulse.material.opacity=0;pulse2.material.opacity=0}
+    /* scroll position (smoothed) drives the camera / rotation; scroll speed shakes the particles loose */
+    const mxS=Math.max(1,document.documentElement.scrollHeight-innerHeight),sf=Math.min(1,Math.max(0,scrollY/mxS));sfs+=(sf-sfs)*Math.min(1,dt*3);
+    const dy=scrollY-lastY;lastY=scrollY;const inst=dt>0?Math.min(1.4,Math.abs(dy)/innerHeight/dt*.35):0;vel+=(inst-vel)*Math.min(1,dt*(inst>vel?6:2.2));
+    const asm=Math.min(1,(performance.now()-T0)/2400),e=1-Math.pow(1-asm,3),sh=vel*(ph?1.5:2.1);
+    if(asm<1||sh>.004||!settled){settled=asm>=1&&sh<=.004;const P=T.p;
+      for(let i=0;i<N;i++){const j=i*3,s=sd[i],ox=sh*Math.sin(s*61.3)*(.6+s),oy=sh*Math.cos(s*17.9)*(.6+s),oz=sh*Math.sin(s*93.7);
+        cur[j]=start[j]+(P[j]-start[j])*e+ox;cur[j+1]=start[j+1]+(P[j+1]-start[j+1])*e+oy;cur[j+2]=start[j+2]+(P[j+2]-start[j+2])*e+oz}
+      g.attributes.position.needsUpdate=true}
+    cg.forEach(x=>x.material.opacity=x.userData.o*e);
+    if(kind==="galaxy"){spin+=dt*.06+Math.abs(dy)*.0009;grp.rotation.y=spin;grp.rotation.x=.95-sfs*.45}
+    else if(kind==="fibc"){grp.rotation.z=t*.1+sfs*2.6;grp.rotation.x=.08+sfs*.55;grp.rotation.y=Math.sin(t*.2)*.12}
+    else{grp.rotation.y=-.42+sfs*.84+Math.sin(t*.22)*.07;grp.rotation.x=.06+sfs*.12}
+    /* candles: grow up from the bottom as the particles land, dissolve a little while scrolling fast */
+    if(cm){const op=Math.max(0,Math.min(1,(asm-.45)/.4))*(1-Math.min(.75,vel*1.1));cm.mats.forEach(m=>m.opacity=op*.92);
+      const gs=.15+.85*(1-Math.pow(1-Math.min(1,asm/.85),3));cm.cGrp.scale.y=gs;cm.cGrp.position.y=-4.6*(1-gs);
+      /* the last candle is live: price ticks up and down, wick grows, colour flips when it crosses the open */
+      const b=cm.base,pr=b.c+Math.sin(t*1.15)*.24+Math.sin(t*2.7+1.3)*.1+Math.sin(t*6.1)*.03;cm.lk.c=pr;cm.lk.h=Math.max(b.h,pr+.02);cm.lk.l=Math.min(b.l,pr-.02);
+      cm.set(cm.n-1,cm.lk);cm.body.instanceMatrix.needsUpdate=true;cm.wick.instanceMatrix.needsUpdate=true;cm.body.instanceColor.needsUpdate=true;cm.wick.instanceColor.needsUpdate=true;
+      cm.pl.position.set(0,pr,0);cm.pl.material.color.copy(pr>=cm.lk.o?UPC:DNC);cm.pl.material.opacity=op*(.4+.2*Math.sin(t*3))}
+    stars.rotation.y=t*.006+sfs*.4;
+    cx+=((mx*3)-cx)*Math.min(1,dt*1.8);cy+=((5.5+my*-2-sfs*1.5)-cy)*Math.min(1,dt*1.8);cam.position.set(cx,cy,16-sfs*(isChart?3:2.5));cam.lookAt(0,-.5,0);
     neb.forEach((n,i)=>{n.position.x=n.userData.p[0]+Math.sin(t*.07+i)*2.5;n.position.y=n.userData.p[1]+Math.cos(t*.05+i)*1.5;n.material.opacity=n.userData.o*(.75+.25*Math.sin(t*.3+i*2))});
-    shoot.forEach(s=>{const u=s.userData;u.t+=dt;if(u.t<0)return;if(u.t===dt||!u.on){u.on=true;s.position.set(rnd(25),8+Math.random()*8,-20-Math.random()*10);s.rotation.z=-.35-Math.random()*.3}
+    shoot.forEach(s=>{const u=s.userData;u.t+=dt;if(u.t<0)return;if(!u.on){u.on=true;s.position.set(rnd(25),8+Math.random()*8,-20-Math.random()*10);s.rotation.z=-.35-Math.random()*.3}
       const p=u.t/1.1;s.position.x+=dt*22*Math.cos(s.rotation.z);s.position.y+=dt*22*Math.sin(s.rotation.z);s.material.opacity=p<1?Math.sin(p*Math.PI)*.9:0;if(p>=1){u.t=-3-Math.random()*7;u.on=false}});
     r.render(scene,cam)})();
   return {r}}
-
-
-
-
-
-
 

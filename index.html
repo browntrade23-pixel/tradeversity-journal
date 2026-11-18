@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -2135,10 +2135,15 @@ setInterval(ntfRefresh,30000);
 async function rqReadyLoad(){if(!S.me||S.me.role!=="admin"||!API||!API.listProfiles)return;
   try{const P=await API.listProfiles();S._rqReady=P.filter(p=>p.role!=="admin"&&p.status==="pending"&&p.tgOk&&p.emailOk!==false).map(p=>({id:p.id,name:p.name}));ntfRefresh()}catch(e){}}
 setInterval(rqReadyLoad,180000);
-function galaxyBg(){const on=S.view==="propfirms"&&!!S.me;let g=document.getElementById("galBg");document.documentElement.classList.toggle("gal-on",on&&!!g);
-  if(!on){if(g)g.remove();document.documentElement.classList.remove("gal-on");return}
-  if(!g){g=document.createElement("div");g.id="galBg";g.setAttribute("aria-hidden","true");$("#app").prepend(g);
-    A3().then(m=>{if(!g.isConnected)return;try{m.galaxyBackground(g);document.documentElement.classList.add("gal-on")}catch(e){g.remove()}}).catch(()=>g.remove())}}
+/* one 3D background per section: galaxy (prop firms), bullish candles (journal), Fibonacci circles (stats),
+   bearish candles (risk), Fibonacci retracement (plan) */
+const BG3D={propfirms:"galaxy",journal:"bull",stats:"fibc",risk:"bear",plan:"fibr"};
+function galaxyBg(){const kind=S.me&&!S.page?BG3D[S.view]:null;let g=document.getElementById("galBg");
+  if(g&&g.dataset.k!==kind){g.remove();g=null}
+  if(!kind){document.documentElement.classList.remove("gal-on");return}
+  if(!g){g=document.createElement("div");g.id="galBg";g.dataset.k=kind;g.setAttribute("aria-hidden","true");$("#app").prepend(g);
+    A3().then(m=>{if(!g.isConnected)return;try{m.galaxyBackground(g,kind);document.documentElement.classList.add("gal-on")}catch(e){g.remove();document.documentElement.classList.remove("gal-on")}}).catch(()=>g.remove())}
+  else document.documentElement.classList.add("gal-on")}
 function render(){setTimeout(galaxyBg,0);const _tr=document.getElementById("pfTray");if(_tr&&S.view!=="propfirms")_tr.className="";document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
   const fn={today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
@@ -3143,7 +3148,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   a3Mount(st.days,"s",el);
 }
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-18a";
+const APP_VER="2026-11-18b";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3154,7 +3159,7 @@ const APP_VER="2026-11-18a";
   window.__updCheck=check;setTimeout(check,8000);setInterval(()=>{if(!document.hidden)check()},5*60000);
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)check()})})();
 /* ============ IN-APP 3D (app3d.js, loaded only where shown; the flat version stays if 3D can't run) ============ */
-let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=12"));
+let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=13"));
 function mount3d(id,fn,...args){setTimeout(()=>{const el=document.getElementById(id);if(!el||el.dataset.a3)return;el.dataset.a3="1";
   A3().then(m=>{if(!el.isConnected)return;try{m[fn](el,...args)}catch(e){console.warn("3D",e)}}).catch(e=>console.warn("3D off",e))},40)}
 function newsClockState(){const now=Date.now(),reds=S.newsLoaded?newsFor(todayStr()).filter(n=>n.impact==="High"):[],W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,t,a:t-5*60000,b:t+5*60000}});
