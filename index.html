@@ -1392,7 +1392,20 @@ html:not([data-theme=light]) :is(.mk-chip.on,.st-tab.on){border-color:rgba(110,1
 </style>
 <style>
 /* ===== ADMIN organized dashboard ===== */
-.adm{display:grid;gap:12px;margin:6px 0 14px}
+.adm{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin:6px 0 14px}
+.adm-sec.on{grid-template-columns:minmax(0,1fr)}.adm-sec>*,.adm>*{min-width:0;max-width:100%}
+/* phones: admin never wider than the screen — tabs scroll in one row, tables become stacked rows */
+@media(max-width:760px){
+  .adm-tabs{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;border-radius:16px!important;padding:4px}
+  .adm-tabs::-webkit-scrollbar{display:none}
+  .adm-tabs button{flex:none!important;min-width:0!important;padding:0 14px}
+  .adm-sec table,.adm-sec thead,.adm-sec tbody,.adm-sec tr,.adm-sec th,.adm-sec td{display:block;width:100%!important;box-sizing:border-box}
+  .adm-sec table{border:0}.adm-sec thead,.adm-sec tr:has(> th),.adm-sec th{display:none!important}
+  .adm-sec tr{display:flex!important;flex-wrap:wrap;align-items:center;gap:4px 12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+  .adm-sec td{width:auto!important;flex:0 1 auto;max-width:100%;padding:2px!important;border:0!important;text-align:start!important;white-space:normal!important;overflow-wrap:anywhere}
+  .adm-sec td:empty{display:none}
+  .adm-sec .card{overflow-wrap:anywhere}
+}
 .adm-tabs{display:flex;flex-wrap:wrap;gap:4px;width:100%}.adm-tabs button{flex:1;min-width:120px;white-space:nowrap}
 .adm-n{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--gold);color:#1b1305;font-size:11px;font-weight:800}
 .adm-sec{display:none}.adm-sec.on{display:grid;gap:12px}.adm-sec .card{margin-bottom:0!important}
@@ -3318,7 +3331,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-18zd";
+const APP_VER="2026-11-18ze";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
