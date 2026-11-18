@@ -66,8 +66,9 @@ h1 em,h2 em{font-style:normal;background:linear-gradient(180deg,var(--g2),var(--
 .stats3 b{display:block;font-size:26px;font-weight:900;color:var(--g)}
 .stats3 span{font-size:12.5px;color:var(--mut)}
 /* floating phone with a real screenshot */
-.shot{display:flex;justify-content:center;perspective:1200px}
-.phone{width:min(300px,70vw);aspect-ratio:390/844;border-radius:42px;padding:10px;background:linear-gradient(145deg,#3a3d4a,#101118 40%,#07080b);box-shadow:0 0 0 1.5px rgba(255,255,255,.14),0 40px 90px -20px rgba(245,185,66,.4),0 0 120px -10px rgba(58,72,224,.35);transform:rotateY(-14deg) rotateX(6deg);transition:transform .8s cubic-bezier(.2,.9,.3,1)}
+.shot{display:flex;justify-content:flex-end;perspective:1200px}
+section.r .shot{justify-content:flex-start}
+.phone{width:min(240px,70vw);aspect-ratio:390/844;border-radius:42px;padding:10px;background:linear-gradient(145deg,#3a3d4a,#101118 40%,#07080b);box-shadow:0 0 0 1.5px rgba(255,255,255,.14),0 40px 90px -20px rgba(245,185,66,.4),0 0 120px -10px rgba(58,72,224,.35);transform:rotateY(-14deg) rotateX(6deg);transition:transform .8s cubic-bezier(.2,.9,.3,1)}
 section.r .phone{transform:rotateY(14deg) rotateX(6deg)}
 .phone:hover{transform:rotateY(0) rotateX(0)}
 .phone div{width:100%;height:100%;border-radius:33px;background:#050608 top/100% auto no-repeat}
@@ -100,7 +101,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   section:first-of-type{min-height:100vh}
   .wrap{grid-template-columns:1fr;gap:26px}
   section.r .txt,section.r .shot{grid-column:1;grid-row:auto}
-  .shot{order:2}
+  .shot{order:2;justify-content:center!important}
   .phone,section.r .phone{transform:rotateY(0) rotateX(4deg);width:min(260px,72vw)}
   .dots{display:none}
   .brand span{display:none}
@@ -130,7 +131,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
 <nav class="dots" aria-label="Sections"></nav>
 
 <main>
-<section id="hero" data-shape="tvchart"><div class="wrap"><div class="txt">
+<section id="hero" data-shape="city"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="hero_k">Tradeversity</div>
   <h1 class="reveal" data-t="hero_h">The <em>Effective</em> Journal</h1>
   <p class="lead reveal" data-t="hero_p">The trading journal built for prop firm traders. Journal every trade, know your real numbers, never break a rule, and get funded.</p>
@@ -138,7 +139,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   <div class="stats3 reveal"><div><b data-t="yrs_n">~7</b><span data-t="yrs">years in the markets</span></div><div><b>350+</b><span data-t="stu">students</span></div><div><b>3</b><span data-t="langs">languages · EN FR AR</span></div></div>
 </div></div><div class="scroll" data-t="scroll">SCROLL</div></section>
 
-<section id="journal" data-shape="trades"><div class="wrap"><div class="txt">
+<section id="journal" data-shape="book"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="j_k">Trading journal</div>
   <h2 class="reveal" data-t="j_h">Every trade. <em>In your pocket.</em></h2>
   <p class="lead reveal" data-t="j_p">Log a trade in seconds: P&amp;L, commissions of your prop firm, emotions, rating and your chart screenshot.</p>
@@ -150,7 +151,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   </ul></div>
   <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/trade.jpg)"></div></div></div></div></section>
 
-<section id="stats" class="r" data-shape="pnl"><div class="wrap"><div class="txt">
+<section id="stats" class="r" data-shape="heatmap"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="s_k">Statistics</div>
   <h2 class="reveal" data-t="s_h">Know your <em>real numbers.</em></h2>
   <p class="lead reveal" data-t="s_p">Your P&amp;L calendar, win rate, profit factor, expectancy, streaks, best and worst day. All calculated for you.</p>
@@ -162,7 +163,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   </ul></div>
   <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/stats.jpg)"></div></div></div></div></section>
 
-<section id="rules" data-shape="levels"><div class="wrap"><div class="txt">
+<section id="rules" data-shape="shield"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="r_k">Prop firm rules</div>
   <h2 class="reveal" data-t="r_h">Pick your firm. <em>The rules fill in.</em></h2>
   <p class="lead reveal" data-t="r_p">Choose futures or CFD, your prop firm, plan and size. Profit target, daily loss and max drawdown appear by themselves.</p>
@@ -174,7 +175,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   </ul></div>
   <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/rules-auto.jpg)"></div></div></div></div></section>
 
-<section id="firms" class="r" data-shape="wall"><div class="wrap"><div class="txt">
+<section id="firms" class="r" data-shape="orbit"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="f_k">Prop firm tracker</div>
   <h2 class="reveal" data-t="f_h">45 prop firms. <em>No secrets.</em></h2>
   <p class="lead reveal" data-t="f_p">Rules and hidden rules of every futures and CFD prop firm, prices for every size, payouts and Algeria availability.</p>
@@ -186,7 +187,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   </ul></div>
   <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/propfirms.jpg)"></div></div></div></div></section>
 
-<section id="news" data-shape="spike"><div class="wrap"><div class="txt">
+<section id="news" data-shape="wave"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="n_k">News alerts</div>
   <h2 class="reveal" data-t="n_h">Red news? <em>You know first.</em></h2>
   <p class="lead reveal" data-t="n_p">Every red and orange folder USD news with a countdown in New York and Algeria time, and what each news means.</p>
@@ -198,7 +199,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   </ul></div>
   <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/news.jpg)"></div></div></div></div></section>
 
-<section id="tools" class="r" data-shape="position"><div class="wrap"><div class="txt">
+<section id="tools" class="r" data-shape="balance"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="t_k">Trading tools</div>
   <h2 class="reveal" data-t="t_h">Size every trade <em>right.</em></h2>
   <p class="lead reveal" data-t="t_p">Contracts or lots for your stop, on futures or CFD. Know if you pass the consistency rule before you trade.</p>
@@ -210,7 +211,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   </ul></div>
   <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/risk.jpg)"></div></div></div></div></section>
 
-<section id="results" data-shape="breakout"><div class="wrap"><div class="txt">
+<section id="results" data-shape="trophy"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="a_k">About Tradeversity</div>
   <h2 class="reveal" data-t="a_h">Real students. <em>Real results.</em></h2>
   <p class="lead reveal" data-t="a_p">A trading mentorship founded by Brown Algo and ZNtrading: a precise scalping system, a clear daily bias, a written plan, strict risk and an honest journal.</p>
@@ -218,7 +219,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   <div class="cta reveal"><a class="btn" href="https://t.me/tradeversity_feedbackresult" target="_blank" rel="noopener" data-t="res_btn">See all results on Telegram</a></div>
 </div></div></section>
 
-<section id="join" data-shape="reversal"><div class="wrap"><div class="txt">
+<section id="join" data-shape="helix"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="z_k">Start today</div>
   <h2 class="reveal" data-t="z_h">Journal. Plan. <em>Get funded.</em></h2>
   <p class="lead reveal" data-t="z_p">Free for Tradeversity students. Create your account, verify your email and Telegram, and get access.</p>
@@ -279,7 +280,7 @@ const small=innerWidth<860;
 const N=small?9000:15000;
 renderer.setPixelRatio(Math.min(devicePixelRatio,small?1.5:1.75));
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(55,1,.1,100);camera.position.set(0,0,8.5);
-import {buildShapes} from "./trade3d-shapes.js?v=2";
+import {buildShapes} from "./trade3d-shapes.js?v=3";
 const rnd=(a=1)=>(Math.random()*2-1)*a;
 const S=buildShapes(THREE,N);   /* TradingView-style chart scenes: candles, levels, P&L bars, position tool... */
 /* points */
@@ -299,8 +300,8 @@ sg.setAttribute("position",new THREE.BufferAttribute(sp,3));scene.add(new THREE.
 /* scroll -> which shapes and how far between them */
 const secs=[...document.querySelectorAll("main section")],keys=secs.map(s=>s.dataset.shape);
 /* where each shape sits: beside the text on desktop (around the phone), above the text on phones */
-const LAY={hero:{x:2.1,y:0,s:1.1,ry:-.38},results:{x:0,y:2.05,s:.7,ry:0},join:{x:0,y:-.1,s:1.15,ry:0}};
-const lay=secs.map(s=>LAY[s.id]||(s.classList.contains("r")?{x:-2.3,y:0,s:1.25,ry:.3}:{x:2.3,y:0,s:1.25,ry:-.3}));
+const LAY={hero:{x:2.4,y:.5,s:1.25,ry:-.3},results:{x:0,y:2.05,s:.7,ry:0},join:{x:0,y:-.1,s:1.15,ry:0}};
+const lay=secs.map(s=>LAY[s.id]||(s.classList.contains("r")?{x:-1.55,y:.1,s:.95,ry:.28}:{x:1.55,y:.1,s:.95,ry:-.28}));
 const layM=secs.map(s=>s.id==="results"?{x:0,y:3.2,s:.62,ry:0}:{x:0,y:2.6,s:.74,ry:0});
 function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.position.z=w<860?11:8.5;camera.updateProjectionMatrix()}
 addEventListener("resize",size);size();
@@ -309,6 +310,7 @@ function state(){const v=scrollY+innerHeight/2;let i=0;const cs=secs.map(s=>s.of
   while(i<cs.length-1&&v>=cs[i+1])i++;if(v<cs[0])return {a:0,b:0,t:0};if(i>=cs.length-1)return {a:cs.length-1,b:cs.length-1,t:0};
   const raw=(v-cs[i])/(cs[i+1]-cs[i]);return {a:i,b:i+1,t:smooth(Math.min(1,Math.max(0,(raw-.25)/.5)))}}
 let mx=0,my=0;addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
+const SPIN={orbit:1,trophy:1,helix:1};let spinA=0,lastT=0;
 const clock=new THREE.Clock();let cur=state(),offX=2.3,offY=0,offS=.95,offR=-.42;
 function frame(){const t=clock.getElapsedTime();const s=state();cur=s;
   const A=S[keys[s.a]],B=S[keys[s.b]],k=s.t,burst=Math.sin(k*Math.PI)*(small?1.1:1.4);
@@ -322,13 +324,17 @@ function frame(){const t=clock.getElapsedTime();const s=state();cur=s;
   const L=innerWidth<860?layM:lay,la=L[s.a],lb=L[s.b],tx=la.x+(lb.x-la.x)*k,ty=la.y+(lb.y-la.y)*k,ts=la.s+(lb.s-la.s)*k;
   const tr=la.ry+(lb.ry-la.ry)*k;offX+=(tx-offX)*.08;offY+=(ty-offY)*.08;offS+=(ts-offS)*.08;offR+=(tr-offR)*.08;grp.position.set(offX,offY,0);grp.scale.setScalar(offS);
   /* charts face the middle of the screen, swaying gently like a 3D trading screen */
-  grp.rotation.y=offR+(reduce?0:Math.sin(t*.35)*.12)+mx*.35;grp.rotation.x=-.08+(reduce?0:Math.sin(t*.27)*.05)+my*.2;grp.rotation.z=0;
+  /* the 3D objects (orbit, trophy, helix) turn slowly; the flat ones sway */
+  const sw=(SPIN[keys[s.a]]||0)*(1-k)+(SPIN[keys[s.b]]||0)*k;if(!reduce)spinA+=(t-lastT)*.45*sw;lastT=t;
+  grp.rotation.y=offR+spinA+(reduce?0:Math.sin(t*.35)*.12*(1-sw))+mx*.35;grp.rotation.x=-.08+(reduce?0:Math.sin(t*.27)*.05)+my*.2;grp.rotation.z=0;
   mat.uniforms.uTime.value=t;renderer.render(scene,camera);if(!reduce)requestAnimationFrame(frame)}
 document.getElementById("fallback").style.opacity=".35";
 if(reduce){addEventListener("scroll",()=>requestAnimationFrame(frame),{passive:true});frame()}else frame();
 </script>
 </body>
 </html>
+
+
 
 
 

@@ -3867,9 +3867,10 @@ async function bootDemo(){const D=demoData();S._demo=true;
 </script>
 <!-- 3D particles behind login / sign-up (falls back to the night scene if 3D is not supported) -->
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"}}</script>
-<script type="module">import("./auth3d.js?v=5").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))</script>
+<script type="module">import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))</script>
 </body>
 </html>
+
 
 
 

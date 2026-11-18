@@ -1,9 +1,9 @@
 ﻿/* 3D trading-chart background for the login / sign-up page (same scenes as welcome.html, from trade3d-shapes.js).
-   The chart follows the step: log in = bullish TradingView chart, sign-up = bullish breakout,
-   email code = prop firm levels, Telegram = buy/sell trades, waiting for approval = long position tool.
+   The scene follows the step: log in = candle city, sign-up = growth helix,
+   email code = rules shield, Telegram = prop firm orbit, waiting for approval = trophy.
    If WebGL is not available, the night scene stays. */
 import * as THREE from "three";
-import {buildShapes} from "./trade3d-shapes.js?v=2";
+import {buildShapes} from "./trade3d-shapes.js?v=3";
 const auth=document.getElementById("auth");
 const canvas=document.createElement("canvas");canvas.id="auth3d";canvas.setAttribute("aria-hidden","true");
 let renderer;
@@ -33,12 +33,12 @@ function place(){const ph=innerWidth<860;grp.scale.setScalar(ph?.74:1.45);grp.po
 addEventListener("resize",()=>{size();place()});size();place();
 /* which step is on screen */
 const vis=id=>{const e=document.getElementById(id);return e&&!e.classList.contains("hidden")&&e.offsetParent!==null};
-function want(){if(vis("waitBox"))return "position";if(vis("tgForm"))return "trades";if(vis("otpForm"))return "levels";if(vis("signupForm"))return "breakout";return "tvchart"}
-let from=S.tvchart,to=S.tvchart,toKey="tvchart",t0=0,k=1;
+function want(){if(vis("waitBox"))return "trophy";if(vis("tgForm"))return "orbit";if(vis("otpForm"))return "shield";if(vis("signupForm"))return "helix";return "city"}
+let from=S.city,to=S.city,toKey="city",t0=0,k=1;
 for(let i=0;i<N*3;i++){pos[i]=to.p[i];col[i]=to.c[i]}
 geo.attributes.position.needsUpdate=true;geo.attributes.color.needsUpdate=true;
 let mx=0,my=0;addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
-const clock=new THREE.Clock();
+const clock=new THREE.Clock();let spin=0,lt=0;
 function frame(){requestAnimationFrame(frame);
   if(auth.classList.contains("hidden")||document.hidden)return;
   const t=clock.getElapsedTime(),w=want();
@@ -51,8 +51,9 @@ function frame(){requestAnimationFrame(frame);
       col[j]=from.c[j]+(to.c[j]-from.c[j])*e;col[j+1]=from.c[j+1]+(to.c[j+1]-from.c[j+1])*e;col[j+2]=from.c[j+2]+(to.c[j+2]-from.c[j+2])*e}
     geo.attributes.position.needsUpdate=true;geo.attributes.color.needsUpdate=true}
   /* a 3D trading screen that sways gently and follows the mouse a little */
-  grp.rotation.y=(reduce?0:Math.sin(t*.3)*.22)+mx*.35;grp.rotation.x=-.1+(reduce?0:Math.sin(t*.23)*.05)+my*.2;
+  spin+=(reduce?0:(t-lt)*.45*(toKey==="helix"||toKey==="orbit"||toKey==="trophy"?1:0));lt=t;grp.rotation.y=spin+(reduce?0:Math.sin(t*.3)*.22)+mx*.35;grp.rotation.x=-.1+(reduce?0:Math.sin(t*.23)*.05)+my*.2;
   mat.uniforms.uTime.value=t;renderer.render(scene,camera)}
 frame();
 }
+
 
