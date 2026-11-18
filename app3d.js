@@ -72,7 +72,7 @@ export function streakFlame(el,streak){const B=base(el,{h:small()?120:130,pos:[0
 /* 4. 3D P&L CALENDAR: each day of the month a column, height = P&L, green / red. Tap → that day. */
 export function calendar3d(el,days,month,onDay){const [y,m]=month.split("-").map(Number),first=new Date(y,m-1,1),nd=new Date(y,m,0).getDate(),off=(first.getDay()+6)%7;
   const vals=[];for(let d=1;d<=nd;d++){const k=`${month}-${String(d).padStart(2,"0")}`;vals.push([k,days[k]])}const mx=Math.max(1,...vals.map(v=>Math.abs(v[1]||0)));
-  const B=base(el,{h:small()?250:300,pos:[0,7,8.5],look:[0,0,.4]});const boxes=[],rows=Math.ceil((nd+off)/7);
+  const B=base(el,{h:small()?260:320,pos:[0,small()?7:5.6,small()?8.2:6.6],look:[0,0,.3]});const boxes=[],rows=Math.ceil((nd+off)/7);
   vals.forEach(([k,v],i)=>{const idx=i+off,cx=(idx%7-3)*1.1,cz=(Math.floor(idx/7)-(rows-1)/2)*1.1,hasV=v!=null,h=hasV?.12+Math.abs(v)/mx*2.6:.06;
     const mat=new THREE.MeshStandardMaterial({color:hasV?(v>=0?C.up:C.dn):C.grey,roughness:.4,metalness:.2,emissive:hasV?(v>=0?C.up:C.dn):C.grey,emissiveIntensity:hasV?.25:.05});
     const b=new THREE.Mesh(new THREE.BoxGeometry(.9,h,.9),mat);b.position.set(cx,h/2,cz);b.userData.k=k;b.userData.h=h;b.scale.y=.001;boxes.push(b);B.grp.add(b)});
@@ -119,6 +119,7 @@ export function firmGalaxy(el,firms,onFirm){const B=base(el,{h:small()?300:360,p
   B.onTap(planets,hit=>{if(onFirm)onFirm(hit.object.userData.f.id)});
   B.cv.addEventListener("pointermove",e=>{const h=B.pick(e,planets);if(h){const f=h.object.userData.f,b=B.cv.getBoundingClientRect();tip.style.display="block";tip.style.left=(e.clientX-b.left+12)+"px";tip.style.top=(e.clientY-b.top-10)+"px";tip.innerHTML=`<b>${f.name}</b>${f.deal?`<small>🏷️ ${f.deal}</small>`:""}`;B.cv.style.cursor="pointer"}else{tip.style.display="none";B.cv.style.cursor="grab"}});
   B.setTick((t,st)=>{planets.forEach(p=>{const u=p.userData,a=u.a+t*u.sp;p.position.set(Math.cos(a)*u.R,u.y,Math.sin(a)*u.R);p.rotation.y=t});core.rotation.y=t*.3;B.grp.rotation.y=st.ry;B.grp.rotation.x=.15+st.rx});return B}
+
 
 
 

@@ -2337,6 +2337,7 @@ function vStudent(el){const u=S.subject,ts=[...S.trades].sort((a,b)=>byDT(b,a)),
      ${kpi("Max drawdown",`<span class="neg">${money(-st.mdd,0)}</span>`,"peak to trough")}
      ${kpi("Avg R",isFinite(st.avgR)?st.avgR.toFixed(2)+"R":"—","from trades with a stop")}
    </div>
+   ${S.readonly?"":a3Card(withNoTrade(calc(allF)).days,"j")}
    <div class="row" style="margin-bottom:12px"><button class="btn" data-goto="journal">📓 Full journal</button><button class="btn" data-goto="stats">📊 All statistics</button><button class="btn" data-goto="plan">🧭 Plan page</button></div>
    <div class="card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0">Latest trades</h3><span class="mut" style="font-size:12px">Click a trade to see every detail</span></div>
      ${ts.length?ts.slice(0,10).map(tcard).join(""):`<div class="empty">No trades yet.</div>`}
@@ -2663,12 +2664,14 @@ function vJournal(el){
      ${S.readonly?"":kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):st.pf===Infinity?"∞":"—","gross win ÷ gross loss")}
      ${kpi("Avg R",isFinite(st.avgR)?st.avgR.toFixed(2)+"R":"—","from trades with a stop")}
    </div>
+   ${S.readonly?"":a3Card(withNoTrade(calc(allF)).days,"j")}
    ${(()=>{if(!jfOn())noTradeDates().filter(d=>!byDay[d]).forEach(d=>byDay[d]=[]);return ""})()}
    ${Object.keys(byDay).length?Object.keys(byDay).sort().reverse().map(d=>{const dn=byDay[d].reduce((a,t)=>a+tradeNet(t),0);
      if(!byDay[d].length)return `<div class="day"><div class="dayh"><span>${fmtDate(d)}</span><span class="mono mut">$0.00</span></div><div class="ntd-row">🚫 <span>No trades this day</span> <small class="mut">· ${esc(I18N.t("counted as a $0 day"))}</small></div></div>`;
      const di=Object.keys(byDay).sort().reverse().indexOf(d),fold=!jfOn()&&di>=5&&!(S._unfold&&S._unfold[d]),sc=S.readonly?null:dayScore(d);
      return `<div class="day ${fold?"fold":""}"><div class="dayh" data-day="${d}"><span>${fmtDate(d)} <small class="mut day-n">· <span data-notr>${byDay[d].length}</span> <span>${byDay[d].length===1?"trade":"trades"}</span></small>${sc?` <span class="day-sc ${sc.score>=80?"g":sc.score>=60?"y":"r"}" title="${esc(I18N.t("Discipline score"))}" data-notr>${sc.score}</span>`:""}</span><span class="mono ${cls(dn)}">${smoney(dn)} <span class="day-tg">▾</span></span></div>${byDay[d].map(tcard).join("")}</div>`}).join("")
    :`<div class="card empty">No trades yet. ${S.readonly?"":"Add your first trade or import a CSV from your broker."}</div>`}`;
+  if($("#a3_j"))a3Mount(withNoTrade(calc(allF)).days,"j",el);
   bindFilters();bindJf();bindCoach();bindEod();bindStart();bindImpFiles(el);bindNoTrade();if($("#addT"))$("#addT").onclick=()=>editTrade(null);if($("#qLog"))$("#qLog").onclick=quickLog;
   if($("#impBody"))vImport($("#impBody"),true);
   if($("#impT"))$("#impT").onclick=()=>{const b=$("#impBox");b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
@@ -3086,9 +3089,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   ${edgeCard(ts)}
   ${commCard(ts)}
   ${insights(ts).length?`<div class="card" style="margin-bottom:12px"><h3>What your journal says</h3>${insights(ts).map(([i,t])=>`<div class="insight"><span class="ic">${i}</span><span>${t}</span></div>`).join("")}</div>`:""}
-  ${Object.keys(st.days).length>=2?`<div class="card a3-card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><h3 style="margin:0">✨ <span>3D view</span></h3>
-    <div class="seg" id="a3StatsTab"><button type="button" data-a3s="mtn" class="${S._a3s!=="cal"?"on":""}">🏔 <span>Equity mountain</span></button><button type="button" data-a3s="cal" class="${S._a3s==="cal"?"on":""}">📅 <span>3D calendar</span></button></div></div>
-    <div id="a3Stats" class="a3-box"></div><p class="mut a3-hint"><span>Drag to rotate · tap a day to open it</span></p></div>`:`<div class="card a3-card a3-wait" style="margin-bottom:12px">🏔 <b>3D view</b> <span class="mut">· <span>Your 3D equity mountain and 3D calendar appear after 2 trading days in this account.</span></span></div>`}
+  ${a3Card(st.days,"s")}
   <div class="card" style="margin-bottom:12px"><h3>Equity curve</h3>${equityChart(st.curve)}</div>
   <div class="grid g2" style="margin-bottom:12px"><div class="card"><h3>Daily P&L</h3>${dailyBars(st.days)}</div><div class="card"><h3>Calendar</h3>${calendar(st.days,true)}<p class="mut" style="font-size:12px;margin:8px 0 0">👆 <span>Click a day to see its trades, screenshots and journal.</span></p></div></div>
   <div class="grid g2">
@@ -3107,12 +3108,10 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   $("#calP").onclick=()=>shift(-1);$("#calN").onclick=()=>shift(1);
   $$(".cal .c[data-day]",el).forEach(c=>c.onclick=()=>{$("#tip").style.display="none";S.dayPage=c.dataset.day;render();window.scrollTo(0,0)});
   bindStatTabs();bindComm(el);
-  if($("#a3Stats")){const openDay=d=>{S.dayPage=d;render();window.scrollTo(0,0)};
-    if(S._a3s==="cal")mount3d("a3Stats","calendar3d",st.days,statsMonth(st.days),openDay);else mount3d("a3Stats","equityMountain",st.days,openDay);
-    $$("[data-a3s]",el).forEach(b=>b.onclick=()=>{S._a3s=b.dataset.a3s;render()})}
+  a3Mount(st.days,"s",el);
 }
 /* ============ IN-APP 3D (app3d.js, loaded only where shown; the flat version stays if 3D can't run) ============ */
-let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=3"));
+let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=4"));
 function mount3d(id,fn,...args){setTimeout(()=>{const el=document.getElementById(id);if(!el||el.dataset.a3)return;el.dataset.a3="1";
   A3().then(m=>{if(!el.isConnected)return;try{m[fn](el,...args)}catch(e){console.warn("3D",e)}}).catch(e=>console.warn("3D off",e))},40)}
 function newsClockState(){const now=Date.now(),reds=S.newsLoaded?newsFor(todayStr()).filter(n=>n.impact==="High"):[],W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,t,a:t-5*60000,b:t+5*60000}});
@@ -3121,6 +3120,15 @@ function newsClockState(){const now=Date.now(),reds=S.newsLoaded?newsFor(todaySt
   if(next){const mins=Math.max(1,Math.round((next.a-now)/60000));return {inWindow:false,mins,label:`<b data-notr>${mins>=60?Math.floor(mins/60)+"h "+String(mins%60).padStart(2,"0"):mins+" min"}</b><small>${esc(I18N.t("to the next no-trade window"))}</small><small data-notr>${esc(next.n.title)}</small>`}}
   return {inWindow:false,mins:999,label:`<span>✅</span><small>${esc(I18N.t("No red news left today"))}</small>`}}
 function statsMonth(days){const keys=Object.keys(days).sort();return S.calMonth||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7))}
+
+/* 3D card used on Journal and Statistics. key = which page remembers its tab */
+function a3Card(days,key){const n=Object.keys(days).length,mode=S["_a3"+key]||(key==="j"?"cal":"mtn"),m=n>=2?mode:"cal";
+  return `<div class="card a3-card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><h3 style="margin:0">✨ <span>3D view</span></h3>
+    <div class="seg" data-a3seg="${key}"><button type="button" data-a3m="cal" class="${m==="cal"?"on":""}">📅 <span>3D calendar</span></button><button type="button" data-a3m="mtn" class="${m==="mtn"?"on":""}" ${n<2?"disabled":""} title="${n<2?esc(I18N.t("Appears after 2 trading days")):""}">🏔 <span>Equity mountain</span></button></div></div>
+    <div id="a3_${key}" class="a3-box"></div><p class="mut a3-hint">${m==="cal"?`<span>Each day of the month is a column: green = profit, red = loss, grey = no trade yet. Tap a day to open it · drag to rotate.</span>`:`<span>Drag to rotate · tap a day to open it</span>`}</p></div>`}
+function a3Mount(days,key,el){const n=Object.keys(days).length,m=n>=2?(S["_a3"+key]||(key==="j"?"cal":"mtn")):"cal",openDay=d=>{S.dayPage=d;S.view="stats";try{history.replaceState(null,"","#stats")}catch(e){}render();window.scrollTo(0,0)};
+  if(m==="cal")mount3d("a3_"+key,"calendar3d",days,statsMonth(days),openDay);else mount3d("a3_"+key,"equityMountain",days,openDay);
+  $$(`[data-a3seg="${key}"] [data-a3m]`,el).forEach(b=>b.onclick=()=>{if(b.disabled)return;S["_a3"+key]=b.dataset.a3m;render()})}
 
 /* ============ WELCOME TOUR (first login, phone and PC) ============
    Short spotlight tour on the real buttons: bottom bar on phones, top menu on PC. Shown once (synced), replay from Today. */
@@ -4641,6 +4649,8 @@ let __a3=false;const __a3t=setInterval(()=>{const a=document.getElementById("aut
   import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))},250)</script>
 </body>
 </html>
+
+
 
 
 
