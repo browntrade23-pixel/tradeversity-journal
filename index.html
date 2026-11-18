@@ -1519,6 +1519,22 @@ img.cover{cursor:zoom-in}
 .t2-btns{display:flex;gap:8px;align-items:center}.t2-btns span{flex:1}
 @keyframes t2in{from{opacity:0;margin-top:10px}to{opacity:1;margin-top:0}}
 </style>
+<style>
+/* in-app 3D */
+.a3-box{position:relative;width:100%;border-radius:14px;overflow:hidden;background:radial-gradient(400px 220px at 50% 40%,rgba(58,72,224,.18),transparent 70%)}
+.a3-box canvas{display:block}.a3-hint{font-size:12px;margin:6px 0 0;text-align:center}.a3-hide{display:none}
+.a3-ov{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;text-align:center;pointer-events:none;gap:2px}
+.a3-ov.orb b{font:900 34px Inter,sans-serif;text-shadow:0 2px 14px rgba(0,0,0,.9)}.a3-ov.orb small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#dfe3ee}
+.a3-ov.clock b{font:900 26px "JetBrains Mono",monospace}.a3-ov.clock small{font-size:12px;color:#c9cede;max-width:200px}.a3-ov.clock span{font-size:22px}
+.a3-ov.tip{display:none;position:absolute;inset:auto;place-content:normal;padding:6px 10px;border-radius:10px;background:rgba(14,16,24,.95);border:1px solid rgba(245,185,66,.5);font-size:12.5px;white-space:nowrap}
+.a3-ov.tip small{display:block;color:var(--gold)}
+.a3-flat{display:grid;place-content:center;justify-items:center;text-align:center;height:170px;gap:4px}.a3-flat b{font:900 26px "JetBrains Mono",monospace}.a3-flat small{font-size:12px;color:var(--muted)}
+.td-orbw{width:150px;flex:none;display:grid;place-items:center}.td-orbw .a3-box{width:150px}
+.td-flame3d{min-height:40px;display:grid;place-items:center}.td-flame3d.a3-box{background:none}
+.nclock-w{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px;align-items:start;margin-bottom:4px}.nclock{padding:6px;margin:0}
+.pf-gal{margin:12px 0}
+@media(max-width:820px){.nclock-w{grid-template-columns:1fr}.td-orbw,.td-orbw .a3-box{width:130px}}
+</style>
 </head>
 <body>
 
@@ -2247,11 +2263,11 @@ function noTradeWindowsHTML(){if(!S.newsLoaded)return "";const now=Date.now(),re
 function vNews(el){
   const uh=upcomingHolidays(6);
   el.innerHTML=`<h1>📰 USD news</h1><p class="sub">Red and orange folder USD events from Forex Factory, in New York and Algeria (DZ) time. Plan around them.</p>
-   <div id="newsTop">${noTradeWindowsHTML()}${newsWeekHTML()}</div>
+   <div class="nclock-w"><div class="card a3-card nclock"><div id="a3Clock" class="a3-box"><div class="a3-flat" data-notr>${newsClockState().label}</div></div></div><div id="newsTop">${noTradeWindowsHTML()}${newsWeekHTML()}</div></div>
    <label class="nw-red"><input type="checkbox" id="redOnly" ${S._redOnly?"checked":""}> <span>Red folder only</span></label>
    ${newsPanel()}
    <div class="card"><h3>🏦 Upcoming US holidays</h3>${uh.map(x=>`<div class="nrow hol click ${x.kind}" data-hk="${x.kind}" data-ht="${esc(x.title)}"><span class="hol-ic">🏦</span><span class="mono nt" data-notr>${esc(fmtDate(x.date))}</span><b class="ntitle" data-notr>${esc(x.title)}</b><span class="hol-note">${HOL_NOTE[x.kind]}</span><span class="hol-in"><span>in</span> <b class="mono" data-notr>${daysUntil(x.date)}</b> <span>days</span></span></div>`).join("")||`<div class="mut nb-e">No holidays listed.</div>`}</div>`;
-  bindNewsPanel();if(!S.newsLoaded)loadNews();bindNewsTop(el);
+  bindNewsPanel();if(!S.newsLoaded)loadNews();bindNewsTop(el);mount3d("a3Clock","newsClock",newsClockState);
 }
 function bindNewsTop(el){const ro=$("#redOnly",el),nb=$("#newsPanel",el);const ap=()=>{if(nb)nb.classList.toggle("red-only",!!S._redOnly)};ap();
   if(ro)ro.onchange=()=>{S._redOnly=ro.checked;ap()};
@@ -2469,8 +2485,9 @@ function badgeList(){const ts=S.trades||[],pl=S.plans||[],ds=discStreak(ts,pl),j
     ["funded","💎","Funded","Save the rules of a funded account",funded?1:0,1]]
    .map(([id,ic,n,d,cur,goal])=>({id,ic,n,d,cur:Math.min(cur,goal),goal,ok:cur>=goal||saved.includes(id)}))}
 function badgeCard(B){const n=B.filter(b=>b.ok).length;
-  return `<div class="card td-badges"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">🏅 <span>Badges</span></h3><span class="mut mono" data-notr>${n} / ${B.length}</span></div>
-   <div class="bdg-grid">${B.map(b=>`<div class="bdg ${b.ok?"on":""}" title="${esc(I18N.t(b.d))}"><span class="bi">${b.ok?b.ic:"🔒"}</span><b>${esc(I18N.t(b.n))}</b>${b.ok?`<small>${esc(I18N.t(b.d))}</small>`:`<div class="bp"><i style="width:${b.cur/b.goal*100}%"></i></div><small class="mono" data-notr>${b.cur} / ${b.goal}</small>`}</div>`).join("")}</div></div>`}
+  return `<div class="card td-badges"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">🏅 <span>Badges</span></h3><div class="row" style="gap:8px"><span class="mut mono" data-notr>${n} / ${B.length}</span><button type="button" class="btn sm" id="a3BList">${S._a3bList?"🏆 <span>3D trophy room</span>":"☰ <span>List</span>"}</button></div></div>
+   ${S._a3bList?"":`<div id="a3Trophy" class="a3-box"></div><p class="mut a3-hint"><span>Tap a medal · drag to look around</span></p>`}
+   <div class="bdg-grid ${S._a3bList?"":"a3-hide"}">${B.map(b=>`<div class="bdg ${b.ok?"on":""}" title="${esc(I18N.t(b.d))}"><span class="bi">${b.ok?b.ic:"🔒"}</span><b>${esc(I18N.t(b.n))}</b>${b.ok?`<small>${esc(I18N.t(b.d))}</small>`:`<div class="bp"><i style="width:${b.cur/b.goal*100}%"></i></div><small class="mono" data-notr>${b.cur} / ${b.goal}</small>`}</div>`).join("")}</div></div>`}
 function celebrate(B,targetHit){setTimeout(()=>{let old=null;try{old=JSON.parse(localStorage.getItem(badgeKey())||"null")}catch(e){}
   const now=B.filter(b=>b.ok).map(b=>b.id),merged=[...new Set([...(old||[]),...now])];
   if(old){const fresh=now.filter(id=>!old.includes(id));if(fresh.length){confetti();const b=B.find(x=>x.id===fresh[0]);toast(`🏅 ${I18N.t("New badge")}: ${b.ic} ${I18N.t(b.n)}`)}}
@@ -2535,10 +2552,10 @@ function vToday(el){
    ${cd?`<div class="td-cool"><span class="td-cool-i">🛑</span><div><b>${cd.why==="loss"?"Max daily loss reached":"Max trades reached for today"}</b><small>${cd.why==="loss"?"You hit your daily loss limit. Close the platform, protect the account, come back tomorrow.":"Your plan is done for today. Closing the platform is the trade now."}</small></div></div>`:""}
    ${tHit?`<div class="td-win">🎉 <b>Daily target reached!</b> <span>Lock it in: no more trades today.</span></div>`:""}
    <div class="td-grid">
-    <div class="card td-score"><div class="td-sc-top">${ring(sc.score)}<div><h3>Today's discipline score</h3><p class="mut">${sc.score>=80?"Excellent. This is how funded traders work.":sc.score>=60?"Good. Fix the red points below.":"Follow the checklist below to raise it."}</p></div></div>
+    <div class="card td-score"><div class="td-sc-top"><div class="td-orbw" id="a3Orb">${ring(sc.score)}</div><div><h3>Today's discipline score</h3><p class="mut">${sc.score>=80?"Excellent. This is how funded traders work.":sc.score>=60?"Good. Fix the red points below.":"Follow the checklist below to raise it."}</p></div></div>
      <div class="td-parts">${sc.parts.map(([ic,l,ok])=>`<div class="td-pt ${ok?"ok":""}"><span>${ok?"✅":ic}</span><span>${l}</span><b>${ok?"+20":"0"}</b></div>`).join("")}</div></div>
     <div class="card td-streaks"><h3>🔥 <span>Your streaks</span></h3>
-     <div class="td-st"><div class="td-fl"><span class="td-flame">🔥</span><b class="mono" data-notr>${ds.streak}</b><small>disciplined days in a row</small></div>
+     <div class="td-st"><div class="td-fl"><div class="td-flame td-flame3d" id="a3Flame">🔥</div><b class="mono" data-notr>${ds.streak}</b><small>disciplined days in a row</small></div>
       <div class="td-fl"><span class="td-flame">📓</span><b class="mono" data-notr>${js}</b><small>days journaled in a row</small></div>
       <div class="td-fl"><span class="td-flame">🏆</span><b class="mono" data-notr>${ds.best}</b><small>best discipline streak</small></div></div>
      <div class="td-wkstrip">${week.map(d=>{const s=dayScore(d),f=d===t;return `<div class="td-d ${s.active?(s.score>=80?"g":s.score>=60?"y":"r"):"n"} ${f?"now":""}" title="${esc(fmtDate(d))}"><small data-notr>${esc(fmtDate(d).split(",")[0].slice(0,3))}</small><b data-notr>${s.active?s.score:"·"}</b></div>`}).join("")}</div></div>
@@ -2571,6 +2588,9 @@ function vToday(el){
     else if(a==="notrade"){S._ntdDate=t;go("journal");setTimeout(()=>{const n=$("#ntdSet");if(n)n.scrollIntoView({behavior:"smooth",block:"center"})},200)}
     else if(a==="share")shareWeek()});
   $("#tdFocusOn").onclick=()=>setFocus(true);$("#tdTour").onclick=startTour;
+  mount3d("a3Orb","disciplineOrb",sc.score,I18N.t("score"));mount3d("a3Flame","streakFlame",ds.streak);
+  if($("#a3Trophy"))mount3d("a3Trophy","trophyRoom",B,b=>toast(`${b.ok?b.ic:"🔒"} ${I18N.t(b.n)} · ${b.ok?I18N.t(b.d):`${b.cur} / ${b.goal}`}`));
+  if($("#a3BList"))$("#a3BList").onclick=()=>{S._a3bList=!S._a3bList;render()};
   celebrate(B,tHit)}
 
 /* ===== No-trade days: saved on that day's plan (noTrade:true). They count as $0 days in the statistics. ===== */
@@ -3036,6 +3056,9 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   ${edgeCard(ts)}
   ${commCard(ts)}
   ${insights(ts).length?`<div class="card" style="margin-bottom:12px"><h3>What your journal says</h3>${insights(ts).map(([i,t])=>`<div class="insight"><span class="ic">${i}</span><span>${t}</span></div>`).join("")}</div>`:""}
+  ${Object.keys(st.days).length>=2?`<div class="card a3-card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><h3 style="margin:0">✨ <span>3D view</span></h3>
+    <div class="seg" id="a3StatsTab"><button type="button" data-a3s="mtn" class="${S._a3s!=="cal"?"on":""}">🏔 <span>Equity mountain</span></button><button type="button" data-a3s="cal" class="${S._a3s==="cal"?"on":""}">📅 <span>3D calendar</span></button></div></div>
+    <div id="a3Stats" class="a3-box"></div><p class="mut a3-hint"><span>Drag to rotate · tap a day to open it</span></p></div>`:""}
   <div class="card" style="margin-bottom:12px"><h3>Equity curve</h3>${equityChart(st.curve)}</div>
   <div class="grid g2" style="margin-bottom:12px"><div class="card"><h3>Daily P&L</h3>${dailyBars(st.days)}</div><div class="card"><h3>Calendar</h3>${calendar(st.days,true)}<p class="mut" style="font-size:12px;margin:8px 0 0">👆 <span>Click a day to see its trades, screenshots and journal.</span></p></div></div>
   <div class="grid g2">
@@ -3054,7 +3077,21 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   $("#calP").onclick=()=>shift(-1);$("#calN").onclick=()=>shift(1);
   $$(".cal .c[data-day]",el).forEach(c=>c.onclick=()=>{$("#tip").style.display="none";S.dayPage=c.dataset.day;render();window.scrollTo(0,0)});
   bindStatTabs();bindComm(el);
+  if($("#a3Stats")){const openDay=d=>{S.dayPage=d;render();window.scrollTo(0,0)};
+    if(S._a3s==="cal")mount3d("a3Stats","calendar3d",st.days,statsMonth(st.days),openDay);else mount3d("a3Stats","equityMountain",st.days,openDay);
+    $$("[data-a3s]",el).forEach(b=>b.onclick=()=>{S._a3s=b.dataset.a3s;render()})}
 }
+/* ============ IN-APP 3D (app3d.js, loaded only where shown; the flat version stays if 3D can't run) ============ */
+let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=3"));
+function mount3d(id,fn,...args){setTimeout(()=>{const el=document.getElementById(id);if(!el||el.dataset.a3)return;el.dataset.a3="1";
+  A3().then(m=>{if(!el.isConnected)return;try{m[fn](el,...args)}catch(e){console.warn("3D",e)}}).catch(e=>console.warn("3D off",e))},40)}
+function newsClockState(){const now=Date.now(),reds=S.newsLoaded?newsFor(todayStr()).filter(n=>n.impact==="High"):[],W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,t,a:t-5*60000,b:t+5*60000}});
+  const inW=W.find(w=>now>=w.a&&now<=w.b),next=W.find(w=>w.a>now);
+  if(inW)return {inWindow:true,mins:0,label:`<span>🚫</span><b>${esc(I18N.t("NOW"))}</b><small>${esc(I18N.t("no-trade window"))}</small><small data-notr>${esc(inW.n.title)}</small>`};
+  if(next){const mins=Math.max(1,Math.round((next.a-now)/60000));return {inWindow:false,mins,label:`<b data-notr>${mins>=60?Math.floor(mins/60)+"h "+String(mins%60).padStart(2,"0"):mins+" min"}</b><small>${esc(I18N.t("to the next no-trade window"))}</small><small data-notr>${esc(next.n.title)}</small>`}}
+  return {inWindow:false,mins:999,label:`<span>✅</span><small>${esc(I18N.t("No red news left today"))}</small>`}}
+function statsMonth(days){const keys=Object.keys(days).sort();return S.calMonth||(keys.length?keys[keys.length-1].slice(0,7):todayStr().slice(0,7))}
+
 /* ============ WELCOME TOUR (first login, phone and PC) ============
    Short spotlight tour on the real buttons: bottom bar on phones, top menu on PC. Shown once (synced), replay from Today. */
 const tourKey=()=>"tv_tour_"+((S.me&&S.me.id)||"x");
@@ -3707,7 +3744,8 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
    <div class="pf-tools"><input class="i" id="pfQ" placeholder="Search a prop firm…" value="${esc(S._pfQ||"")}" data-noswipe>
     <label class="pf-dz"><input type="checkbox" id="pfDz" ${dzOnly?"checked":""}> <span>🇩🇿 Only firms open to Algeria</span></label>
     <label class="pf-dz"><input type="checkbox" id="pfFav" ${S._pfFavOnly?"checked":""}> <span>⭐ My favourites</span></label>
-    <button type="button" class="btn sm pri" id="pfQuizB">🧭 <span>Find my prop firm</span></button></div>
+    <button type="button" class="btn sm pri" id="pfQuizB">🧭 <span>Find my prop firm</span></button><button type="button" class="btn sm ${S._pfGal?"pri":""}" id="pfGalB">🌌 <span>Galaxy view</span></button></div>
+   ${S._pfGal?`<div class="card a3-card pf-gal"><div id="a3Gal" class="a3-box"></div><p class="mut a3-hint"><span>Green = open to Algeria · teal = probably · grey = ask support · red = restricted · gold ring = discount code. Drag to rotate, tap a planet to open the firm.</span></p></div>`:""}
    <div class="pf-legend">${Object.values(PFDZ).map(d=>`<span class="dz-b ${d[2]}">${d[0]} <span>${d[1]}</span></span>`).join("")}</div>
    <div class="pf-bar"><span class="mut">${list.length} <span>firms</span></span><button type="button" class="btn sm" id="pfAll">${S._pfShut?"▾ <span>Show all rules</span>":"▴ <span>Hide all rules</span>"}</button></div>
    <div class="pf-list">${list.length?list.map(f=>{const L=f.name.replace(/^The /,"").charAt(0).toUpperCase();const h=L!==letter?(letter=L,`<div class="pf-letter"><span>${L}</span></div>`):"";
@@ -3728,6 +3766,8 @@ function vPropFirms(el){const P=window.PropFirms;if(!P){el.innerHTML='<div class
   $("#pfDz",el).onchange=e=>{S._pfDz=e.target.checked;render()};
   $("#pfAll",el).onclick=()=>{S._pfShut=!S._pfShut;render()};
   $("#pfFav",el).onchange=e=>{S._pfFavOnly=e.target.checked;render()};$("#pfQuizB",el).onclick=pfQuiz;
+  $("#pfGalB",el).onclick=()=>{S._pfGal=!S._pfGal;render()};
+  if(S._pfGal)mount3d("a3Gal","firmGalaxy",list.map(f=>{const k=Object.keys(COUPONS).find(c=>COUPONS[c][f.id]);return {id:f.id,name:f.name,dz:f.dz,deal:k?`-${COUPONS[k][f.id].pct}% ${k}`:"",score:f.name.length}}),id=>{S._pfId=id;S._couponTried=false;render();window.scrollTo(0,0)});
   $$("[data-pfav]",el).forEach(b=>b.onclick=()=>{const F=pfFavs(),id=b.dataset.pfav,i=F.indexOf(id);if(i>=0)F.splice(i,1);else F.push(id);try{localStorage.setItem(pfFavKey,JSON.stringify(F))}catch(e){}settingsPush();render()});
   $$("[data-pcmp]",el).forEach(b=>b.onclick=()=>{const C=S._pfCmp,id=b.dataset.pcmp,i=C.indexOf(id);if(i>=0)C.splice(i,1);else{if(C.length>=3){toast(I18N.t("You can compare up to 3 firms"));return}C.push(id)}render()});
   let tray=$("#pfTray");if(!tray){tray=document.createElement("div");tray.id="pfTray";document.body.appendChild(tray)}
@@ -4564,6 +4604,9 @@ let __a3=false;const __a3t=setInterval(()=>{const a=document.getElementById("aut
   import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))},250)</script>
 </body>
 </html>
+
+
+
 
 
 
