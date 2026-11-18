@@ -3149,7 +3149,7 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
 function a3Mtn(days){if(Object.keys(days).length<2)return "";
   return `<div class="card a3-card" style="margin-bottom:12px"><h3 style="margin:0 0 8px">🏔 <span>Equity mountain</span></h3><div id="a3_s" class="a3-box"></div><p class="mut a3-hint"><span>Drag to rotate · tap a day to open it</span></p></div>`}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-18d";
+const APP_VER="2026-11-18e";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3160,7 +3160,7 @@ const APP_VER="2026-11-18d";
   window.__updCheck=check;setTimeout(check,8000);setInterval(()=>{if(!document.hidden)check()},5*60000);
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)check()})})();
 /* ============ IN-APP 3D (app3d.js, loaded only where shown; the flat version stays if 3D can't run) ============ */
-let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=14"));
+let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=15"));
 function mount3d(id,fn,...args){setTimeout(()=>{const el=document.getElementById(id);if(!el||el.dataset.a3)return;el.dataset.a3="1";
   A3().then(m=>{if(!el.isConnected)return;try{m[fn](el,...args)}catch(e){console.warn("3D",e)}}).catch(e=>console.warn("3D off",e))},40)}
 function newsClockState(){const now=Date.now(),reds=S.newsLoaded?newsFor(todayStr()).filter(n=>n.impact==="High"):[],W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,t,a:t-5*60000,b:t+5*60000}});

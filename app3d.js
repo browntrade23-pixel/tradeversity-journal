@@ -163,7 +163,7 @@ export function galaxyBackground(el,kind="galaxy"){
       const j=i%FIB.length,R=FIB[j]*5.9,a=Math.random()*Math.PI*2;c.set(FC[j]);if(Math.random()<.1)c.lerp(W,.4);return [Math.cos(a)*R+rnd(.035),Math.sin(a)*R+rnd(.035),rnd(.06)]})};
   const CN=ph?30:40;
   const T=kind==="bull"?chart(market(CN,.55,7),false):kind==="bear"?chart(market(CN,-.55,11),false):kind==="fibr"?chart(market(CN,.5,23),true):kind==="fibc"?fibCircles():galaxyShape();
-  if(kind==="galaxy")for(let i=0;i<N;i++){const j=i*3,R=Math.hypot(T.p[j],T.p[j+2]),f=R<3?.35+R*.12:.68;T.c[j]*=f;T.c[j+1]*=f;T.c[j+2]*=f}   /* softer galaxy: dim the bright core most */
+  if(kind==="galaxy")for(let i=0;i<N;i++){const j=i*3,R=Math.hypot(T.p[j],T.p[j+2]),f=R<3?.24+R*.09:.5;T.c[j]*=f;T.c[j+1]*=f;T.c[j+2]*=f}   /* softer galaxy: dim the bright core most */
   /* particles start scattered far away and fly in */
   const start=new Float32Array(N*3),cur=new Float32Array(N*3),sd=new Float32Array(N);
   for(let i=0;i<N;i++){const u=Math.random()*2-1,a=Math.random()*Math.PI*2,R=18+Math.random()*22,q=Math.sqrt(1-u*u);start.set([R*q*Math.cos(a),R*u,R*q*Math.sin(a)],i*3);sd[i]=Math.random()}
@@ -174,12 +174,12 @@ export function galaxyBackground(el,kind="galaxy"){
       vA=.55+.45*sin(uT*(1.5+seed*3.)+seed*60.);gl_PointSize=uS*(.25+seed*.75)/-mv.z;}`,
     fragmentShader:`varying vec3 vC;varying float vA;void main(){vec2 p=gl_PointCoord-.5;float d=length(p);if(d>.5)discard;float a=pow(1.-d*2.,1.8);gl_FragColor=vec4(vC*(.7+a*.8),a*vA*.95);}`});
   const pts=new THREE.Points(g,mat),grp=new THREE.Group();grp.add(pts);scene.add(grp);
-  if(kind==="galaxy"){grp.rotation.x=.95;grp.rotation.z=-.22;grp.position.y=-1}else if(kind==="fibc"){grp.rotation.x=.08}else{grp.rotation.x=.06}
+  if(kind==="galaxy"){grp.rotation.x=-.13;grp.rotation.z=-.14;grp.position.y=.2;grp.scale.setScalar(.82)}else if(kind==="fibc"){grp.rotation.x=.08}else{grp.rotation.x=.06}
   /* glows + nebula clouds */
   const glow=(color,size,op)=>{const s=document.createElement("canvas");s.width=s.height=128;const x=s.getContext("2d"),gr=x.createRadialGradient(64,64,0,64,64,64);
     gr.addColorStop(0,"rgba(255,255,255,1)");gr.addColorStop(.25,"rgba(255,255,255,.45)");gr.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=gr;x.fillRect(0,0,128,128);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(s),color,transparent:true,opacity:op,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(size,size,1);return sp};
-  const cg=kind==="galaxy"?[glow("#ffd27a",6,.38),glow("#ff9e5e",13,.16),glow("#7c8bff",30,.08)]:kind==="fibc"?[glow("#f5b942",7,.5),glow("#7c8bff",22,.15)]:[];cg.forEach(x=>{x.userData.o=x.material.opacity;grp.add(x)});
+  const cg=kind==="galaxy"?[glow("#ffd27a",5,.24),glow("#ff9e5e",11,.1),glow("#7c8bff",26,.05)]:kind==="fibc"?[glow("#f5b942",7,.5),glow("#7c8bff",22,.15)]:[];cg.forEach(x=>{x.userData.o=x.material.opacity;grp.add(x)});
   const NEB={galaxy:[["#3a48e0",30,.3,[-14,2,-18]],["#d16bff",24,.22,[16,-3,-22]],["#2aa8ff",26,.2,[6,8,-26]],["#f5b942",18,.14,[-10,-6,-14]],["#7c8bff",34,.16,[2,-10,-30]]],
     bull:[["#12e07a",30,.16,[-12,-4,-22]],["#2aa8ff",28,.16,[14,6,-26]],["#3a48e0",34,.2,[0,10,-30]]],
     bear:[["#ff2d55",30,.15,[12,4,-22]],["#7a3cff",28,.16,[-14,-5,-26]],["#3a48e0",34,.2,[0,10,-30]]],
@@ -218,7 +218,7 @@ export function galaxyBackground(el,kind="galaxy"){
         cur[j]=start[j]+(P[j]-start[j])*e+ox;cur[j+1]=start[j+1]+(P[j+1]-start[j+1])*e+oy;cur[j+2]=start[j+2]+(P[j+2]-start[j+2])*e+oz}
       g.attributes.position.needsUpdate=true}
     cg.forEach(x=>x.material.opacity=x.userData.o*e);
-    if(kind==="galaxy"){spin+=dt*.06+Math.abs(dy)*.0009;grp.rotation.y=spin;grp.rotation.x=.95-sfs*.45}
+    if(kind==="galaxy"){spin+=dt*.06+Math.abs(dy)*.0009;grp.rotation.y=spin;grp.rotation.x=-.13+sfs*.14}   /* seen from the side: a thin tilted disc */
     else if(kind==="fibc"){grp.rotation.z=t*.1+sfs*2.6;grp.rotation.x=.08+sfs*.55;grp.rotation.y=Math.sin(t*.2)*.12}
     else{grp.rotation.y=-.42+sfs*.84+Math.sin(t*.22)*.07;grp.rotation.x=.06+sfs*.12}
     /* candles: grow up from the bottom as the particles land, dissolve a little while scrolling fast */
