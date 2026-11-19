@@ -1904,6 +1904,8 @@ const Cloud={
   /* Telegram verification: does a username exist? / check the code the bot sent / change my username */
   async tgExists(u){try{const r=await fetch(CONFIG.SUPABASE_URL+"/functions/v1/telegram-verify?check="+encodeURIComponent(u));const j=await r.json();return j.valid===false?false:j.exists}catch(e){return null}},
   async tgVerify(code){const{data,error}=await this.sb.rpc("verify_telegram",{p_code:code});if(error)throw error;return data},
+  /* a rejected or removed user starts again: Telegram verification again, then waits for approval */
+  async requestAgain(){const{error}=await this.sb.rpc("request_access_again");if(error)throw error},
   async setTelegram(id,tg){const{error}=await this.sb.from("profiles").update({telegram:tg}).eq("id",id);if(error)throw error},
   async session(){const{data}=await this.sb.auth.getSession();if(!data.session)return null;return this.profile(data.session.user.id)},
   async signIn(email,password){const{data,error}=await this.sb.auth.signInWithPassword({email,password});if(error)throw error;return this.profile(data.user.id)},
@@ -1960,16 +1962,17 @@ function showWaiting(u){showAuth();$("#authCard").classList.add("hidden");$("#wa
   $("#waitTitle").textContent=rej?"Request not accepted":"Waiting for approval";
   /* what THIS student still has to do: email, Telegram, or both — then Brown Algo's approval */
   const needE=!rej&&u.emailOk===false,needT=!rej&&!!CONFIG.TG_BOT&&!u.tgOk,miss=[needE&&"email",needT&&"Telegram"].filter(Boolean);
-  $("#waitText").textContent=rej?I18N.t("Your request to join was not accepted. Contact Brown Algo on Telegram if you think this is a mistake."):
+  $("#waitText").textContent=rej?I18N.t("Your access is not active. You can start again: verify your Telegram, then wait for Brown Algo's approval."):
     miss.length===2?I18N.t("To be accepted, you need to verify your email and your Telegram first. Then Brown Algo can approve your account."):
     needE?I18N.t("To be accepted, you need to verify your email first. Then Brown Algo can approve your account."):
     needT?I18N.t("To be accepted, you need to verify your Telegram first. Then Brown Algo can approve your account."):
     I18N.t("Your account was created. Brown Algo needs to accept you before you can use the journal. You'll be able to log in as soon as you're approved.");
   const step=(ok,ic,title,sub,btn)=>`<div class="ws ${ok?"ok":"todo"}"><span class="ws-ic">${ok?"✅":ic}</span><div class="ws-tx"><b>${esc(I18N.t(title))}</b><small>${sub}</small></div>${!ok&&btn?btn:""}</div>`;
-  $("#waitSteps").innerHTML=rej?"":
+  $("#waitSteps").innerHTML=rej?`<div class="ws todo"><span class="ws-ic">🔄</span><div class="ws-tx"><b>${esc(I18N.t("Start again"))}</b><small>${esc(I18N.t("Verify your Telegram again, then wait for Brown Algo's approval."))}</small></div><button class="btn sm pri" type="button" id="wsAgain">${esc(I18N.t("Request access again"))}</button></div>`:
     step(!needE,"📧","Verify your email",needE?`${esc(I18N.t("Required to be accepted."))} <span data-notr>${esc(u.email||"")}</span>`:esc(I18N.t("Email verified")),`<button class="btn sm pri" type="button" id="wsMail">${esc(I18N.t("Verify email"))}</button>`)+
     (CONFIG.TG_BOT?step(!needT,"✈️","Verify your Telegram",needT?`${esc(I18N.t("Required to be accepted."))} <span data-notr>${esc(u.telegram||"")}</span>`:esc(I18N.t("Telegram verified")),`<button class="btn sm pri" type="button" id="wsTg">${esc(I18N.t("Verify Telegram"))}</button>`):"")+
     step(false,"⏳","Approval by Brown Algo",esc(I18N.t(miss.length?"Comes after your verification.":"Your verification is done. Brown Algo will approve you soon.")),"");
+  const wa=$("#wsAgain");if(wa)wa.onclick=async()=>{wa.disabled=true;try{await API.requestAgain();const u2=await API.session();if(u2)await enter(u2);else showAuth()}catch(e){wa.disabled=false;toast(I18N.t("Couldn't send the request. Try again in a moment."))}};
   const wt=$("#wsTg");if(wt)wt.onclick=()=>{$("#waitBox").classList.add("hidden");$("#authCard").classList.remove("hidden");showTg(u)};
   const wm=$("#wsMail");if(wm)wm.onclick=async()=>{$("#waitBox").classList.add("hidden");$("#authCard").classList.remove("hidden");showOtp(u.email,false);
     try{await API.resendCode(u.email);otpCooldown();$("#authMsg").innerHTML=`<span class="ok">${esc(I18N.t("New code sent. Check your email."))}</span>`}catch(err){$("#authMsg").innerHTML=authErr(err)}}}
@@ -3338,7 +3341,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-18zk";
+const APP_VER="2026-11-19a";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4520,7 +4523,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    </div>
    ${emoAll.length?`<div class="card" style="margin-bottom:12px"><h3>Group weak spots</h3>${emoAll.map(r=>`<div class="insight"><span class="ic">⚠️</span><span><b>${esc(r.k)}</b> trades across students: <b class="neg">${money(r.net,0)}</b> over ${r.n} trades (${pct(r.wr,0)} win). Good topic for the next live.</span></div>`).join("")}</div>`:""}
    <div class="card acc-card"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px"><h3 style="margin:0">✅ <span>Accepted users</span> <span class="adm-n" data-notr>${students.length}</span></h3><input class="i" id="accQ" placeholder="Search name, email, Telegram" style="width:220px"></div>
-    <p class="mut" style="font-size:12px;margin:0 0 10px"><span>Remove access: the user can't open the journal, their data stays and you can approve them again from Rejected requests. Delete: the account and all its data are erased for good.</span></p>
+    <p class="mut" style="font-size:12px;margin:0 0 10px"><span>Remove access: the user can't open the journal and their data stays. They can request access again: they verify their Telegram again, then wait for your approval. Delete: the account and all its data are erased for good.</span></p>
     <div class="acc-list">${students.length?[...students].sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(s=>`<div class="acc-row" data-accid="${s.id}" data-q="${esc(((s.name||"")+" "+(s.email||"")+" "+(s.telegram||"")+" "+tgUser(s)).toLowerCase().replace(/@/g,""))}"><div class="acc-who"><b data-notr>${esc(s.name||"—")}</b><small class="mut" data-notr>${esc(s.email||"")}${tgUser(s)?` · @${esc(tgUser(s))}`:""}${s.created_at?` · <span>Joined</span> ${esc(fmtDate(s.created_at.slice(0,10)))}`:""}</small></div><div class="acc-acts"><button type="button" class="btn sm" data-remove="${s.id}">✖ <span>Remove access</span></button><button type="button" class="btn sm danger" data-delu="${s.id}">🗑 <span>Delete</span></button></div></div>`).join(""):`<div class="mut">No accepted users yet.</div>`}</div></div>
    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">Students</h3><div class="row"><input class="i" id="aq" placeholder="Search name, email, Telegram" style="width:240px"><button class="btn sm" id="aExp">Export CSV</button></div></div>
    <div class="tw"><table class="t" id="aT"><tr><th>Name (username)</th><th>Email</th><th>Telegram username</th><th>Trades</th><th>Broke plan</th><th>Weak spot</th><th>Journaled today</th><th>Plan today</th><th>Plan tomorrow</th></tr>
@@ -4549,7 +4552,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
   /* delete a user for good: done by the server function (admin only); you must type DELETE to confirm */
   $$("[data-delu]",el).forEach(b=>b.onclick=ev=>{ev.stopPropagation();const s=students.find(x=>x.id===b.dataset.delu)||profs.find(x=>x.id===b.dataset.delu);if(!s)return;deleteUserBox(s,()=>vAdmin(el))});
   $$("[data-remove]",el).forEach(b=>b.onclick=()=>{const s=students.find(x=>x.id===b.dataset.remove);if(!s)return;
-    confirmBox(`${I18N.t("Remove")} ${s.name||s.email||""}? ${I18N.t("They lose access to the journal right away. Their data stays saved, and you can approve them again from Rejected requests.")}`,async()=>{b.disabled=true;
+    confirmBox(`${I18N.t("Remove")} ${s.name||s.email||""}? ${I18N.t("They lose access to the journal right away. Their data stays saved. To come back, they must verify their Telegram again and wait for your approval.")}`,async()=>{b.disabled=true;
       try{await API.setStatus(s.id,"rejected");toast(I18N.t("User removed"));vAdmin(el)}catch(e){b.disabled=false;toast(I18N.t("Couldn't remove")+": "+(e.message||e))}})});
   if(!el.isConnected||!$("#aq",el))return;  /* the user left the admin page while it was loading */
   $("#aq",el).oninput=e=>{const q=e.target.value.toLowerCase();$$("#aT tr[data-q]").forEach(tr=>tr.classList.toggle("hidden",!tr.dataset.q.includes(q)))};
