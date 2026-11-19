@@ -83,6 +83,24 @@ nav.tabs button.on .tico .ico :is(rect,circle,path[d$="z"]):not([fill="currentCo
 .cv-shield{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(5,7,12,.97);color:#e8ebf5;font-weight:600;cursor:pointer;padding:20px;text-align:center}
 .cv-shield.hidden{display:none}
 @media print{.cv-guard{display:none!important}}
+.cv-load{width:28px;height:28px;margin:10px auto;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--gold);animation:cvSp 1s linear infinite}@keyframes cvSp{to{transform:rotate(360deg)}}
+.cv-how{max-width:620px;margin:10px auto}.cv-rules{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:10px}.cv-rules li{display:flex;gap:10px;font-size:13.5px;line-height:1.45}.cv-ri{flex:none;width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:rgba(245,185,66,.1)}
+.cv-act{max-width:620px;margin:10px auto;position:relative;z-index:1}.cv-act-h{display:flex;gap:14px;align-items:center}.cv-act-h h2{margin:0 0 4px}
+.cv-dev{display:flex;gap:12px;align-items:center;padding:12px 14px;margin:12px 0;border:1px solid var(--line2);border-radius:14px;background:rgba(255,255,255,.03);text-align:start}.cv-dev-ic{font-size:24px}.cv-dev b{display:block}.cv-dev small{font-size:12px}
+.cv-warn{border:1px solid rgba(245,185,66,.35);background:rgba(245,185,66,.07);border-radius:14px;padding:12px 14px;font-size:13px}.cv-warn ul{margin:8px 0 0;padding-inline-start:18px;display:grid;gap:5px}
+.cv-ok{display:flex;gap:10px;align-items:flex-start;margin:14px 0;font-size:13.5px;font-weight:600;cursor:pointer}.cv-ok input{width:18px;height:18px;margin-top:1px;flex:none;accent-color:var(--gold)}
+.cv-go{width:100%;justify-content:center;padding:12px}.cv-note{border:1px solid var(--line2);border-radius:12px;padding:10px 12px;font-size:13px;margin:10px 0;background:rgba(255,255,255,.03)}
+.cv-pend{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-color:rgba(255,107,94,.45);background:rgba(255,107,94,.08)}.cv-adm{border-color:rgba(245,185,66,.4)}
+.cv-lic{display:flex;gap:8px 18px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin:0 0 10px;position:relative;z-index:1}
+.cv-prog,.cv-mod,.cv-devcard{position:relative;z-index:1}.cv-bar{height:6px;border-radius:9px;background:var(--line2);margin-top:10px;overflow:hidden}.cv-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.cv-les{display:flex;gap:12px;align-items:center;width:100%;text-align:start;padding:11px 10px;border:0;border-top:1px solid var(--line);background:none;color:inherit;cursor:pointer;border-radius:10px}.cv-les:hover{background:rgba(255,255,255,.04)}
+.cv-n{width:28px;height:28px;flex:none;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line2);font-size:12px;font-weight:700}.cv-les.done .cv-n{background:var(--green);border-color:var(--green);color:#fff}
+.cv-t{flex:1;min-width:0;display:flex;flex-direction:column}.cv-t small{font-size:12px}.cv-draft{color:var(--gold);font-size:11px}.cv-m{font-size:12px}.cv-s{width:34px;text-align:center;color:var(--gold)}
+.cv-player{position:fixed;inset:0;z-index:80;background:rgba(3,4,8,.92);display:grid;place-items:center;padding:14px}.cv-pbox{width:min(980px,100%)}.cv-ph,.cv-pf{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 2px}
+.cv-frame{position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;background:#000}.cv-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.cv-code{font-size:22px;letter-spacing:.4em;text-align:center}.cv-steps{padding-inline-start:20px;font-size:13px;display:grid;gap:6px}
+.cv-tag{display:inline-flex;gap:4px;font-size:11px;padding:2px 7px;border-radius:99px;border:1px solid var(--line2);font-weight:600}.cv-tag.bad{color:var(--red);border-color:var(--red)}.cv-tag.warn{color:var(--gold);border-color:var(--gold)}.cv-tag.ok{color:var(--green);border-color:var(--green)}.cv-tag.pend{color:var(--blue);border-color:var(--blue)}
+.cv-arow.susp{border-color:rgba(245,185,66,.55)}.cv-flag{font-size:12px;padding:2px 8px;border-radius:99px;background:rgba(245,185,66,.15);color:var(--gold)}.cv-flag-p{background:rgba(76,141,255,.15);color:var(--blue)}
 .t-admin{--c1:#ffd27a;--c2:#b07a1c}
 .t-student{--c1:#8e9cff;--c2:#4a55d4}
 html[data-theme=light] .tico{color:var(--c2)}
@@ -2307,7 +2325,7 @@ function render(){setTimeout(galaxyBg,0);
   if(S.readonly)$("#backAdmin").onclick=()=>go("admin");
   /* phones: floating + to log a trade from any student page */
   let fab=$("#fab");if(!fab){fab=document.createElement("button");fab.id="fab";fab.type="button";fab.setAttribute("aria-label","Log a trade");fab.innerHTML="＋";fab.onclick=()=>editTrade(null);document.body.appendChild(fab)}
-  fab.classList.toggle("hidden",!S.me||S.readonly||S.view==="admin"||$("#app").classList.contains("hidden"));}
+  fab.classList.toggle("hidden",!S.me||S.readonly||S.view==="admin"||S.view==="course"||$("#app").classList.contains("hidden"));}
 
 /* ============ filters ============ */
 function accounts(){return [...new Set(S.trades.map(t=>t.account).filter(Boolean))].sort()}
@@ -3416,7 +3434,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-19m";
+const APP_VER="2026-11-19n";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4711,6 +4729,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    <div class="card acc-card"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px"><h3 style="margin:0">✅ <span>Accepted users</span> <span class="adm-n" data-notr>${students.length}</span></h3><input class="i" id="accQ" placeholder="Search name, email, Telegram" style="width:220px"></div>
     <p class="mut" style="font-size:12px;margin:0 0 10px"><span>Remove access: the user can't open the journal and their data stays. They can request access again: they verify their Telegram again, then wait for your approval. Delete: the account and all its data are erased for good.</span></p>
     <div class="acc-list">${students.length?[...students].sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(s=>`<div class="acc-row" data-accid="${s.id}" data-q="${esc(((s.name||"")+" "+(s.email||"")+" "+(s.telegram||"")+" "+tgUser(s)).toLowerCase().replace(/@/g,""))}"><div class="acc-who"><b data-notr>${s.avatar?`<img class="acc-av" src="${esc(s.avatar)}" alt="">`:""}${esc(s.name||"—")}${isVerified(s)?" "+vCheck():""}${s.username?` <span class="mut">@${esc(s.username)}</span>`:""}</b><small class="mut" data-notr>${esc(s.email||"")}${tgUser(s)?` · @${esc(tgUser(s))}`:""}${s.created_at?` · <span>Joined</span> ${esc(fmtDate(s.created_at.slice(0,10)))}`:""}</small></div><div class="acc-acts"><button type="button" class="btn sm" data-remove="${s.id}">✖ <span>Remove access</span></button><button type="button" class="btn sm danger" data-delu="${s.id}">🗑 <span>Delete</span></button></div></div>`).join(""):`<div class="mut">No accepted users yet.</div>`}</div></div>
+   <div class="card acc-card" id="crsAdm"></div>
    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">Students</h3><div class="row"><input class="i" id="aq" placeholder="Search name, email, Telegram" style="width:240px"><button class="btn sm" id="aExp">Export CSV</button></div></div>
    <div class="tw"><table class="t" id="aT"><tr><th>Name (username)</th><th>Email</th><th>Telegram username</th><th>Trades</th><th>Broke plan</th><th>Weak spot</th><th>Journaled today</th><th>Plan today</th><th>Plan tomorrow</th></tr>
    ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b data-notr>${esc(r.s.name||"—")}</b> <span class="tag">👤 Open</span></td><td data-notr><a class="lnk" href="mailto:${esc(r.s.email||"")}" onclick="event.stopPropagation()">${esc(r.s.email||"—")}</a></td><td class="mono" data-notr>${tgUser(r.s)?`${r.s.tgOk?"✅":"⚠️"} <a class="lnk" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">@${esc(tgUser(r.s))}</a>`:"—"}</td><td class="mono">${r.c.n}</td>
@@ -4734,6 +4753,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
     if(v==="plan")S._planDate=r&&r.pNext?nd:today;
     S.view=v;render();window.scrollTo(0,0)});
   /* accepted users: search + remove (status -> rejected: no access, data kept, can be approved again) */
+  courseAdmin($("#crsAdm",el),students);
   const accQ=$("#accQ",el);if(accQ)accQ.oninput=e=>{const q=e.target.value.toLowerCase().replace(/@/g,"").trim();$$(".acc-row",el).forEach(r=>r.classList.toggle("hidden",!r.dataset.q.includes(q)))};
   /* delete a user for good: done by the server function (admin only); you must type DELETE to confirm */
   $$("[data-delu]",el).forEach(b=>b.onclick=ev=>{ev.stopPropagation();const s=students.find(x=>x.id===b.dataset.delu)||profs.find(x=>x.id===b.dataset.delu);if(!s)return;deleteUserBox(s,()=>vAdmin(el))});
@@ -4924,30 +4944,267 @@ function aboutExtra(){const tl=[["📈",`${ABOUT.yearsPrefix?ABOUT.yearsPrefix+"
   return `<div class="card ab-story"><h3>🧭 <span>Our story</span></h3><div class="ab-tl">${tl.map(([ic,t,d])=>`<div class="ab-st"><span class="ab-ic">${ic}</span><div><b>${esc(t)}</b><p class="mut">${esc(d)}</p></div></div>`).join("")}</div></div>
    <div class="card ab-faq"><h3>❓ <span>Questions</span></h3>${faq.map(([q,a])=>`<details class="ab-q"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>`}
 /* ============ Mentorship course (paid content, protected) ============
-   Lessons are not published yet: the page shows "content still unavailable".
-   Protection layer for the course page: no right-click, copy, drag, select, save, print or view-source shortcuts;
-   the content hides when the window loses focus (screenshot tools take the focus) or the tab is hidden;
-   a moving watermark with the member's name and email marks every view, so a leaked capture can be traced. */
-const COURSE={lessons:[]};
-function courseMark(){const m=S.me||{},who=[m.name,m.email].filter(Boolean).join(" · ")||"Tradeversity member",d=new Date().toISOString().slice(0,16).replace("T"," ");return esc(who+" · "+d)}
+   ONE DEVICE PER MEMBER. On activation this browser creates an ECDSA P-256 key pair; the private key can't be exported
+   (WebCrypto, non-extractable, kept in IndexedDB). The server (Edge Function "course") only stores the public key and
+   answers lessons / videos only to requests signed by that key. Same login on another phone, PC or browser = no key = locked.
+   Device change: code on Telegram -> the new device waits 24 h (the old one keeps working and can cancel). 1 per 90 days, 2 per year.
+   Page protection: no right-click, copy, drag, select, save, print or view-source shortcuts; the page hides when another app
+   takes the focus; moving watermark with the member's name and email. Videos: VdoCipher DRM (no download, capture blocked). */
+const CDev={_db:null,_mem:null,
+  ok(){return !!(window.crypto&&crypto.subtle&&window.indexedDB)},
+  other(){return S._demo&&new URLSearchParams(location.search).get("cvother")==="1"},   /* demo only: act as a second device */
+  async db(){if(this._db)return this._db;this._db=await new Promise((res,rej)=>{const r=indexedDB.open("tv_course",1);r.onupgradeneeded=()=>r.result.createObjectStore("k");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});return this._db},
+  async get(){if(this.other())return this._mem;try{const db=await this.db();return await new Promise(res=>{const q=db.transaction("k").objectStore("k").get("dev");q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)})}catch(e){return null}},
+  async make(){const kp=await crypto.subtle.generateKey({name:"ECDSA",namedCurve:"P-256"},false,["sign","verify"]);const j=await crypto.subtle.exportKey("jwk",kp.publicKey);
+    const d={priv:kp.privateKey,pub:{kty:"EC",crv:"P-256",x:j.x,y:j.y},at:Date.now()};
+    if(this.other()){this._mem=d;return d}
+    const db=await this.db();await new Promise((res,rej)=>{const t=db.transaction("k","readwrite");t.objectStore("k").put(d,"dev");t.oncomplete=res;t.onerror=()=>rej(t.error)});return d},
+  async key(){return (await this.get())||await this.make()},
+  async sign(d,msg){const s=await crypto.subtle.sign({name:"ECDSA",hash:"SHA-256"},d.priv,new TextEncoder().encode(msg));return btoa(String.fromCharCode(...new Uint8Array(s)))},
+  label(){const u=navigator.userAgent;
+    const os=/iPhone/.test(u)?"iPhone":(/iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1))?"iPad":/Android/.test(u)?"Android":/Windows/.test(u)?"Windows PC":/Mac OS X/.test(u)?"Mac":/CrOS/.test(u)?"Chromebook":/Linux/.test(u)?"Linux PC":"Device";
+    const br=/Edg\//.test(u)?"Edge":/OPR\/|Opera/.test(u)?"Opera":/SamsungBrowser/.test(u)?"Samsung Internet":/Firefox|FxiOS/.test(u)?"Firefox":/CriOS|Chrome/.test(u)?"Chrome":/Safari/.test(u)?"Safari":"Browser";
+    return os+" · "+br}};
+const CourseAPI={_ts:0,
+  async call(action,body={}){if(S._demo)return CourseDemo.call(action,body);
+    try{const{data}=await Cloud.sb.auth.getSession();const tok=data&&data.session&&data.session.access_token;
+      const r=await fetch(CONFIG.SUPABASE_URL+"/functions/v1/course",{method:"POST",headers:{Authorization:"Bearer "+tok,apikey:CONFIG.SUPABASE_ANON_KEY,"Content-Type":"application/json"},body:JSON.stringify({action,...body})});
+      let j={};try{j=await r.json()}catch(e){}if(!r.ok&&!j.error)j={ok:false,error:"server"};return j}
+    catch(e){return {ok:false,error:"network"}}},
+  async signed(action,extra="",body={}){const d=await CDev.key();this._ts=Math.max(Date.now(),this._ts+1);const ts=this._ts;
+    const sig=await CDev.sign(d,`${action}|${S.me.id}|${extra}|${ts}`);return this.call(action,{...body,pub:d.pub,ts,sig,label:CDev.label()})},
+  async status(){const d=await CDev.get();return this.call("status",{pub:d?d.pub:null})},
+  async progress(id,pct,done){if(S._demo)return CourseDemo.progress(id,pct,done);
+    const{error}=await Cloud.sb.from("course_progress").upsert({user_id:S.me.id,lesson_id:id,pct,done,updated_at:new Date().toISOString()},{onConflict:"user_id,lesson_id"});if(error)throw error},
+  lessonsAdmin:{
+    async list(){if(S._demo)return CourseDemo.les;const{data,error}=await Cloud.sb.from("course_lessons").select("*").order("position");if(error)throw error;return data||[]},
+    async save(l){if(S._demo){const i=CourseDemo.les.findIndex(x=>x.id===l.id);if(i>=0)CourseDemo.les[i]=l;else CourseDemo.les.push({...l,id:"d"+Date.now()});return}
+      const row={position:l.position,module:l.module||null,title:l.title,summary:l.summary||null,minutes:l.minutes||null,video_id:l.video_id||null,published:!!l.published};
+      const{error}=l.id?await Cloud.sb.from("course_lessons").update(row).eq("id",l.id):await Cloud.sb.from("course_lessons").insert(row);if(error)throw error},
+    async del(id){if(S._demo){CourseDemo.les=CourseDemo.les.filter(x=>x.id!==id);return}const{error}=await Cloud.sb.from("course_lessons").delete().eq("id",id);if(error)throw error}}};
+/* demo mode: the same rules as the server, kept in this browser (real signatures checked with WebCrypto) */
+const CourseDemo={les:[],prog:{},
+  st(){try{return JSON.parse(localStorage.getItem("tv_cdemo"))}catch(e){return null}},save(m){try{localStorage.setItem("tv_cdemo",JSON.stringify(m))}catch(e){}},
+  async ver(pub,msg,sig){try{const k=await crypto.subtle.importKey("jwk",{...pub,ext:true},{name:"ECDSA",namedCurve:"P-256"},false,["verify"]);return await crypto.subtle.verify({name:"ECDSA",hash:"SHA-256"},k,Uint8Array.from(atob(sig),c=>c.charCodeAt(0)),new TextEncoder().encode(msg))}catch(e){return false}},
+  progress(id,pct,done){this.prog[id]={pct,done}},
+  async call(a,b){const q=new URLSearchParams(location.search),WAIT=q.get("cvfast")==="1"?20e3:864e5;
+    if(q.get("cvlessons")==="1"&&!this.les.length)this.les=[{id:"l1",position:1,module:"Module 1 · Foundations",title:"Welcome and how the course works",summary:"",minutes:6,published:true,video_id:""},{id:"l2",position:2,module:"Module 1 · Foundations",title:"Market structure",summary:"",minutes:18,published:true,video_id:""},{id:"l3",position:3,module:"Module 2 · Execution",title:"Building your daily plan",summary:"",minutes:14,published:true,video_id:""}];
+    if(a.startsWith("admin")){const D=this.adm=this.adm||[{user_id:"u1",name:"Yassine B.",email:"yassine@example.com",telegram:"@yassine",status:"active",device_label:"iPhone · Safari",device_at:new Date(Date.now()-9*864e5).toISOString(),resets:[],blocked7:0,lastIp:"105.66.12.4",lastCountry:"DZ",lastAt:new Date().toISOString()},
+        {user_id:"u2",name:"Amina K.",email:"amina@example.com",telegram:"@amina_k",status:"active",device_label:"Windows PC · Chrome",device_at:new Date(Date.now()-30*864e5).toISOString(),pend_label:"Android · Chrome",pend_at:new Date(Date.now()-3*36e5).toISOString(),resets:[],blocked7:4,suspicious:true,lastIp:"41.200.3.9",lastCountry:"DZ",lastAt:new Date().toISOString()},
+        {user_id:"u3",name:"Karim S.",email:"karim@example.com",telegram:"@karims",status:"active",device_label:null,resets:[],blocked7:0}];
+      const m=D.find(x=>x.user_id===b.userId);
+      if(a==="adminList")return {ok:true,members:D};if(a==="adminLog")return {ok:true,log:[{at:new Date().toISOString(),action:"play",ok:true,device:"iPhone · Safari",ip:"105.66.12.4",country:"DZ"},{at:new Date(Date.now()-36e5).toISOString(),action:"lessons",ok:false,reason:"other_device",ip:"197.0.4.1",country:"TN"}]};
+      if(a==="adminGrant"){if(!m)D.push({user_id:b.userId,name:b.name||"",email:b.email||"",telegram:"",status:"active",device_label:null,resets:[],blocked7:0});return {ok:true}}
+      if(!m)return {ok:false,error:"no_user"};
+      if(a==="adminRevoke")D.splice(D.indexOf(m),1);if(a==="adminBlock")m.status="blocked";if(a==="adminUnblock")m.status="active";
+      if(a==="adminReset")Object.assign(m,{device_label:null,device_at:null,pend_label:null,pend_at:null});
+      if(a==="adminApprove")Object.assign(m,{device_label:m.pend_label,device_at:new Date().toISOString(),pend_label:null,pend_at:null});return {ok:true}}
+    let m=this.st()||{status:"active",resets:[],last:0};const pub=b.pub,same=(x,y)=>!!x&&!!y&&x.x===y.x&&x.y===y.y,uid=S.me.id;
+    if(m.pend&&Date.now()-m.pendAt>=WAIT){m.resets.push(Date.now());Object.assign(m,{dev:m.pend,label:m.pendLabel,at:Date.now(),pend:null,pendLabel:null,pendAt:null,last:0});this.save(m)}
+    const lim=()=>{const now=Date.now(),rs=m.resets,yr=rs.filter(t=>now-t<365*864e5),lr=rs.length?Math.max(...rs):0,next=Math.max(lr?lr+90*864e5:0,yr.length>=2?Math.min(...yr)+365*864e5:0);return {left:Math.max(0,2-yr.length),nextAt:next>now?new Date(next).toISOString():null,allowed:next<=now&&yr.length<2}};
+    const state=()=>({ok:true,member:true,blocked:m.status==="blocked",device:!m.dev?"none":same(m.dev,pub)?"this":(m.pend&&same(m.pend,pub))?"pending":"other",label:m.label,since:m.at&&new Date(m.at).toISOString(),
+      pending:m.pend?{label:m.pendLabel,at:new Date(m.pendAt).toISOString(),readyAt:new Date(m.pendAt+WAIT).toISOString()}:null,resets:lim(),telegram:true});
+    const signed=async(extra="")=>{if(!pub||!m.dev||!same(pub,m.dev))return "other_device";if(Math.abs(Date.now()-b.ts)>12e4||b.ts<=m.last)return "bad_time";
+      if(!(await this.ver(m.dev,`${a}|${uid}|${extra}|${b.ts}`,b.sig)))return "bad_signature";m.last=b.ts;this.save(m);return ""};
+    if(m.status==="blocked")return {ok:true,member:true,blocked:true};
+    if(a==="status")return state();
+    if(a==="activate"){if(m.dev)return {...state(),ok:false,error:"already_active"};if(b.accept!==true)return {ok:false,error:"must_accept"};
+      if(!(await this.ver(pub,`activate|${uid}||${b.ts}`,b.sig)))return {ok:false,error:"bad_signature"};Object.assign(m,{dev:pub,label:b.label,at:Date.now(),last:b.ts});this.save(m);return state()}
+    if(a==="lessons"){const e=await signed();if(e)return {...state(),ok:false,error:e};return {...state(),lessons:this.les.filter(l=>l.published).map(l=>({...l,video:!!l.video_id,pct:(this.prog[l.id]||{}).pct||0,done:!!(this.prog[l.id]||{}).done}))}}
+    if(a==="play"){const e=await signed(b.lessonId);if(e)return {ok:false,error:e};const l=this.les.find(x=>x.id===b.lessonId);return {ok:false,error:!l?"no_lesson":!l.video_id?"video_not_ready":"video_not_configured"}}
+    if(a==="cancelPending"){const e=await signed();if(e)return {ok:false,error:e};Object.assign(m,{pend:null,pendLabel:null,pendAt:null});this.save(m);return state()}
+    if(a==="resetCode"){if(m.pend)return {ok:false,error:"already_pending"};if(!lim().allowed)return {ok:false,error:"limit",resets:lim()};this.code="123456";
+      setTimeout(()=>toast(I18N.t("Demo: your Telegram code is")+" 123456",6000),300);return {ok:true}}
+    if(a==="resetConfirm"){if(m.pend)return {ok:false,error:"already_pending"};if(!lim().allowed)return {ok:false,error:"limit"};if(!this.code)return {ok:false,error:"code_expired"};
+      if(String(b.code||"").trim()!==this.code)return {ok:false,error:"wrong_code"};if(!(await this.ver(pub,`resetConfirm|${uid}||${b.ts}`,b.sig)))return {ok:false,error:"bad_signature"};
+      this.code=null;Object.assign(m,{pend:pub,pendLabel:b.label,pendAt:Date.now()});this.save(m);return state()}
+    return {ok:false,error:"unknown_action"}}};
+const CERR={other_device:"This course is locked to another device.",bad_time:"Your device's date and time are wrong. Turn on automatic date and time, then try again.",
+  bad_signature:"This device couldn't be verified. Reload the page and try again.",limit:"You've used your device changes for now.",
+  no_telegram:"Connect your Telegram first, so we can send you the code.",telegram_failed:"We couldn't send the code. Open the Tradeversity bot on Telegram, press Start, then try again.",
+  wait_minute:"A code was just sent. Wait a minute before asking for a new one.",code_expired:"The code expired. Ask for a new one.",too_many_tries:"Too many wrong codes. Ask for a new one.",
+  wrong_code:"Wrong code. Check the message on Telegram.",already_pending:"A device change is already waiting.",already_active:"The course is already activated on a device.",
+  video_not_ready:"This video isn't ready yet.",video_not_configured:"Videos aren't switched on yet.",video_error:"The video couldn't load. Try again in a moment.",
+  no_lesson:"This lesson isn't available.",not_logged_in:"Please log in again.",must_accept:"Please accept the device rule first.",
+  network:"No connection. Check your internet and try again.",server:"The course server isn't reachable. Try again in a moment.",bad_key:"This browser can't hold a secure course key."};
+const cErr=e=>I18N.t(CERR[e]||"Something went wrong. Try again.");
+const cDT=d=>d?new Date(d).toLocaleString(I18N.locale(),{dateStyle:"medium",timeStyle:"short"}):"";
+const cD=d=>d?new Date(d).toLocaleDateString(I18N.locale(),{dateStyle:"medium"}):"";
+function courseMark(){const m=S.me||{},who=[m.name,m.email].filter(Boolean).join(" · ")||"Tradeversity member";return esc(who+" · "+new Date().toLocaleDateString(I18N.locale()))}
+const C_RULES=`<ul class="cv-rules">
+   <li><span class="cv-ri">📱</span><span><b>One device.</b> <span>The course opens only on the device you activate. Another phone, PC or browser can't open it, even with your account and password.</span></span></li>
+   <li><span class="cv-ri">🛡</span><span><b>Protected videos.</b> <span>No download. Screen recording and screenshots of the videos are blocked on most devices.</span></span></li>
+   <li><span class="cv-ri">💧</span><span><b>Your name on every video.</b> <span>Your name and email move across the video, so any leak shows who it came from.</span></span></li>
+   <li><span class="cv-ri">🔁</span><span><b>New phone?</b> <span>Move the course yourself with a code sent to your Telegram: once every 90 days, 2 times a year. The new device replaces the old one 24 hours later.</span></span></li>
+  </ul>`;
 function vCourse(el){el.classList.add("course-v","cv-guard");
   el.innerHTML=`<h1>🎓 <span>Trading mentorship course</span></h1><p class="sub">The Tradeversity mentorship, step by step, by Brown Algo and ZN Trading.</p>
-   <div class="card cv-soon">
-    <div class="cv-lock">🔒</div>
-    <h2>Content still unavailable</h2>
-    <p class="mut">The lessons are being prepared. They will appear here as soon as they are ready.</p>
-    <div class="cv-badges"><span class="ind-b">🛡 <span>Protected content</span></span><span class="ind-b">👤 <span>Members only</span></span></div>
-   </div>
+   <div id="cvBody"><div class="card cv-soon"><div class="cv-load"></div></div></div>
    <div class="cv-wm" aria-hidden="true" data-notr>${Array.from({length:18},()=>`<span>${courseMark()}</span>`).join("")}</div>
    <div class="cv-shield hidden" id="cvShield"><div>🔒 <span>Content hidden. Click here to continue.</span></div></div>`;
-  $$("img,video",el).forEach(x=>{x.setAttribute("draggable","false");x.setAttribute("controlslist","nodownload noplaybackrate noremoteplayback");x.setAttribute("disablepictureinpicture","")});
-  $("#cvShield").onclick=()=>$("#cvShield").classList.add("hidden")}
+  $("#cvShield").onclick=()=>$("#cvShield").classList.add("hidden");
+  courseLoad(el)}
+async function courseLoad(el){const B=$("#cvBody",el);if(!B)return;
+  if(!CDev.ok()){B.innerHTML=`<div class="card cv-soon"><div class="cv-lock">⚠️</div><h2>This browser can't open the course</h2><p class="mut">Use an up-to-date Chrome, Safari, Edge or Firefox, not a private window.</p></div>`;return}
+  const st=await CourseAPI.status();if(!B.isConnected)return;
+  if(!st.ok&&st.error){B.innerHTML=`<div class="card cv-soon"><div class="cv-lock">📡</div><h2>${esc(cErr(st.error))}</h2><button class="btn" id="cvRetry">↻ <span>Try again</span></button></div>`;$("#cvRetry",B).onclick=()=>courseLoad(el);return}
+  if(!st.member)return cvSoon(B);
+  if(st.blocked){B.innerHTML=`<div class="card cv-soon"><div class="cv-lock">⛔</div><h2>Your course access is suspended</h2><p class="mut">Contact Brown Algo on Telegram.</p></div>`;return}
+  if(st.admin||st.device==="this")return cvCourse(el,B,st);
+  if(st.device==="none")return cvActivate(el,B,st);
+  return cvLocked(el,B,st)}
+function cvSoon(B){B.innerHTML=`<div class="card cv-soon">
+    <div class="cv-lock">🔒</div><h2>Content still unavailable</h2>
+    <p class="mut">The lessons are being prepared. They will appear here as soon as they are ready.</p>
+    <div class="cv-badges"><span class="ind-b">🛡 <span>Protected content</span></span><span class="ind-b">👤 <span>Members only</span></span><span class="ind-b">📱 <span>One device</span></span></div></div>
+   <div class="card cv-how"><h3>How your course access works</h3>${C_RULES}</div>`}
+function cvDevBox(lbl,sub){return `<div class="cv-dev"><span class="cv-dev-ic">${/iPhone|Android/.test(lbl)?"📱":/iPad/.test(lbl)?"📲":"💻"}</span><span><b data-notr>${esc(lbl||"")}</b>${sub?`<small class="mut">${sub}</small>`:""}</span></div>`}
+function cvActivate(el,B,st){
+  B.innerHTML=`<div class="card cv-act"><div class="cv-act-h"><div class="cv-lock">📱</div><div><h2>Activate this device</h2><p class="mut">Your course opens on one device only. Activate the device you will study on.</p></div></div>
+    ${cvDevBox(CDev.label(),`<span>This device</span>`)}
+    <div class="cv-warn"><b>⚠️ <span>Read before you activate</span></b>
+     <ul><li><span>This device will be the only device that can open the course.</span></li>
+      <li><span>The course will not open on any other phone, PC or browser, even with your account and password.</span></li>
+      <li><span>Use your usual browser. A private window, or clearing this browser's data, locks the course on this device.</span></li>
+      <li><span>Changed device? Move the course yourself with a code sent to your Telegram: once every 90 days, 2 times a year.</span></li></ul></div>
+    <label class="cv-ok"><input type="checkbox" id="cvAcc"><span>I understand and accept that this device is my only course device.</span></label>
+    <button class="btn pri cv-go" id="cvActBtn" disabled>🔐 <span>Activate this device</span></button></div>
+   <div class="card cv-how"><h3>How your course access works</h3>${C_RULES}</div>`;
+  const acc=$("#cvAcc",B),go=$("#cvActBtn",B);acc.onchange=()=>go.disabled=!acc.checked;
+  go.onclick=async()=>{go.disabled=true;go.classList.add("busy");
+    const r=await CourseAPI.signed("activate","",{accept:true});
+    if(r.ok&&r.device==="this"){toast(I18N.t("This device is now your course device"));courseLoad(el)}
+    else{go.disabled=false;go.classList.remove("busy");toast(cErr(r.error));if(r.error==="already_active")courseLoad(el)}}}
+function cvLocked(el,B,st){
+  const p=st.pending,mine=st.device==="pending",R=st.resets||{};
+  if(mine){const left=Math.max(0,new Date(p.readyAt)-Date.now()),h=Math.floor(left/36e5),mi=Math.ceil(left%36e5/6e4);
+    B.innerHTML=`<div class="card cv-soon"><div class="cv-lock">⏳</div><h2>This device is waiting</h2>
+      <p class="mut"><span>Your course moves to this device on</span> <b data-notr>${esc(cDT(p.readyAt))}</b> <span class="mut" data-notr>(${h}h ${mi}m)</span>.</p>
+      ${cvDevBox(p.label,`<span>New course device</span>`)}
+      <p class="mut" style="font-size:12.5px"><span>Until then your old device keeps working. This waiting time protects your account if someone else asked for the change.</span></p>
+      <button class="btn" id="cvRetry">↻ <span>Check again</span></button></div>`;
+    $("#cvRetry",B).onclick=()=>courseLoad(el);return}
+  B.innerHTML=`<div class="card cv-soon cv-lockd"><div class="cv-lock">🔒</div><h2>This course is locked to another device</h2>
+     <p class="mut"><span>Your course is activated on:</span></p>${cvDevBox(st.label,st.since?`<span>Since</span> <span data-notr>${esc(cD(st.since))}</span>`:"")}
+     <p class="mut" style="font-size:13px"><span>It can't open on this device, even with your account. For your protection, every try is recorded.</span></p>
+     ${p?`<div class="cv-note">⏳ <span>A device change is already waiting:</span> <b data-notr>${esc(p.label||"")}</b> · <span data-notr>${esc(cDT(p.readyAt))}</span></div>`
+       :R.allowed?`<button class="btn pri cv-go" id="cvMove">📲 <span>Move my course to this device</span></button><p class="mut" style="font-size:12px;margin-top:8px"><span>Device changes left this year:</span> <b data-notr>${R.left}</b></p>`
+       :`<div class="cv-note">🔁 <span>You've used your device changes for now. Next change possible on</span> <b data-notr>${esc(cD(R.nextAt))}</b>. <span>Lost your device? Contact Brown Algo on Telegram.</span></div>`}
+   </div>`;
+  const mv=$("#cvMove",B);if(mv)mv.onclick=()=>cvMoveFlow(el,st)}
+function cvMoveFlow(el,st){
+  if(!st.telegram){toast(cErr("no_telegram"));return}
+  openModal(`<div class="cv-flow"><h3 style="margin-top:0">📲 <span>Move my course to this device</span></h3>
+    ${cvDevBox(CDev.label(),`<span>New course device</span>`)}
+    <ol class="cv-steps"><li><span>We send a 6-digit code to your Telegram.</span></li><li><span>You enter the code here.</span></li><li><span>24 hours later, this device replaces your old one. Until then the old device keeps working and can cancel.</span></li></ol>
+    <div id="cvStep"><button class="btn pri cv-go" id="cvSend">✈️ <span>Send the code to my Telegram</span></button></div>
+    <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="cvClose">Cancel</button></div></div>`);
+  $("#cvClose").onclick=closeModal;
+  const send=$("#cvSend");send.onclick=async()=>{send.disabled=true;send.classList.add("busy");const r=await CourseAPI.call("resetCode");
+    if(!r.ok){send.disabled=false;send.classList.remove("busy");toast(cErr(r.error));return}
+    $("#cvStep").innerHTML=`<label class="f"><span>Code from Telegram</span><input class="i cv-code" id="cvCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></label>
+      <label class="cv-ok"><input type="checkbox" id="cvAcc2"><span>I accept that this device becomes my only course device.</span></label>
+      <button class="btn pri cv-go" id="cvConf" disabled>✔ <span>Confirm the change</span></button><button type="button" class="btn sm" id="cvResend" style="margin-top:8px">↻ <span>Send a new code</span></button>`;
+    const c=$("#cvCode"),a=$("#cvAcc2"),ok=$("#cvConf"),upd=()=>ok.disabled=!(a.checked&&/^\d{6}$/.test(c.value.trim()));c.oninput=()=>{c.value=c.value.replace(/\D/g,"").slice(0,6);upd()};a.onchange=upd;setTimeout(()=>c.focus(),50);
+    $("#cvResend").onclick=async()=>{const r2=await CourseAPI.call("resetCode");toast(r2.ok?I18N.t("New code sent"):cErr(r2.error))};
+    ok.onclick=async()=>{ok.disabled=true;ok.classList.add("busy");const r2=await CourseAPI.signed("resetConfirm","",{code:c.value.trim()});
+      if(r2.ok&&r2.device==="pending"){closeModal();toast(I18N.t("Done. This device becomes your course device in 24 hours."),5000);courseLoad(el)}
+      else{ok.classList.remove("busy");upd();toast(cErr(r2.error))}}}}
+async function cvCourse(el,B,st){
+  B.innerHTML=`<div class="card cv-soon"><div class="cv-load"></div></div>`;
+  const r=await CourseAPI.signed("lessons");if(!B.isConnected)return;
+  if(!r.ok){if(r.error==="other_device")return courseLoad(el);B.innerHTML=`<div class="card cv-soon"><div class="cv-lock">⚠️</div><h2>${esc(cErr(r.error))}</h2><button class="btn" id="cvRetry">↻ <span>Try again</span></button></div>`;$("#cvRetry",B).onclick=()=>courseLoad(el);return}
+  const L=(r.lessons||[]).sort((a,b)=>a.position-b.position),done=L.filter(l=>l.done).length,pc=L.length?Math.round(done/L.length*100):0,next=L.find(l=>!l.done);
+  const mods=[];L.forEach(l=>{const k=l.module||"";let g=mods.find(x=>x.k===k);if(!g)mods.push(g={k,ls:[]});g.ls.push(l)});let n=0;
+  const p=st.pending;
+  B.innerHTML=`${st.admin?`<div class="cv-note cv-adm">👑 <span>Admin preview: the device lock doesn't apply to you. Unpublished lessons are shown.</span></div>`:""}
+   <div class="cv-lic"><span>🛡 <span>Licensed to</span> <b data-notr>${esc(S.me.name||S.me.email||"")}</b></span>${st.admin?"":`<span>📱 <span>This device:</span> <b data-notr>${esc(st.label||CDev.label())}</b></span>`}</div>
+   ${p&&!st.admin?`<div class="cv-note cv-pend"><span>⚠️ <span>A device change was requested for</span> <b data-notr>${esc(p.label||"")}</b> <span>on</span> <span data-notr>${esc(cDT(p.at))}</span>. <span>It replaces this device on</span> <b data-notr>${esc(cDT(p.readyAt))}</b>. <span>Not you? Cancel it now.</span></span><button class="btn sm danger" id="cvCancel">✖ <span>Cancel the change</span></button></div>`:""}
+   ${L.length?`<div class="card cv-prog"><div class="row" style="justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b>Your progress</b> <span class="mut" data-notr>${done}/${L.length} · ${pc}%</span></div>${next?`<button class="btn pri sm" data-les="${next.id}">▶ <span>${done?"Continue":"Start the course"}</span></button>`:`<span class="ind-b">🏆 <span>Course completed</span></span>`}</div><div class="cv-bar"><i style="width:${pc}%"></i></div></div>
+     ${mods.map(g=>`<div class="card cv-mod">${g.k?`<h3 data-notr>${esc(g.k)}</h3>`:""}${g.ls.map(l=>`<button type="button" class="cv-les ${l.done?"done":""}" data-les="${l.id}"><span class="cv-n" data-notr>${l.done?"✓":++n}</span><span class="cv-t"><b data-notr>${esc(l.title)}</b>${l.summary?`<small class="mut" data-notr>${esc(l.summary)}</small>`:""}${st.admin&&!l.published?`<small class="cv-draft">Draft</small>`:""}</span><span class="cv-m mut" data-notr>${l.minutes?l.minutes+" min":""}</span><span class="cv-s">${l.done?"":l.pct?`<span data-notr>${l.pct}%</span>`:"▶"}</span></button>`).join("")}</div>`).join("")}`
+   :`<div class="card cv-soon"><div class="cv-lock">🎬</div><h2>Content still unavailable</h2><p class="mut">The lessons are being prepared. They will appear here as soon as they are ready.</p></div>`}
+   ${st.admin?"":`<div class="card cv-devcard"><h3>📱 <span>Your course device</span></h3>${cvDevBox(st.label,st.since?`<span>Activated</span> <span data-notr>${esc(cD(st.since))}</span>`:"")}
+     <p class="mut" style="font-size:12.5px;margin:10px 0 0"><span>New phone or PC? Open the course on the new device and press "Move my course to this device". Changes left this year:</span> <b data-notr>${(st.resets||{}).left??2}</b></p></div>`}`;
+  const cc=$("#cvCancel",B);if(cc)cc.onclick=async()=>{cc.disabled=true;const x=await CourseAPI.signed("cancelPending");if(x.ok){toast(I18N.t("Device change cancelled"));courseLoad(el)}else{cc.disabled=false;toast(cErr(x.error))}};
+  $$("[data-les]",B).forEach(b=>b.onclick=()=>cvPlay(el,L.find(l=>l.id===b.dataset.les),st))}
+async function cvPlay(el,l,st){if(!l)return;
+  const r=st.admin?await CourseAPI.call("play",{lessonId:l.id}):await CourseAPI.signed("play",l.id,{lessonId:l.id});
+  if(!r.ok){toast(cErr(r.error));if(r.error==="other_device")courseLoad(el);return}
+  const pl=document.createElement("div");pl.className="cv-player";
+  pl.innerHTML=`<div class="cv-pbox"><div class="cv-ph"><b data-notr>${esc(l.title)}</b><button class="btn sm" id="cvPx" aria-label="Close">✕</button></div>
+    <div class="cv-frame"><iframe src="https://player.vdocipher.com/v2/?otp=${encodeURIComponent(r.otp)}&playbackInfo=${encodeURIComponent(r.playbackInfo)}" allow="encrypted-media; fullscreen" allowfullscreen referrerpolicy="origin"></iframe></div>
+    <div class="cv-pf"><span class="mut" style="font-size:12px">🛡 <span>Protected video · licensed to</span> <span data-notr>${esc(S.me.name||S.me.email||"")}</span></span><button class="btn pri sm" id="cvDone">✓ <span>${l.done?"Done":"Mark as done"}</span></button></div></div>`;
+  el.appendChild(pl);try{I18N.apply&&I18N.apply(pl)}catch(e){}
+  const close=()=>{pl.remove();courseLoad(el)};$("#cvPx",pl).onclick=close;
+  $("#cvDone",pl).onclick=async()=>{try{await CourseAPI.progress(l.id,100,true);toast(I18N.t("Lesson completed"));close()}catch(e){toast(I18N.t("Couldn't save")+": "+(e.message||e))}}}
 (function courseGuard(){const on=()=>S.view==="course"&&!!document.querySelector(".cv-guard"),hide=()=>{const s=$("#cvShield");if(s&&on())s.classList.remove("hidden")};
-  ["contextmenu","copy","cut","dragstart","selectstart"].forEach(t=>document.addEventListener(t,e=>{if(on()&&e.target.closest&&e.target.closest(".cv-guard"))e.preventDefault()},true));
+  ["contextmenu","copy","cut","dragstart","selectstart"].forEach(t=>document.addEventListener(t,e=>{if(on()&&e.target.closest&&e.target.closest(".cv-guard")&&!e.target.closest("input,textarea"))e.preventDefault()},true));
   document.addEventListener("keydown",e=>{if(!on())return;const k=(e.key||"").toLowerCase(),c=e.ctrlKey||e.metaKey;
-    if(k==="printscreen"||k==="f12"||(c&&["s","p","u","c"].includes(k))||(c&&e.shiftKey&&["i","j","c","s"].includes(k))){e.preventDefault();e.stopPropagation();hide()}},true);
+    if(k==="printscreen"||k==="f12"||(c&&["s","p","u"].includes(k))||(c&&k==="c"&&!e.target.closest("input,textarea"))||(c&&e.shiftKey&&["i","j","c","s"].includes(k))){e.preventDefault();e.stopPropagation();hide()}},true);
   document.addEventListener("keyup",e=>{if(on()&&(e.key||"").toLowerCase()==="printscreen"){hide();try{navigator.clipboard.writeText("")}catch(x){}}},true);
-  addEventListener("blur",hide);document.addEventListener("visibilitychange",()=>{if(document.hidden)hide()});addEventListener("beforeprint",hide)})();
+  /* clicking into the video player moves the focus into its frame: that is not a screenshot tool */
+  addEventListener("blur",()=>setTimeout(()=>{const a=document.activeElement;if(a&&a.tagName==="IFRAME")return;hide()},0));
+  document.addEventListener("visibilitychange",()=>{if(document.hidden)hide()});addEventListener("beforeprint",hide)})();
+/* admin: course members (device, change waiting, suspicious use) + lessons */
+async function courseAdmin(box,students){if(!box)return;box.innerHTML=`<h3 style="margin:0 0 8px">🎓 <span>Mentorship course</span></h3><div class="empty">…</div>`;
+  const r=await CourseAPI.call("adminList");if(!box.isConnected)return;
+  if(!r.ok){box.innerHTML=`<h3 style="margin:0 0 8px">🎓 <span>Mentorship course</span></h3><p class="mut" style="font-size:13px">${esc(r.error==="server"||r.error==="network"?I18N.t("The course server isn't set up yet."):cErr(r.error))}</p><button class="btn sm" id="crsLes">🎬 <span>Lessons</span></button>`;$("#crsLes",box).onclick=()=>courseLessonsBox();return}
+  const M=(r.members||[]).sort((a,b)=>(b.suspicious?1:0)-(a.suspicious?1:0)||(a.name||"").localeCompare(b.name||""));
+  const susp=M.filter(m=>m.suspicious).length,pend=M.filter(m=>m.pend_label).length;
+  box.innerHTML=`<div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px"><h3 style="margin:0">🎓 <span>Mentorship course</span> <span class="adm-n" data-notr>${M.length}</span>${susp?` <span class="cv-flag">⚠️ <span data-notr>${susp}</span></span>`:""}${pend?` <span class="cv-flag cv-flag-p">⏳ <span data-notr>${pend}</span></span>`:""}</h3>
+     <div class="row" style="gap:6px;flex-wrap:wrap"><input class="i" id="crsQ" placeholder="Search name, email, Telegram" style="width:200px"><button class="btn sm pri" id="crsAdd">＋ <span>Give access</span></button><button class="btn sm" id="crsLes">🎬 <span>Lessons</span></button></div></div>
+    <p class="mut" style="font-size:12px;margin:0 0 10px"><span>Each member opens the course on one device only. Reset device: the next device they open the course on becomes their device. Block: access stops right away on every device.</span></p>
+    <div class="acc-list">${M.length?M.map(m=>`<div class="acc-row cv-arow ${m.suspicious?"susp":""}" data-q="${esc(((m.name||"")+" "+(m.email||"")+" "+(m.telegram||"")).toLowerCase().replace(/@/g,""))}">
+      <div class="acc-who"><b data-notr>${esc(m.name||"—")}${m.status==="blocked"?` <span class="cv-tag bad">⛔ <span>Blocked</span></span>`:""}${m.suspicious?` <span class="cv-tag warn">⚠️ <span>Check</span></span>`:""}</b>
+       <small class="mut" data-notr>${esc(m.email||"")}${m.telegram?" · "+esc(m.telegram):""}</small>
+       <small>${m.device_label?`📱 <b data-notr>${esc(m.device_label)}</b> <span class="mut" data-notr>· ${esc(cD(m.device_at))}</span>`:`<span class="mut">⏳ <span>Not activated yet</span></span>`}
+        ${m.pend_label?` · <span class="cv-tag pend">⏳ <span>Change to</span> <span data-notr>${esc(m.pend_label)}</span></span>`:""}</small>
+       <small class="mut"><span>Device changes:</span> <span data-notr>${(m.resets||[]).length}/2</span>${m.blocked7?` · <span class="neg"><span>Blocked tries (7 days):</span> <span data-notr>${m.blocked7}</span></span>`:""}${m.lastAt?` · <span>Last seen</span> <span data-notr>${esc(cDT(m.lastAt))}${m.lastIp?" · "+esc(m.lastIp):""}${m.lastCountry?" · "+esc(m.lastCountry):""}</span>`:""}</small></div>
+      <div class="acc-acts">${m.pend_label?`<button type="button" class="btn sm pri" data-ca="adminApprove" data-u="${m.user_id}">✔ <span>Approve now</span></button>`:""}
+       ${m.device_label||m.pend_label?`<button type="button" class="btn sm" data-ca="adminReset" data-u="${m.user_id}">🔁 <span>Reset device</span></button>`:""}
+       <button type="button" class="btn sm" data-clog="${m.user_id}">📜 <span>Log</span></button>
+       ${m.status==="blocked"?`<button type="button" class="btn sm" data-ca="adminUnblock" data-u="${m.user_id}">✅ <span>Unblock</span></button>`:`<button type="button" class="btn sm" data-ca="adminBlock" data-u="${m.user_id}">⛔ <span>Block</span></button>`}
+       <button type="button" class="btn sm danger" data-ca="adminRevoke" data-u="${m.user_id}">✖ <span>Remove access</span></button></div></div>`).join(""):`<div class="empty">No members yet. Use "Give access".</div>`}</div>`;
+  const q=$("#crsQ",box);if(q)q.oninput=()=>{const v=q.value.toLowerCase().replace(/@/g,"").trim();$$(".cv-arow",box).forEach(x=>x.classList.toggle("hidden",!x.dataset.q.includes(v)))};
+  const ASK={adminReset:"Reset this member's device? The next device they open the course on becomes their device.",adminBlock:"Block this member? The course stops right away on every device.",adminRevoke:"Remove course access for this member?",adminApprove:"Approve the device change now (without the 24-hour wait)?"};
+  $$("[data-ca]",box).forEach(b=>b.onclick=()=>{const m=M.find(x=>x.user_id===b.dataset.u),run=async()=>{b.disabled=true;const x=await CourseAPI.call(b.dataset.ca,{userId:b.dataset.u});if(x.ok){toast(I18N.t("Done"));courseAdmin(box,students)}else{b.disabled=false;toast(cErr(x.error))}};
+    if(ASK[b.dataset.ca])confirmBox(`${m&&m.name||""} · ${I18N.t(ASK[b.dataset.ca])}`,run);else run()});
+  $$("[data-clog]",box).forEach(b=>b.onclick=async()=>{const m=M.find(x=>x.user_id===b.dataset.clog),x=await CourseAPI.call("adminLog",{userId:b.dataset.clog});
+    openModal(`<h3 style="margin-top:0">📜 <span>Course log</span> · <span data-notr>${esc(m&&m.name||"")}</span></h3><div class="tw" style="max-height:60vh;overflow:auto"><table class="t"><tr><th>Time</th><th>Action</th><th>Result</th><th>Device</th><th>IP</th></tr>
+      ${(x.log||[]).map(l=>`<tr><td class="mono" data-notr>${esc(cDT(l.at))}</td><td data-notr>${esc(l.action)}</td><td>${l.ok?"✅":`❌ <span class="mut" data-notr>${esc(l.reason||"")}</span>`}</td><td data-notr>${esc(l.device||"")}</td><td class="mono" data-notr>${esc(l.ip||"")}${l.country?" · "+esc(l.country):""}</td></tr>`).join("")||`<tr><td colspan="5" class="mut">—</td></tr>`}</table></div>
+      <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="clX">Close</button></div>`);$("#clX").onclick=closeModal});
+  $("#crsLes",box).onclick=()=>courseLessonsBox();
+  $("#crsAdd",box).onclick=()=>{const have=new Set(M.map(m=>m.user_id)),list=(students||[]).filter(s=>!have.has(s.id));
+    openModal(`<h3 style="margin-top:0">🎓 <span>Give course access</span></h3><input class="i" id="gaQ" placeholder="Search name, email, Telegram" style="width:100%;margin-bottom:8px">
+      <div class="acc-list" style="max-height:50vh">${list.length?list.map(s=>`<div class="acc-row ga-row" data-q="${esc(((s.name||"")+" "+(s.email||"")+" "+(s.telegram||"")).toLowerCase().replace(/@/g,""))}"><div class="acc-who"><b data-notr>${esc(s.name||"—")}</b><small class="mut" data-notr>${esc(s.email||"")}</small></div><button type="button" class="btn sm pri" data-ga="${s.id}">＋ <span>Give access</span></button></div>`).join(""):`<div class="empty">Every accepted user already has access.</div>`}</div>
+      <p class="mut" style="font-size:12px"><span>They get a Telegram message. The first device they open the course on becomes their only course device.</span></p>
+      <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="gaX">Close</button></div>`);
+    $("#gaX").onclick=()=>{closeModal();courseAdmin(box,students)};
+    $("#gaQ").oninput=e=>{const v=e.target.value.toLowerCase().replace(/@/g,"").trim();$$(".ga-row").forEach(x=>x.classList.toggle("hidden",!x.dataset.q.includes(v)))};
+    $$("[data-ga]").forEach(b=>b.onclick=async()=>{const s=list.find(x=>x.id===b.dataset.ga);b.disabled=true;const x=await CourseAPI.call("adminGrant",{userId:b.dataset.ga,name:s&&s.name,email:s&&s.email});
+      if(x.ok){b.outerHTML=`<span class="ind-b">✅ <span>Access given</span></span>`}else{b.disabled=false;toast(cErr(x.error))}})}}
+async function courseLessonsBox(){let L=[];try{L=(await CourseAPI.lessonsAdmin.list()).sort((a,b)=>a.position-b.position)}catch(e){toast(I18N.t("Couldn't load")+": "+(e.message||e));return}
+  openModal(`<h3 style="margin-top:0">🎬 <span>Course lessons</span></h3>
+    <p class="mut" style="font-size:12px;margin-top:0"><span>Upload each video to VdoCipher, then paste its video ID here. Only published lessons are shown to members.</span></p>
+    <div class="acc-list" style="max-height:48vh">${L.length?L.map(l=>`<div class="acc-row"><div class="acc-who"><b data-notr>${l.position}. ${esc(l.title)}</b><small class="mut" data-notr>${esc(l.module||"")}${l.minutes?" · "+l.minutes+" min":""}</small><small>${l.published?`<span class="cv-tag ok">✅ <span>Published</span></span>`:`<span class="cv-tag">📝 <span>Draft</span></span>`} ${l.video_id?`<span class="cv-tag ok">🎬 <span>Video linked</span></span>`:`<span class="cv-tag warn">⚠️ <span>No video yet</span></span>`}</small></div>
+      <div class="acc-acts"><button type="button" class="btn sm" data-le="${l.id}">✏️ <span>Edit</span></button><button type="button" class="btn sm danger" data-ld="${l.id}">🗑</button></div></div>`).join(""):`<div class="empty">No lessons yet.</div>`}</div>
+    <div class="row" style="justify-content:space-between;margin-top:12px"><button class="btn pri" id="leAdd">＋ <span>Add a lesson</span></button><button class="btn" id="leX">Close</button></div>`);
+  $("#leX").onclick=closeModal;$("#leAdd").onclick=()=>courseLessonEdit({position:(L.length?Math.max(...L.map(x=>x.position)):0)+1,module:L.length?L[L.length-1].module:"",published:false});
+  $$("[data-le]").forEach(b=>b.onclick=()=>courseLessonEdit(L.find(x=>x.id===b.dataset.le)));
+  $$("[data-ld]").forEach(b=>b.onclick=()=>{const l=L.find(x=>x.id===b.dataset.ld);confirmBox(`${I18N.t("Delete this lesson?")} ${l.title}`,async()=>{try{await CourseAPI.lessonsAdmin.del(l.id);courseLessonsBox()}catch(e){toast(I18N.t("Couldn't delete")+": "+(e.message||e))}})})}
+function courseLessonEdit(l){
+  openModal(`<h3 style="margin-top:0">${l.id?"✏️ <span>Edit the lesson</span>":"＋ <span>New lesson</span>"}</h3>
+    <div class="grid2" style="display:grid;grid-template-columns:90px minmax(0,1fr);gap:8px"><label class="f"><span>Order</span><input class="i" id="leP" type="number" min="0" value="${l.position||0}"></label><label class="f"><span>Module</span><input class="i" id="leM" value="${esc(l.module||"")}" placeholder="Module 1 · Foundations"></label></div>
+    <label class="f"><span>Title</span><input class="i" id="leT" value="${esc(l.title||"")}" maxlength="140"></label>
+    <label class="f"><span>Short description</span><input class="i" id="leS" value="${esc(l.summary||"")}" maxlength="240"></label>
+    <div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px"><label class="f"><span>Minutes</span><input class="i" id="leMin" type="number" min="0" value="${l.minutes||""}"></label><label class="f"><span>VdoCipher video ID</span><input class="i mono" id="leV" value="${esc(l.video_id||"")}" placeholder="e.g. 1234567890abcdef1234567890abcdef"></label></div>
+    <label class="cv-ok"><input type="checkbox" id="lePub" ${l.published?"checked":""}><span>Published (members can see it)</span></label>
+    <div class="row" style="justify-content:flex-end;gap:8px;margin-top:12px"><button class="btn" id="leC">Cancel</button><button class="btn pri" id="leOk">💾 <span>Save</span></button></div>`);
+  $("#leC").onclick=courseLessonsBox;
+  $("#leOk").onclick=async()=>{const t=$("#leT").value.trim();if(!t){toast(I18N.t("Add a title"));return}
+    const v=$("#leV").value.trim();if(v&&!/^[A-Za-z0-9_-]{8,64}$/.test(v)){toast(I18N.t("This VdoCipher video ID doesn't look right"));return}
+    try{await CourseAPI.lessonsAdmin.save({...l,position:parseInt($("#leP").value)||0,module:$("#leM").value.trim(),title:t,summary:$("#leS").value.trim(),minutes:parseInt($("#leMin").value)||null,video_id:v,published:$("#lePub").checked});toast(I18N.t("Saved"));courseLessonsBox()}
+    catch(e){toast(I18N.t("Couldn't save")+": "+(e.message||e))}}}
 function vAbout(el){el.classList.add("about-v");
   el.innerHTML=`<div class="about-hero"><div class="logo lg" role="img" aria-label="Tradeversity"></div><div><h1>About us</h1>
     <p class="sub" style="max-width:640px">Tradeversity is a trading mentorship and bootcamp not like the standard simple trading courses we see everyday and community founded by <b>Brown Algo</b> and <b>ZNtrading</b>. We teach a precise scalping trading system with clean entries and confirmations using our experience and advanced technicals at the charts, of course with rule-based way to trade having and preparing a clear daily bias, a written plan, strict risk, and an honest journal.</p></div></div>
