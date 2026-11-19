@@ -820,8 +820,10 @@ html[lang=ar] .foot.founder span,html[lang=ar] .foot.founder b,html[lang=ar] .fo
   #app .topin .brand{flex:1 1 auto;min-width:0}
   #app .topin .spacer,#app .founder-chip,#whoChip{display:none}
   #app #logout{order:1}
-  #app .theme-slot,#app .disp-w,#app #langTop{order:2}
-  #app #langTop .langSel{max-width:130px}
+  /* one row: logo, search, bell, profile, settings */
+  #app .topin{flex-wrap:nowrap;column-gap:6px}
+  #app .topin .brand>div{overflow:hidden;text-overflow:ellipsis;min-width:0}
+  #app .topin .hd-ic,#app .topin .ntf-bell{width:34px;height:34px;flex:none}
   #app main#view{overflow-x:hidden}
 }
 @media(max-width:1180px){.founder-chip{display:none}}
@@ -1619,6 +1621,21 @@ html[data-theme=light] .cmdk-box{background:#fff;border-color:#d7dcf5}html[data-
 html:not(.foot-full) #app .appfoot :is([data-promo],#socFoot,.foot.founder){display:none!important}html:not(.foot-full) #app .appfoot{padding-bottom:20px}
 .disp-pop .dp-row>small.dp-note{text-transform:none;letter-spacing:0;font-weight:500;font-size:11px}
 .dp-acts{display:flex;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}.dp-acts .btn{flex:1}
+/* My profile + verified check */
+.vchk{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,#4f9dff,#2563eb);color:#fff;font-size:11px;font-weight:900;vertical-align:middle;box-shadow:0 0 0 2px rgba(79,157,255,.25)}
+.me-btn{position:relative;overflow:visible}.me-btn img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.me-btn .me-v{position:absolute;right:-3px;bottom:-3px;width:15px;height:15px;border-radius:50%;background:#2563eb;color:#fff;font:900 9px/15px Inter,sans-serif;font-style:normal;text-align:center;box-shadow:0 0 0 2px #0b0d15}
+.pf-nudge{display:flex!important;align-items:center;gap:12px;width:100%;margin:0 0 12px;text-align:start;cursor:pointer;font:inherit;color:inherit;border-color:rgba(79,157,255,.45)!important}
+.pf-av{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:rgba(255,255,255,.06);overflow:hidden;border:1px solid var(--line2)}.pf-av img{width:100%;height:100%;object-fit:cover}
+.pf-av.big{width:96px;height:96px;font-size:44px;border:2px solid rgba(79,157,255,.5)}
+.pf-nt{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}.pf-nt b{font-size:14px}
+.pf-bar{display:block;height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}.pf-bar i{display:block;height:100%;background:linear-gradient(90deg,#2563eb,#4f9dff)}
+.pf-head{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.pf-photo{display:flex;flex-direction:column;align-items:center;gap:8px}
+.pf-up{cursor:pointer}.pf-who{flex:1;min-width:200px;display:flex;flex-direction:column;gap:4px}.pf-who>b{font-size:20px}
+.pf-status{margin-top:6px;font-size:13px;color:var(--muted);line-height:1.5}.pf-status.ok{color:#4f9dff;font-weight:800}
+.pf-grid .f{min-width:0}.pf-err{min-height:18px;margin:8px 0}
+.acc-av{width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-inline-end:6px}
+@media(max-width:620px){.pf-grid{grid-template-columns:minmax(0,1fr)!important}.pf-head{justify-content:center;text-align:center}.pf-who{align-items:center}}
 .lang-sw{display:inline-flex;gap:2px;padding:3px;border-radius:99px;border:1px solid var(--line2);background:var(--panel2)}
 .lang-sw button{min-width:40px;height:28px;padding:0 10px;display:grid;place-items:center;border:0;border-radius:99px;background:none;color:var(--muted);cursor:pointer;font:700 12px Inter,system-ui,sans-serif;letter-spacing:.5px;transition:background .2s,color .2s}
 .lang-sw button[data-l="ar"]{font-family:Cairo,Inter,sans-serif;font-size:14px}
@@ -1770,6 +1787,7 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
       <button type="button" class="hd-ic" id="cmdBtn" title="Search (Ctrl+K)" aria-label="Search">🔍</button>
       <button class="ntf-bell" id="ntfBell" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="ntf-badge hidden" id="ntfBadge"></span></button>
       <!-- ⚙️ one menu: theme, background, language, tour, log out -->
+      <button type="button" class="hd-ic me-btn" id="meBtn" title="My profile" aria-label="My profile">👤</button>
       <span class="disp-w"><button type="button" class="hd-ic" id="dispBtn" title="Settings" aria-label="Settings" aria-expanded="false">⚙️</button><div class="disp-pop hidden" id="dispPop" role="dialog" aria-label="Settings"><div class="dp-row"><small>Language</small><span id="langTop"></span></div><div class="dp-row"><small>Theme</small><span class="theme-slot"></span></div><div class="dp-row"><small>Background</small><div class="seg dp-bg" id="bgSeg"><button type="button" data-bg="3d">✨ <span>3D</span></button><button type="button" data-bg="light">🖼 <span>Light</span></button><button type="button" data-bg="off">⬛ <span>Off</span></button></div><small class="mut dp-note">Light = still image, saves battery.</small></div><div class="dp-acts"><button type="button" class="btn sm" id="dpTour">❓ <span>Platform tour</span></button><button class="btn sm ghost" id="logout" type="button">↪ <span>Log out</span></button></div></div></span>
     </div>
     <div class="tabs-wrap" id="tabsWrap"><button type="button" class="tabs-arr l" id="tabsL" aria-label="Previous sections">‹</button><nav class="tabs" id="tabs"></nav><button type="button" class="tabs-arr r" id="tabsR" aria-label="More sections">›</button></div>
@@ -1908,7 +1926,11 @@ const Cloud={
   async init(){await new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.onload=res;s.onerror=rej;document.head.appendChild(s)});
     this.sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
     this.sb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY")openNewPassword()});},
-  async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,status:data.status,created_at:data.created_at,tgOk:!!data.telegram_verified,emailOk:await this.emailOk(id)}},
+  async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,status:data.status,created_at:data.created_at,tgOk:!!data.telegram_verified,emailOk:await this.emailOk(id),...pfFields(data)}},
+  /* My profile: saved on the student's own row (private: only them and the admin can read it) */
+  async saveProfile(id,p){const row={username:p.username||null,first_name:p.first||null,last_name:p.last||null,birth_date:p.birth||null,country:p.country||null,city:p.city||null,zip:p.zip||null,phone:p.phone||null,avatar:p.avatar||null};
+    if(p.first||p.last)row.full_name=[p.first,p.last].filter(Boolean).join(" ");
+    const{error}=await this.sb.from("profiles").update(row).eq("id",id);if(error)throw error},
   async emailOk(id){try{const{data}=await this.sb.auth.getSession();const su=data&&data.session&&data.session.user;return su&&su.id===id?!!(su.email_confirmed_at||su.confirmed_at):true}catch(e){return true}},
   /* Telegram verification: does a username exist? / check the code the bot sent / change my username */
   async tgExists(u){try{const r=await fetch(CONFIG.SUPABASE_URL+"/functions/v1/telegram-verify?check="+encodeURIComponent(u));const j=await r.json();return j.valid===false?false:j.exists}catch(e){return null}},
@@ -1939,7 +1961,7 @@ const Cloud={
   async savePlan(p){const{error}=await this.sb.from("plans").upsert({user_id:p.user_id,plan_date:p.date,data:p},{onConflict:"user_id,plan_date"});if(error)throw error},
   async listProfiles(){const{data,error}=await this.sb.from("profiles").select("*").order("created_at");if(error)throw error;
     let em={};try{const r=await this.sb.rpc("admin_email_status");if(!r.error&&r.data)r.data.forEach(x=>em[x.id]=x.email_ok)}catch(e){}
-    return data.map(d=>({id:d.id,name:d.full_name,telegram:d.telegram,email:d.email,role:d.role,status:d.status,created_at:d.created_at,tgOk:!!d.telegram_verified,emailOk:em[d.id]}))},
+    return data.map(d=>({id:d.id,name:d.full_name,telegram:d.telegram,email:d.email,role:d.role,status:d.status,created_at:d.created_at,tgOk:!!d.telegram_verified,emailOk:em[d.id],...pfFields(d)}))},
   async setStatus(id,status){const{error}=await this.sb.rpc("set_student_status",{target:id,new_status:status});if(error)throw error},
   async allTradesLite(){const{data,error}=await this.sb.from("trades").select("id,user_id,trade_date,symbol,account,pnl,data").limit(20000);if(error)throw error;return data.map(r=>({...(r.data||{}),id:r.id,user_id:r.user_id,shots:[]}))},
   /* affiliate / coupon click counter (insert by anyone, read by admin only) */
@@ -2071,7 +2093,7 @@ async function enter(u){
   if(!isApproved(u)){S.me=null;showWaiting(u);return}   /* waiting screen lists what is missing: email, Telegram, or both */
   if(needsTg(u)){S.me=null;showTg(u);return}
   S.me=u;$("#auth").classList.add("hidden");$("#app").classList.remove("hidden");
-  $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;
+  $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${isVerified(u)?" "+vCheck():""}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;meBtnDraw();
   if(u.role==="admin"){S.view="admin";await loadSubject(u,false);go("admin")}
   else{await loadSubject(u,false);go(location.hash.slice(1)||"today");setTimeout(maybeTour,1500)}
   S._commR=null;settingsPull();rqReadyLoad();
@@ -2145,7 +2167,7 @@ document.addEventListener("click",e=>{const s=$("#bnSheet");if(s&&!s.classList.c
     const rtl=document.documentElement.dir==="rtl",step=(dx<0)!==rtl?1:-1,n=order[i+step];if(!n)return;
     go(n);const v=$("#view");v.classList.remove("sw-n","sw-p");void v.offsetWidth;v.classList.add(step>0?"sw-n":"sw-p")},{passive:true});
 })();
-function go(v){if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";if(v==="today"&&S.readonly)v="journal";
+function go(v){if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student","profile"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";if(v==="today"&&S.readonly)v="journal";
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
   S.view=v;S.page=null;S.dayPage=null;S._fromDay=null;S._pfId=null;S._planCopy=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
@@ -2245,7 +2267,7 @@ function render(){setTimeout(galaxyBg,0);
   /* full footer (partner offer, social links, founder) only on Today, Prop firms and About; a slim one elsewhere */
   document.documentElement.classList.toggle("foot-full",["today","propfirms","about"].includes(S.view));const _tr=document.getElementById("pfTray");if(_tr&&S.view!=="propfirms")_tr.className="";document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
-  const fn={today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
+  const fn={profile:vProfile,today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
   v.innerHTML=h+'<div id="vb"></div>';Promise.resolve(fn($("#vb"))).then(()=>bindNotify(v)).catch(()=>{});
   if(S.readonly)$("#backAdmin").onclick=()=>go("admin");
   /* phones: floating + to log a trade from any student page */
@@ -2727,8 +2749,9 @@ function vToday(el){
     $$("[data-td]",el).forEach(b=>b.onclick=()=>{const a=b.dataset.td;if(a==="trade")editTrade(null);else if(a==="planToday"){S._planDate=t;go("plan")}});
     celebrate(B,tHit);return}
   el.innerHTML=`<div class="td">
-   <div class="td-hero"><div><div class="td-hi"><span>${hello}</span>${name?`, <b data-notr>${name}</b>`:""} 👋</div><div class="td-date mut" data-notr>${esc(fmtDate(t))}</div></div>
+   <div class="td-hero"><div><div class="td-hi"><span>${hello}</span>${name?`, <b data-notr>${name}</b>`:""}${isVerified(S.me)?" "+vCheck():""} 👋</div><div class="td-date mut" data-notr>${esc(fmtDate(t))}</div></div>
     <div class="td-hr"><div class="td-q">“<span>${esc(q)}</span>” <small>— BROWN ALGO</small></div>${sessStarted()?`<span class="chip ss-on">✅ <span>Session started</span></span>`:`<button class="btn sm pri ss-btn" type="button" data-td="session">🚀 <span>Start my session</span></button>`}<button class="btn sm" type="button" id="tdFocusOn">🎯 <span>Focus mode</span></button></div></div>
+   ${profileNudge()}
    ${cd?`<div class="td-cool"><span class="td-cool-i">🛑</span><div><b>${cd.why==="loss"?"Max daily loss reached":"Max trades reached for today"}</b><small>${cd.why==="loss"?"You hit your daily loss limit. Close the platform, protect the account, come back tomorrow.":"Your plan is done for today. Closing the platform is the trade now."}</small></div></div>`:""}
    ${tHit?`<div class="td-win">🎉 <b>Daily target reached!</b> <span>Lock it in: no more trades today.</span></div>`:""}
    <div class="td-grid">
@@ -2771,6 +2794,7 @@ function vToday(el){
     else if(a==="rules"){const ac=accounts()[0];if(ac)S.acct=ac;go("stats");setTimeout(()=>{const r=$("#rulesCard");if(r)r.scrollIntoView({behavior:"smooth",block:"center"})},300)}});
   bindWeekReview();
   $("#tdFocusOn").onclick=()=>setFocus(true);{const tt=$("#tdTour");if(tt)tt.onclick=startTour}
+  {const pn=$("#pfNudge");if(pn)pn.onclick=()=>{go("profile");window.scrollTo(0,0)}}
   mount3d("a3Orb","disciplineOrb",sc.score,I18N.t("score"));mount3d("a3Flame","streakFlame",ds.streak);
   if($("#a3Trophy"))mount3d("a3Trophy","trophyRoom",B,b=>toast(`${b.ok?b.ic:"🔒"} ${I18N.t(b.n)} · ${b.ok?I18N.t(b.d):`${b.cur} / ${b.goal}`}`));
   if($("#a3BList"))$("#a3BList").onclick=()=>{S._a3bList=!S._a3bList;render()};
@@ -3357,7 +3381,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-19c";
+const APP_VER="2026-11-19d";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3549,6 +3573,60 @@ function bindStatTabs(){
     $("#stImp").onclick=()=>{closeModal();const b=$("#impBox");if(!b)return;b.open=true;b.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("#cDrop")&&$("#cDrop").click(),350)};
     $("#stMan").onclick=()=>{const n=$("#stName").value.trim();if(!n){$("#stName").focus();toast("Write a name for the account first");return}closeModal();S.acct=n;render();editTrade(null)}};
 }
+/* ============ MY PROFILE + the ✔ verified check ============
+   Fields live on the student's own profiles row (private: only them and the admin can read it).
+   Verified = every field + photo filled, and email + Telegram verified. */
+function pfFields(d){return {username:d.username||"",first:d.first_name||"",last:d.last_name||"",birth:d.birth_date||"",country:d.country||"",city:d.city||"",zip:d.zip||"",phone:d.phone||"",avatar:d.avatar||""}}
+const PF_KEYS=[["username","Username"],["first","First name"],["last","Last name"],["birth","Date of birth"],["country","Country"],["city","City"],["zip","Zip code"],["phone","Phone number"],["avatar","Profile picture"]];
+function pfMissing(u){if(!u)return [];const m=PF_KEYS.filter(([k])=>!String(u[k]||"").trim()).map(([,l])=>l);if(u.emailOk===false)m.push("Email verification");if(CONFIG.TG_BOT&&!u.tgOk&&u.role!=="admin")m.push("Telegram verification");return m}
+function isVerified(u){return !!u&&pfMissing(u).length===0}
+function vCheck(){return `<span class="vchk" title="${esc(I18N.t("Verified profile"))}" aria-label="${esc(I18N.t("Verified profile"))}">✔</span>`}
+function meBtnDraw(){const b=$("#meBtn");if(!b)return;const u=S.me;b.classList.toggle("hidden",!u);if(!u)return;
+  b.innerHTML=(u.avatar?`<img src="${esc(u.avatar)}" alt="">`:"👤")+(isVerified(u)?`<i class="me-v">✔</i>`:"");b.title=I18N.t("My profile")}
+(function(){const b=$("#meBtn");if(b)b.onclick=()=>{if(S.me){if(S.readonly)loadSubject(S.me,false);go("profile");window.scrollTo(0,0)}}})();
+/* Today: a friendly nudge until the profile is complete */
+function profileNudge(){const u=S.me;if(!u||S.readonly||isVerified(u))return "";const done=PF_KEYS.length-PF_KEYS.filter(([k])=>!String(u[k]||"").trim()).length;
+  return `<button type="button" class="card pf-nudge" id="pfNudge"><span class="pf-av">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:"👤"}</span><span class="pf-nt"><b>${esc(I18N.t("Complete your profile to get the verified check"))} ${vCheck()}</b><small class="mut"><span data-notr>${done} / ${PF_KEYS.length}</span> · ${esc(I18N.t("Takes 1 minute"))}</small><span class="pf-bar"><i style="width:${done/PF_KEYS.length*100}%"></i></span></span><span class="bdg-chev">›</span></button>`}
+/* countries, names in the site language */
+const PF_CC="DZ MA TN LY EG MR FR BE CH CA US GB DE ES IT PT NL LU IE AT SE NO DK FI PL CZ RO GR TR SA AE QA KW BH OM JO LB SY IQ PS YE SD SN CI ML NE BF CM GA CG CD NG GH KE ZA ET RU UA IN PK BD ID MY SG TH VN PH CN JP KR AU NZ BR AR MX CO CL PE VE".split(" ");
+function pfCountries(){let dn=null;try{dn=new Intl.DisplayNames([(window.I18N&&I18N.lang)||"en"],{type:"region"})}catch(e){}const n=c=>dn?dn.of(c):c;return PF_CC.map(c=>[c,n(c)]).sort((a,b)=>a[1].localeCompare(b[1]))}
+/* photo: centre square, 256 px JPEG (about 20-40 KB) */
+function pfPhoto(file){return new Promise((res,rej)=>{if(!file||!/^image\//.test(file.type)){rej(new Error("not_image"));return}const fr=new FileReader();fr.onerror=()=>rej(fr.error);
+  fr.onload=()=>{const im=new Image();im.onerror=()=>rej(new Error("bad_image"));im.onload=()=>{const s=Math.min(im.width,im.height),c=document.createElement("canvas");c.width=c.height=256;
+    c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,256,256);res(c.toDataURL("image/jpeg",.82))};im.src=fr.result};fr.readAsDataURL(file)})}
+function vProfile(el){const u=S.me;if(!u){el.innerHTML="";return}
+  const f=S._pfDraft||(S._pfDraft={...pfFields({username:u.username,first_name:u.first,last_name:u.last,birth_date:u.birth,country:u.country,city:u.city,zip:u.zip,phone:u.phone,avatar:u.avatar})});
+  const miss=pfMissing({...u,...f}),ok=miss.length===0,today=todayStr();
+  const inp=(k,l,type,ph,extra)=>`<label class="f"><span>${esc(I18N.t(l))}</span><input class="i" data-pf="${k}" type="${type||"text"}" value="${esc(f[k]||"")}" ${ph?`placeholder="${esc(ph)}"`:""} ${extra||""}></label>`;
+  el.innerHTML=`<h1>👤 <span>My profile</span></h1><p class="sub">${esc(I18N.t("Only you and Brown Algo can see these details."))}</p>
+   <div class="card pf-head"><div class="pf-photo"><div class="pf-av big">${f.avatar?`<img src="${esc(f.avatar)}" alt="">`:"👤"}</div>
+     <label class="btn sm pf-up">📷 <span>${esc(I18N.t(f.avatar?"Change photo":"Add a photo"))}</span><input type="file" accept="image/*" id="pfFile" hidden></label></div>
+    <div class="pf-who"><b data-notr>${esc([f.first,f.last].filter(Boolean).join(" ")||u.name||u.email||"")}</b>${ok?" "+vCheck():""}${f.username?`<small class="mut" data-notr>@${esc(f.username)}</small>`:""}
+     <div class="pf-status ${ok?"ok":""}">${ok?`✔ <span>${esc(I18N.t("Verified profile"))}</span>`:`<span>${esc(I18N.t("To get the verified check, complete:"))}</span> <span data-notr>${miss.map(m=>esc(I18N.t(m))).join(" · ")}</span>`}</div></div></div>
+   <div class="card"><div class="grid g2 pf-grid">
+    ${inp("username","Username","text","e.g. trader_karim",'maxlength="20" autocomplete="username"')}
+    ${inp("phone","Phone number","tel","+213 5 55 12 34 56",'maxlength="20" autocomplete="tel"')}
+    ${inp("first","First name","text","",'maxlength="40" autocomplete="given-name"')}
+    ${inp("last","Last name","text","",'maxlength="40" autocomplete="family-name"')}
+    ${inp("birth","Date of birth","date","",`max="${today}" min="1920-01-01" autocomplete="bday"`)}
+    <label class="f"><span>${esc(I18N.t("Country"))}</span><select class="i" data-pf="country"><option value="">—</option>${pfCountries().map(([c,n])=>`<option value="${c}" ${f.country===c?"selected":""}>${esc(n)}</option>`).join("")}</select></label>
+    ${inp("city","City","text","",'maxlength="60" autocomplete="address-level2"')}
+    ${inp("zip","Zip code","text","",'maxlength="12" autocomplete="postal-code"')}
+   </div>
+   <p class="mut pf-err" id="pfErr"></p>
+   <div class="row" style="justify-content:flex-end;gap:8px"><button class="btn" type="button" id="pfBack">${esc(I18N.t("Back"))}</button><button class="btn pri" type="button" id="pfSave">💾 <span>${esc(I18N.t("Save my profile"))}</span></button></div></div>`;
+  $$("[data-pf]",el).forEach(i=>i.oninput=i.onchange=()=>{f[i.dataset.pf]=i.value.trim()});
+  $("#pfBack",el).onclick=()=>{S._pfDraft=null;go("today")};
+  $("#pfFile",el).onchange=async e=>{try{f.avatar=await pfPhoto(e.target.files[0]);vProfile(el)}catch(err){toast(I18N.t("This file isn't a photo. Choose a JPG or PNG image."))}};
+  $("#pfSave",el).onclick=async()=>{const er=$("#pfErr",el),bad=m=>{er.textContent=I18N.t(m);er.classList.add("neg")};er.textContent="";
+    if(f.username&&!/^[a-zA-Z0-9_.]{3,20}$/.test(f.username))return bad("Username: 3 to 20 letters, numbers, _ or .");
+    if(f.phone&&!/^\+?[0-9 ()\-]{6,20}$/.test(f.phone))return bad("Phone number: digits only, with the country code (e.g. +213).");
+    if(f.birth){const y=new Date().getFullYear()-Number(f.birth.slice(0,4));if(f.birth>today||y>110)return bad("Check your date of birth.");}
+    const b=$("#pfSave",el);b.disabled=true;
+    try{await API.saveProfile(u.id,f);Object.assign(S.me,f);if(f.first||f.last)S.me.name=[f.first,f.last].filter(Boolean).join(" ");S._pfDraft=null;
+      $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(S.me.name||S.me.email)}${isVerified(S.me)?" "+vCheck():""}${S.me.telegram?` · <span class="mono">${esc(S.me.telegram)}</span>`:""}`;meBtnDraw();
+      toast(isVerified(S.me)?"✔ "+I18N.t("Profile verified"):I18N.t("Profile saved"));if(isVerified(S.me))confetti();vProfile(el)}
+    catch(e){b.disabled=false;const m=String(e.message||e);bad(/duplicate|unique|profiles_username/i.test(m)?"This username is already taken. Choose another one.":/avatar_size/i.test(m)?"This photo is too big. Choose a smaller one.":m)}}}
 /* admin: delete a user for good (account + trades + plans + settings + shares). Needs the server function, never the website alone. */
 function deleteUserBox(s,done){
   openModal(`<h3 style="margin-top:0">🗑 <span>Delete this user for good?</span></h3>
@@ -4541,7 +4619,7 @@ async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</
    ${emoAll.length?`<div class="card" style="margin-bottom:12px"><h3>Group weak spots</h3>${emoAll.map(r=>`<div class="insight"><span class="ic">⚠️</span><span><b>${esc(r.k)}</b> trades across students: <b class="neg">${money(r.net,0)}</b> over ${r.n} trades (${pct(r.wr,0)} win). Good topic for the next live.</span></div>`).join("")}</div>`:""}
    <div class="card acc-card"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px"><h3 style="margin:0">✅ <span>Accepted users</span> <span class="adm-n" data-notr>${students.length}</span></h3><input class="i" id="accQ" placeholder="Search name, email, Telegram" style="width:220px"></div>
     <p class="mut" style="font-size:12px;margin:0 0 10px"><span>Remove access: the user can't open the journal and their data stays. They can request access again: they verify their Telegram again, then wait for your approval. Delete: the account and all its data are erased for good.</span></p>
-    <div class="acc-list">${students.length?[...students].sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(s=>`<div class="acc-row" data-accid="${s.id}" data-q="${esc(((s.name||"")+" "+(s.email||"")+" "+(s.telegram||"")+" "+tgUser(s)).toLowerCase().replace(/@/g,""))}"><div class="acc-who"><b data-notr>${esc(s.name||"—")}</b><small class="mut" data-notr>${esc(s.email||"")}${tgUser(s)?` · @${esc(tgUser(s))}`:""}${s.created_at?` · <span>Joined</span> ${esc(fmtDate(s.created_at.slice(0,10)))}`:""}</small></div><div class="acc-acts"><button type="button" class="btn sm" data-remove="${s.id}">✖ <span>Remove access</span></button><button type="button" class="btn sm danger" data-delu="${s.id}">🗑 <span>Delete</span></button></div></div>`).join(""):`<div class="mut">No accepted users yet.</div>`}</div></div>
+    <div class="acc-list">${students.length?[...students].sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(s=>`<div class="acc-row" data-accid="${s.id}" data-q="${esc(((s.name||"")+" "+(s.email||"")+" "+(s.telegram||"")+" "+tgUser(s)).toLowerCase().replace(/@/g,""))}"><div class="acc-who"><b data-notr>${s.avatar?`<img class="acc-av" src="${esc(s.avatar)}" alt="">`:""}${esc(s.name||"—")}${isVerified(s)?" "+vCheck():""}${s.username?` <span class="mut">@${esc(s.username)}</span>`:""}</b><small class="mut" data-notr>${esc(s.email||"")}${tgUser(s)?` · @${esc(tgUser(s))}`:""}${s.created_at?` · <span>Joined</span> ${esc(fmtDate(s.created_at.slice(0,10)))}`:""}</small></div><div class="acc-acts"><button type="button" class="btn sm" data-remove="${s.id}">✖ <span>Remove access</span></button><button type="button" class="btn sm danger" data-delu="${s.id}">🗑 <span>Delete</span></button></div></div>`).join(""):`<div class="mut">No accepted users yet.</div>`}</div></div>
    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">Students</h3><div class="row"><input class="i" id="aq" placeholder="Search name, email, Telegram" style="width:240px"><button class="btn sm" id="aExp">Export CSV</button></div></div>
    <div class="tw"><table class="t" id="aT"><tr><th>Name (username)</th><th>Email</th><th>Telegram username</th><th>Trades</th><th>Broke plan</th><th>Weak spot</th><th>Journaled today</th><th>Plan today</th><th>Plan tomorrow</th></tr>
    ${rows.map(r=>`<tr class="click" data-id="${r.s.id}" data-q="${esc((r.s.name+" "+r.s.email+" "+r.s.telegram).toLowerCase())}"><td><b data-notr>${esc(r.s.name||"—")}</b> <span class="tag">👤 Open</span></td><td data-notr><a class="lnk" href="mailto:${esc(r.s.email||"")}" onclick="event.stopPropagation()">${esc(r.s.email||"—")}</a></td><td class="mono" data-notr>${tgUser(r.s)?`${r.s.tgOk?"✅":"⚠️"} <a class="lnk" href="https://t.me/${encodeURIComponent(tgUser(r.s))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">@${esc(tgUser(r.s))}</a>`:"—"}</td><td class="mono">${r.c.n}</td>
@@ -4924,7 +5002,8 @@ async function bootDemo(){const D=demoData();S._demo=true;
     saveTrade:async t=>{const i=mem.trades.findIndex(x=>x.id===t.id);if(i>=0)mem.trades[i]=t;else mem.trades.push(t)},saveTrades:async ts=>{mem.trades.push(...ts)},
     deleteTrade:async t=>{mem.trades=mem.trades.filter(x=>x.id!==t.id)},deleteTrades:async ids=>{const s=new Set(ids);mem.trades=mem.trades.filter(x=>!s.has(x.id))},
     savePlan:ok,news:async()=>D.news,getSettings:async()=>mem.settings,saveSettings:ok,track:()=>{},affClicks:async()=>[],announcements:async()=>[],
-    listShares:async()=>[],createShare:async()=>{throw new Error("Not available in the demo")},signOut:async()=>{location.href=location.pathname}};
+    listShares:async()=>[],createShare:async()=>{throw new Error("Not available in the demo")},signOut:async()=>{location.href=location.pathname},
+    saveProfile:async(id,p)=>{Object.assign(S.me,p,{name:[p.first,p.last].filter(Boolean).join(" ")||S.me.name})}};
   document.documentElement.classList.add("demo");
   await enter({id:"demo",email:"demo@tradeversity",role:"student",name:"Demo Trader",telegram:"@demo_trader",status:"approved",tgOk:true,emailOk:true});
   try{const g=$("#gate");if(g)g.classList.add("gone")}catch(e){}
