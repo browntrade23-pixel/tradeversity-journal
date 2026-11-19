@@ -10,7 +10,7 @@
   location.replace("welcome.html")}catch(e){}})();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Effective Journal — by Tradeversity</title>
+<title>TRADEVERSITY</title>
 <link rel="icon" type="image/png" href="brand/logo-192.png?v=hq">
 <link rel="apple-touch-icon" href="brand/app-192.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1712,8 +1712,8 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
 
   <!-- the gate: first thing a visitor sees -->
   <div id="gate">
-    <div class="logo lg gate-logo" role="img" aria-label="The Effective Journal by Tradeversity — founder Brown Algo"></div>
-    <div class="gate-name">The Effective Journal</div>
+    <div class="logo lg gate-logo" role="img" aria-label="TRADEVERSITY — founder Brown Algo"></div>
+    <div class="gate-name">TRADEVERSITY</div>
     <div class="gate-l l1">Not everyone gets in.</div>
     <div class="gate-l l2">Only the disciplined see what's behind this door.</div>
     <button class="btn pri gate-btn" id="gateBtn">Enter</button>
@@ -1726,8 +1726,8 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
 
   <div class="authbox sealed">
     <div class="brand stack" style="justify-content:center;margin-bottom:18px">
-      <div class="logo lg" role="img" aria-label="The Effective Journal by Tradeversity — founder Brown Algo"></div>
-      <div style="font-size:18px" class="shine-t">The Effective Journal<small>BY TRADEVERSITY</small></div>
+      <div class="logo lg" role="img" aria-label="TRADEVERSITY — founder Brown Algo"></div>
+      <div style="font-size:18px" class="shine-t">TRADEVERSITY</div>
     </div>
     <div class="card hidden" id="waitBox" style="text-align:center">
       <div style="font-size:40px;margin-bottom:6px" id="waitIcon">⏳</div>
@@ -1794,7 +1794,7 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
 <section id="app" class="hidden">
   <header class="top">
     <div class="topin">
-      <div class="brand"><div class="logo" role="img" aria-label="The Effective Journal by Tradeversity — founder Brown Algo"></div><div>The Effective Journal<small>BY TRADEVERSITY</small></div></div>
+      <div class="brand"><div class="logo" role="img" aria-label="TRADEVERSITY — founder Brown Algo"></div><div>TRADEVERSITY</div></div>
       <div class="spacer"></div>
       <span class="chip" id="whoChip" data-notr></span>
       <button class="btn sm inst-btn hidden" id="instBtn" type="button">📲 <span>Install app</span></button>
@@ -3395,7 +3395,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-19f";
+const APP_VER="2026-11-19g";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3429,7 +3429,7 @@ function a3Mount(days,key,el){const n=Object.keys(days).length,m=n>=2?(S["_a3"+k
    Short spotlight tour on the real buttons: bottom bar on phones, top menu on PC. Shown once (synced), replay from Today. */
 const tourKey=()=>"tv_tour_"+((S.me&&S.me.id)||"x");
 function tourSteps(){const ph=innerWidth<821,nav=k=>ph?`#bnav [data-v="${k}"]`:`#tabs [data-v="${k}"]`;
-  return [[null,"👋","Welcome to The Effective Journal","A 30-second tour of your trading platform. You can skip it anytime."],
+  return [[null,"👋","Welcome to TRADEVERSITY","A 30-second tour of your trading platform. You can skip it anytime."],
     [nav("today"),"🏠","Today: your home","Your discipline score, streaks, today's plan, your limits and the red news. Start every session here."],
     [ph?"#fab":'[data-td="trade"]',"＋","Log a trade","Tap here after each trade. ⚡ Quick log takes a few taps; add screenshots and notes later."],
     [nav("journal"),"📓","Journal","Every trade with your notes, emotions and screenshots. Search, filter, edit anytime."],
@@ -3636,7 +3636,7 @@ function vProfile(el){const u=S.me;if(!u){el.innerHTML="";return}
   if(!f.country&&!saved.country){const g=pfGuessCountry();if(g)f.country=g}
   const today=todayStr(),T=k=>esc(I18N.t(k));
   const inp=(k,l,type,ph,extra)=>`<label class="f pf-f"><span>${T(l)}</span><input class="i" data-pf="${k}" type="${type||"text"}" value="${esc(f[k]||"")}" ${ph?`placeholder="${esc(ph)}"`:""} ${extra||""}><small class="pf-msg" data-msg="${k}"></small></label>`;
-  el.innerHTML=`<h1>👤 <span>My profile</span></h1><p class="sub">🔒 ${T("Only you and Brown Algo can see these details.")}</p>
+  el.innerHTML=`<h1>👤 <span>My profile</span></h1>
    <div class="card pf-head"><div class="pf-photo" id="pfDrop"><div class="pf-av big" id="pfAv"></div>
      <div class="pf-pbtn"><label class="btn sm pf-up"><span id="pfUpL"></span><input type="file" accept="image/*" id="pfFile" hidden></label><button type="button" class="btn sm ghost" id="pfDel">🗑</button></div>
      <small class="mut pf-hint">${T("JPG or PNG. On a computer you can also drop a photo here.")}</small></div>
@@ -3787,7 +3787,7 @@ async function openShare(){const ac=accounts();
         try{const c=await qrCard(url,lab);box.innerHTML=`<img alt="QR code" src="${c.toDataURL("image/png")}"><div class="row" style="justify-content:center;margin-top:8px"><button class="btn sm pri" data-dl>⬇ Download QR image</button></div>`;$("[data-dl]",box).onclick=()=>downloadCanvas(c,`effective-journal-share-${tok.slice(0,6)}.png`)}catch(e){box.innerHTML=`<div class="empty">${esc(e.message||e)}</div>`}};
       card.querySelector('[data-a="copy"]').onclick=()=>copyText(url);
       card.querySelector('[data-a="qr"]').onclick=showQR;
-      const nb=card.querySelector('[data-a="native"]');if(nb)nb.onclick=()=>navigator.share({title:"The Effective Journal",text:lab,url}).catch(()=>{});
+      const nb=card.querySelector('[data-a="native"]');if(nb)nb.onclick=()=>navigator.share({title:"TRADEVERSITY",text:lab,url}).catch(()=>{});
       card.querySelector('[data-a="stop"]').onclick=async()=>{if(!confirm(I18N.t("Stop sharing? This link and its QR code will stop working right away.")))return;try{await API.revokeShare(tok);toast("Link stopped");list()}catch(e){toast("Couldn't stop: "+(e.message||e))}};
       if(tok===openTok)showQR()})};
   $("#shGo").onclick=async()=>{const b=$("#shGo");b.disabled=true;try{const r=await API.createShare({account:$("#shAcct").value||null,title:$("#shTitle").value.trim()||null,show_name:$("#shName").value==="1"});
@@ -3798,7 +3798,7 @@ async function openShare(){const ac=accounts();
 const SH={tok:null,data:undefined,month:null};
 function shareDays(){const d={},n={};(SH.data.days||[]).forEach(x=>{d[x.date]=Number(x.pnl)||0;n[x.date]=x.n||0});return {d,n}}
 function drawShare(){const el=$("#shMain");const D=SH.data;
-  if(!D){el.innerHTML=`<div class="card sh-dead"><div style="font-size:44px">🔒</div><h2>This link is no longer active</h2><p class="mut">The owner stopped sharing it, or the link is wrong.</p><a class="btn pri" href="${location.pathname}">Visit The Effective Journal</a></div>`;return}
+  if(!D){el.innerHTML=`<div class="card sh-dead"><div style="font-size:44px">🔒</div><h2>This link is no longer active</h2><p class="mut">The owner stopped sharing it, or the link is wrong.</p><a class="btn pri" href="${location.pathname}">Visit TRADEVERSITY</a></div>`;return}
   const {d:days,n:cnt}=shareDays();const keys=Object.keys(days).sort();const vals=keys.map(k=>days[k]);
   const net=vals.reduce((a,b)=>a+b,0),green=vals.filter(v=>v>0).length,red=vals.filter(v=>v<0).length,dec=green+red;
   let eq=0,peak=0,mdd=0;const curve=keys.map(k=>{eq+=days[k];peak=Math.max(peak,eq);mdd=Math.max(mdd,peak-eq);return {t:{date:k},eq,tip:`${fmtDate(k)}\n${I18N.t("Day")}: ${smoney(days[k])}\n${I18N.t("Total")}: ${money(eq)}`}});
@@ -3822,13 +3822,13 @@ function drawShare(){const el=$("#shMain");const D=SH.data;
    <div class="card" style="margin-bottom:12px"><h3>P&L calendar</h3>${calendar(days)}</div>
    <div class="grid g2" style="margin-bottom:12px"><div class="card"><h3>Equity curve</h3>${equityChart(curve)}</div><div class="card"><h3>Daily P&L</h3>${dailyBars(days)}</div></div>
    <div class="card" style="margin-bottom:12px"><h3>Month by month</h3>${months.length?`<div class="tw"><table class="t"><tr><th>Month</th><th>Days</th><th>Green / red</th><th>Net P&L</th><th></th></tr>${months.map(([k,o])=>`<tr class="click" data-m="${k}"><td>${mName(k)}</td><td class="mono">${o.n}</td><td class="mono"><span class="pos">${o.g}</span> / <span class="neg">${o.r}</span></td><td class="mono ${cls(o.net)}">${smoney(o.net)}</td><td style="width:30%"><div class="bar"><i style="width:${Math.abs(o.net)/mx*100}%;background:${o.net>=0?"var(--green)":"var(--red)"}"></i></div></td></tr>`).join("")}</table></div>`:'<div class="empty">No trades yet</div>'}</div>
-   <div class="card sh-cta"><div><b>Trade with discipline. Journal every trade.</b><div class="mut" style="font-size:13px">These results are tracked in The Effective Journal by Tradeversity.</div></div><a class="btn pri" href="${location.pathname}">Join Tradeversity</a></div>`;
+   <div class="card sh-cta"><div><b>Trade with discipline. Journal every trade.</b><div class="mut" style="font-size:13px">These results are tracked in TRADEVERSITY.</div></div><a class="btn pri" href="${location.pathname}">Join Tradeversity</a></div>`;
   const shift=k=>{const[y,m]=S.calMonth.split("-").map(Number);const n=new Date(y,m-1+k,1);SH.month=`${n.getFullYear()}-${pad(n.getMonth()+1)}`;drawShare()};
   $("#calP").onclick=()=>shift(-1);$("#calN").onclick=()=>shift(1);
   $$("tr[data-m]").forEach(r=>r.onclick=()=>{SH.month=r.dataset.m;drawShare();$(".cal").scrollIntoView({behavior:"smooth",block:"center"})})}
 async function bootShare(tok){SH.tok=tok;$("#auth").classList.add("hidden");$("#app").classList.add("hidden");
   const sec=document.createElement("section");sec.id="share";
-  sec.innerHTML=`<header class="top"><div class="topin"><a class="brand" href="${location.pathname}" style="color:inherit;text-decoration:none"><div class="logo" role="img" aria-label="The Effective Journal by Tradeversity"></div><div>The Effective Journal<small>BY TRADEVERSITY</small></div></a><div class="spacer"></div><span class="soc icons" id="socShare"></span><span class="theme-slot"></span><span id="langShare"></span></div></header>
+  sec.innerHTML=`<header class="top"><div class="topin"><a class="brand" href="${location.pathname}" style="color:inherit;text-decoration:none"><div class="logo" role="img" aria-label="TRADEVERSITY"></div><div>TRADEVERSITY</div></a><div class="spacer"></div><span class="soc icons" id="socShare"></span><span class="theme-slot"></span><span id="langShare"></span></div></header>
    <main id="shMain"><div class="empty">Loading results…</div></main>
    <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div class="soc" id="socShare2"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>`;
   document.body.insertBefore(sec,$("#modal"));
@@ -4889,9 +4889,9 @@ document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#in
 function aboutExtra(){const tl=[["📈",`${ABOUT.yearsPrefix?ABOUT.yearsPrefix+" ":""}${ABOUT.years} years in the markets`,"Brown Algo and ZNtrading trade futures with a precise scalping system."],
     ["🎓","Tradeversity is born","A mentorship and bootcamp: clear daily bias, written plan, strict risk, honest journal."],
     ["👥",`${ABOUT.students} students`,"Students from Algeria and beyond, with certificates and payouts shared on Telegram."],
-    ["📓","The Effective Journal","Our own platform: journal, statistics, prop firm rules, news alerts and risk tools, in 3 languages."]];
+    ["📓","TRADEVERSITY","Our own platform: journal, statistics, prop firm rules, news alerts and risk tools, in 3 languages."]];
   const faq=[["How do I join?","Create a free account, verify your email and your Telegram, then Brown Algo approves you. You get a notification when you are accepted."],
-    ["Is the journal free?","Yes. The Effective Journal is free for Tradeversity students."],
+    ["Is the journal free?","Yes. The journal is free for all Tradeversity students."],
     ["Why do you ask for my Telegram?","To keep the community private and to send you reminders: red news 5 minutes before, plan for tomorrow, and daily loss alerts. You can turn each reminder off."],
     ["Who can see my journal?","Only you, and Brown Algo to coach you. When you share your results with a link or a QR code, people see only daily totals: no trade details, notes or screenshots."],
     ["Does it work on my phone?","Yes. Open the site on your phone and install it like an app (Install app button). It works in English, Français and العربية."],

@@ -1,5 +1,5 @@
 /* =====================================================================
-   The Effective Journal — explanations of USD news events (EN / FR / AR)
+   TRADEVERSITY — explanations of USD news events (EN / FR / AR)
    Each entry: [pattern on the Forex Factory title, {en:[name, what it is, how it usually moves markets], fr:[...], ar:[...]}]
    General, educational explanations — markets can react differently.
    ===================================================================== */
