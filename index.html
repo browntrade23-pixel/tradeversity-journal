@@ -69,7 +69,20 @@ nav.tabs button.on .tico .ico :is(rect,circle,path[d$="z"]):not([fill="currentCo
 .t-risk{--c1:#b38cff;--c2:#7046d6}
 .t-propfirms{--c1:#2ec5c9;--c2:#12868a}.t-indicator{--c1:#f5b942;--c2:#c47f12}
 .t-consistency{--c1:#2fd3c8;--c2:#0d8a85}
+.t-course{--c1:#e6c27a;--c2:#a77a24}
 .t-about{--c1:#b9c4d6;--c2:#5d6b84}
+/* course page: protected content */
+.cv-guard{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;position:relative;overflow:hidden}
+.cv-guard :is(img,video){pointer-events:none;-webkit-user-drag:none}
+.cv-soon{text-align:center;padding:42px 20px;max-width:620px;margin:10px auto;position:relative;z-index:1}
+.cv-soon h2{margin:10px 0 6px}.cv-lock{font-size:38px;opacity:.85}
+.cv-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.cv-wm{position:absolute;inset:-40px;pointer-events:none;display:flex;flex-wrap:wrap;gap:60px 80px;align-content:flex-start;padding:40px;opacity:.05;transform:rotate(-18deg);z-index:2;animation:cvWm 40s ease-in-out infinite}
+.cv-wm span{font-size:12px;white-space:nowrap;color:var(--text)}
+@keyframes cvWm{50%{transform:rotate(-18deg) translate(-40px,30px)}}
+.cv-shield{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(5,7,12,.97);color:#e8ebf5;font-weight:600;cursor:pointer;padding:20px;text-align:center}
+.cv-shield.hidden{display:none}
+@media print{.cv-guard{display:none!important}}
 .t-admin{--c1:#ffd27a;--c2:#b07a1c}
 .t-student{--c1:#8e9cff;--c2:#4a55d4}
 html[data-theme=light] .tico{color:var(--c2)}
@@ -2139,6 +2152,7 @@ const ICON={
   consistency:'<path d="M12 4v16M7.5 20.5h9M5 7h14"/><circle cx="12" cy="4" r="1"/><path d="M5 7 2.5 13a2.5 2.5 0 0 0 5 0z"/><path d="M19 7l-2.5 6a2.5 2.5 0 0 0 5 0z"/>',
   indicator:'<path d="M3 20.5h18"/><path d="M4 16l4.5-5 4 3.5L20 6" /><circle cx="20" cy="6" r="1.6" fill="currentColor"/>',
   propfirms:'<path d="M4 20.5V9.5L12 4l8 5.5v11"/><path d="M8 20.5v-6h8v6" fill="currentColor" fill-opacity=".18"/><path d="M2.5 20.5h19M9.5 10h5"/>',
+  course:'<path d="M2.5 9 12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11v5c1.5 1.6 3.4 2.4 5.5 2.4s4-.8 5.5-2.4v-5"/><path d="M21.5 9v5"/>',
   about:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".7" fill="currentColor"/>',
   admin:'<path d="M3.5 8.5 8 12l4-6.5 4 6.5 4.5-3.5-1.8 10H5.3z"/><path d="M6 21.5h12"/>',
   student:'<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/>',
@@ -2146,7 +2160,7 @@ const ICON={
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
   system:'<rect x="3" y="4" width="18" height="12.5" rx="2"/><path d="M8.5 20.5h7M12 16.5v4"/>'};
 const ico=(k,cls)=>`<svg class="ico ${cls||""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
-const VIEWS=[["today","Today"],["journal","Journal"],["stats","Statistics"],["news","News"],["plan","Tomorrow's plan"],["risk","Risk calculator"],["consistency","Consistency rule"],["propfirms","Prop firm tracker"],["indicator","Free ICT indicator"],["about","About us"]];
+const VIEWS=[["today","Today"],["journal","Journal"],["stats","Statistics"],["news","News"],["plan","Tomorrow's plan"],["risk","Risk calculator"],["consistency","Consistency rule"],["propfirms","Prop firm tracker"],["indicator","Free ICT indicator"],["course","Mentorship course"],["about","About us"]];
 function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button data-v="${k}" class="${c||""} ${S.view===k?"on":""}"><span class="tico t-${k}">${ico(k)}</span><span>${l}</span></button>`;
   if(S.me.role==="admin")h+=tab("admin","Admin dashboard","admin");
   if(S.readonly)h+=tab("student","Student file","admin");
@@ -2256,7 +2270,7 @@ setInterval(rqReadyLoad,180000);
    bearish candles (risk), Fibonacci retracement (plan) */
 /* section backgrounds: 3D (three.js) for prop firms + statistics, light 2D canvases for the others.
    Background switch: 3D (animated) / Light (one still image, saves battery) / Off. Dark theme only. */
-const BG3D={propfirms:"galaxy",stats:"fibc",consistency:"stones",news:"earth",journal:"book",indicator:"liquidity"},BG2D={today:"aurora",journal:"streak",news:"map",plan:"aurora2",risk:"shield",consistency:"pillars",about:"dust"};
+const BG3D={propfirms:"galaxy",stats:"fibc",consistency:"stones",news:"earth",journal:"book",indicator:"liquidity"},BG2D={today:"aurora",journal:"streak",news:"map",plan:"aurora2",risk:"shield",consistency:"pillars",course:"dawn",about:"dust"};
 const BGM={key:"tv_bg",
   auto(){const n=navigator,ph=innerWidth<821;if(matchMedia("(prefers-reduced-motion: reduce)").matches||(n.connection&&n.connection.saveData))return "light";
     if(ph&&((n.deviceMemory&&n.deviceMemory<=3)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)))return "light";return "3d"},
@@ -2288,7 +2302,7 @@ function render(){setTimeout(galaxyBg,0);
   /* full footer (partner offer, social links, founder) only on Today, Prop firms and About; a slim one elsewhere */
   document.documentElement.classList.toggle("foot-full",["today","propfirms","about"].includes(S.view));const _tr=document.getElementById("pfTray");if(_tr&&S.view!=="propfirms")_tr.className="";document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
-  const fn={profile:vProfile,today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
+  const fn={profile:vProfile,today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,course:vCourse,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
   v.innerHTML=h+'<div id="vb"></div>';Promise.resolve(fn($("#vb"))).then(()=>bindNotify(v)).catch(()=>{});
   if(S.readonly)$("#backAdmin").onclick=()=>go("admin");
   /* phones: floating + to log a trade from any student page */
@@ -3402,7 +3416,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-19l";
+const APP_VER="2026-11-19m";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3413,7 +3427,7 @@ const APP_VER="2026-11-19l";
   window.__updCheck=check;setTimeout(check,8000);setInterval(()=>{if(!document.hidden)check()},5*60000);
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)check()})})();
 /* ============ IN-APP 3D (app3d.js, loaded only where shown; the flat version stays if 3D can't run) ============ */
-let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=32"));
+let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=33"));
 function mount3d(id,fn,...args){setTimeout(()=>{const el=document.getElementById(id);if(!el||el.dataset.a3)return;el.dataset.a3="1";
   A3().then(m=>{if(!el.isConnected)return;try{m[fn](el,...args)}catch(e){console.warn("3D",e)}}).catch(e=>console.warn("3D off",e))},40)}
 function newsClockState(){const now=Date.now(),reds=S.newsLoaded?newsFor(todayStr()).filter(n=>n.impact==="High"):[],W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,t,a:t-5*60000,b:t+5*60000}});
@@ -4909,6 +4923,31 @@ function aboutExtra(){const tl=[["📈",`${ABOUT.yearsPrefix?ABOUT.yearsPrefix+"
     ["Which prop firms can I track?","45 futures and CFD prop firms, with their rules, hidden rules, payouts, Algeria availability and our discount codes."]];
   return `<div class="card ab-story"><h3>🧭 <span>Our story</span></h3><div class="ab-tl">${tl.map(([ic,t,d])=>`<div class="ab-st"><span class="ab-ic">${ic}</span><div><b>${esc(t)}</b><p class="mut">${esc(d)}</p></div></div>`).join("")}</div></div>
    <div class="card ab-faq"><h3>❓ <span>Questions</span></h3>${faq.map(([q,a])=>`<details class="ab-q"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>`}
+/* ============ Mentorship course (paid content, protected) ============
+   Lessons are not published yet: the page shows "content still unavailable".
+   Protection layer for the course page: no right-click, copy, drag, select, save, print or view-source shortcuts;
+   the content hides when the window loses focus (screenshot tools take the focus) or the tab is hidden;
+   a moving watermark with the member's name and email marks every view, so a leaked capture can be traced. */
+const COURSE={lessons:[]};
+function courseMark(){const m=S.me||{},who=[m.name,m.email].filter(Boolean).join(" · ")||"Tradeversity member",d=new Date().toISOString().slice(0,16).replace("T"," ");return esc(who+" · "+d)}
+function vCourse(el){el.classList.add("course-v","cv-guard");
+  el.innerHTML=`<h1>🎓 <span>Trading mentorship course</span></h1><p class="sub">The Tradeversity mentorship, step by step, by Brown Algo and ZN Trading.</p>
+   <div class="card cv-soon">
+    <div class="cv-lock">🔒</div>
+    <h2>Content still unavailable</h2>
+    <p class="mut">The lessons are being prepared. They will appear here as soon as they are ready.</p>
+    <div class="cv-badges"><span class="ind-b">🛡 <span>Protected content</span></span><span class="ind-b">👤 <span>Members only</span></span></div>
+   </div>
+   <div class="cv-wm" aria-hidden="true" data-notr>${Array.from({length:18},()=>`<span>${courseMark()}</span>`).join("")}</div>
+   <div class="cv-shield hidden" id="cvShield"><div>🔒 <span>Content hidden. Click here to continue.</span></div></div>`;
+  $$("img,video",el).forEach(x=>{x.setAttribute("draggable","false");x.setAttribute("controlslist","nodownload noplaybackrate noremoteplayback");x.setAttribute("disablepictureinpicture","")});
+  $("#cvShield").onclick=()=>$("#cvShield").classList.add("hidden")}
+(function courseGuard(){const on=()=>S.view==="course"&&!!document.querySelector(".cv-guard"),hide=()=>{const s=$("#cvShield");if(s&&on())s.classList.remove("hidden")};
+  ["contextmenu","copy","cut","dragstart","selectstart"].forEach(t=>document.addEventListener(t,e=>{if(on()&&e.target.closest&&e.target.closest(".cv-guard"))e.preventDefault()},true));
+  document.addEventListener("keydown",e=>{if(!on())return;const k=(e.key||"").toLowerCase(),c=e.ctrlKey||e.metaKey;
+    if(k==="printscreen"||k==="f12"||(c&&["s","p","u","c"].includes(k))||(c&&e.shiftKey&&["i","j","c","s"].includes(k))){e.preventDefault();e.stopPropagation();hide()}},true);
+  document.addEventListener("keyup",e=>{if(on()&&(e.key||"").toLowerCase()==="printscreen"){hide();try{navigator.clipboard.writeText("")}catch(x){}}},true);
+  addEventListener("blur",hide);document.addEventListener("visibilitychange",()=>{if(document.hidden)hide()});addEventListener("beforeprint",hide)})();
 function vAbout(el){el.classList.add("about-v");
   el.innerHTML=`<div class="about-hero"><div class="logo lg" role="img" aria-label="Tradeversity"></div><div><h1>About us</h1>
     <p class="sub" style="max-width:640px">Tradeversity is a trading mentorship and bootcamp not like the standard simple trading courses we see everyday and community founded by <b>Brown Algo</b> and <b>ZNtrading</b>. We teach a precise scalping trading system with clean entries and confirmations using our experience and advanced technicals at the charts, of course with rule-based way to trade having and preparing a clear daily bias, a written plan, strict risk, and an honest journal.</p></div></div>

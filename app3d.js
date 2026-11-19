@@ -211,7 +211,7 @@ export function galaxyBackground(el,kind="galaxy",opts={}){
   let mx=0,my=0;const mv=e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5};addEventListener("pointermove",mv,{passive:true});
   const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()};addEventListener("resize",rs);
   const clock=new THREE.Clock(),T0=performance.now()-(opts.still?9999:0);let stillN=0;let last=0,cx=0,cy=6,sfs=0,vel=0,lastY=scrollY,spin=0,settled=false;
-  let stopped=false;(function loop(){if(stopped)return;if(!el.isConnected){removeEventListener("pointermove",mv);removeEventListener("resize",rs);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose();return}
+  let stopped=false;(function loop(){if(stopped)return;if(!el.isConnected){removeEventListener("pointermove",mv);removeEventListener("resize",rs);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){[].concat(o.material).forEach(m=>{if(m.map&&m.map.dispose)m.map.dispose();if(m.dispose)m.dispose()})}});r.dispose();return}
     requestAnimationFrame(loop);if(document.hidden||busy(loop))return;const t=clock.getElapsedTime(),dt=Math.min(.05,t-last);last=t;mat.uniforms.uT.value=t;
     /* scroll position (smoothed) drives the camera / rotation; scroll speed shakes the particles loose */
     const mxS=Math.max(1,document.documentElement.scrollHeight-innerHeight),sf=Math.min(1,Math.max(0,scrollY/mxS));sfs+=(sf-sfs)*Math.min(1,dt*3);
@@ -239,7 +239,7 @@ export function galaxyBackground(el,kind="galaxy",opts={}){
       const p=u.t/1.1;s.position.x+=dt*22*Math.cos(s.rotation.z);s.position.y+=dt*22*Math.sin(s.rotation.z);s.material.opacity=p<1?Math.sin(p*Math.PI)*.9:0;if(p>=1){u.t=-3-Math.random()*7;u.on=false}});
     r.render(scene,cam);
     /* Light mode: draw the finished design a few times, then stop (no animation, saves battery) */
-    if(opts.still&&++stillN>4){stopped=true;const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose()}},3000)}})();
+    if(opts.still&&++stillN>4){stopped=true;const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){[].concat(o.material).forEach(m=>{if(m.map&&m.map.dispose)m.map.dispose();if(m.dispose)m.dispose()})}});r.dispose()}},3000)}})();
   return {r}}
 
 /* 9. CONSISTENCY RULE BACKGROUND (3D): glass light pillars like daily profits on a dark reflective floor.
@@ -363,7 +363,7 @@ export function earthBackground(el,opts={}){
 function softGlowTex(){const s=document.createElement("canvas");s.width=s.height=64;const x=s.getContext("2d"),g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,"rgba(255,255,255,1)");g.addColorStop(.35,"rgba(255,255,255,.4)");g.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(s)}
 function softLoop(el,r,scene,cam,opts,frame,cleanup){const clock=new THREE.Clock();let last=0,stopped=false,n=0;
   const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()};addEventListener("resize",rs);
-  const free=()=>{removeEventListener("resize",rs);cleanup&&cleanup();scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose()}});r.dispose()};
+  const free=()=>{removeEventListener("resize",rs);cleanup&&cleanup();scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){[].concat(o.material).forEach(m=>{if(m.map&&m.map.dispose)m.map.dispose();if(m.dispose)m.dispose()})}});r.dispose()};
   (function loop(){if(stopped)return;if(!el.isConnected){free();return}requestAnimationFrame(loop);if(document.hidden||busy(loop))return;
     const t=opts.still?4:clock.getElapsedTime(),dt=opts.still?1:Math.min(.05,t-last);last=t;frame(t,dt);r.render(scene,cam);
     if(opts.still&&++n>4){stopped=true;const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);free()}},3000)}})()}
