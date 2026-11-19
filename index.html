@@ -3395,7 +3395,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-19g";
+const APP_VER="2026-11-19h";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4899,7 +4899,7 @@ function aboutExtra(){const tl=[["📈",`${ABOUT.yearsPrefix?ABOUT.yearsPrefix+"
   return `<div class="card ab-story"><h3>🧭 <span>Our story</span></h3><div class="ab-tl">${tl.map(([ic,t,d])=>`<div class="ab-st"><span class="ab-ic">${ic}</span><div><b>${esc(t)}</b><p class="mut">${esc(d)}</p></div></div>`).join("")}</div></div>
    <div class="card ab-faq"><h3>❓ <span>Questions</span></h3>${faq.map(([q,a])=>`<details class="ab-q"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>`}
 function vAbout(el){el.classList.add("about-v");
-  el.innerHTML=`<div class="about-hero"><div class="logo lg" role="img" aria-label="Tradeversity"></div><div><h1>About <span data-notr>TRADEVERSITY</span></h1>
+  el.innerHTML=`<div class="about-hero"><div class="logo lg" role="img" aria-label="Tradeversity"></div><div><h1>About us</h1>
     <p class="sub" style="max-width:640px">Tradeversity is a trading mentorship and bootcamp not like the standard simple trading courses we see everyday and community founded by <b>Brown Algo</b> and <b>ZNtrading</b>. We teach a precise scalping trading system with clean entries and confirmations using our experience and advanced technicals at the charts, of course with rule-based way to trade having and preparing a clear daily bias, a written plan, strict risk, and an honest journal.</p></div></div>
    ${aboutStatsHTML()}
    <div style="display:flex;justify-content:center;margin:14px 0 0">${tourBtn()}</div>
