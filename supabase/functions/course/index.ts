@@ -181,7 +181,7 @@ Deno.serve(async (req) => {
     const bad = await signed();
     if (bad) { await log(uid, "lessons", false, bad); return json({ ...state(), ok: false, error: bad }); }
     await log(uid, "lessons", true, null, m.device_label);
-    return json({ ...state(), lessons: await lessons(uid, false) });
+    return json({ ...state(), lessons: await lessons(uid, false, m.granted_at) });
   }
 
   if (action === "play") {
@@ -189,7 +189,7 @@ Deno.serve(async (req) => {
     const bad = await signed(id);
     if (bad) { await log(uid, "play", false, bad); return json({ ok: false, error: bad }); }
     await log(uid, "play", true, id, m.device_label);
-    return json(await play(id, me, false));
+    return json(await play(id, me, false, m.granted_at));
   }
 
   if (action === "cancelPending") {
@@ -237,26 +237,36 @@ Deno.serve(async (req) => {
   return json({ ok: false, error: "unknown_action" }, 400);
 });
 
-async function lessons(uid: string, admin: boolean) {
-  let q = sb.from("course_lessons").select("id,position,module,title,summary,minutes,video_id,published").order("position");
+// weekly unlock: a lesson opens unlock_days after the member got access (the admin sees everything)
+const opensAt = (start: string | null, days: number) => start && days > 0 ? new Date(new Date(start).getTime() + days * DAY).toISOString() : null;
+
+async function lessons(uid: string, admin: boolean, start: string | null = null) {
+  let q = sb.from("course_lessons").select("id,position,module,title,summary,minutes,video_id,published,unlock_days,assignment").order("position");
   if (!admin) q = q.eq("published", true);
   const { data } = await q;
   const { data: pr } = await sb.from("course_progress").select("lesson_id,pct,done").eq("user_id", uid);
   const P: Record<string, any> = {}; (pr || []).forEach((p: any) => (P[p.lesson_id] = p));
   // the video ID never goes to the browser: only "has a video"
-  return (data || []).map((l: any) => ({ id: l.id, position: l.position, module: l.module, title: l.title, summary: l.summary, minutes: l.minutes,
-    published: l.published, video: !!l.video_id, pct: P[l.id]?.pct || 0, done: !!P[l.id]?.done }));
+  return (data || []).map((l: any) => {
+    const at = admin ? null : opensAt(start, l.unlock_days || 0), locked = !!at && new Date(at).getTime() > Date.now();
+    return { id: l.id, position: l.position, module: l.module, title: l.title, summary: l.summary, minutes: l.minutes, published: l.published,
+      video: !!l.video_id, unlock_days: l.unlock_days || 0, locked, opensAt: locked ? at : null, assignment: locked ? null : (l.assignment || null),
+      pct: P[l.id]?.pct || 0, done: !!P[l.id]?.done };
+  });
 }
 
-async function play(id: string, me: any, admin: boolean) {
-  const { data: l } = await sb.from("course_lessons").select("id,video_id,published").eq("id", id).maybeSingle();
+async function play(id: string, me: any, admin: boolean, start: string | null = null) {
+  const { data: l } = await sb.from("course_lessons").select("id,video_id,published,unlock_days").eq("id", id).maybeSingle();
   if (!l || (!l.published && !admin)) return { ok: false, error: "no_lesson" };
+  const at = admin ? null : opensAt(start, l.unlock_days || 0);
+  if (at && new Date(at).getTime() > Date.now()) return { ok: false, error: "locked", opensAt: at };
   if (!l.video_id) return { ok: false, error: "video_not_ready" };
   if (!VDO) return { ok: false, error: "video_not_configured" };
   const mark = [me?.full_name, me?.email].filter(Boolean).join(" · ");
-  // small, fixed, top-left: discreet for the viewer, still identifies the buyer on any leak
+  // small fixed line top-left + a faint name that moves to a new random place every 20 s (can't be cropped out of a recording)
   const annotate = JSON.stringify([
     { type: "text", text: mark, alpha: "0.55", x: "12", y: "10", color: "0xFFFFFF", size: "11" },
+    { type: "rtext", text: mark, alpha: "0.16", color: "0xFFFFFF", size: "12", interval: "20000" },
   ]);
   const r = await fetch("https://dev.vdocipher.com/api/videos/" + encodeURIComponent(l.video_id) + "/otp", {
     method: "POST", headers: { Authorization: "Apisecret " + VDO, "Content-Type": "application/json", Accept: "application/json" },
