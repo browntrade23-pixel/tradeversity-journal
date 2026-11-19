@@ -253,10 +253,10 @@ async function play(id: string, me: any, admin: boolean) {
   if (!l || (!l.published && !admin)) return { ok: false, error: "no_lesson" };
   if (!l.video_id) return { ok: false, error: "video_not_ready" };
   if (!VDO) return { ok: false, error: "video_not_configured" };
-  const mark = [me?.full_name, me?.email, (me?.id || "").slice(0, 8)].filter(Boolean).join(" · ");
+  const mark = [me?.full_name, me?.email].filter(Boolean).join(" · ");
+  // small, fixed, top-left: discreet for the viewer, still identifies the buyer on any leak
   const annotate = JSON.stringify([
-    { type: "rtext", text: mark, alpha: "0.55", color: "0xFFFFFF", size: "14", interval: "5000" },
-    { type: "rtext", text: "TRADEVERSITY · " + (me?.email || ""), alpha: "0.25", color: "0xF5B942", size: "12", interval: "9000" },
+    { type: "text", text: mark, alpha: "0.55", x: "12", y: "10", color: "0xFFFFFF", size: "11" },
   ]);
   const r = await fetch("https://dev.vdocipher.com/api/videos/" + encodeURIComponent(l.video_id) + "/otp", {
     method: "POST", headers: { Authorization: "Apisecret " + VDO, "Content-Type": "application/json", Accept: "application/json" },
