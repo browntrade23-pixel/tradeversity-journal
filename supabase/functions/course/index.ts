@@ -18,7 +18,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 const TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
-const VDO = Deno.env.get("VDOCIPHER_API_SECRET") ?? "";
+const VDO = (Deno.env.get("VDOCIPHER_API_SECRET") ?? "").replace(/^\s*(api\s*secret\s*:?|apisecret)\s*/i, "").replace(/\s+/g, "");
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST,OPTIONS" };
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...CORS, "Content-Type": "application/json" } });
 const DAY = 86400e3, WAIT = DAY, GAP = 90 * DAY, YEAR = 365 * DAY, MAX_YEAR = 2, SKEW = 120e3;
@@ -262,7 +262,7 @@ async function play(id: string, me: any, admin: boolean) {
     method: "POST", headers: { Authorization: "Apisecret " + VDO, "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ ttl: 300, annotate }),
   });
-  if (!r.ok) return { ok: false, error: "video_error" };
+  if (!r.ok) { const t = (await r.text()).slice(0, 300); console.log("vdocipher otp failed", r.status, t); return { ok: false, error: "video_error", detail: admin ? r.status + " " + t : undefined }; }
   const j = await r.json();
   return { ok: true, otp: j.otp, playbackInfo: j.playbackInfo };
 }
