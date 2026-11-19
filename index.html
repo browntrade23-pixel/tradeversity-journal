@@ -1616,6 +1616,12 @@ html.visit #logout{display:none!important}
 .cmdk-i.on,.cmdk-i:hover{background:rgba(58,72,224,.22)}.cmdk-ic{width:22px;text-align:center}
 html[data-theme=light] .cmdk-box{background:#fff;border-color:#d7dcf5}html[data-theme=light] .cmdk-i.on{background:#eef0ff}
 .adm-sum-t{white-space:pre-wrap;font:13px/1.5 ui-monospace,Consolas,monospace;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;margin:0 0 10px}
+html:not(.foot-full) #app .appfoot :is([data-promo],#socFoot,.foot.founder){display:none!important}html:not(.foot-full) #app .appfoot{padding-bottom:20px}
+.disp-pop .dp-row>small.dp-note{text-transform:none;letter-spacing:0;font-weight:500;font-size:11px}
+.dp-acts{display:flex;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}.dp-acts .btn{flex:1}
+.disp-pop #langTop .langSel,.disp-pop #langTop select{width:100%;max-width:none!important}
+.bdg-line{display:flex!important;align-items:center;gap:10px;width:100%;text-align:start;cursor:pointer;font:inherit;color:inherit;font-weight:700;padding:14px 16px!important}
+.bdg-line>span:first-child{flex:1}.bdg-chev{font-size:20px;color:var(--muted)}
 .disp-w{position:relative;flex:none}.disp-pop{position:absolute;right:0;top:calc(100% + 10px);z-index:200;min-width:240px;padding:12px;border-radius:14px;background:#0d1020;border:1px solid rgba(110,124,245,.45);box-shadow:0 20px 50px rgba(0,0,0,.6)}
 .disp-pop .dp-row{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}.disp-pop .dp-row>small{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--muted);text-transform:uppercase}.dp-bg button{font-size:12px;padding:6px 10px}.dp-note{display:block;font-size:11px}
 html[data-theme=light] .disp-pop{background:#fff;border-color:#d7dcf5}
@@ -1755,13 +1761,12 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
     <div class="topin">
       <div class="brand"><div class="logo" role="img" aria-label="The Effective Journal by Tradeversity — founder Brown Algo"></div><div>The Effective Journal<small>BY TRADEVERSITY</small></div></div>
       <div class="spacer"></div>
-      <button type="button" class="hd-ic" id="cmdBtn" title="Search (Ctrl+K)" aria-label="Search">🔍</button>
-      <span class="disp-w"><button type="button" class="hd-ic" id="dispBtn" title="Display" aria-label="Display" aria-expanded="false">⚙️</button><div class="disp-pop hidden" id="dispPop" role="dialog" aria-label="Display"><div class="dp-row"><small>Theme</small><span class="theme-slot"></span></div><div class="dp-row"><small>Background</small><div class="seg dp-bg" id="bgSeg"><button type="button" data-bg="3d">✨ <span>3D</span></button><button type="button" data-bg="light">🖼 <span>Light</span></button><button type="button" data-bg="off">⬛ <span>Off</span></button></div></div><small class="mut dp-note">Light = still image, saves battery.</small></div></span>
-      <span id="langTop"></span>
-     <span class="chip" id="whoChip" data-notr></span>
+      <span class="chip" id="whoChip" data-notr></span>
       <button class="btn sm inst-btn hidden" id="instBtn" type="button">📲 <span>Install app</span></button>
+      <button type="button" class="hd-ic" id="cmdBtn" title="Search (Ctrl+K)" aria-label="Search">🔍</button>
       <button class="ntf-bell" id="ntfBell" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="ntf-badge hidden" id="ntfBadge"></span></button>
-      <button class="btn sm ghost" id="logout">Log out</button>
+      <!-- ⚙️ one menu: theme, background, language, tour, log out -->
+      <span class="disp-w"><button type="button" class="hd-ic" id="dispBtn" title="Settings" aria-label="Settings" aria-expanded="false">⚙️</button><div class="disp-pop hidden" id="dispPop" role="dialog" aria-label="Settings"><div class="dp-row"><small>Language</small><span id="langTop"></span></div><div class="dp-row"><small>Theme</small><span class="theme-slot"></span></div><div class="dp-row"><small>Background</small><div class="seg dp-bg" id="bgSeg"><button type="button" data-bg="3d">✨ <span>3D</span></button><button type="button" data-bg="light">🖼 <span>Light</span></button><button type="button" data-bg="off">⬛ <span>Off</span></button></div><small class="mut dp-note">Light = still image, saves battery.</small></div><div class="dp-acts"><button type="button" class="btn sm" id="dpTour">❓ <span>Platform tour</span></button><button class="btn sm ghost" id="logout" type="button">↪ <span>Log out</span></button></div></div></span>
     </div>
     <div class="tabs-wrap" id="tabsWrap"><button type="button" class="tabs-arr l" id="tabsL" aria-label="Previous sections">‹</button><nav class="tabs" id="tabs"></nav><button type="button" class="tabs-arr r" id="tabsR" aria-label="More sections">›</button></div>
   </header>
@@ -2232,7 +2237,9 @@ function galaxyBg(){const m=BGM.mode(),light=document.documentElement.getAttribu
     p.then(()=>{if(g.isConnected)document.documentElement.classList.add("gal-on")}).catch(e=>{console.warn("bg off",e);g.remove();document.documentElement.classList.remove("gal-on")})}
   else document.documentElement.classList.add("gal-on")}
 setInterval(()=>{if(S.view==="news")bgStateNews()},20000);
-function render(){setTimeout(galaxyBg,0);const _tr=document.getElementById("pfTray");if(_tr&&S.view!=="propfirms")_tr.className="";document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
+function render(){setTimeout(galaxyBg,0);
+  /* full footer (partner offer, social links, founder) only on Today, Prop firms and About; a slim one elsewhere */
+  document.documentElement.classList.toggle("foot-full",["today","propfirms","about"].includes(S.view));const _tr=document.getElementById("pfTray");if(_tr&&S.view!=="propfirms")_tr.className="";document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
   const fn={today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
   v.innerHTML=h+'<div id="vb"></div>';Promise.resolve(fn($("#vb"))).then(()=>bindNotify(v)).catch(()=>{});
@@ -2652,7 +2659,9 @@ function badgeList(){const ts=S.trades||[],pl=S.plans||[],ds=discStreak(ts,pl),j
     ["funded","💎","Funded","Save the rules of a funded account",funded?1:0,1]]
    .map(([id,ic,n,d,cur,goal])=>({id,ic,n,d,cur:Math.min(cur,goal),goal,ok:cur>=goal||saved.includes(id)}))}
 function badgeCard(B){const n=B.filter(b=>b.ok).length;
-  return `<div class="card td-badges"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">🏅 <span>Badges</span></h3><div class="row" style="gap:8px"><span class="mut mono" data-notr>${n} / ${B.length}</span><button type="button" class="btn sm" id="a3BList">${S._a3bList?"🏆 <span>3D trophy room</span>":"☰ <span>List</span>"}</button></div></div>
+  /* folded by default (shorter Today page): one line, opens on tap */
+  if(!S._bdgOpen)return `<button type="button" class="card td-badges bdg-line" id="bdgOpen"><span>🏅 <span>Badges</span></span><span class="mut mono" data-notr>${n} / ${B.length}</span><span class="bdg-chev">›</span></button>`;
+  return `<div class="card td-badges"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h3 style="margin:0">🏅 <span>Badges</span></h3><div class="row" style="gap:8px"><span class="mut mono" data-notr>${n} / ${B.length}</span><button type="button" class="btn sm" id="a3BList">${S._a3bList?"🏆 <span>3D trophy room</span>":"☰ <span>List</span>"}</button><button type="button" class="btn sm" id="bdgClose" aria-label="Close">✕</button></div></div>
    ${S._a3bList?"":`<div id="a3Trophy" class="a3-box"></div><p class="mut a3-hint"><span>Tap a medal · drag to look around</span></p>`}
    <div class="bdg-grid ${S._a3bList?"":"a3-hide"}">${B.map(b=>`<div class="bdg ${b.ok?"on":""}" title="${esc(I18N.t(b.d))}"><span class="bi">${b.ok?b.ic:"🔒"}</span><b>${esc(I18N.t(b.n))}</b>${b.ok?`<small>${esc(I18N.t(b.d))}</small>`:`<div class="bp"><i style="width:${b.cur/b.goal*100}%"></i></div><small class="mono" data-notr>${b.cur} / ${b.goal}</small>`}</div>`).join("")}</div></div>`}
 function celebrate(B,targetHit){setTimeout(()=>{let old=null;try{old=JSON.parse(localStorage.getItem(badgeKey())||"null")}catch(e){}
@@ -2715,7 +2724,7 @@ function vToday(el){
     celebrate(B,tHit);return}
   el.innerHTML=`<div class="td">
    <div class="td-hero"><div><div class="td-hi"><span>${hello}</span>${name?`, <b data-notr>${name}</b>`:""} 👋</div><div class="td-date mut" data-notr>${esc(fmtDate(t))}</div></div>
-    <div class="td-hr"><div class="td-q">“<span>${esc(q)}</span>” <small>— BROWN ALGO</small></div>${sessStarted()?`<span class="chip ss-on">✅ <span>Session started</span></span>`:`<button class="btn sm pri ss-btn" type="button" data-td="session">🚀 <span>Start my session</span></button>`}<button class="btn sm" type="button" id="tdFocusOn">🎯 <span>Focus mode</span></button><button class="btn sm" type="button" id="tdTour" title="Platform tour">❓ <span>Tour</span></button></div></div>
+    <div class="td-hr"><div class="td-q">“<span>${esc(q)}</span>” <small>— BROWN ALGO</small></div>${sessStarted()?`<span class="chip ss-on">✅ <span>Session started</span></span>`:`<button class="btn sm pri ss-btn" type="button" data-td="session">🚀 <span>Start my session</span></button>`}<button class="btn sm" type="button" id="tdFocusOn">🎯 <span>Focus mode</span></button></div></div>
    ${cd?`<div class="td-cool"><span class="td-cool-i">🛑</span><div><b>${cd.why==="loss"?"Max daily loss reached":"Max trades reached for today"}</b><small>${cd.why==="loss"?"You hit your daily loss limit. Close the platform, protect the account, come back tomorrow.":"Your plan is done for today. Closing the platform is the trade now."}</small></div></div>`:""}
    ${tHit?`<div class="td-win">🎉 <b>Daily target reached!</b> <span>Lock it in: no more trades today.</span></div>`:""}
    <div class="td-grid">
@@ -2757,10 +2766,12 @@ function vToday(el){
     else if(a==="share")shareWeek();else if(a==="session")startSession();
     else if(a==="rules"){const ac=accounts()[0];if(ac)S.acct=ac;go("stats");setTimeout(()=>{const r=$("#rulesCard");if(r)r.scrollIntoView({behavior:"smooth",block:"center"})},300)}});
   bindWeekReview();
-  $("#tdFocusOn").onclick=()=>setFocus(true);$("#tdTour").onclick=startTour;
+  $("#tdFocusOn").onclick=()=>setFocus(true);{const tt=$("#tdTour");if(tt)tt.onclick=startTour}
   mount3d("a3Orb","disciplineOrb",sc.score,I18N.t("score"));mount3d("a3Flame","streakFlame",ds.streak);
   if($("#a3Trophy"))mount3d("a3Trophy","trophyRoom",B,b=>toast(`${b.ok?b.ic:"🔒"} ${I18N.t(b.n)} · ${b.ok?I18N.t(b.d):`${b.cur} / ${b.goal}`}`));
   if($("#a3BList"))$("#a3BList").onclick=()=>{S._a3bList=!S._a3bList;render()};
+  if($("#bdgOpen"))$("#bdgOpen").onclick=()=>{S._bdgOpen=true;render();setTimeout(()=>{const c=$(".td-badges");c&&c.scrollIntoView({behavior:"smooth",block:"start"})},80)};
+  if($("#bdgClose"))$("#bdgClose").onclick=()=>{S._bdgOpen=false;render()};
   celebrate(B,tHit)}
 
 /* ===== No-trade days: saved on that day's plan (noTrade:true). They count as $0 days in the statistics. ===== */
@@ -3331,7 +3342,8 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
       /* phones: a panel centred under the button, always fully on screen */
       if(innerWidth<761){const g=d.getBoundingClientRect();Object.assign(p.style,{position:"fixed",top:(g.bottom+8)+"px",left:"12px",right:"12px",minWidth:"0"})}else{["position","top","left","right","minWidth"].forEach(k=>p.style[k]="")}};
     p.onclick=e=>e.stopPropagation();addEventListener("scroll",()=>{if(!p.classList.contains("hidden")&&innerWidth<761){p.classList.add("hidden");d.setAttribute("aria-expanded","false")}},{passive:true});document.addEventListener("click",()=>{p.classList.add("hidden");d.setAttribute("aria-expanded","false")});
-    $$("#bgSeg [data-bg]").forEach(x=>x.onclick=()=>BGM.set(x.dataset.bg))}
+    $$("#bgSeg [data-bg]").forEach(x=>x.onclick=()=>BGM.set(x.dataset.bg));
+    const tb=$("#dpTour");if(tb)tb.onclick=()=>{p.classList.add("hidden");d.setAttribute("aria-expanded","false");if(S.me)startTour()}}
   BGM.btn()})();
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const today=todayStr(),d7=new Date();d7.setDate(d7.getDate()-6);const d7s=ymd(d7),sid=new Set(students.map(s=>s.id));
@@ -3341,7 +3353,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-19a";
+const APP_VER="2026-11-19b";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3382,8 +3394,9 @@ function tourSteps(){const ph=innerWidth<821,nav=k=>ph?`#bnav [data-v="${k}"]`:`
     [nav("stats"),"📊","Statistics","Win rate, profit factor, calendar, what makes you money and what costs you money. Import CSV files here."],
     [nav("plan"),"🧭","Plan tomorrow","Bias, key levels, max loss and max trades. A trader without a plan is a gambler."],
     [nav("news"),"📰","Red news","Countdown, no-trade windows and what each news means."],
-    [ph?"#bnMore":"#toolsBtn","🧰","Tools","Risk calculator, consistency rule, prop firm tracker with discounts, and our free ICT indicator."],
+    [ph?"#bnMore":nav("risk"),"🧰","Tools","Risk calculator, consistency rule, prop firm tracker with discounts, and our free ICT indicator."],
     ["#ntfBell","🔔","Notifications","Red news, journal and plan reminders, and announcements from Brown Algo."],
+    ["#dispBtn","⚙️","Settings","Language, theme, background, this tour and log out are all here."],
     [null,"🚀","You're ready","Turn on the Telegram reminders in Tomorrow's plan, then log your first trade. Discipline is the edge nobody can copy."]]}
 function startTour(){if(S.readonly||!S.me)return;if(S.view!=="today")go("today");let i=0;const steps=tourSteps();
   document.querySelectorAll(".tour2").forEach(x=>x.remove());const ov=document.createElement("div");ov.className="tour2";document.body.appendChild(ov);
