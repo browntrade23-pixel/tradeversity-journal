@@ -331,6 +331,7 @@ html.auth3d .authbox #authCard,html.auth3d .authbox #waitBox{background:rgba(10,
 .gate-logo{width:168px;height:168px;animation:gin 1.6s cubic-bezier(.2,.8,.2,1) both,aura 3.2s ease-in-out 1.6s infinite}
 @keyframes gin{0%{opacity:0;transform:scale(.6);filter:blur(14px) brightness(2)}100%{opacity:1;transform:none;filter:blur(0)}}
 .gate-name{font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold2);opacity:0;animation:up .9s ease .7s forwards}
+.gate-name .gate-by{display:block;margin-top:8px;font-size:10px;letter-spacing:.26em;color:var(--muted);opacity:.85}
 .gate-l{opacity:0;animation:rev 1.8s cubic-bezier(.2,.8,.2,1) forwards}
 .gate-l.l1{font-size:28px;font-weight:800;animation:rev 1.8s cubic-bezier(.2,.8,.2,1) 1.1s forwards,shine 7s linear 3.2s infinite;
   background:linear-gradient(90deg,#e8eef8 0%,#e8eef8 35%,#ffd27a 50%,#e8eef8 65%,#e8eef8 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -823,6 +824,7 @@ html[lang=ar] .foot.founder span,html[lang=ar] .foot.founder b,html[lang=ar] .fo
   /* one row: logo, search, bell, profile, settings */
   #app .topin{flex-wrap:nowrap;column-gap:6px}
   #app .topin .brand>div{overflow:hidden;text-overflow:ellipsis;min-width:0}
+  #app .topin .brand small{font-size:8.5px;letter-spacing:.04em}
   #app .topin .hd-ic,#app .topin .ntf-bell{width:34px;height:34px;flex:none}
   #app main#view{overflow-x:hidden}
 }
@@ -1713,7 +1715,7 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
   <!-- the gate: first thing a visitor sees -->
   <div id="gate">
     <div class="logo lg gate-logo" role="img" aria-label="TRADEVERSITY — founder Brown Algo"></div>
-    <div class="gate-name">TRADEVERSITY</div>
+    <div class="gate-name">TRADEVERSITY<small class="gate-by" data-notr>BY BROWN ALGO / ZN TRADING</small></div>
     <div class="gate-l l1">Not everyone gets in.</div>
     <div class="gate-l l2">Only the disciplined see what's behind this door.</div>
     <button class="btn pri gate-btn" id="gateBtn">Enter</button>
@@ -1727,7 +1729,7 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
   <div class="authbox sealed">
     <div class="brand stack" style="justify-content:center;margin-bottom:18px">
       <div class="logo lg" role="img" aria-label="TRADEVERSITY — founder Brown Algo"></div>
-      <div style="font-size:18px" class="shine-t">TRADEVERSITY</div>
+      <div style="font-size:18px" class="shine-t">TRADEVERSITY<small data-notr>BY BROWN ALGO / ZN TRADING</small></div>
     </div>
     <div class="card hidden" id="waitBox" style="text-align:center">
       <div style="font-size:40px;margin-bottom:6px" id="waitIcon">⏳</div>
@@ -1794,7 +1796,7 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
 <section id="app" class="hidden">
   <header class="top">
     <div class="topin">
-      <div class="brand"><div class="logo" role="img" aria-label="TRADEVERSITY — founder Brown Algo"></div><div>TRADEVERSITY</div></div>
+      <div class="brand"><div class="logo" role="img" aria-label="TRADEVERSITY — founder Brown Algo"></div><div>TRADEVERSITY<small data-notr>BY BROWN ALGO / ZN TRADING</small></div></div>
       <div class="spacer"></div>
       <span class="chip" id="whoChip" data-notr></span>
       <button class="btn sm inst-btn hidden" id="instBtn" type="button">📲 <span>Install app</span></button>
@@ -3395,7 +3397,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-19h";
+const APP_VER="2026-11-19i";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3598,6 +3600,10 @@ function vCheck(){return `<span class="vchk" title="${esc(I18N.t("Verified profi
 function meBtnDraw(){const b=$("#meBtn");if(!b)return;const u=S.me;b.classList.toggle("hidden",!u);if(!u)return;
   b.innerHTML=(u.avatar?`<img src="${esc(u.avatar)}" alt="">`:"👤")+(isVerified(u)?`<i class="me-v">✔</i>`:"");b.title=I18N.t("My profile")}
 (function(){const b=$("#meBtn");if(b)b.onclick=()=>{if(S.me){if(S.readonly)loadSubject(S.me,false);go("profile");window.scrollTo(0,0)}}})();
+/* the TRADEVERSITY logo at the top left goes back home (Today, or the Admin dashboard for the admin) */
+(function(){const br=$("#app header .brand");if(!br)return;br.style.cursor="pointer";br.setAttribute("role","link");br.setAttribute("tabindex","0");br.title=I18N.t("Home");
+  const home=()=>{if(!S.me)return;if(S.readonly)loadSubject(S.me,false);go(S.me.role==="admin"?"admin":"today");window.scrollTo({top:0,behavior:"smooth"})};
+  br.onclick=home;br.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();home()}}})();
 /* Today: a friendly nudge until the profile is complete */
 function profileNudge(){const u=S.me;if(!u||S.readonly||isVerified(u))return "";const done=PF_KEYS.length-PF_KEYS.filter(([k])=>!String(u[k]||"").trim()).length;
   return `<button type="button" class="card pf-nudge" id="pfNudge"><span class="pf-av">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:"👤"}</span><span class="pf-nt"><b>${esc(I18N.t("Complete your profile to get the verified check"))} ${vCheck()}</b><small class="mut"><span data-notr>${done} / ${PF_KEYS.length}</span> · ${esc(I18N.t("Takes 1 minute"))}</small><span class="pf-bar"><i style="width:${done/PF_KEYS.length*100}%"></i></span></span><span class="bdg-chev">›</span></button>`}
@@ -3828,7 +3834,7 @@ function drawShare(){const el=$("#shMain");const D=SH.data;
   $$("tr[data-m]").forEach(r=>r.onclick=()=>{SH.month=r.dataset.m;drawShare();$(".cal").scrollIntoView({behavior:"smooth",block:"center"})})}
 async function bootShare(tok){SH.tok=tok;$("#auth").classList.add("hidden");$("#app").classList.add("hidden");
   const sec=document.createElement("section");sec.id="share";
-  sec.innerHTML=`<header class="top"><div class="topin"><a class="brand" href="${location.pathname}" style="color:inherit;text-decoration:none"><div class="logo" role="img" aria-label="TRADEVERSITY"></div><div>TRADEVERSITY</div></a><div class="spacer"></div><span class="soc icons" id="socShare"></span><span class="theme-slot"></span><span id="langShare"></span></div></header>
+  sec.innerHTML=`<header class="top"><div class="topin"><a class="brand" href="${location.pathname}" style="color:inherit;text-decoration:none"><div class="logo" role="img" aria-label="TRADEVERSITY"></div><div>TRADEVERSITY<small data-notr>BY BROWN ALGO / ZN TRADING</small></div></a><div class="spacer"></div><span class="soc icons" id="socShare"></span><span class="theme-slot"></span><span id="langShare"></span></div></header>
    <main id="shMain"><div class="empty">Loading results…</div></main>
    <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div class="soc" id="socShare2"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>`;
   document.body.insertBefore(sec,$("#modal"));
