@@ -488,6 +488,7 @@ const T={
 "Assignment (optional)":["Exercice (facultatif)","تمرين (اختياري)"],
 "Right away":["Tout de suite","فورًا"],
 "On PC.":["Sur PC.","على الحاسوب."],
+"See what members see":["Voir ce que voient les membres","شاهد ما يراه الأعضاء"],
 "On PC and Android.":["Sur PC et Android.","على الحاسوب وأندرويد."],
 "The course plays in the Tradeversity Video Player app (Windows and Android), which screen recorders and screenshots can't capture.":["La formation se lit dans l'application Tradeversity Video Player (Windows et Android), que les enregistreurs d'écran et les captures ne peuvent pas filmer.","تُشغَّل الدورة في تطبيق Tradeversity Video Player (ويندوز وأندرويد)، الذي لا تستطيع برامج تسجيل الشاشة ولقطاتها التقاطه."],
 "On Android, the course plays in Tradeversity Video Player":["Sur Android, la formation se lit dans Tradeversity Video Player","على أندرويد، تُشغَّل الدورة في Tradeversity Video Player"],
