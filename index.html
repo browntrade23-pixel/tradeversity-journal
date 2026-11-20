@@ -3443,7 +3443,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-20b";
+const APP_VER="2026-11-20c";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -5043,7 +5043,7 @@ const CERR={other_device:"This course is locked to another device.",bad_time:"Yo
   wait_minute:"A code was just sent. Wait a minute before asking for a new one.",code_expired:"The code expired. Ask for a new one.",too_many_tries:"Too many wrong codes. Ask for a new one.",
   wrong_code:"Wrong code. Check the message on Telegram.",already_pending:"A device change is already waiting.",already_active:"The course is already activated on a device.",
   video_not_ready:"This video isn't ready yet.",video_not_configured:"Videos aren't switched on yet.",video_error:"The video couldn't load. Try again in a moment.",
-  no_lesson:"This lesson isn't available.",locked:"This lesson isn't open yet.",use_app:"On PC, open the course in the TRADEVERSITY app.",not_logged_in:"Please log in again.",must_accept:"Please accept the device rule first.",
+  no_lesson:"This lesson isn't available.",locked:"This lesson isn't open yet.",use_app:"On PC, open the course in Tradeversity Video Player.",not_logged_in:"Please log in again.",must_accept:"Please accept the device rule first.",
   network:"No connection. Check your internet and try again.",server:"The course server isn't reachable. Try again in a moment.",bad_key:"This browser can't hold a secure course key."};
 const cErr=e=>I18N.t(CERR[e]||"Something went wrong. Try again.");
 const cDT=d=>d?new Date(d).toLocaleString(I18N.locale(),{dateStyle:"medium",timeStyle:"short"}):"";
@@ -5052,7 +5052,7 @@ function courseMark(){const m=S.me||{},who=[m.name,m.email].filter(Boolean).join
 const C_RULES=`<ul class="cv-rules">
    <li><span class="cv-ri">📱</span><span><b>One device.</b> <span>The course opens only on the device you activate. Another phone, PC or browser can't open it, even with your account and password.</span></span></li>
    <li><span class="cv-ri">🛡</span><span><b>Protected videos.</b> <span>Encrypted videos (DRM): no download, and they play only on this website.</span></span></li>
-   <li><span class="cv-ri">💻</span><span><b>On PC.</b> <span>The course opens in the TRADEVERSITY Windows app, which screen recorders and screenshots can't capture.</span></span></li>
+   <li><span class="cv-ri">💻</span><span><b>On PC.</b> <span>The course plays in Tradeversity Video Player for Windows, which screen recorders and screenshots can't capture.</span></span></li>
    <li><span class="cv-ri">💧</span><span><b>Your name on every video.</b> <span>Your name and email are shown on every video, so any leak shows who it came from.</span></span></li>
    <li><span class="cv-ri">📜</span><span><b>Course rules.</b> <span>Sharing, recording or downloading the course is forbidden. If a leak shows your name, your access is removed without refund.</span></span></li>
    <li><span class="cv-ri">🗓</span><span><b>Step by step.</b> <span>New lessons open week by week, with assignments your mentor reviews in your journal.</span></span></li>
@@ -5075,16 +5075,16 @@ async function courseLoad(el){const B=$("#cvBody",el);if(!B)return;
   if(st.admin||st.device==="this")return cvCourse(el,B,st);
   if(st.device==="none")return cvActivate(el,B,st);
   return cvLocked(el,B,st)}
-/* Windows PC: the course opens only in the TRADEVERSITY app (its window is hidden from every screen recorder and screenshot) */
-const CV_APP_URL="https://jointradeversity.com/download/Tradeversity-Setup.exe";
+/* Windows PC: the course plays only in Tradeversity Video Player (its window is hidden from every screen recorder and screenshot) */
+const CV_APP_URL="https://jointradeversity.com/download/Tradeversity-Video-Player-Setup.exe";
 const cvInApp=()=>/TradeversityApp\//.test(navigator.userAgent);
 const cvNeedsApp=()=>/Windows NT/.test(navigator.userAgent)&&!cvInApp();
 function cvGetApp(B){B.innerHTML=`<div class="card cv-act cv-app">
-    <div class="cv-act-h"><div class="cv-lock">💻</div><div><h2>On PC, the course opens in the TRADEVERSITY app</h2><p class="mut">To protect the lessons, Windows hides the app from screen recorders and screenshots. On your phone, keep using the website.</p></div></div>
-    <a class="btn pri cv-go" href="${CV_APP_URL}" download>⬇ <span>Download TRADEVERSITY for Windows</span></a>
-    <ol class="cv-steps"><li><span>Open the downloaded file "Tradeversity-Setup.exe".</span></li>
+    <div class="cv-act-h"><div class="cv-lock">💻</div><div><h2>On PC, the course plays in Tradeversity Video Player</h2><p class="mut">To protect the lessons, Windows hides the app from screen recorders and screenshots. On your phone, keep using the website.</p></div></div>
+    <a class="btn pri cv-go" href="${CV_APP_URL}" download>⬇ <span>Download Tradeversity Video Player for Windows</span></a>
+    <ol class="cv-steps"><li><span>Open the downloaded file "Tradeversity-Video-Player-Setup.exe".</span></li>
      <li><span>If Windows shows "Windows protected your PC", click "More info", then "Run anyway".</span></li>
-     <li><span>Press OK to install. The TRADEVERSITY icon appears on your desktop.</span></li>
+     <li><span>Press OK to install. The Tradeversity Video Player icon appears on your desktop.</span></li>
      <li><span>Open it, log in with your account, and open the Mentorship course.</span></li></ol>
     <p class="mut" style="font-size:12px;margin:0"><span>Windows 10 or 11 · free · no admin rights needed · about 65 MB</span></p></div>
    <div class="card cv-how"><h3>How your course access works</h3>${C_RULES}</div>`}
