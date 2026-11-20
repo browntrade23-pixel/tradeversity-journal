@@ -132,6 +132,10 @@ Deno.serve(async (req) => {
   if (["activate", "lessons", "play", "resetConfirm"].includes(action) && /Windows NT/.test(fullUa) && !/TradeversityApp\//.test(fullUa)) {
     await log(uid, action, false, "use_app"); return json({ ok: false, error: "use_app" });
   }
+  // Android: only phones with hardware video protection (Widevine L1); L2/L3 phones can be screen-recorded
+  if (["activate", "lessons", "play", "resetConfirm"].includes(action) && /Android/i.test(fullUa) && b.drm !== "L1") {
+    await log(uid, action, false, "need_l1", String(b.drm || "none").slice(0, 8)); return json({ ok: false, error: "need_l1" });
+  }
 
   // a device change that waited 24 hours becomes the device now
   if (m.pend_pub && m.pend_at && Date.now() - new Date(m.pend_at).getTime() >= WAIT) {
