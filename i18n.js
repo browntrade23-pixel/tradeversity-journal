@@ -488,6 +488,7 @@ const T={
 "Assignment (optional)":["Exercice (facultatif)","تمرين (اختياري)"],
 "Right away":["Tout de suite","فورًا"],
 "On PC.":["Sur PC.","على الحاسوب."],
+"On PC, open the course in the TRADEVERSITY app.":["Sur PC, ouvrez la formation dans l'application TRADEVERSITY.","على الحاسوب، افتح الدورة في تطبيق TRADEVERSITY."],
 "The course opens in the TRADEVERSITY Windows app, which screen recorders and screenshots can't capture.":["La formation s'ouvre dans l'application Windows TRADEVERSITY, que les enregistreurs d'écran et captures ne peuvent pas filmer.","تُفتح الدورة في تطبيق TRADEVERSITY لويندوز، الذي لا تستطيع برامج تسجيل الشاشة ولقطات الشاشة التقاطه."],
 "On PC, the course opens in the TRADEVERSITY app":["Sur PC, la formation s'ouvre dans l'application TRADEVERSITY","على الحاسوب، تُفتح الدورة في تطبيق TRADEVERSITY"],
 "To protect the lessons, Windows hides the app from screen recorders and screenshots. On your phone, keep using the website.":["Pour protéger les leçons, Windows cache l'application aux enregistreurs d'écran et aux captures. Sur votre téléphone, continuez à utiliser le site.","لحماية الدروس، يُخفي ويندوز التطبيق عن برامج تسجيل الشاشة ولقطاتها. على هاتفك، واصل استخدام الموقع."],
