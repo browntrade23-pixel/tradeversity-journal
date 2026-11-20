@@ -3447,7 +3447,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-20i";
+const APP_VER="2026-11-20j";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -5047,7 +5047,7 @@ const CERR={other_device:"This course is locked to another device.",bad_time:"Yo
   wait_minute:"A code was just sent. Wait a minute before asking for a new one.",code_expired:"The code expired. Ask for a new one.",too_many_tries:"Too many wrong codes. Ask for a new one.",
   wrong_code:"Wrong code. Check the message on Telegram.",already_pending:"A device change is already waiting.",already_active:"The course is already activated on a device.",
   video_not_ready:"This video isn't ready yet.",video_not_configured:"Videos aren't switched on yet.",video_error:"The video couldn't load. Try again in a moment.",
-  no_lesson:"This lesson isn't available.",locked:"This lesson isn't open yet.",use_app:"On PC, open the course in Tradeversity Video Player.",use_android_app:"On Android, open the course in the Tradeversity Video Player app.",need_l1:"Your phone is not supported. Please watch the course on a PC with Tradeversity Video Player.",not_logged_in:"Please log in again.",must_accept:"Please accept the device rule first.",
+  no_lesson:"This lesson isn't available.",locked:"This lesson isn't open yet.",use_app:"On PC, open the course in Tradeversity Video Player.",use_android_app:"On Android, open the course in the Tradeversity Video Player app.",ios_blocked:"The course isn't available on iPhone yet. Use an Android phone or a PC.",need_l1:"Your phone is not supported. Please watch the course on a PC with Tradeversity Video Player.",not_logged_in:"Please log in again.",must_accept:"Please accept the device rule first.",
   network:"No connection. Check your internet and try again.",server:"The course server isn't reachable. Try again in a moment.",bad_key:"This browser can't hold a secure course key."};
 const cErr=e=>I18N.t(CERR[e]||"Something went wrong. Try again.");
 const cDT=d=>d?new Date(d).toLocaleString(I18N.locale(),{dateStyle:"medium",timeStyle:"short"}):"";
@@ -5073,6 +5073,8 @@ async function courseLoad(el){const B=$("#cvBody",el);if(!B)return;
   if(!CDev.ok()){B.innerHTML=`<div class="card cv-soon"><div class="cv-lock">⚠️</div><h2>This browser can't open the course</h2><p class="mut">Use an up-to-date Chrome, Safari, Edge or Firefox, not a private window.</p></div>`;return}
   const st=await CourseAPI.status();if(!B.isConnected)return;
   if(!st.ok&&st.error){B.innerHTML=`<div class="card cv-soon"><div class="cv-lock">📡</div><h2>${esc(cErr(st.error))}</h2><button class="btn" id="cvRetry">↻ <span>Try again</span></button></div>`;$("#cvRetry",B).onclick=()=>courseLoad(el);return}
+  /* iPhone / iPad: the course can't be protected there yet, so it can't be bought or watched on them (members and visitors) */
+  if(cvIOS()&&!st.admin)return cvNoIOS(B);
   if(!st.member)return cvSoon(B);
   if(st.blocked){B.innerHTML=`<div class="card cv-soon"><div class="cv-lock">⛔</div><h2>Your course access is suspended</h2><p class="mut">Contact Brown Algo on Telegram.</p></div>`;return}
   if(!st.admin&&cvNeedsApp())return cvGetApp(B);
@@ -5084,6 +5086,14 @@ async function courseLoad(el){const B=$("#cvBody",el);if(!B)return;
   return cvLocked(el,B,st)}
 /* Windows PC: the course plays only in Tradeversity Video Player (its window is hidden from every screen recorder and screenshot) */
 const CV_APP_URL="https://jointradeversity.com/download/Tradeversity-Video-Player-Setup.exe",CV_APK_URL="https://jointradeversity.com/download/Tradeversity-Video-Player.apk";
+/* iPhone / iPad (also iPadOS asking for the desktop site): the course is not available until the iPhone app + FairPlay exist */
+function cvIOS(){const u=navigator.userAgent;return /iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1)||(S._demo&&/[?&]cvios=1/.test(location.search))}
+function cvNoIOS(B){B.innerHTML=`<div class="card cv-act cv-ios">
+    <div class="cv-act-h"><div class="cv-lock">🚫</div><div><h2>The course isn't available on iPhone yet</h2><p class="mut">To protect the sessions from screen recording, the Mentorship course can only be bought and watched on an Android phone or a PC for now.</p></div></div>
+    <div class="cv-dev"><span class="cv-dev-ic">📱</span><span><b>Android phone</b><small class="mut">Watch in Tradeversity Video Player for Android</small></span></div>
+    <div class="cv-dev"><span class="cv-dev-ic">💻</span><span><b>Windows PC</b><small class="mut">Watch in Tradeversity Video Player for Windows</small></span></div>
+    <p class="mut" style="font-size:13px;margin:12px 0 0"><span>Open jointradeversity.com on your Android phone or your PC to buy and watch the course. An iPhone app is coming.</span></p></div>
+   <div class="card cv-how"><h3>How your course access works</h3>${C_RULES}</div>`}
 /* Android: guided install, big buttons only. 1 Get the app (download) -> 2 Open it (Downloads) -> 3 Open the app (course page) */
 const CV_APK_OPEN="intent://course#Intent;scheme=tradeversity;package=com.tradeversity.player;end";
 const CV_DOWNLOADS="intent:#Intent;action=android.intent.action.VIEW_DOWNLOADS;end";
@@ -5197,14 +5207,14 @@ function cvMoveFlow(el,st){
 async function cvCourse(el,B,st){
   B.innerHTML=`<div class="card cv-soon"><div class="cv-load"></div></div>`;
   const r=await CourseAPI.signed("lessons");if(!B.isConnected)return;
-  if(!r.ok){if(r.error==="other_device")return courseLoad(el);if(r.error==="use_app")return cvGetApp(B);if(r.error==="need_l1"||r.error==="use_android_app")return cvGetAndroidApp(B);B.innerHTML=`<div class="card cv-soon"><div class="cv-lock">⚠️</div><h2>${esc(cErr(r.error))}</h2><button class="btn" id="cvRetry">↻ <span>Try again</span></button></div>`;$("#cvRetry",B).onclick=()=>courseLoad(el);return}
+  if(!r.ok){if(r.error==="other_device")return courseLoad(el);if(r.error==="use_app")return cvGetApp(B);if(r.error==="need_l1"||r.error==="use_android_app")return cvGetAndroidApp(B);if(r.error==="ios_blocked")return cvNoIOS(B);B.innerHTML=`<div class="card cv-soon"><div class="cv-lock">⚠️</div><h2>${esc(cErr(r.error))}</h2><button class="btn" id="cvRetry">↻ <span>Try again</span></button></div>`;$("#cvRetry",B).onclick=()=>courseLoad(el);return}
   let subs=[];if(!st.admin){try{subs=await CourseAPI.subs.mine()}catch(e){}}if(!B.isConnected)return;
   const subOf=id=>subs.find(s=>s.lesson_id===id);
   const SUBTAG={pending:`<small class="cv-tag pend">📝 <span>Sent to your mentor</span></small>`,approved:`<small class="cv-tag ok">✅ <span>Approved</span></small>`,redo:`<small class="cv-tag warn">↩ <span>To redo</span></small>`};
   const L=(r.lessons||[]).sort((a,b)=>a.position-b.position),done=L.filter(l=>l.done).length,pc=L.length?Math.round(done/L.length*100):0,next=L.find(l=>!l.done&&!l.locked);
   const mods=[];L.forEach(l=>{const k=l.module||"";let g=mods.find(x=>x.k===k);if(!g)mods.push(g={k,ls:[]});g.ls.push(l)});let n=0;
   const p=st.pending;
-  B.innerHTML=`${st.admin&&cvNeedsApp()?`<div class="cv-note cv-adm">💻 ⛔ <span>PC browser: members are sent to Tradeversity Video Player for Windows.</span> <button type="button" class="btn sm" id="cvSeeMemberPc">👀 <span>See what members see</span></button></div>`:""}${st.admin&&cvAndroid()?`<div class="cv-note cv-adm">📱 ${cvInApp()?`✅ <span>Android app: secure screen on. Members watch the course here.</span>`:`⛔ <span>Android browser: members are sent to the Tradeversity Video Player app.</span> <button type="button" class="btn sm" id="cvSeeMember">👀 <span>See what members see</span></button>`}</div>`:""}${st.admin?`<div class="cv-note cv-adm">👑 <span>Admin preview: the device lock doesn't apply to you. Unpublished lessons are shown.</span></div>`:""}
+  B.innerHTML=`${st.admin&&cvIOS()?`<div class="cv-note cv-adm">🚫 <span>iPhone/iPad: members and visitors can't buy or watch the course here.</span> <button type="button" class="btn sm" id="cvSeeMemberIos">👀 <span>See what members see</span></button></div>`:""}${st.admin&&cvNeedsApp()?`<div class="cv-note cv-adm">💻 ⛔ <span>PC browser: members are sent to Tradeversity Video Player for Windows.</span> <button type="button" class="btn sm" id="cvSeeMemberPc">👀 <span>See what members see</span></button></div>`:""}${st.admin&&cvAndroid()?`<div class="cv-note cv-adm">📱 ${cvInApp()?`✅ <span>Android app: secure screen on. Members watch the course here.</span>`:`⛔ <span>Android browser: members are sent to the Tradeversity Video Player app.</span> <button type="button" class="btn sm" id="cvSeeMember">👀 <span>See what members see</span></button>`}</div>`:""}${st.admin?`<div class="cv-note cv-adm">👑 <span>Admin preview: the device lock doesn't apply to you. Unpublished lessons are shown.</span></div>`:""}
    <div class="cv-lic"><span>🛡 <span>Licensed to</span> <b data-notr>${esc(S.me.name||S.me.email||"")}</b></span>${st.admin?"":`<span>📱 <span>This device:</span> <b data-notr>${esc(st.label||CDev.label())}</b></span>`}</div>
    ${p&&!st.admin?`<div class="cv-note cv-pend"><span>⚠️ <span>A device change was requested for</span> <b data-notr>${esc(p.label||"")}</b> <span>on</span> <span data-notr>${esc(cDT(p.at))}</span>. <span>It replaces this device on</span> <b data-notr>${esc(cDT(p.readyAt))}</b>. <span>Not you? Cancel it now.</span></span><button class="btn sm danger" id="cvCancel">✖ <span>Cancel the change</span></button></div>`:""}
    ${L.length?`<div class="card cv-prog"><div class="row" style="justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b>Your progress</b> <span class="mut" data-notr>${done}/${L.length} · ${pc}%</span></div>${next?`<button class="btn pri sm" data-les="${next.id}">▶ <span>${done?"Continue":"Start the course"}</span></button>`:`<span class="ind-b">🏆 <span>Course completed</span></span>`}</div><div class="cv-bar"><i style="width:${pc}%"></i></div></div>
@@ -5213,6 +5223,7 @@ async function cvCourse(el,B,st){
    :`<div class="card cv-soon"><div class="cv-lock">🎬</div><h2>Content still unavailable</h2><p class="mut">The lessons are being prepared. They will appear here as soon as they are ready.</p></div>`}
    ${st.admin?"":`<div class="card cv-devcard"><h3>📱 <span>Your course device</span></h3>${cvDevBox(st.label,st.since?`<span>Activated</span> <span data-notr>${esc(cD(st.since))}</span>`:"")}
      <p class="mut" style="font-size:12.5px;margin:10px 0 0"><span>New phone or PC? Open the course on the new device and press "Move my course to this device". Changes left this year:</span> <b data-notr>${(st.resets||{}).left??2}</b></p></div>`}`;
+  const smi=$("#cvSeeMemberIos",B);if(smi)smi.onclick=()=>{cvNoIOS(B);window.scrollTo(0,0)};
   const smp=$("#cvSeeMemberPc",B);if(smp)smp.onclick=()=>{cvGetApp(B);window.scrollTo(0,0)};
   const sm=$("#cvSeeMember",B);if(sm)sm.onclick=()=>{cvGetAndroidApp(B);window.scrollTo(0,0)};
   const cc=$("#cvCancel",B);if(cc)cc.onclick=async()=>{cc.disabled=true;const x=await CourseAPI.signed("cancelPending");if(x.ok){toast(I18N.t("Device change cancelled"));courseLoad(el)}else{cc.disabled=false;toast(cErr(x.error))}};

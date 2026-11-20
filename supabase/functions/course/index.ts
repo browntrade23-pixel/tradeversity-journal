@@ -132,6 +132,10 @@ Deno.serve(async (req) => {
   if (["activate", "lessons", "play", "resetConfirm"].includes(action) && /Windows NT/.test(fullUa) && !/TradeversityApp\//.test(fullUa)) {
     await log(uid, action, false, "use_app"); return json({ ok: false, error: "use_app" });
   }
+  // iPhone / iPad: not available until the iPhone app + FairPlay exist (buy and watch on Android or PC)
+  if (["activate", "lessons", "play", "resetConfirm"].includes(action) && /iPhone|iPad|iPod/.test(fullUa)) {
+    await log(uid, action, false, "ios_blocked"); return json({ ok: false, error: "ios_blocked" });
+  }
   // Android: the course works only in the Tradeversity Video Player Android app (secure window: no screenshots or recordings on any phone)
   if (["activate", "lessons", "play", "resetConfirm"].includes(action) && /Android/i.test(fullUa) && !/TradeversityApp\//.test(fullUa)) {
     await log(uid, action, false, "use_android_app"); return json({ ok: false, error: "use_android_app" });
