@@ -63,6 +63,7 @@ nav.tabs button.admin{color:var(--gold)}
 nav.tabs button:hover .tico{transform:translateY(-1px)}
 nav.tabs button.on .tico .ico :is(rect,circle,path[d$="z"]):not([fill="currentColor"]){fill-opacity:.32}
 .t-journal{--c1:#f5b942;--c2:#b97a12}
+.t-trading{--c1:#f5b942;--c2:#b97a12}
 .t-stats{--c1:#34d17f;--c2:#13914c}
 .t-news{--c1:#ff6b5e;--c2:#d6382f}
 .t-plan{--c1:#5b9bff;--c2:#2b62d9}
@@ -915,6 +916,24 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 @keyframes swN{from{transform:translateX(48px);opacity:.3}to{transform:none;opacity:1}}
 @keyframes swP{from{transform:translateX(-48px);opacity:.3}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){#view.sw-n,#view.sw-p{animation:none}}
+/* ---- 📓 My trading: Journal · Statistics · Tomorrow's plan ---- */
+.hub{margin:0 0 16px;display:grid;gap:8px}
+.hub-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line,rgba(255,255,255,.08))}
+.hub-tabs button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:6px 8px;border:1px solid transparent;border-radius:10px;background:none;color:var(--muted);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.hub-tabs button:hover{color:var(--text,#f5f7fa);background:rgba(255,255,255,.04)}
+.hub-tabs button.on{color:var(--text,#f5f7fa);background:linear-gradient(180deg,rgba(245,185,66,.16),rgba(245,185,66,.06));border-color:rgba(245,185,66,.45);box-shadow:0 0 18px -8px rgba(245,185,66,.7)}
+.hub-n{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:10.5px;font-weight:800;background:rgba(255,255,255,.08);color:var(--muted);flex:none}
+.hub-tabs button.on .hub-n{background:var(--gold);color:#1b1305}
+.hub-tabs .tico{width:18px;height:18px}.hub-tabs .tico .ico{width:18px;height:18px}
+.hub-sh{display:none}
+.hub-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.hub-sum>*{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid var(--line,rgba(255,255,255,.07));text-align:start;font:inherit;color:inherit;min-width:0}
+.hub-sum button{cursor:pointer}.hub-sum button:hover{border-color:rgba(245,185,66,.45)}
+.hub-sum small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hub-sum b{font-size:15px;font-weight:800}.hub-todo{color:var(--gold)}
+@media(max-width:560px){.hub-lg{display:none}.hub-sh{display:inline}.hub-tabs button{flex-direction:column;gap:2px;font-size:12px;min-height:50px}.hub-n{display:none}.hub-sum{gap:6px}.hub-sum>*{padding:7px 9px}.hub-sum b{font-size:14px}}
+html[data-theme=light] .hub-tabs,html[data-theme=light] .hub-sum>*{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.08)}
+html[data-theme=light] .hub-tabs button.on{background:linear-gradient(180deg,rgba(245,185,66,.28),rgba(245,185,66,.12));color:#1b1305}
 .cal .c.cday{cursor:pointer;transition:transform .15s,box-shadow .2s,outline-color .2s;outline:1px solid transparent}
 .cal .c.cday:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 6px 18px -8px rgba(0,0,0,.6);outline-color:var(--gold);z-index:1;position:relative}
 .dp-hero{text-align:center;padding:20px 16px;border-radius:18px;margin-bottom:12px;border:1px solid var(--line2);background:var(--panel)}
@@ -2202,6 +2221,7 @@ S.ann=[];async function loadAnn(){try{if(!API||!API.announcements)return;S.ann=a
 /* ============ nav ============ */
 /* crisp line icons (24×24, drawn with the current text colour) */
 const ICON={
+  trading:'<rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7.5h8"/><path d="m7.5 16.5 3-3.5 2.5 2 3.5-4.5"/><circle cx="16.5" cy="10.5" r=".6" fill="currentColor"/>',
   today:'<path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5v10h12v-10"/><path d="M10 19.5v-5h4v5"/>',
   journal:'<path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v14.5H7.5A2.5 2.5 0 0 0 5 20z"/><path d="M5 20a1.5 1.5 0 0 0 1.5 1.5H19v-4"/><path d="M9 7.5h6M9 11h4"/>',
   stats:'<path d="M3.5 20.5h17"/><rect x="5" y="13" width="3.2" height="5" rx="1"/><rect x="10.4" y="10" width="3.2" height="8" rx="1"/><rect x="15.8" y="11.5" width="3.2" height="6.5" rx="1"/><path d="M4.5 9 9.5 5l4 3 6-4.5"/><path d="M16.5 3.5h3v3"/>',
@@ -2219,8 +2239,14 @@ const ICON={
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
   system:'<rect x="3" y="4" width="18" height="12.5" rx="2"/><path d="M8.5 20.5h7M12 16.5v4"/>'};
 const ico=(k,cls)=>`<svg class="ico ${cls||""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
-const VIEWS=[["today","Today"],["journal","Journal"],["stats","Statistics"],["news","News"],["plan","Tomorrow's plan"],["risk","Risk calculator"],["consistency","Consistency rule"],["propfirms","Prop firm tracker"],["indicator","Free ICT indicator"],["course","Mentorship course"],["about","About us"]];
-function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button data-v="${k}" class="${c||""} ${S.view===k?"on":""}"><span class="tico t-${k}">${ico(k)}</span><span>${l}</span></button>`;
+/* "My trading" = one menu tab holding 3 sub-tabs in the trading cycle: record (Journal) → review (Statistics) → prepare (Tomorrow's plan).
+   The sub-tabs keep their own views and links (#journal, #stats, #plan), so reminders, search and the tours still land on the right page. */
+const HUB=[["journal","Journal"],["stats","Statistics"],["plan","Tomorrow's plan"]],HUBK=HUB.map(x=>x[0]);
+const hubLastKey=()=>"tv_hub_"+((S.me&&S.me.id)||"x");
+function hubLast(){try{const v=localStorage.getItem(hubLastKey());return HUBK.includes(v)?v:"journal"}catch(e){return "journal"}}
+const navKey=v=>HUBK.includes(v)?"trading":v;
+const VIEWS=[["today","Today"],["trading","My trading"],["news","News"],["risk","Risk calculator"],["consistency","Consistency rule"],["propfirms","Prop firm tracker"],["indicator","Free ICT indicator"],["course","Mentorship course"],["about","About us"]];
+function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button data-v="${k}" class="${c||""} ${navKey(S.view)===k?"on":""}"><span class="tico t-${k}">${ico(k)}</span><span>${l}</span></button>`;
   if(S.me.role==="admin")h+=tab("admin","Admin dashboard","admin");
   if(S.readonly)h+=tab("student","Student file","admin");
   /* every section side by side; the ‹ › arrows on the edges of the bar scroll it when it doesn't fit */
@@ -2238,11 +2264,11 @@ function tabsArrows(){const t=$("#tabs"),L=$("#tabsL"),R=$("#tabsR"),w=$("#tabsW
     t.addEventListener("wheel",e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)&&t.scrollWidth>t.clientWidth){e.preventDefault();t.scrollBy({left:e.deltaY,behavior:"smooth"})}},{passive:false})}
   upd();setTimeout(upd,300)}
 /* phones: app-style bottom bar with the 5 main tabs + "More" */
-const BNAV_MAIN=[["today","Today"],["journal","Journal"],["stats","Stats"],["news","News"],["plan","Plan"]];
+const BNAV_MAIN=[["today","Today"],["trading","My trading"],["news","News"],["course","Course"]];
 function renderBottomNav(){let b=$("#bnav");if(!b){b=document.createElement("nav");b.id="bnav";b.setAttribute("aria-label","Main");$("#app").appendChild(b)}
   const all=[...$$("#tabs button[data-v]:not(.tool-tab)"),...$$("#toolsMenu button[data-v]")].map(x=>[x.dataset.v,x.querySelector("span:last-child").textContent]);const mainKeys=BNAV_MAIN.map(m=>m[0]);
   const more=all.filter(([k])=>!mainKeys.includes(k)),inMore=more.some(([k])=>k===S.view);
-  b.innerHTML=BNAV_MAIN.map(([k,l])=>`<button type="button" data-v="${k}" class="${S.view===k?"on":""}"><span class="bn-ic t-${k}">${ico(k)}</span><span class="bn-l">${l}</span></button>`).join("")+
+  b.innerHTML=BNAV_MAIN.map(([k,l])=>`<button type="button" data-v="${k}" class="${navKey(S.view)===k?"on":""}"><span class="bn-ic t-${k}">${ico(k)}</span><span class="bn-l">${l}</span></button>`).join("")+
     `<button type="button" id="bnMore" class="${inMore?"on":""}"><span class="bn-ic"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span><span class="bn-l">More</span></button>
     <div class="bn-sheet hidden" id="bnSheet">${more.map(([k,l])=>`<button type="button" data-v="${k}" class="${S.view===k?"on":""}"><span class="bn-ic t-${k}">${ico(k)}</span><span>${l}</span></button>`).join("")}</div>`;
   $$("button[data-v]",b).forEach(x=>x.onclick=()=>{$("#bnSheet").classList.add("hidden");go(x.dataset.v)});
@@ -2257,11 +2283,13 @@ document.addEventListener("click",e=>{const s=$("#bnSheet");if(s&&!s.classList.c
   document.addEventListener("touchend",e=>{if(!ok)return;ok=false;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
     if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*1.8||Date.now()-st>800)return;
     if(window.getSelection&&String(window.getSelection()).length)return;
-    const order=[...$$("#tabs button[data-v]:not(.tool-tab)"),...$$("#toolsMenu button[data-v]")].map(b=>b.dataset.v),i=order.indexOf(S.view);if(i<0)return;
+    /* inside "My trading" the swipe moves between Journal / Statistics / Tomorrow's plan first, then to the next menu tab */
+    const order=[...$$("#tabs button[data-v]:not(.tool-tab)"),...$$("#toolsMenu button[data-v]")].map(b=>b.dataset.v).flatMap(k=>k==="trading"?HUBK:[k]),i=order.indexOf(S.view);if(i<0)return;
     const rtl=document.documentElement.dir==="rtl",step=(dx<0)!==rtl?1:-1,n=order[i+step];if(!n)return;
     go(n);const v=$("#view");v.classList.remove("sw-n","sw-p");void v.offsetWidth;v.classList.add(step>0?"sw-n":"sw-p")},{passive:true});
 })();
-function go(v){if(PLAYER)v="course";if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student","profile"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";if(v==="today"&&S.readonly)v="journal";
+function go(v){if(PLAYER)v="course";if(v==="import")v="stats";if(v==="trading")v=hubLast();if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),...HUBK,"admin","student","profile"].includes(v))v=S.me.role==="admin"?"admin":"journal";
+  if(HUBK.includes(v)){try{localStorage.setItem(hubLastKey(),v)}catch(e){}}if(v==="admin"&&S.me.role!=="admin")v="journal";if(v==="today"&&S.readonly)v="journal";
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
   S.view=v;S.page=null;S.dayPage=null;S._fromDay=null;S._pfId=null;S._planCopy=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
@@ -2362,11 +2390,24 @@ function render(){setTimeout(galaxyBg,0);
   document.documentElement.classList.toggle("foot-full",["today","propfirms","about"].includes(S.view));const _tr=document.getElementById("pfTray");if(_tr&&S.view!=="propfirms")_tr.className="";document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
   const fn={profile:vProfile,today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,course:vCourse,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
+  if(HUBK.includes(S.view)&&!S.page&&!S.dayPage)h+=hubBar();
   v.innerHTML=h+'<div id="vb"></div>';Promise.resolve(fn($("#vb"))).then(()=>bindNotify(v)).catch(()=>{});
   if(S.readonly)$("#backAdmin").onclick=()=>go("admin");
   /* phones: floating + to log a trade from any student page */
   let fab=$("#fab");if(!fab){fab=document.createElement("button");fab.id="fab";fab.type="button";fab.setAttribute("aria-label","Log a trade");fab.innerHTML="＋";fab.onclick=()=>editTrade(null);document.body.appendChild(fab)}
   fab.classList.toggle("hidden",!S.me||S.readonly||S.view==="admin"||S.view==="course"||$("#app").classList.contains("hidden"));}
+
+/* "My trading" header: the 3 sub-tabs in trading order + a small summary (today's P&L, 30-day win rate, next session planned?) */
+function hubBar(){const ts=S.trades||[],today=todayStr(),tt=ts.filter(t=>t.date===today),pnl=tt.reduce((a,t)=>a+tradeNet(t),0);
+  const d=new Date();d.setDate(d.getDate()-29);const from=ymd(d),r=ts.filter(t=>t.date>=from),w=r.filter(t=>resultOf(t)==="Win").length,l=r.filter(t=>resultOf(t)==="Loss").length,wr=w+l?Math.round(w/(w+l)*100):null;
+  let planned=false;try{const nd=nextTradingDay();planned=(S.plans||[]).some(p=>p.date===nd)}catch(e){}
+  const SHORT={journal:"Journal",stats:"Stats",plan:"Plan"};
+  return `<div class="hub"><div class="hub-tabs" role="tablist" aria-label="My trading">${HUB.map(([k,l],i)=>`<button type="button" role="tab" data-hub="${k}" aria-selected="${S.view===k}" class="${S.view===k?"on":""}"><span class="hub-n" data-notr>${i+1}</span><span class="tico t-${k}">${ico(k)}</span><span class="hub-l"><span class="hub-lg">${l}</span><span class="hub-sh">${SHORT[k]}</span></span></button>`).join("")}</div>
+    <div class="hub-sum"><div><small>Today</small><b class="mono ${pnl>0?"pos":pnl<0?"neg":""}" data-notr>${tt.length?money(pnl,0):"—"}</b></div>
+     <div><small><span class="hub-lg">Win rate · 30 days</span><span class="hub-sh">Win rate</span></small><b class="mono" data-notr>${wr==null?"—":wr+"%"}</b></div>
+     <button type="button" data-hub="plan"><small><span class="hub-lg">Tomorrow's plan</span><span class="hub-sh">Plan</span></small><b class="${planned?"pos":"hub-todo"}">${planned?"✓ <span>Ready</span>":"<span>To do</span>"}</b></button></div></div>`}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-hub]");if(!b||!S.me)return;const k=b.dataset.hub;if(k===S.view)return;
+  const step=HUBK.indexOf(k)>HUBK.indexOf(S.view)?1:-1;go(k);const v=$("#view");v.classList.remove("sw-n","sw-p");void v.offsetWidth;v.classList.add(step>0?"sw-n":"sw-p")});
 
 /* ============ filters ============ */
 function accounts(){return [...new Set(S.trades.map(t=>t.account).filter(Boolean))].sort()}
@@ -3445,7 +3486,7 @@ function cmdItems(q){const out=[],t=q.trim().toLowerCase(),has=s=>!t||s.toLowerC
     ["🧭","Write today's plan",()=>{S._planDate=todayStr();go("plan")}],["🚫","No trades today",()=>{S._ntdDate=todayStr();go("journal")}],["🎯","Focus mode",()=>{try{localStorage.setItem("tv_focus","1")}catch(e){}go("today")}],
     ["📥","Import a CSV",()=>go("stats")],["📲","Install app",()=>{const b=$("#instBtn");if(b)b.click()}],["❓","Platform tour",()=>startTour()]];
   A.forEach(([ic,l,run])=>{if(has(l))out.push({ic,l:I18N.t(l),run})});
-  VIEWS.forEach(([k,l])=>{if(has(l))out.push({ic:"↗",l:I18N.t(l),run:()=>go(k)})});
+  [...VIEWS,...HUB].forEach(([k,l])=>{if(has(l))out.push({ic:"↗",l:I18N.t(l),run:()=>go(k)})});
   if(t.length>=2){const L=(typeof PFLIST==="function"?PFLIST():[]).filter(f=>f.name.toLowerCase().includes(t.replace(/\s*(rules?|règles?)\s*$/,"")));
     L.slice(0,6).forEach(f=>out.push({ic:"🏦",l:`${f.name} · ${I18N.t("rules")}`,run:()=>{S._pfId=f.id;go("propfirms");window.scrollTo(0,0)}}))}
   return out.slice(0,12)}
@@ -3475,7 +3516,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-20p";
+const APP_VER="2026-11-20q";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3512,9 +3553,7 @@ function tourSteps(){const ph=innerWidth<821,nav=k=>ph?`#bnav [data-v="${k}"]`:`
   return [[null,"👋","Welcome to TRADEVERSITY","A 30-second tour of your trading platform. You can skip it anytime."],
     [nav("today"),"🏠","Today: your home","Your discipline score, streaks, today's plan, your limits and the red news. Start every session here."],
     [ph?"#fab":'[data-td="trade"]',"＋","Log a trade","Tap here after each trade. ⚡ Quick log takes a few taps; add screenshots and notes later."],
-    [nav("journal"),"📓","Journal","Every trade with your notes, emotions and screenshots. Search, filter, edit anytime."],
-    [nav("stats"),"📊","Statistics","Win rate, profit factor, calendar, what makes you money and what costs you money. Import CSV files here."],
-    [nav("plan"),"🧭","Plan tomorrow","Bias, key levels, max loss and max trades. A trader without a plan is a gambler."],
+    [nav("trading"),"📓","My trading","Your trading routine in one place. Journal: every trade with notes, emotions and screenshots. Statistics: win rate, calendar, CSV import. Tomorrow's plan: bias, key levels, max loss."],
     [nav("news"),"📰","Red news","Countdown, no-trade windows and what each news means."],
     [ph?"#bnMore":nav("risk"),"🧰","Tools","Risk calculator, consistency rule, prop firm tracker with discounts, and our free ICT indicator."],
     ["#ntfBell","🔔","Notifications","Red news, journal and plan reminders, and announcements from Brown Algo."],

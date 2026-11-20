@@ -357,6 +357,8 @@ const T={
 "Trading mentorship course":["Formation de mentorat en trading","دورة الإرشاد في التداول"],
 "The Tradeversity mentorship, step by step, by Brown Algo and ZN Trading.":["Le mentorat Tradeversity, étape par étape, par Brown Algo et ZN Trading.","إرشاد Tradeversity خطوة بخطوة، من Brown Algo و ZN Trading."],
 "Content still unavailable":["Contenu pas encore disponible","المحتوى غير متاح بعد"],
+"My trading":["Mon trading","تداولي"],"Course":["Formation","الدورة"],"Win rate · 30 days":["Taux de réussite · 30 jours","نسبة الربح · 30 يوماً"],"To do":["À faire","لم تُنجز"],"Ready":["Prête","جاهزة"],
+"Your trading routine in one place. Journal: every trade with notes, emotions and screenshots. Statistics: win rate, calendar, CSV import. Tomorrow's plan: bias, key levels, max loss.":["Votre routine de trading au même endroit. Journal : chaque trade avec notes, émotions et captures. Statistiques : taux de réussite, calendrier, import CSV. Plan de demain : biais, niveaux clés, perte max.","روتين تداولك في مكان واحد. اليومية: كل صفقة مع الملاحظات والمشاعر والصور. الإحصائيات: نسبة النجاح، التقويم، استيراد CSV. خطة الغد: الاتجاه، المستويات المهمة، أقصى خسارة."],
 "Watch: what is Cerebra by TDV?":["Regardez : c'est quoi Cerebra by TDV ?","شاهد: ما هو Cerebra by TDV؟"],
 "45 seconds · the secure player of the course":["45 secondes · le lecteur sécurisé de la formation","45 ثانية · المشغّل الآمن للدورة"],
 "The lessons are being prepared. They will appear here as soon as they are ready.":["Les leçons sont en préparation. Elles apparaîtront ici dès qu'elles seront prêtes.","الدروس قيد التحضير. ستظهر هنا فور جاهزيتها."],
