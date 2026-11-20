@@ -71,6 +71,9 @@ nav.tabs button.on .tico .ico :is(rect,circle,path[d$="z"]):not([fill="currentCo
 .t-consistency{--c1:#2fd3c8;--c2:#0d8a85}
 .t-course{--c1:#e6c27a;--c2:#a77a24}
 .t-about{--c1:#b9c4d6;--c2:#5d6b84}
+/* Tradeversity Video Player: course only (no menus, other sections, search, bell, profile, tour, footer) */
+html.player :is(#tabsWrap,#bnav,#fab,.appfoot,#cmdBtn,#ntfBell,#meBtn,#instBtn,#dpTour,#visitBar,#cvJr){display:none!important}
+html.player .dp-row:has(#bgSeg){display:none!important}
 /* course page: protected content */
 .cv-guard{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;position:relative;overflow:hidden}
 .cv-guard :is(img,video){pointer-events:none;-webkit-user-drag:none}
@@ -2048,6 +2051,9 @@ const Cloud={
 let API=Cloud;
 
 /* ============ state ============ */
+/* Tradeversity Video Player (Windows / Android apps): after login only the Mentorship course is shown, nothing else */
+const PLAYER=/TradeversityApp\//.test(navigator.userAgent)||(/[?&]demo=1/.test(location.search)&&/[?&]cvapp=1/.test(location.search));
+document.documentElement.classList.toggle("player",PLAYER);
 const S={me:null,subject:null,trades:[],plans:[],view:"journal",page:null,acct:"all",range:"all",calMonth:null,readonly:false};
 
 /* ============ auth UI ============ */
@@ -2159,7 +2165,8 @@ async function enter(u){
   if(needsTg(u)){S.me=null;showTg(u);return}
   S.me=u;$("#auth").classList.add("hidden");$("#app").classList.remove("hidden");
   $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${isVerified(u)?" "+vCheck():""}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;meBtnDraw();
-  if(u.role==="admin"){S.view="admin";await loadSubject(u,false);go("admin")}
+  if(PLAYER){await loadSubject(u,false);go("course")}
+  else if(u.role==="admin"){S.view="admin";await loadSubject(u,false);go("admin")}
   else{await loadSubject(u,false);go(location.hash.slice(1)||"today");setTimeout(maybeTour,1500)}
   S._commR=null;settingsPull();rqReadyLoad();
 }
@@ -2233,7 +2240,7 @@ document.addEventListener("click",e=>{const s=$("#bnSheet");if(s&&!s.classList.c
     const rtl=document.documentElement.dir==="rtl",step=(dx<0)!==rtl?1:-1,n=order[i+step];if(!n)return;
     go(n);const v=$("#view");v.classList.remove("sw-n","sw-p");void v.offsetWidth;v.classList.add(step>0?"sw-n":"sw-p")},{passive:true});
 })();
-function go(v){if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student","profile"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";if(v==="today"&&S.readonly)v="journal";
+function go(v){if(PLAYER)v="course";if(v==="import")v="stats";if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),"admin","student","profile"].includes(v))v=S.me.role==="admin"?"admin":"journal";if(v==="admin"&&S.me.role!=="admin")v="journal";if(v==="today"&&S.readonly)v="journal";
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
   S.view=v;S.page=null;S.dayPage=null;S._fromDay=null;S._pfId=null;S._planCopy=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
@@ -3447,7 +3454,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-20j";
+const APP_VER="2026-11-20k";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4977,7 +4984,7 @@ const CDev={_db:null,_mem:null,
   label(){const u=navigator.userAgent;
     const os=/iPhone/.test(u)?"iPhone":(/iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1))?"iPad":/Android/.test(u)?"Android":/Windows/.test(u)?"Windows PC":/Mac OS X/.test(u)?"Mac":/CrOS/.test(u)?"Chromebook":/Linux/.test(u)?"Linux PC":"Device";
     const br=/Edg\//.test(u)?"Edge":/OPR\/|Opera/.test(u)?"Opera":/SamsungBrowser/.test(u)?"Samsung Internet":/Firefox|FxiOS/.test(u)?"Firefox":/CriOS|Chrome/.test(u)?"Chrome":/Safari/.test(u)?"Safari":"Browser";
-    return os+" · "+br}};
+    return os+" · "+(/TradeversityApp\//.test(u)?"Tradeversity Video Player":br)}};
 const CourseAPI={_ts:0,
   async call(action,body={}){if(S._demo)return CourseDemo.call(action,body);
     try{const{data}=await Cloud.sb.auth.getSession();const tok=data&&data.session&&data.session.access_token;
