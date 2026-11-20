@@ -1613,6 +1613,14 @@ img.cover{cursor:zoom-in}
 .rk-chk{margin-top:8px;padding:10px 12px;border-radius:12px;font-size:13.5px;border:1px solid var(--line)}
 .rk-chk.ok{border-color:rgba(38,166,154,.5);background:rgba(38,166,154,.08)}.rk-chk.warn{border-color:rgba(245,185,66,.5);background:rgba(245,185,66,.08)}.rk-chk.bad{border-color:rgba(239,83,80,.55);background:rgba(239,83,80,.1)}
 @media(max-width:620px){.nw-strip{gap:4px}.nw-d b{font-size:15px}}
+#newsTabs{display:flex;max-width:100%;overflow-x:auto;scrollbar-width:none}#newsTabs::-webkit-scrollbar{display:none}#newsTabs button{white-space:nowrap;flex:1 0 auto}
+@media(max-width:560px){#newsTabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:100%;overflow:visible}#newsTabs button{white-space:normal;padding:7px 2px;font-size:11.5px;line-height:1.15;text-align:center}}
+.nwk-range{display:flex;align-items:center;gap:6px;margin:8px 0 10px;font-size:14px}
+.nwk-strip .nw-d{cursor:default}.nwk-strip .nw-d.hol{border-color:color-mix(in srgb,var(--gold) 45%,transparent)}
+.nwk-wait{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;margin:4px 0 10px;border-radius:12px;border:1px solid color-mix(in srgb,var(--gold) 35%,transparent);background:color-mix(in srgb,var(--gold) 7%,transparent);font-size:13px;line-height:1.5}
+.nwk-wait>span>span{color:var(--muted)}
+.nwk-sub{margin:14px 0 6px;font-size:13px}
+.nwk-cal{min-height:300px;border-radius:12px;overflow:hidden}
 </style>
 <style>
 /* prop firms: favourites, compare, quiz · indicator steps · about story + FAQ */
@@ -2614,13 +2622,34 @@ function nextEventHTML(){if(!S.newsLoaded)return `<span class="mut">Loading news
   if(!n)return `<span class="mut">No upcoming red or orange USD news this week.</span>`;const ms=new Date(n.starts_at).getTime()-now;
   return `<span class="ne-l">⏱ Next event</span> <i class="fold ${n.impact==="High"?"red":"org"}"></i> <b class="ne-t" data-notr data-ni="${S.news.indexOf(n)}">${esc(n.title)}</b> ${cdSpan(n,"ne-in")} <span class="mut mono" data-notr>${tzTime(n.starts_at,NY)} NY / ${tzTime(n.starts_at,DZ)} DZ · ${esc(fmtDate(tzDate(n.starts_at,NY)))}</span>`}
 function newsRows(list){const now=new Date().toISOString();return list.map(n=>`<div class="nrow click ${n.starts_at<now?"past":""}" data-ni="${S.news.indexOf(n)}"><i class="fold ${n.impact==="High"?"red":"org"}"></i><span class="mono nt" data-notr>${tzTime(n.starts_at,NY)}</span><span class="tzl">NY</span><span class="mono nt" data-notr>${tzTime(n.starts_at,DZ)}</span><span class="tzl">DZ</span><b class="ntitle" data-notr>${esc(n.title)}</b>${n.forecast||n.previous?`<span class="mut nfp" data-notr>F ${esc(n.forecast||"—")} · P ${esc(n.previous||"—")}</span>`:""}${cdSpan(n,"col")}<span class="nmore" aria-hidden="true">›</span></div>`).join("")}
+/* short weekday name in the site language (Mon / lun. / الاثنين) */
+function wdShort(d){try{return new Date(d+"T12:00:00").toLocaleDateString((window.I18N&&I18N.locale())||"en-US",{weekday:"short"})}catch(e){return d}}
+/* next week (Mon-Fri after this one; on the weekend: the coming Mon-Fri) */
+function nextWeekDays(){const t=todayStr(),[y,m,dd]=t.split("-").map(Number),mon=new Date(y,m-1,dd);mon.setDate(mon.getDate()-((mon.getDay()+6)%7)+7);
+  return [0,1,2,3,4].map(i=>{const x=new Date(mon);x.setDate(mon.getDate()+i);return ymd(x)})}
+/* Forex Factory's free feed only carries the current week (Sunday to Saturday): next week's events arrive on Sunday.
+   Until then: the known US holidays + a TradingView US calendar preview (high and medium importance). */
+function newsNextWeekBody(){const days=nextWeekDays(),any=days.some(d=>newsFor(d).length);
+  const strip=`<div class="nw-strip nwk-strip">${days.map(d=>{const ev=newsFor(d),r=ev.filter(n=>n.impact==="High").length,o=ev.length-r,h=holidaysFor(d);
+    return `<div class="nw-d ${r?"red":""} ${h.some(x=>x.kind==="closed")?"hol":""}"><small data-notr>${esc(wdShort(d))}</small><b data-notr>${d.slice(8)}</b><span>${r?`<i class="fold red"></i><span data-notr>${r}</span>`:""}${o?` <i class="fold org"></i><span data-notr>${o}</span>`:""}${!r&&!o?(h.length?"🏦":"<span class='mut'>—</span>"):""}</span></div>`}).join("")}</div>`;
+  const head=`<div class="nwk-range">📅 <b data-notr>${esc(fmtDate(days[0]))} → ${esc(fmtDate(days[4]))}</b></div>`;
+  const list=days.map(d=>{const ev=newsFor(d),ho=holidaysFor(d);return ev.length||ho.length?`<div class="nday"><span data-notr>${esc(fmtDate(d))}</span></div>${holRows(ho)}${newsRows(ev)}`:""}).join("");
+  if(any)return head+strip+list+(days.some(d=>newsFor(d).some(n=>n.impact==="High"))?`<div class="nb-w">⚠️ Red folder: expect volatility.</div>`:"");
+  return head+strip+`<div class="nwk-wait">⏳ <span><b>Forex Factory publishes next week's USD calendar on Sunday.</b> <span>It appears here automatically.</span></span></div>`+
+    (list?`<div class="nwk-sub">🏦 <b>Already known</b></div>`+list:"")+
+    `<div class="nwk-sub">📆 <b>Preview: US economic calendar</b> <span class="mut">· TradingView</span></div><div id="nwkCal" class="tradingview-widget-container nwk-cal"></div>`}
+function mountNextCal(){const box=$("#nwkCal");if(!box||box.dataset.on)return;box.dataset.on="1";
+  const loc={en:"en",fr:"fr",ar:"ar_AE"}[(window.I18N&&I18N.lang)||"en"]||"en",light=document.documentElement.getAttribute("data-theme")==="light";
+  box.innerHTML='<div class="tradingview-widget-container__widget"></div>';const s=document.createElement("script");s.src="https://s3.tradingview.com/external-embedding/embed-widget-events.js";s.async=true;
+  s.textContent=JSON.stringify({colorTheme:light?"light":"dark",isTransparent:true,width:"100%",height:innerWidth<821?480:560,locale:loc,importanceFilter:"0,1",countryFilter:"us"});box.appendChild(s)}
 function newsPanelBody(tab){if(!S.newsLoaded)return `<div class="mut nb-e">Loading news…</div>`;
+  if(tab==="next")return newsNextWeekBody();
   if(tab==="week"){const days=weekDays();const html=days.map(d=>{const ev=newsFor(d),ho=holidaysFor(d);return ev.length||ho.length?`<div class="nday ${d===todayStr()?"today":""}"><span data-notr>${esc(fmtDate(d))}</span>${d===todayStr()?` <span class="tag">Today</span>`:""}</div>${holRows(ho)}${newsRows(ev)}`:""}).join("");
     return html||`<div class="mut nb-e">No red or orange USD news this week.</div>`}
   const d=tab==="yday"?prevTradingDay():tab==="tmrw"?nextTradingDay():todayStr();const ev=newsFor(d),ho=holidaysFor(d);
   return `<div class="nday"><span data-notr>${esc(fmtDate(d))}</span></div>`+holRows(ho)+(ev.length?newsRows(ev):ho.length?"":d>newsWeekEnd()?`<div class="mut nb-e"><span>Next week's calendar isn't published yet.</span> <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">Forex Factory</a></div>`:`<div class="mut nb-e">No red or orange USD news this day.</div>`)+
     (ev.some(n=>n.impact==="High")?`<div class="nb-w">⚠️ Red folder: expect volatility.</div>`:"")}
-function newsPanel(){const tab=S._newsTab||"today";const tabs=[["yday","Yesterday"],["today","Today"],["tmrw","Tomorrow"],["week","This week"]];
+function newsPanel(){const tab=S._newsTab||"today";const tabs=[["yday","Yesterday"],["today","Today"],["tmrw","Tomorrow"],["week","This week"],["next","Next week"]];
   return `<div class="card newspanel" id="newsPanel" style="margin-bottom:14px">
     <div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0">📰 USD news <span class="mut" style="text-transform:none;letter-spacing:0;font-weight:500">· Forex Factory</span></h3>
       <span class="nb-lg"><i class="fold red"></i><span>Red folder</span><i class="fold org"></i><span>Orange folder</span></span></div>
@@ -2628,14 +2657,14 @@ function newsPanel(){const tab=S._newsTab||"today";const tabs=[["yday","Yesterda
     <div class="ni-hint">👆 <span>Tap any event to see what it means and how it usually moves the market.</span></div>
     <div class="seg" id="newsTabs" style="margin:10px 0 6px">${tabs.map(([k,l])=>`<button data-t="${k}" class="${tab===k?"on":""}">${l}</button>`).join("")}</div>
     <div id="newsBody">${newsPanelBody(tab)}</div></div>`}
-function bindNewsPanel(){$$("#newsTabs button").forEach(b=>b.onclick=()=>{S._newsTab=b.dataset.t;$$("#newsTabs button").forEach(x=>x.classList.toggle("on",x===b));$("#newsBody").innerHTML=newsPanelBody(S._newsTab)})}
-function refreshNewsPanel(){const ne=$("#nextEv");if(ne)ne.innerHTML=nextEventHTML();const nb=$("#newsBody");if(nb)nb.innerHTML=newsPanelBody(S._newsTab||"today")}
+function bindNewsPanel(){$$("#newsTabs button").forEach(b=>b.onclick=()=>{S._newsTab=b.dataset.t;$$("#newsTabs button").forEach(x=>x.classList.toggle("on",x===b));$("#newsBody").innerHTML=newsPanelBody(S._newsTab);mountNextCal()});mountNextCal()}
+function refreshNewsPanel(){const ne=$("#nextEv");if(ne)ne.innerHTML=nextEventHTML();const nb=$("#newsBody");if(nb){nb.innerHTML=newsPanelBody(S._newsTab||"today");mountNextCal()}}
 setInterval(()=>{const ne=$("#nextEv");if(ne&&!document.hidden)ne.innerHTML=nextEventHTML();const nt=$("#newsTop");if(nt&&!document.hidden){nt.innerHTML=noTradeWindowsHTML()+newsWeekHTML();bindNewsTop($("#view"))}},30000);
 /* this week at a glance (Mon-Fri) + today's no-trade windows (5 minutes before / after each red news) */
 function newsWeekHTML(){if(!S.newsLoaded)return "";const t=todayStr(),[y,m,dd]=t.split("-").map(Number),mon=new Date(y,m-1,dd);mon.setDate(mon.getDate()-((mon.getDay()+6)%7));
   const days=[];for(let i=0;i<5;i++){const x=new Date(mon);x.setDate(mon.getDate()+i);days.push(ymd(x))}
   return `<div class="nw-strip">${days.map(d=>{const ev=newsFor(d),r=ev.filter(n=>n.impact==="High").length,o=ev.length-r,h=holidaysFor(d).length;
-    return `<button type="button" class="nw-d ${d===t?"now":""} ${r?"red":""}" data-nwd="${d}"><small data-notr>${esc(fmtDate(d).split(",")[0])}</small><b data-notr>${d.slice(8)}</b><span>${r?`<i class="fold red"></i><span data-notr>${r}</span>`:""}${o?` <i class="fold org"></i><span data-notr>${o}</span>`:""}${!r&&!o?(h?"🏦":"<span class='mut'>—</span>"):""}</span></button>`}).join("")}</div>`}
+    return `<button type="button" class="nw-d ${d===t?"now":""} ${r?"red":""}" data-nwd="${d}"><small data-notr>${esc(wdShort(d))}</small><b data-notr>${d.slice(8)}</b><span>${r?`<i class="fold red"></i><span data-notr>${r}</span>`:""}${o?` <i class="fold org"></i><span data-notr>${o}</span>`:""}${!r&&!o?(h?"🏦":"<span class='mut'>—</span>"):""}</span></button>`}).join("")}</div>`}
 function noTradeWindowsHTML(){if(!S.newsLoaded)return "";const now=Date.now(),reds=newsFor(todayStr()).filter(n=>n.impact==="High");
   if(!reds.length)return `<div class="ntw ok">✅ <b>No red news today.</b> <span>Normal trading conditions (still follow your plan).</span></div>`;
   const W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,a:t-5*60000,b:t+5*60000}}),inW=W.find(w=>now>=w.a&&now<=w.b),next=W.find(w=>w.a>now);
@@ -3575,7 +3604,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-20r";
+const APP_VER="2026-11-20s";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
