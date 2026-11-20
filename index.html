@@ -71,7 +71,7 @@ nav.tabs button.on .tico .ico :is(rect,circle,path[d$="z"]):not([fill="currentCo
 .t-consistency{--c1:#2fd3c8;--c2:#0d8a85}
 .t-course{--c1:#e6c27a;--c2:#a77a24}
 .t-about{--c1:#b9c4d6;--c2:#5d6b84}
-/* Oracle by TDV: course only (no menus, other sections, search, bell, profile, tour, footer) */
+/* Cerebra by TDV: course only (no menus, other sections, search, bell, profile, tour, footer) */
 html.player :is(#tabsWrap,#bnav,#fab,.appfoot,#cmdBtn,#ntfBell,#meBtn,#instBtn,#dpTour,#visitBar,#cvJr){display:none!important}
 html.player .dp-row:has(#bgSeg){display:none!important}
 /* course page: protected content */
@@ -2051,7 +2051,7 @@ const Cloud={
 let API=Cloud;
 
 /* ============ state ============ */
-/* Oracle by TDV (Windows / Android apps): after login only the Mentorship course is shown, nothing else */
+/* Cerebra by TDV (Windows / Android apps): after login only the Mentorship course is shown, nothing else */
 const PLAYER=/TradeversityApp\//.test(navigator.userAgent)||(/[?&]demo=1/.test(location.search)&&/[?&]cvapp=1/.test(location.search));
 document.documentElement.classList.toggle("player",PLAYER);
 const S={me:null,subject:null,trades:[],plans:[],view:"journal",page:null,acct:"all",range:"all",calMonth:null,readonly:false};
@@ -3454,7 +3454,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-20l";
+const APP_VER="2026-11-20m";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4984,7 +4984,7 @@ const CDev={_db:null,_mem:null,
   label(){const u=navigator.userAgent;
     const os=/iPhone/.test(u)?"iPhone":(/iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1))?"iPad":/Android/.test(u)?"Android":/Windows/.test(u)?"Windows PC":/Mac OS X/.test(u)?"Mac":/CrOS/.test(u)?"Chromebook":/Linux/.test(u)?"Linux PC":"Device";
     const br=/Edg\//.test(u)?"Edge":/OPR\/|Opera/.test(u)?"Opera":/SamsungBrowser/.test(u)?"Samsung Internet":/Firefox|FxiOS/.test(u)?"Firefox":/CriOS|Chrome/.test(u)?"Chrome":/Safari/.test(u)?"Safari":"Browser";
-    return os+" · "+(/TradeversityApp\//.test(u)?"Oracle by TDV":br)}};
+    return os+" · "+(/TradeversityApp\//.test(u)?"Cerebra by TDV":br)}};
 const CourseAPI={_ts:0,
   async call(action,body={}){if(S._demo)return CourseDemo.call(action,body);
     try{const{data}=await Cloud.sb.auth.getSession();const tok=data&&data.session&&data.session.access_token;
@@ -5054,7 +5054,7 @@ const CERR={other_device:"This course is locked to another device.",bad_time:"Yo
   wait_minute:"A code was just sent. Wait a minute before asking for a new one.",code_expired:"The code expired. Ask for a new one.",too_many_tries:"Too many wrong codes. Ask for a new one.",
   wrong_code:"Wrong code. Check the message on Telegram.",already_pending:"A device change is already waiting.",already_active:"The course is already activated on a device.",
   video_not_ready:"This video isn't ready yet.",video_not_configured:"Videos aren't switched on yet.",video_error:"The video couldn't load. Try again in a moment.",
-  no_lesson:"This lesson isn't available.",locked:"This lesson isn't open yet.",use_app:"On PC, open the course in Oracle by TDV.",use_android_app:"On Android, open the course in the Oracle by TDV app.",ios_blocked:"The course isn't available on iPhone yet. Use an Android phone or a PC.",need_l1:"Your phone is not supported. Please watch the course on a PC with Oracle by TDV.",not_logged_in:"Please log in again.",must_accept:"Please accept the device rule first.",
+  no_lesson:"This lesson isn't available.",locked:"This lesson isn't open yet.",use_app:"On PC, open the course in Cerebra by TDV.",use_android_app:"On Android, open the course in the Cerebra by TDV app.",ios_blocked:"The course isn't available on iPhone yet. Use an Android phone or a PC.",need_l1:"Your phone is not supported. Please watch the course on a PC with Cerebra by TDV.",not_logged_in:"Please log in again.",must_accept:"Please accept the device rule first.",
   network:"No connection. Check your internet and try again.",server:"The course server isn't reachable. Try again in a moment.",bad_key:"This browser can't hold a secure course key."};
 const cErr=e=>I18N.t(CERR[e]||"Something went wrong. Try again.");
 const cDT=d=>d?new Date(d).toLocaleString(I18N.locale(),{dateStyle:"medium",timeStyle:"short"}):"";
@@ -5063,7 +5063,7 @@ function courseMark(){const m=S.me||{},who=[m.name,m.email].filter(Boolean).join
 const C_RULES=`<ul class="cv-rules">
    <li><span class="cv-ri">📱</span><span><b>One device.</b> <span>The course opens only on the device you activate. Another phone, PC or browser can't open it, even with your account and password.</span></span></li>
    <li><span class="cv-ri">🛡</span><span><b>Protected videos.</b> <span>Encrypted videos (DRM): no download, and they play only on this website.</span></span></li>
-   <li><span class="cv-ri">💻</span><span><b>On PC and Android.</b> <span>The course plays in the Oracle by TDV app (Windows and Android), which screen recorders and screenshots can't capture.</span></span></li>
+   <li><span class="cv-ri">💻</span><span><b>On PC and Android.</b> <span>The course plays in the Cerebra by TDV app (Windows and Android), which screen recorders and screenshots can't capture.</span></span></li>
    <li><span class="cv-ri">💧</span><span><b>Your name on every video.</b> <span>Your name and email are shown on every video, so any leak shows who it came from.</span></span></li>
    <li><span class="cv-ri">📜</span><span><b>Course rules.</b> <span>Sharing, recording or downloading the course is forbidden. If a leak shows your name, your access is removed without refund.</span></span></li>
    <li><span class="cv-ri">🗓</span><span><b>Step by step.</b> <span>New lessons open week by week, with assignments your mentor reviews in your journal.</span></span></li>
@@ -5085,20 +5085,20 @@ async function courseLoad(el){const B=$("#cvBody",el);if(!B)return;
   if(!st.member)return cvSoon(B);
   if(st.blocked){B.innerHTML=`<div class="card cv-soon"><div class="cv-lock">⛔</div><h2>Your course access is suspended</h2><p class="mut">Contact Brown Algo on Telegram.</p></div>`;return}
   if(!st.admin&&cvNeedsApp())return cvGetApp(B);
-  /* Android: the course plays only in Oracle by TDV for Android (secure window: black in screenshots and recordings on every phone).
+  /* Android: the course plays only in Cerebra by TDV for Android (secure window: black in screenshots and recordings on every phone).
      Checked before activation, so a browser never takes the member's one course device. */
   if(cvAndroid()&&!cvInApp()&&!st.admin)return cvGetAndroidApp(B);
   if(st.admin||st.device==="this")return cvCourse(el,B,st);
   if(st.device==="none")return cvActivate(el,B,st);
   return cvLocked(el,B,st)}
-/* Windows PC: the course plays only in Oracle by TDV (its window is hidden from every screen recorder and screenshot) */
-const CV_APP_URL="https://jointradeversity.com/download/Oracle-by-TDV-Setup.exe",CV_APK_URL="https://jointradeversity.com/download/Oracle-by-TDV.apk";
+/* Windows PC: the course plays only in Cerebra by TDV (its window is hidden from every screen recorder and screenshot) */
+const CV_APP_URL="https://jointradeversity.com/download/Cerebra-by-TDV-Setup.exe",CV_APK_URL="https://jointradeversity.com/download/Cerebra-by-TDV.apk";
 /* iPhone / iPad (also iPadOS asking for the desktop site): the course is not available until the iPhone app + FairPlay exist */
 function cvIOS(){const u=navigator.userAgent;return /iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1)||(S._demo&&/[?&]cvios=1/.test(location.search))}
 function cvNoIOS(B){B.innerHTML=`<div class="card cv-act cv-ios">
     <div class="cv-act-h"><div class="cv-lock">🚫</div><div><h2>The course isn't available on iPhone yet</h2><p class="mut">To protect the sessions from screen recording, the Mentorship course can only be bought and watched on an Android phone or a PC for now.</p></div></div>
-    <div class="cv-dev"><span class="cv-dev-ic">📱</span><span><b>Android phone</b><small class="mut">Watch in Oracle by TDV for Android</small></span></div>
-    <div class="cv-dev"><span class="cv-dev-ic">💻</span><span><b>Windows PC</b><small class="mut">Watch in Oracle by TDV for Windows</small></span></div>
+    <div class="cv-dev"><span class="cv-dev-ic">📱</span><span><b>Android phone</b><small class="mut">Watch in Cerebra by TDV for Android</small></span></div>
+    <div class="cv-dev"><span class="cv-dev-ic">💻</span><span><b>Windows PC</b><small class="mut">Watch in Cerebra by TDV for Windows</small></span></div>
     <p class="mut" style="font-size:13px;margin:12px 0 0"><span>Open jointradeversity.com on your Android phone or your PC to buy and watch the course. An iPhone app is coming.</span></p></div>
    <div class="card cv-how"><h3>How your course access works</h3>${C_RULES}</div>`}
 /* Android: guided install, big buttons only. 1 Get the app (download) -> 2 Open it (Downloads) -> 3 Open the app (course page) */
@@ -5107,14 +5107,14 @@ const CV_DOWNLOADS="intent:#Intent;action=android.intent.action.VIEW_DOWNLOADS;e
 function cvGetAndroidApp(B,step){step=step||1;
   const st=(n,h)=>`<div class="cv-step ${step===n?"on":step>n?"done":""}"><span class="cv-sn">${step>n?"✓":n}</span><div class="cv-sb">${h}</div></div>`;
   B.innerHTML=`<div class="card cv-act cv-app cv-and">
-    <div class="cv-act-h"><div class="cv-lock">📱</div><div><h2>Watch the course in the Oracle by TDV app</h2><p class="mut">On Android the sessions play only in the app: screenshots and screen recordings come out black.</p></div></div>
+    <div class="cv-act-h"><div class="cv-lock">📱</div><div><h2>Watch the course in the Cerebra by TDV app</h2><p class="mut">On Android the sessions play only in the app: screenshots and screen recordings come out black.</p></div></div>
     <a class="btn cv-open" href="${CV_APK_OPEN}" id="cvOpenApp">▶ <span>I already have the app: open it</span></a>
     ${st(1,`<b>Get the app</b><small class="mut">Free · less than 1 MB · Android 7 or newer</small>
       <a class="btn pri cv-go" href="${CV_APK_URL}" download id="cvGetApk">⬇ <span>Get the app</span></a>
       <small class="mut">If Chrome asks, tap "Download anyway".</small>`)}
     ${st(2,`<b>Install it</b>
       <a class="btn pri cv-go" href="${CV_DOWNLOADS}" id="cvOpenDl">📂 <span>Open the downloaded app</span></a>
-      <small class="mut">Tap "Oracle-by-TDV" → Install. If Android asks, allow Chrome, then go back and tap Install. If Play Protect warns, tap "More details" → "Install anyway".</small>`)}
+      <small class="mut">Tap "Cerebra-by-TDV" → Install. If Android asks, allow Chrome, then go back and tap Install. If Play Protect warns, tap "More details" → "Install anyway".</small>`)}
     ${st(3,`<b>Open it and log in</b>
       <a class="btn pri cv-go" href="${CV_APK_OPEN}">▶ <span>Open the app</span></a>
       <small class="mut">Log in with your account: the Mentorship course opens.</small>`)}
@@ -5138,18 +5138,18 @@ function cvNoL1(B,lv){B.innerHTML=`<div class="card cv-act cv-nol1">
     <div class="cv-dev"><span class="cv-dev-ic">🔓</span><span><b data-notr>${lv==="none"?"No DRM":"Widevine "+esc(lv)}</b><small class="mut">This phone's protection level</small></span></div>
     <div class="cv-warn"><b>💻 <span>Watch the course sessions on your PC</span></b>
      <ol class="cv-steps" style="margin:8px 0 0"><li><span>On your PC, open jointradeversity.com and log in.</span></li>
-      <li><span>Open the Mentorship course and download Oracle by TDV.</span></li>
+      <li><span>Open the Mentorship course and download Cerebra by TDV.</span></li>
       <li><span>Install it, log in, and watch the sessions there.</span></li></ol></div>
     <p class="mut" style="font-size:12px;margin:12px 0 8px"><span>Opened the site inside Telegram, Instagram or another app? Open it in Google Chrome and check again.</span></p>
     <button class="btn" id="cvL1Retry">↻ <span>Check again</span></button></div>
    <div class="card cv-how"><h3>How your course access works</h3>${C_RULES}</div>`;
   $("#cvL1Retry",B).onclick=()=>{_cvDrm=null;CourseAPI._drm=null;const el=B.closest(".course-v");if(el)courseLoad(el)}}
 function cvGetApp(B){B.innerHTML=`<div class="card cv-act cv-app">
-    <div class="cv-act-h"><div class="cv-lock">💻</div><div><h2>On PC, the course plays in Oracle by TDV</h2><p class="mut">To protect the lessons, Windows hides the app from screen recorders and screenshots. On your phone, keep using the website.</p></div></div>
-    <a class="btn pri cv-go" href="${CV_APP_URL}" download>⬇ <span>Download Oracle by TDV for Windows</span></a>
-    <ol class="cv-steps"><li><span>Open the downloaded file "Oracle-by-TDV-Setup.exe".</span></li>
+    <div class="cv-act-h"><div class="cv-lock">💻</div><div><h2>On PC, the course plays in Cerebra by TDV</h2><p class="mut">To protect the lessons, Windows hides the app from screen recorders and screenshots. On your phone, keep using the website.</p></div></div>
+    <a class="btn pri cv-go" href="${CV_APP_URL}" download>⬇ <span>Download Cerebra by TDV for Windows</span></a>
+    <ol class="cv-steps"><li><span>Open the downloaded file "Cerebra-by-TDV-Setup.exe".</span></li>
      <li><span>If Windows shows "Windows protected your PC", click "More info", then "Run anyway".</span></li>
-     <li><span>Press OK to install. The Oracle by TDV icon appears on your desktop.</span></li>
+     <li><span>Press OK to install. The Cerebra by TDV icon appears on your desktop.</span></li>
      <li><span>Open it, log in with your account, and open the Mentorship course.</span></li></ol>
     <p class="mut" style="font-size:12px;margin:0"><span>Windows 10 or 11 · free · no admin rights needed · about 65 MB</span></p></div>
    <div class="card cv-how"><h3>How your course access works</h3>${C_RULES}</div>`}
@@ -5221,7 +5221,7 @@ async function cvCourse(el,B,st){
   const L=(r.lessons||[]).sort((a,b)=>a.position-b.position),done=L.filter(l=>l.done).length,pc=L.length?Math.round(done/L.length*100):0,next=L.find(l=>!l.done&&!l.locked);
   const mods=[];L.forEach(l=>{const k=l.module||"";let g=mods.find(x=>x.k===k);if(!g)mods.push(g={k,ls:[]});g.ls.push(l)});let n=0;
   const p=st.pending;
-  B.innerHTML=`${st.admin&&cvIOS()?`<div class="cv-note cv-adm">🚫 <span>iPhone/iPad: members and visitors can't buy or watch the course here.</span> <button type="button" class="btn sm" id="cvSeeMemberIos">👀 <span>See what members see</span></button></div>`:""}${st.admin&&cvNeedsApp()?`<div class="cv-note cv-adm">💻 ⛔ <span>PC browser: members are sent to Oracle by TDV for Windows.</span> <button type="button" class="btn sm" id="cvSeeMemberPc">👀 <span>See what members see</span></button></div>`:""}${st.admin&&cvAndroid()?`<div class="cv-note cv-adm">📱 ${cvInApp()?`✅ <span>Android app: secure screen on. Members watch the course here.</span>`:`⛔ <span>Android browser: members are sent to the Oracle by TDV app.</span> <button type="button" class="btn sm" id="cvSeeMember">👀 <span>See what members see</span></button>`}</div>`:""}${st.admin?`<div class="cv-note cv-adm">👑 <span>Admin preview: the device lock doesn't apply to you. Unpublished lessons are shown.</span></div>`:""}
+  B.innerHTML=`${st.admin&&cvIOS()?`<div class="cv-note cv-adm">🚫 <span>iPhone/iPad: members and visitors can't buy or watch the course here.</span> <button type="button" class="btn sm" id="cvSeeMemberIos">👀 <span>See what members see</span></button></div>`:""}${st.admin&&cvNeedsApp()?`<div class="cv-note cv-adm">💻 ⛔ <span>PC browser: members are sent to Cerebra by TDV for Windows.</span> <button type="button" class="btn sm" id="cvSeeMemberPc">👀 <span>See what members see</span></button></div>`:""}${st.admin&&cvAndroid()?`<div class="cv-note cv-adm">📱 ${cvInApp()?`✅ <span>Android app: secure screen on. Members watch the course here.</span>`:`⛔ <span>Android browser: members are sent to the Cerebra by TDV app.</span> <button type="button" class="btn sm" id="cvSeeMember">👀 <span>See what members see</span></button>`}</div>`:""}${st.admin?`<div class="cv-note cv-adm">👑 <span>Admin preview: the device lock doesn't apply to you. Unpublished lessons are shown.</span></div>`:""}
    <div class="cv-lic"><span>🛡 <span>Licensed to</span> <b data-notr>${esc(S.me.name||S.me.email||"")}</b></span>${st.admin?"":`<span>📱 <span>This device:</span> <b data-notr>${esc(st.label||CDev.label())}</b></span>`}</div>
    ${p&&!st.admin?`<div class="cv-note cv-pend"><span>⚠️ <span>A device change was requested for</span> <b data-notr>${esc(p.label||"")}</b> <span>on</span> <span data-notr>${esc(cDT(p.at))}</span>. <span>It replaces this device on</span> <b data-notr>${esc(cDT(p.readyAt))}</b>. <span>Not you? Cancel it now.</span></span><button class="btn sm danger" id="cvCancel">✖ <span>Cancel the change</span></button></div>`:""}
    ${L.length?`<div class="card cv-prog"><div class="row" style="justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b>Your progress</b> <span class="mut" data-notr>${done}/${L.length} · ${pc}%</span></div>${next?`<button class="btn pri sm" data-les="${next.id}">▶ <span>${done?"Continue":"Start the course"}</span></button>`:`<span class="ind-b">🏆 <span>Course completed</span></span>`}</div><div class="cv-bar"><i style="width:${pc}%"></i></div></div>
