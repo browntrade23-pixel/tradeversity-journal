@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Cerebra by TDV — promo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Inter:wght@500;600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:540px;height:960px;overflow:hidden;background:#000}
+body{font-family:Inter,"Segoe UI",sans-serif;color:#f3f4f8;-webkit-font-smoothing:antialiased}
+*{animation-play-state:paused!important}
+:root{--g:#f5b942;--g2:#ffd27a;--ink:#05050a}
+#stage{position:relative;width:540px;height:960px;overflow:hidden;background:#04040a}
+.abs{position:absolute}.full{position:absolute;inset:0}
+.ctr{display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}
+.g{color:var(--g)}
+
+/* generic motions */
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@keyframes popIn{from{opacity:0;transform:scale(.6)}70%{transform:scale(1.06)}to{opacity:1;transform:none}}
+@keyframes outUp{from{opacity:1;transform:none;filter:none}to{opacity:0;transform:translateY(-22px);filter:blur(6px)}}
+@keyframes outZoom{from{opacity:1;transform:none;filter:none}to{opacity:0;transform:scale(1.08);filter:blur(8px)}}
+.sc{opacity:0}
+
+/* background: deep violet glow, gold dust, neural lines */
+#amb{background:radial-gradient(520px 460px at 50% 55%,rgba(245,185,66,.16),transparent 70%),radial-gradient(640px 420px at 50% -8%,rgba(98,70,190,.32),transparent 70%),radial-gradient(500px 360px at 50% 108%,rgba(98,70,190,.22),transparent 70%);animation:fadeIn 1.6s ease .1s both}
+#dust i{position:absolute;width:3px;height:3px;border-radius:50%;background:#ffd27a;box-shadow:0 0 8px #f5b942}
+#net{opacity:.0;animation:netIn 2s ease .6s both}
+@keyframes netIn{to{opacity:.35}}
+#vign{background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,.8) 100%);pointer-events:none;z-index:50}
+#grain{z-index:51;opacity:.045;background-image:repeating-radial-gradient(circle at 17% 32%,#fff 0 1px,transparent 1px 3px);mix-blend-mode:overlay}
+
+/* captions */
+.cap{left:28px;right:28px;top:96px;text-align:center;z-index:20}
+.cap .k{display:inline-block;font:700 11px/1 Inter;letter-spacing:4px;color:var(--g);padding:7px 12px;border:1px solid rgba(245,185,66,.4);border-radius:30px;background:rgba(245,185,66,.08);margin-bottom:14px}
+.cap h2{font-size:33px;font-weight:900;letter-spacing:-.9px;line-height:1.08}
+.cap p{margin-top:10px;font-size:15px;font-weight:600;color:#b9bdd0;line-height:1.4}
+
+/* ===== S1: the orb ===== */
+#s1{animation:fadeIn .01s linear 0s both,outZoom .5s ease-in 5.15s forwards}
+.orbwrap{left:50%;top:330px;width:300px;height:300px;margin-left:-150px;animation:orbIn 1.3s cubic-bezier(.2,1.1,.3,1) .35s both}
+@keyframes orbIn{from{opacity:0;transform:scale(.3) rotate(-25deg);filter:blur(14px)}to{opacity:1;transform:none;filter:none}}
+.orbglow{left:50%;top:480px;width:520px;height:520px;margin:-260px;border-radius:50%;background:radial-gradient(circle,rgba(255,210,122,.5),rgba(245,185,66,.12) 35%,transparent 65%);animation:glowP 1.6s ease-out 1.1s both}
+@keyframes glowP{from{opacity:0;transform:scale(.3)}30%{opacity:1;transform:scale(1.15)}to{opacity:.6;transform:scale(.9)}}
+.ring{left:50%;top:480px;width:330px;height:330px;margin:-165px;border-radius:50%;border:2px solid rgba(255,210,122,.8);animation:ringOut 1.4s ease-out 1.25s both}
+.ring.r2{animation-delay:1.5s;border-color:rgba(160,130,255,.6)}
+@keyframes ringOut{from{opacity:.9;transform:scale(.6)}to{opacity:0;transform:scale(1.8)}}
+#gold{animation:goldFill 1s ease 1.0s both}
+@keyframes goldFill{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0 0 0 0)}}
+.nline{stroke-dasharray:240;stroke-dashoffset:240;animation:draw 1.1s ease 1.35s both}
+@keyframes draw{to{stroke-dashoffset:0}}
+.node{opacity:0;transform-box:fill-box;transform-origin:center;animation:popIn .4s cubic-bezier(.2,1.4,.4,1) both}
+.t1{left:0;right:0;top:640px;animation:fadeUp .7s cubic-bezier(.2,.9,.3,1) 2.0s both}
+.t1 b{display:block;font-size:58px;font-weight:900;letter-spacing:-1.5px;background:linear-gradient(180deg,#fff7e2,#f5b942 70%,#c98a24);-webkit-background-clip:text;color:transparent}
+.t1 small{display:block;margin-top:4px;font-size:14px;font-weight:800;letter-spacing:9px;color:#d8dbe8}
+.t2{left:40px;right:40px;top:762px;font-size:16px;font-weight:600;color:#b9bdd0;line-height:1.45;animation:fadeUp .7s ease 2.8s both}
+.t2 b{color:#fff}
+
+/* ===== the phone (S2 – S4) ===== */
+#P{left:50%;top:268px;width:262px;height:566px;margin-left:-131px;z-index:10;animation:phIn 1s cubic-bezier(.2,.9,.25,1) 5.55s both,phLeft .8s cubic-bezier(.5,0,.2,1) 13.75s forwards,phOut .5s ease-in 21.6s forwards}
+@keyframes phIn{from{opacity:0;transform:translateY(560px) rotate(8deg)}to{opacity:1;transform:none}}
+@keyframes phLeft{from{transform:none}to{transform:translate(-112px,40px) scale(.82)}}
+@keyframes phOut{from{opacity:1;transform:translate(-112px,40px) scale(.82)}to{opacity:0;transform:translate(-112px,40px) scale(.7);filter:blur(6px)}}
+.ph{position:absolute;inset:0;border-radius:40px;padding:10px;background:linear-gradient(145deg,#3b3a4c,#121119 40%,#07070b);box-shadow:0 0 0 1.5px rgba(255,255,255,.14),0 40px 90px -20px rgba(245,185,66,.4),0 0 120px -10px rgba(98,70,190,.45)}
+.scr{position:relative;width:100%;height:100%;border-radius:31px;overflow:hidden;background:#07070d}
+.notch{left:50%;top:8px;width:84px;height:24px;margin-left:-42px;border-radius:20px;background:#000;z-index:9}
+.glare{inset:10px;border-radius:31px;background:linear-gradient(115deg,rgba(255,255,255,.13),transparent 30%,transparent 72%,rgba(255,255,255,.05));z-index:8;pointer-events:none}
+.view{position:absolute;inset:0;opacity:0}
+/* splash inside the phone (same as the real app) */
+#vSplash{background:radial-gradient(circle at 50% 42%,#1d1830,#07070d 70%);animation:fadeIn .3s ease 5.9s both,fadeOut .35s ease 7.7s forwards}
+#vSplash img{position:absolute;left:50%;top:150px;width:120px;margin-left:-60px;animation:popIn .6s cubic-bezier(.2,1.3,.4,1) 6.1s both}
+#vSplash h4{position:absolute;left:0;right:0;top:290px;text-align:center;font-size:17px;font-weight:600;color:#e6e7ef;animation:fadeUp .5s ease 6.5s both}
+#vSplash h4 b{color:var(--g2)}
+#vSplash p{position:absolute;left:0;right:0;top:318px;text-align:center;font-size:10px;letter-spacing:4px;font-weight:800;color:#9a9db3;animation:fadeUp .5s ease 6.7s both}
+#vSplash .bar{position:absolute;left:70px;right:70px;top:360px;height:3px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}
+#vSplash .bar i{display:block;height:100%;background:linear-gradient(90deg,#f5b942,#ffd27a);animation:barG 1.2s ease 6.4s both}
+@keyframes barG{from{width:0}to{width:100%}}
+/* course list */
+#vList{padding:44px 14px 0;animation:fadeIn .4s ease 7.75s both,fadeOut .35s ease 10.95s forwards}
+.hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.hdr img{width:26px;height:26px}
+.hdr b{font-size:12.5px;font-weight:800;letter-spacing:.2px}
+.hdr small{display:block;font-size:9px;color:#8f93a8;font-weight:600}
+.prog{height:5px;border-radius:5px;background:rgba(255,255,255,.08);margin:10px 0 12px;overflow:hidden}
+.prog i{display:block;height:100%;width:38%;background:linear-gradient(90deg,#f5b942,#ffd27a);animation:barG2 1s ease 8.3s both}
+@keyframes barG2{from{width:0}to{width:38%}}
+.ls{display:flex;align-items:center;gap:9px;padding:10px;border-radius:13px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);margin-bottom:8px;opacity:0}
+.ls .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:13px;background:rgba(245,185,66,.14);flex:none}
+.ls b{display:block;font-size:11px;font-weight:700}
+.ls small{display:block;font-size:9px;color:#8f93a8;font-weight:600;margin-top:2px}
+.ls.now{border-color:rgba(245,185,66,.55);background:rgba(245,185,66,.08);box-shadow:0 0 22px -6px rgba(245,185,66,.5)}
+.ls.lock{opacity:0}.ls.lock .ic{background:rgba(255,255,255,.06)}
+.ls.lock b{color:#9a9db3}
+/* lesson video */
+#vVid{background:#07070d;animation:fadeIn .35s ease 11.0s both}
+.vtop{position:absolute;left:0;right:0;top:40px;padding:0 14px;font-size:10px;color:#8f93a8;font-weight:700}
+.vtop b{display:block;color:#fff;font-size:12px;margin-top:2px}
+.video{position:absolute;left:8px;right:8px;top:86px;height:170px;border-radius:12px;overflow:hidden;background:#0b0c14;border:1px solid rgba(255,255,255,.08)}
+.video svg{position:absolute;inset:0}
+#chartClip{animation:chartGrow 9s linear 11.2s both}
+@keyframes chartGrow{from{width:30px}to{width:244px}}
+.wmk{position:absolute;left:8px;top:6px;font-size:7px;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:.2px;z-index:3}
+.vbar{position:absolute;left:8px;right:8px;bottom:8px;height:3px;border-radius:3px;background:rgba(255,255,255,.15)}
+.vbar i{display:block;height:100%;width:0;background:var(--g);animation:vprog 10s linear 11.2s both}
+@keyframes vprog{to{width:62%}}
+.play{position:absolute;right:12px;bottom:16px;font-size:9px;color:#cfd2e0;font-weight:700}
+.notes{position:absolute;left:12px;right:12px;top:272px}
+.notes .line{height:7px;border-radius:4px;background:rgba(255,255,255,.07);margin-bottom:8px}
+.asg{position:absolute;left:10px;right:10px;top:350px;padding:11px;border-radius:13px;background:rgba(245,185,66,.07);border:1px solid rgba(245,185,66,.3)}
+.asg b{font-size:10.5px}.asg small{display:block;font-size:9px;color:#9a9db3;margin-top:3px}
+/* recording badge + flash */
+.rec{left:50%;top:228px;margin-left:-62px;width:124px;padding:7px 0;border-radius:30px;background:rgba(220,40,60,.18);border:1px solid rgba(255,80,100,.6);font-size:12px;font-weight:800;color:#ff8a98;text-align:center;z-index:30;opacity:0;animation:popIn .35s ease 12.55s both,fadeOut .3s ease 17.6s forwards}
+.rec i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff3d57;margin-right:7px;box-shadow:0 0 10px #ff3d57;animation:blink 1s steps(2) 12.55s 6}
+@keyframes blink{50%{opacity:.2}}
+.flash{inset:0;background:#fff;opacity:0;z-index:40;animation:flash .45s ease-out 13.35s both}
+@keyframes flash{from{opacity:0}12%{opacity:.85}to{opacity:0}}
+/* what the recorder gets */
+.got{left:300px;top:362px;width:212px;height:440px;border-radius:30px;padding:8px;background:linear-gradient(145deg,#2a2a36,#0c0c12);box-shadow:0 0 0 1.5px rgba(255,255,255,.12),0 30px 70px -20px rgba(0,0,0,.9);z-index:11;opacity:0;animation:gotIn .7s cubic-bezier(.2,1.1,.3,1) 13.9s both,fadeOut .45s ease 21.55s forwards}
+@keyframes gotIn{from{opacity:0;transform:translateX(160px) rotate(6deg)}to{opacity:1;transform:none}}
+.got .blk{position:relative;width:100%;height:100%;border-radius:23px;background:#000;overflow:hidden}
+.got .lbl{position:absolute;left:0;right:0;bottom:-46px;text-align:center;font-size:12px;font-weight:800;letter-spacing:.3px;color:#ff8a98}
+.got .lbl2{position:absolute;left:0;right:0;top:-26px;text-align:center;font-size:11px;font-weight:800;letter-spacing:2px;color:#8f93a8}
+.mine{position:absolute;left:58px;width:200px;text-align:center;top:336px;font-size:11px;font-weight:800;letter-spacing:2px;color:#8f93a8;opacity:0;animation:fadeIn .4s ease 14.3s both,fadeOut .4s ease 21.55s forwards;z-index:12}
+/* waveform inside the black frame */
+.wave{position:absolute;left:18px;right:18px;top:50%;height:90px;margin-top:-45px;display:flex;align-items:center;justify-content:space-between;opacity:0;animation:fadeIn .3s ease 18.05s both}
+.wave i{display:block;width:5px;border-radius:3px;background:linear-gradient(#ffd27a,#f5b942);height:6px}
+.mute{position:absolute;left:0;right:0;top:calc(50% + 58px);text-align:center;font-size:30px;opacity:0;animation:popIn .45s cubic-bezier(.2,1.4,.4,1) 19.45s both}
+.got .lbl.l2{opacity:0;animation:fadeIn .35s ease 19.5s both}
+.got .lbl.l1{animation:fadeOut .3s ease 19.3s forwards}
+
+/* chips */
+.chip{position:absolute;left:24px;right:24px;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:14px;background:rgba(14,13,24,.82);border:1px solid rgba(245,185,66,.32);box-shadow:0 12px 30px -10px rgba(0,0,0,.8);backdrop-filter:blur(8px);font-size:13.5px;font-weight:700;z-index:25;opacity:0}
+.chip i{font-style:normal;font-size:17px;width:24px;text-align:center;flex:none}
+.chip small{display:block;font-size:11px;color:#9a9db3;font-weight:600;margin-top:2px}
+
+/* ===== S5: one device ===== */
+#s5{animation:fadeIn .4s ease 22.0s both,outUp .45s ease 26.75s forwards}
+.mini{position:absolute;top:322px;width:176px;height:372px;border-radius:30px;padding:8px;background:linear-gradient(145deg,#3b3a4c,#121119 40%,#07070b);box-shadow:0 0 0 1.5px rgba(255,255,255,.13),0 30px 70px -24px rgba(245,185,66,.35)}
+.mini .scr{border-radius:23px}
+.mini.a{left:62px;animation:miniInL .8s cubic-bezier(.2,1,.3,1) 22.15s both}
+.mini.b{right:62px;animation:miniInR .8s cubic-bezier(.2,1,.3,1) 23.3s both}
+@keyframes miniInL{from{opacity:0;transform:translateX(-200px) rotate(-8deg)}to{opacity:1;transform:rotate(-4deg)}}
+@keyframes miniInR{from{opacity:0;transform:translateX(200px) rotate(8deg)}to{opacity:1;transform:rotate(4deg)}}
+.mini .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px}
+.mini .in img{width:120px;margin:-22px 0 -12px}
+.mini .big{font-size:40px;margin-bottom:8px}
+.mini .in b{font-size:12.5px;font-weight:800}
+.mini .in small{font-size:10px;color:#9a9db3;font-weight:600;margin-top:5px;line-height:1.35}
+.badge{position:absolute;left:50%;bottom:-20px;margin-left:-22px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:21px;font-weight:900;z-index:3}
+.badge.ok{background:#1fbf75;box-shadow:0 0 0 4px #04040a,0 0 26px rgba(31,191,117,.7);animation:popIn .45s cubic-bezier(.2,1.4,.4,1) 22.85s both}
+.badge.no{background:#e5364f;box-shadow:0 0 0 4px #04040a,0 0 26px rgba(229,54,79,.7);animation:popIn .45s cubic-bezier(.2,1.4,.4,1) 24.05s both}
+.mini.b .in{animation:shake .5s ease 24.05s both}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+
+/* ===== S6: step by step ===== */
+#s6{animation:fadeIn .4s ease 27.0s both,outUp .45s ease 31.75s forwards}
+.wk{position:absolute;left:34px;right:34px;height:74px;display:flex;align-items:center;gap:14px;padding:0 16px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);opacity:0}
+.wk .ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:20px;background:rgba(245,185,66,.14);flex:none;position:relative}
+.wk b{display:block;font-size:15px;font-weight:800}
+.wk small{display:block;font-size:12px;color:#9a9db3;font-weight:600;margin-top:3px}
+.wk.on{border-color:rgba(245,185,66,.55);background:rgba(245,185,66,.08);box-shadow:0 0 30px -8px rgba(245,185,66,.55)}
+.wk .lk,.wk .un{position:absolute;inset:0;display:grid;place-items:center}
+.wk3 .un{opacity:0;animation:popIn .4s cubic-bezier(.2,1.4,.4,1) 28.75s both}
+.wk3 .lk{animation:lockOff .4s ease 28.55s forwards}
+@keyframes lockOff{to{opacity:0;transform:translateY(-14px) rotate(-20deg) scale(.6)}}
+.wk3{animation:fadeUp .5s ease 27.75s both,glowOn .6s ease 28.6s forwards}
+@keyframes glowOn{from{opacity:1}to{opacity:1;border-color:rgba(245,185,66,.6);background:rgba(245,185,66,.09);box-shadow:0 0 34px -8px rgba(245,185,66,.6)}}
+.wk3 .s1{animation:fadeOut .2s ease 28.6s forwards}
+.wk3 .s2{position:absolute;top:21px;left:0;white-space:nowrap;opacity:0;animation:fadeIn .3s ease 28.75s both;color:var(--g2)!important}
+.mentor{left:34px;right:34px;top:690px;padding:16px;border-radius:18px;background:linear-gradient(135deg,rgba(98,70,190,.22),rgba(245,185,66,.08));border:1px solid rgba(160,130,255,.4);opacity:0;animation:fadeUp .55s ease 29.6s both}
+.mentor .row{display:flex;align-items:center;gap:12px}
+.mentor .av{width:42px;height:42px;border-radius:50%;background:url(../brand/logo-512.png) center/cover;box-shadow:0 0 0 2px var(--g);flex:none}
+.mentor b{font-size:14px;font-weight:800}.mentor small{display:block;font-size:12px;color:#b9bdd0;font-weight:600;margin-top:3px}
+.mentor .st{margin-left:auto;padding:6px 10px;border-radius:20px;font-size:11px;font-weight:800;background:rgba(31,191,117,.16);color:#4fe0a0;border:1px solid rgba(31,191,117,.5);opacity:0;animation:popIn .4s cubic-bezier(.2,1.4,.4,1) 30.5s both}
+
+/* ===== S7: install ===== */
+#s7{animation:fadeIn .4s ease 32.0s both,outUp .45s ease 36.25s forwards}
+.plat{position:absolute;top:300px;width:200px;height:150px;border-radius:22px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0}
+.plat svg{width:54px;height:54px}
+.plat b{font-size:16px;font-weight:800}
+.plat small{font-size:11px;color:#9a9db3;font-weight:600;margin-top:-6px}
+.plat.and{left:56px;animation:popIn .5s cubic-bezier(.2,1.3,.4,1) 32.3s both}
+.plat.win{right:56px;animation:popIn .5s cubic-bezier(.2,1.3,.4,1) 32.55s both}
+.steps{position:absolute;left:40px;right:40px;top:500px;display:flex;justify-content:space-between}
+.stp{width:132px;text-align:center;opacity:0}
+.stp .n{width:52px;height:52px;margin:0 auto 10px;border-radius:50%;display:grid;place-items:center;font:900 20px Inter;color:#1a1204;background:linear-gradient(145deg,#ffe4a6,#f5b942 60%,#b97a18);box-shadow:0 0 24px -4px rgba(245,185,66,.7)}
+.stp b{font-size:14px;font-weight:800}
+.stp small{display:block;font-size:11px;color:#9a9db3;font-weight:600;margin-top:3px}
+.steps .ln{position:absolute;top:26px;left:66px;right:66px;height:2px;background:linear-gradient(90deg,#f5b942,#ffd27a);transform-origin:0 50%;transform:scaleX(0);animation:lnG 1.2s ease 33.1s both;z-index:-1}
+@keyframes lnG{to{transform:scaleX(1)}}
+.upd{left:60px;right:60px;top:690px;padding:15px;border-radius:18px;background:rgba(245,185,66,.08);border:1px solid rgba(245,185,66,.4);display:flex;align-items:center;gap:13px;opacity:0;animation:fadeUp .5s ease 34.5s both}
+.upd .sp{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:22px;color:var(--g2);animation:spin 1.2s linear 34.5s 2;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.upd b{font-size:14.5px;font-weight:800}.upd small{display:block;font-size:12px;color:#b9bdd0;font-weight:600;margin-top:3px}
+
+/* ===== S8: relation + end card ===== */
+#s8{animation:fadeIn .4s ease 36.5s both,outZoom .5s ease-in 39.6s forwards}
+.eq{position:absolute;left:30px;right:30px;height:122px;border-radius:22px;display:flex;align-items:center;gap:16px;padding:0 20px;opacity:0}
+.eq img{width:74px;height:74px;flex:none}
+.eq b{display:block;font-size:20px;font-weight:900;letter-spacing:-.3px}
+.eq small{display:block;font-size:13.5px;color:#b9bdd0;font-weight:600;margin-top:5px;line-height:1.35}
+.eq.c{top:330px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);animation:eqL .6s cubic-bezier(.2,1,.3,1) 36.7s both}
+.eq.p{top:530px;background:linear-gradient(135deg,rgba(245,185,66,.12),rgba(98,70,190,.16));border:1px solid rgba(245,185,66,.5);box-shadow:0 0 40px -10px rgba(245,185,66,.5);animation:eqR .6s cubic-bezier(.2,1,.3,1) 37.6s both}
+.eq.c img{border-radius:50%;box-shadow:0 0 0 2px var(--g)}
+@keyframes eqL{from{opacity:0;transform:translateX(-140px)}to{opacity:1;transform:none}}
+@keyframes eqR{from{opacity:0;transform:translateX(140px)}to{opacity:1;transform:none}}
+.plus{position:absolute;left:0;right:0;top:462px;text-align:center;font-size:30px;font-weight:900;color:var(--g);opacity:0;animation:popIn .4s ease 37.25s both}
+.eqline{position:absolute;left:0;right:0;top:700px;text-align:center;font-size:17px;font-weight:700;color:#d8dbe8;opacity:0;animation:fadeUp .5s ease 38.4s both}
+.eqline b{color:var(--g2)}
+
+#end{animation:fadeIn .5s ease 39.85s both}
+.eorb{left:50%;top:250px;width:250px;height:250px;margin-left:-125px;animation:orbIn 1.1s cubic-bezier(.2,1.1,.3,1) 39.9s both}
+.eglow{left:50%;top:375px;width:480px;height:480px;margin:-240px;border-radius:50%;background:radial-gradient(circle,rgba(255,210,122,.42),rgba(245,185,66,.1) 38%,transparent 65%);animation:glowP 1.6s ease-out 40.3s both}
+.et{left:0;right:0;top:526px;animation:fadeUp .6s ease 40.5s both}
+.et b{display:block;font-size:50px;font-weight:900;letter-spacing:-1.3px;background:linear-gradient(180deg,#fff7e2,#f5b942 70%,#c98a24);-webkit-background-clip:text;color:transparent}
+.et small{display:block;margin-top:4px;font-size:13px;font-weight:800;letter-spacing:8px;color:#d8dbe8}
+.es{left:40px;right:40px;top:640px;font-size:15px;font-weight:600;color:#b9bdd0;line-height:1.45;animation:fadeUp .6s ease 40.9s both}
+.pills{left:0;right:0;top:712px;display:flex;justify-content:center;gap:10px;animation:fadeUp .6s ease 41.2s both}
+.pills span{padding:8px 14px;border-radius:30px;font-size:12.5px;font-weight:800;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05)}
+.url{left:50%;top:790px;width:300px;margin-left:-150px;padding:14px 0;border-radius:16px;text-align:center;font-size:18px;font-weight:900;letter-spacing:.3px;color:#1a1204;background:linear-gradient(145deg,#ffe4a6,#f5b942 60%,#c98a24);box-shadow:0 14px 40px -10px rgba(245,185,66,.7);animation:popIn .55s cubic-bezier(.2,1.3,.4,1) 41.55s both}
+.url small{display:block;font-size:10.5px;font-weight:800;letter-spacing:2px;margin-top:3px;color:#4a3208}
+/* French / Arabic (set from ?lang=) */
+html[lang=ar] body{font-family:Cairo,Inter,"Segoe UI",sans-serif}
+html[lang=ar] :is(.cap,.t2,.chip,.ls,.wk,.mentor,.stp,.upd,.eq,.eqline,.es,.mini,.vtop,.asg,.notes,.got .lbl,.got .lbl2,.mine,.rec,.url small,.plat,.wmk){letter-spacing:0!important}
+html[lang=ar] .cap h2{font-size:31px;line-height:1.3;letter-spacing:0}
+html[lang=ar] :is(.chip,.ls,.wk,.mentor .row,.upd,.eq,.hdr,.vtop,.asg){direction:rtl}
+html[lang=ar] .wk3 .s2{left:auto;right:0}
+html[lang=ar] #stage{direction:rtl}
+html[lang=ar] :is(.play,.video svg){direction:ltr}
+html[lang=ar] :is(.t1,.et,.url){font-family:Inter,"Segoe UI",sans-serif;direction:ltr}
+html[lang=ar] .url small{font-family:Cairo,Inter,sans-serif}
+.rec{width:fit-content!important;left:0!important;right:0;margin:0 auto!important;padding:7px 14px!important;white-space:nowrap}
+html[lang=fr] :is(.got .lbl2,.mine){letter-spacing:.5px}
+html[lang=fr] .cap h2{font-size:30px}
+html[lang=fr] .cap .k,html[lang=ar] .cap .k{letter-spacing:2px}
+</style></head><body><div id="stage">
+
+<div id="amb" class="full"></div>
+<svg id="net" class="full" viewBox="0 0 540 960"></svg>
+<div id="dust" class="full"></div>
+
+<!-- shared logo symbol (split brain in a glass orb) -->
+<svg width="0" height="0" style="position:absolute"><defs>
+ <path id="brain" d="M40 95 C20 90 15 65 30 50 C30 30 50 18 70 22 C80 8 105 5 120 15 C135 5 160 10 168 28 C188 32 196 55 186 70 C196 85 186 105 168 106 C162 120 145 126 132 118 C120 128 98 128 88 118 C75 124 58 118 55 106 C45 108 38 103 40 95 Z"/>
+ <g id="folds" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M60 40 C70 48 66 60 78 62 C90 64 88 50 100 52"/><path d="M110 30 C112 44 126 44 128 56 C130 68 116 72 120 84"/>
+  <path d="M140 34 C150 40 146 52 158 56 C168 60 172 72 166 80"/><path d="M42 70 C54 66 60 76 70 78 C82 80 80 92 92 94"/>
+  <path d="M100 70 C108 78 104 90 116 96 C126 100 134 92 144 96"/><path d="M150 72 C156 82 150 92 160 98"/>
+  <path d="M74 100 C82 96 90 104 98 104"/><path d="M84 34 C92 30 98 38 106 36"/>
+ </g>
+ <path id="stem" d="M124 116 C126 130 130 138 138 146" fill="none"/>
+ <ellipse id="cereb" cx="158" cy="110" rx="20" ry="12"/>
+ <radialGradient id="cOrb" cx="40%" cy="32%" r="70%"><stop offset="0" stop-color="#34304a"/><stop offset=".5" stop-color="#100e19"/><stop offset="1" stop-color="#020203"/></radialGradient>
+ <linearGradient id="cGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3cf"/><stop offset=".45" stop-color="#f5b942"/><stop offset="1" stop-color="#9c600f"/></linearGradient>
+ <clipPath id="cL"><rect x="0" y="0" width="112" height="160"/></clipPath>
+ <clipPath id="cR"><rect x="112" y="0" width="120" height="160"/></clipPath>
+ <filter id="cGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs></svg>
+
+<!-- ===== S1 ===== -->
+<div id="s1" class="full sc">
+ <div class="orbglow abs"></div><div class="ring abs"></div><div class="ring r2 abs"></div>
+ <div class="orbwrap abs">
+  <svg viewBox="106 96 300 300" width="300" height="300">
+   <circle cx="256" cy="246" r="150" fill="url(#cOrb)"/>
+   <circle cx="256" cy="246" r="150" fill="none" stroke="#f5b942" stroke-opacity=".6" stroke-width="4"/>
+   <g transform="translate(150 172) scale(1.06)">
+    <g id="gold" clip-path="url(#cL)"><use href="#brain" fill="url(#cGold)"/><use href="#folds" stroke="#7a4a08" stroke-width="3.2" opacity=".8"/></g>
+    <g clip-path="url(#cR)" filter="url(#cGlow)">
+     <use href="#brain" class="nline" fill="none" stroke="#ffd27a" stroke-width="3" pathLength="240"/>
+     <g stroke="#ffd27a" stroke-width="2.2" fill="none" stroke-linecap="round">
+      <path class="nline" pathLength="240" d="M110 30 C112 44 126 44 128 56 C130 68 116 72 120 84"/>
+      <path class="nline" pathLength="240" d="M140 34 C150 40 146 52 158 56 C168 60 172 72 166 80"/>
+      <path class="nline" pathLength="240" d="M100 70 C108 78 104 90 116 96 C126 100 134 92 144 96"/>
+      <path class="nline" pathLength="240" d="M150 72 C156 82 150 92 160 98"/>
+     </g>
+     <g fill="#fff4d6"><circle class="node" style="animation-delay:1.9s" cx="128" cy="56" r="4"/><circle class="node" style="animation-delay:2.0s" cx="158" cy="56" r="4"/><circle class="node" style="animation-delay:2.1s" cx="144" cy="96" r="4"/><circle class="node" style="animation-delay:2.2s" cx="166" cy="80" r="3.5"/><circle class="node" style="animation-delay:2.3s" cx="120" cy="84" r="3.5"/></g>
+    </g>
+    <use href="#cereb" fill="#c98a24"/><use href="#stem" stroke="#c98a24" stroke-width="9" stroke-linecap="round"/>
+   </g>
+   <ellipse cx="196" cy="160" rx="58" ry="28" fill="#fff" opacity=".1" transform="rotate(-28 196 160)"/>
+  </svg>
+ </div>
+ <div class="t1 abs ctr"><b>Cerebra</b><small>BY TDV</small></div>
+ <div class="t2 abs ctr">The private video player of the<br><b>TRADEVERSITY Mentorship</b></div>
+</div>
+
+<!-- captions -->
+<div class="cap abs sc" style="animation:fadeUp .55s ease 5.7s both,outUp .4s ease 10.85s forwards"><span class="k">THE MENTORSHIP VAULT</span><h2>Your course lives<br><span class="g">in one place.</span></h2></div>
+<div class="cap abs sc" style="animation:fadeUp .55s ease 11.1s both,outUp .4s ease 17.75s forwards"><span class="k">ANTI-LEAK</span><h2>Screenshots & screen<br>recordings? <span class="g">Black.</span></h2></div>
+<div class="cap abs sc" style="animation:fadeUp .55s ease 17.95s both,outUp .4s ease 21.6s forwards"><span class="k">SOUND TOO</span><h2>Recorders get<br><span class="g">no sound.</span></h2></div>
+<div class="cap abs sc" style="animation:fadeUp .55s ease 22.1s both,outUp .4s ease 26.75s forwards"><span class="k">ONE BUYER · ONE DEVICE</span><h2>Your course.<br><span class="g">Your device only.</span></h2></div>
+<div class="cap abs sc" style="animation:fadeUp .55s ease 27.1s both,outUp .4s ease 31.75s forwards"><span class="k">LEARN STEP BY STEP</span><h2>New lessons unlock.<br><span class="g">Your mentor reviews.</span></h2></div>
+<div class="cap abs sc" style="animation:fadeUp .55s ease 32.1s both,outUp .4s ease 36.25s forwards"><span class="k">ANDROID · WINDOWS</span><h2>Installed in<br><span class="g">3 taps.</span></h2></div>
+<div class="cap abs sc" style="animation:fadeUp .55s ease 36.6s both,outUp .4s ease 39.6s forwards"><span class="k">HOW IT FITS</span><h2>One mentorship.<br><span class="g">One secure player.</span></h2></div>
+
+<!-- ===== the phone ===== -->
+<div id="P" class="abs sc">
+ <div class="ph"><div class="scr">
+  <div id="vSplash" class="view"><img src="../brand/cerebra-fg-512.png" alt=""><h4>Welcome to <b>Cerebra Player</b></h4><p>BY TRADEVERSITY</p><div class="bar"><i></i></div></div>
+  <div id="vList" class="view">
+   <div class="hdr"><img src="../brand/cerebra-fg-512.png" alt=""><div><b>TRADEVERSITY Mentorship</b><small>Lesson 3 of 8 · 38% done</small></div></div>
+   <div class="prog"><i></i></div>
+   <div class="ls" style="animation:fadeUp .4s ease 8.2s both"><div class="ic">✓</div><div><b>1 · The trader's mindset</b><small>Watched</small></div></div>
+   <div class="ls" style="animation:fadeUp .4s ease 8.35s both"><div class="ic">✓</div><div><b>2 · Market structure</b><small>Watched · assignment reviewed</small></div></div>
+   <div class="ls now" style="animation:fadeUp .4s ease 8.5s both"><div class="ic">▶</div><div><b>3 · Liquidity & entries</b><small>Continue watching · 12 min</small></div></div>
+   <div class="ls lock" style="animation:fadeUp .4s ease 8.65s both"><div class="ic">🔒</div><div><b>4 · Risk like a pro</b><small>Unlocks in 6 days</small></div></div>
+   <div class="ls lock" style="animation:fadeUp .4s ease 8.8s both"><div class="ic">🔒</div><div><b>5 · Building your plan</b><small>Unlocks in 13 days</small></div></div>
+  </div>
+  <div id="vVid" class="view">
+   <div class="vtop">LESSON 3<b>Liquidity & entries</b></div>
+   <div class="video">
+    <span class="wmk">YOUR NAME · your@email.com</span>
+    <svg viewBox="0 0 244 170" width="244" height="170" preserveAspectRatio="none"><defs><clipPath id="cc"><rect id="chartClip" x="0" y="0" width="30" height="170"/></clipPath></defs><g id="candles" clip-path="url(#cc)"></g></svg>
+    <span class="play">▶ 07:24 / 12:00</span>
+    <div class="vbar"><i></i></div>
+   </div>
+   <div class="notes"><div class="line" style="width:90%"></div><div class="line" style="width:72%"></div><div class="line" style="width:82%"></div></div>
+   <div class="asg"><b>📝 Assignment</b><small>Mark 3 liquidity zones on your chart and send it to your mentor.</small></div>
+  </div>
+ </div></div>
+ <div class="notch abs"></div><div class="glare abs"></div>
+</div>
+<div class="rec abs"><i></i>RECORDING</div>
+<div class="mine">WHAT YOU SEE</div>
+<div class="got abs"><div class="lbl2">WHAT THE RECORDING GETS</div><div class="blk"><div class="wave" id="wave"></div><div class="mute">🔇</div></div><div class="lbl l1">⬛ Black screen</div><div class="lbl l2" style="color:#ffd27a">⬛ Black screen · 🔇 no sound</div></div>
+<div class="flash abs"></div>
+
+<!-- chips around S2 – S4 -->
+<div id="chips"></div>
+
+<!-- ===== S5 ===== -->
+<div id="s5" class="full sc">
+ <div class="mini a"><div class="scr"><div class="in"><img src="../brand/cerebra-fg-512.png" alt=""><b>Your device</b><small>The course is linked<br>to this device</small></div></div><div class="badge ok">✓</div></div>
+ <div class="mini b"><div class="scr"><div class="in"><div class="big">🚫</div><b>Another device</b><small>This course is linked<br>to its owner's device</small></div></div><div class="badge no">✕</div></div>
+</div>
+
+<!-- ===== S6 ===== -->
+<div id="s6" class="full sc">
+ <div class="wk on" style="top:320px;animation:fadeUp .5s ease 27.35s both"><div class="ic">✓</div><div><b>Week 1 · Foundations</b><small>Watched · assignment reviewed</small></div></div>
+ <div class="wk on" style="top:410px;animation:fadeUp .5s ease 27.55s both"><div class="ic">✓</div><div><b>Week 2 · Structure</b><small>Watched · assignment reviewed</small></div></div>
+ <div class="wk wk3" style="top:500px"><div class="ic"><span class="lk">🔒</span><span class="un">🔓</span></div><div style="position:relative"><b>Week 3 · Entries</b><small class="s1">Unlocks in 1 day</small><small class="s2">Unlocked · watch now</small></div></div>
+ <div class="wk" style="top:590px;animation:fadeUp .5s ease 27.95s both"><div class="ic" style="background:rgba(255,255,255,.06)">🔒</div><div><b style="color:#9a9db3">Week 4 · Risk</b><small>Unlocks next week</small></div></div>
+ <div class="mentor abs"><div class="row"><div class="av"></div><div><b>Assignment reviewed</b><small>"Clean zones. Now wait for the sweep."</small></div><span class="st">✓ DONE</span></div></div>
+</div>
+
+<!-- ===== S7 ===== -->
+<div id="s7" class="full sc">
+ <div class="plat and"><svg viewBox="0 0 24 24"><path fill="#3ddc84" d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85a.637.637 0 0 0-.83.22l-1.88 3.24a11.43 11.43 0 0 0-8.94 0L5.65 5.67a.643.643 0 0 0-.87-.2c-.28.18-.37.54-.22.83L6.4 9.48A10.78 10.78 0 0 0 1 18h22a10.78 10.78 0 0 0-5.4-8.52M7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5m10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5"/></svg><b>Android</b><small>Cerebra app</small></div>
+ <div class="plat win"><svg viewBox="0 0 24 24"><path fill="#3fa9f5" d="M3 5.1 10.4 4v7.1H3zm0 13.8 7.4 1.1v-7H3zm8.3 1.2L21 21.5V13h-9.7zm0-16.2V11.1H21V2.5z"/></svg><b>Windows PC</b><small>Cerebra app</small></div>
+ <div class="steps"><div class="ln"></div>
+  <div class="stp" style="animation:popIn .45s cubic-bezier(.2,1.3,.4,1) 33.1s both"><div class="n">1</div><b>Download</b><small>from the course page</small></div>
+  <div class="stp" style="animation:popIn .45s cubic-bezier(.2,1.3,.4,1) 33.55s both"><div class="n">2</div><b>Install</b><small>one tap</small></div>
+  <div class="stp" style="animation:popIn .45s cubic-bezier(.2,1.3,.4,1) 34.0s both"><div class="n">3</div><b>Log in</b><small>and watch</small></div>
+ </div>
+ <div class="upd abs"><div class="sp">⟳</div><div><b>Always up to date</b><small>New versions download by themselves when you open the app.</small></div></div>
+</div>
+
+<!-- ===== S8 ===== -->
+<div id="s8" class="full sc">
+ <div class="eq c"><img src="../brand/logo-512.png" alt=""><div><b>TRADEVERSITY Mentorship</b><small>The lessons, the assignments,<br>your mentor.</small></div></div>
+ <div class="plus">+</div>
+ <div class="eq p"><img src="../brand/cerebra-fg-512.png" alt="" style="transform:scale(1.35)"><div><b>Cerebra by TDV</b><small>The secure player where<br>you watch every lesson.</small></div></div>
+ <div class="eqline">Join the mentorship → <b>watch it in Cerebra.</b></div>
+</div>
+
+<div id="end" class="full sc">
+ <div class="eglow abs"></div>
+ <div class="eorb abs"><img src="../brand/cerebra-fg-512.png" alt="" style="width:250px;height:250px;transform:scale(1.72)"></div>
+ <div class="et abs ctr"><b>Cerebra</b><small>BY TDV</small></div>
+ <div class="es abs ctr">The protected player of the TRADEVERSITY Mentorship</div>
+ <div class="pills abs"><span>🤖 Android</span><span>🪟 Windows</span></div>
+ <div class="url abs">jointradeversity.com<small>MENTORSHIP COURSE</small></div>
+</div>
+
+<div id="vign" class="full"></div><div id="grain" class="full"></div>
+</div>
+<script>
+const DUR=44.5;
+/* gold dust drifting */
+const du=document.getElementById('dust');
+for(let i=0;i<34;i++){const d=document.createElement('i');const x=(i*97)%540,y=(i*233)%960,s=.4+((i*13)%10)/10;d.style.left=x+'px';d.style.top=y+'px';d.style.opacity=.15+((i*7)%10)/22;d.style.transform=`scale(${s})`;
+ const n='du'+i,st=document.createElement('style');st.textContent=`@keyframes ${n}{from{transform:translate(0,0) scale(${s})}to{transform:translate(${((i%5)-2)*14}px,${-120-(i%7)*30}px) scale(${s})}}`;document.head.appendChild(st);
+ d.style.animation=`${n} ${DUR}s linear 0s both`;du.appendChild(d)}
+/* faint neural network in the background */
+const net=document.getElementById('net');let pts=[];for(let i=0;i<22;i++)pts.push([(i*151+40)%520+10,(i*347+60)%940+10]);
+let h='';pts.forEach((p,i)=>{pts.forEach((q,j)=>{if(j>i){const d=Math.hypot(p[0]-q[0],p[1]-q[1]);if(d<190)h+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#8f7ad8" stroke-width=".7" opacity="${(1-d/190).toFixed(2)}"/>`}})});
+pts.forEach(p=>h+=`<circle cx="${p[0]}" cy="${p[1]}" r="2" fill="#ffd27a"/>`);net.innerHTML=h;
+/* candles of the lesson video */
+let y=100,c='';for(let i=0;i<30;i++){const o=y;y+=Math.sin(i*1.7)*9+Math.cos(i*.6)*6-(i>16?2.2:0)+(i<8?1.5:0);const hi=Math.min(o,y)-4-(i%3)*2,lo=Math.max(o,y)+4+(i%4);const up=y<o,x=8+i*7.8;
+ c+=`<line x1="${x+2.5}" y1="${hi}" x2="${x+2.5}" y2="${lo}" stroke="${up?'#26c281':'#e5536a'}" stroke-width="1"/><rect x="${x}" y="${Math.min(o,y)}" width="5" height="${Math.max(2,Math.abs(y-o))}" fill="${up?'#26c281':'#e5536a'}"/>`}
+c+=`<rect x="120" y="58" width="124" height="16" fill="rgba(245,185,66,.18)"/><text x="196" y="69" font-size="7" fill="#ffd27a" font-family="Inter" font-weight="700">LIQUIDITY</text>`;
+document.getElementById('candles').innerHTML=c;
+/* waveform: alive, then flattened */
+const wv=document.getElementById('wave');for(let i=0;i<22;i++){const b=document.createElement('i');const hh=18+((i*37)%60);const n='wv'+i,st=document.createElement('style');
+ st.textContent=`@keyframes ${n}{0%{height:6px}10%{height:${hh}px}25%{height:${hh*.5}px}40%{height:${hh}px}55%{height:${hh*.7}px}70%{height:${hh}px}85%{height:6px;opacity:1}100%{height:4px;opacity:.35}}`;document.head.appendChild(st);
+ b.style.animation=`${n} 1.4s ease 18.1s both`;wv.appendChild(b)}
+/* chips [in, out, top, icon, title, sub] */
+/* language: ?lang=fr | ar (English by default) */
+const LANG=(location.search.match(/[?&]lang=(fr|ar)/)||[])[1]||"en";document.documentElement.lang=LANG;
+const TR=(en,fr,ar)=>LANG==="fr"?fr:LANG==="ar"?ar:en;
+const CH=[[8.9,10.8,822,"🎓",TR("Only the Mentorship opens here","Seule la formation s'ouvre ici","تُفتح هنا دورة الإرشاد فقط"),TR("No other pages, no distractions","Aucune autre page, aucune distraction","لا صفحات أخرى، لا تشتيت")],
+ [9.35,10.8,884,"📱",TR("Android phones & Windows PCs","Téléphones Android et PC Windows","هواتف أندرويد وحواسيب ويندوز"),""],
+ [15.0,17.6,866,"🛡️",TR("Hidden from screen recorders","Invisible pour les enregistreurs d'écran","مخفي عن برامج تسجيل الشاشة"),TR("Android: black screen · PC: hidden window","Android : écran noir · PC : fenêtre masquée","أندرويد: شاشة سوداء · الحاسوب: نافذة مخفية")],
+ [19.9,21.5,866,"⏸️",TR("On PC, a recorder app pauses the lesson","Sur PC, un enregistreur met la leçon en pause","على الحاسوب، برنامج التسجيل يوقف الدرس"),TR("Close it and the lesson comes back","Fermez-le et la leçon revient","أغلقه ويعود الدرس")],
+ [24.6,26.6,760,"✍️",TR("Your name on every video","Votre nom sur chaque vidéo","اسمك على كل فيديو"),TR("A leaked copy points back to its owner","Une copie qui fuit désigne son propriétaire","أي نسخة مسرّبة تكشف صاحبها")],
+ [25.1,26.6,822,"🔁",TR("Changed phone?","Nouveau téléphone ?","غيّرت هاتفك؟"),TR("Move the course yourself, safely","Transférez la formation vous-même, en sécurité","انقل الدورة بنفسك وبأمان")]];
+/* [selector, index, French, Arabic]: innerHTML replaced when the language is not English */
+const TX=[
+ [".t2",0,"Le lecteur vidéo privé de la<br><b>formation mentorat TRADEVERSITY</b>","مشغّل الفيديو الخاص بـ<br><b>دورة الإرشاد TRADEVERSITY</b>"],
+ [".cap .k",0,"LE COFFRE DU MENTORAT","خزنة الإرشاد"],[".cap h2",0,'Votre formation vit<br><span class="g">à un seul endroit.</span>','دورتك كلها<br><span class="g">في مكان واحد.</span>'],
+ [".cap .k",1,"ANTI-FUITE","ضد التسريب"],[".cap h2",1,'Captures et enregistrements<br>d\'écran ? <span class="g">Noirs.</span>','لقطات وتسجيلات<br>الشاشة؟ <span class="g">سوداء.</span>'],
+ [".cap .k",2,"LE SON AUSSI","والصوت أيضاً"],[".cap h2",2,'Les enregistreurs<br><span class="g">n\'ont aucun son.</span>','برامج التسجيل<br><span class="g">بدون صوت.</span>'],
+ [".cap .k",3,"UN ACHETEUR · UN APPAREIL","مشترٍ واحد · جهاز واحد"],[".cap h2",3,'Votre formation.<br><span class="g">Votre appareil seulement.</span>','دورتك.<br><span class="g">على جهازك فقط.</span>'],
+ [".cap .k",4,"ÉTAPE PAR ÉTAPE","خطوة بخطوة"],[".cap h2",4,'Les leçons se débloquent.<br><span class="g">Votre mentor corrige.</span>','دروس جديدة تُفتح.<br><span class="g">ومرشدك يراجع.</span>'],
+ [".cap h2",5,'Installée en<br><span class="g">3 gestes.</span>','التثبيت في<br><span class="g">3 خطوات.</span>'],
+ [".cap .k",6,"COMMENT ÇA MARCHE","كيف يعمل"],[".cap h2",6,'Une formation.<br><span class="g">Un lecteur sécurisé.</span>','دورة واحدة.<br><span class="g">ومشغّل آمن واحد.</span>'],
+ ["#vList .hdr b",0,"Formation mentorat TRADEVERSITY","دورة الإرشاد TRADEVERSITY"],["#vList .hdr small",0,"Leçon 3 sur 8 · 38 % terminé","الدرس 3 من 8 · أُنجز 38%"],
+ ["#vList .ls b",0,"1 · L'état d'esprit du trader","1 · عقلية المتداول"],["#vList .ls small",0,"Vue","تمت المشاهدة"],
+ ["#vList .ls b",1,"2 · Structure du marché","2 · هيكل السوق"],["#vList .ls small",1,"Vue · exercice corrigé","تمت المشاهدة · التمرين مُراجَع"],
+ ["#vList .ls b",2,"3 · Liquidité et entrées","3 · السيولة ونقاط الدخول"],["#vList .ls small",2,"Reprendre · 12 min","أكمل المشاهدة · 12 دقيقة"],
+ ["#vList .ls b",3,"4 · Le risque comme un pro","4 · إدارة المخاطر كالمحترفين"],["#vList .ls small",3,"Disponible dans 6 jours","يُفتح بعد 6 أيام"],
+ ["#vList .ls b",4,"5 · Construire votre plan","5 · بناء خطتك"],["#vList .ls small",4,"Disponible dans 13 jours","يُفتح بعد 13 يوماً"],
+ [".vtop",0,"LEÇON 3<b>Liquidité et entrées</b>","الدرس 3<b>السيولة ونقاط الدخول</b>"],[".wmk",0,"VOTRE NOM · votre@email.com","اسمك · your@email.com"],
+ [".asg",0,"<b>📝 Exercice</b><small>Marquez 3 zones de liquidité sur votre graphique et envoyez-le à votre mentor.</small>","<b>📝 تمرين</b><small>حدّد 3 مناطق سيولة على الشارت وأرسله إلى مرشدك.</small>"],
+ [".rec",0,"<i></i>ENREGISTREMENT","<i></i>تسجيل"],[".mine",0,"CE QUE VOUS VOYEZ","ما تراه أنت"],[".got .lbl2",0,"CE QUE L'ENREGISTREMENT CAPTE","ما يلتقطه التسجيل"],
+ [".got .lbl.l1",0,"⬛ Écran noir","⬛ شاشة سوداء"],[".got .lbl.l2",0,"⬛ Écran noir · 🔇 aucun son","⬛ شاشة سوداء · 🔇 بدون صوت"],
+ [".mini.a .in b",0,"Votre appareil","جهازك"],[".mini.a .in small",0,"La formation est liée<br>à cet appareil","الدورة مرتبطة<br>بهذا الجهاز"],
+ [".mini.b .in b",0,"Un autre appareil","جهاز آخر"],[".mini.b .in small",0,"La formation est liée à<br>l'appareil de son propriétaire","هذه الدورة مرتبطة<br>بجهاز صاحبها"],
+ ["#s6 .wk b",0,"Semaine 1 · Les bases","الأسبوع 1 · الأساسيات"],["#s6 .wk small",0,"Vue · exercice corrigé","تمت المشاهدة · التمرين مُراجَع"],
+ ["#s6 .wk b",1,"Semaine 2 · Structure","الأسبوع 2 · هيكل السوق"],["#s6 .wk small",1,"Vue · exercice corrigé","تمت المشاهدة · التمرين مُراجَع"],
+ ["#s6 .wk b",2,"Semaine 3 · Entrées","الأسبوع 3 · نقاط الدخول"],["#s6 .wk small",2,"Disponible dans 1 jour","يُفتح بعد يوم"],["#s6 .wk small",3,"Débloquée · à regarder","مفتوح · شاهد الآن"],
+ ["#s6 .wk b",3,"Semaine 4 · Risque","الأسبوع 4 · المخاطر"],["#s6 .wk small",4,"Disponible la semaine prochaine","يُفتح الأسبوع القادم"],
+ [".mentor b",0,"Exercice corrigé","تمت مراجعة التمرين"],[".mentor small",0,"« Zones propres. Attends maintenant le sweep. »","«مناطق واضحة. انتظر الآن سحب السيولة.»"],[".mentor .st",0,"✓ VALIDÉ","✓ تم"],
+ [".plat.and b",0,"Android","أندرويد"],[".plat.and small",0,"Application Cerebra","تطبيق Cerebra"],[".plat.win b",0,"PC Windows","حاسوب ويندوز"],[".plat.win small",0,"Application Cerebra","تطبيق Cerebra"],
+ [".stp b",0,"Télécharger","حمّل"],[".stp small",0,"depuis la page du cours","من صفحة الدورة"],[".stp b",1,"Installer","ثبّت"],[".stp small",1,"en un geste","بلمسة واحدة"],[".stp b",2,"Se connecter","سجّل الدخول"],[".stp small",2,"et regarder","وشاهد"],
+ [".upd b",0,"Toujours à jour","محدّث دائماً"],[".upd small",0,"Les nouvelles versions se téléchargent toutes seules à l'ouverture.","الإصدارات الجديدة تُحمَّل تلقائياً عند فتح التطبيق."],
+ [".eq.c b",0,"Formation mentorat TRADEVERSITY","دورة الإرشاد TRADEVERSITY"],[".eq.c small",0,"Les leçons, les exercices,<br>votre mentor.","الدروس، التمارين،<br>ومرشدك."],
+ [".eq.p small",0,"Le lecteur sécurisé où<br>vous regardez chaque leçon.","المشغّل الآمن الذي<br>تشاهد فيه كل درس."],
+ [".eqline",0,"Rejoignez la formation → <b>regardez-la dans Cerebra.</b>","انضم إلى الدورة ← <b>وشاهدها في Cerebra.</b>"],
+ [".es",0,"Le lecteur protégé de la formation mentorat TRADEVERSITY","المشغّل المحمي لدورة الإرشاد TRADEVERSITY"],
+ [".pills span",0,"🤖 Android","🤖 أندرويد"],[".pills span",1,"🪟 Windows","🪟 ويندوز"],[".url small",0,"FORMATION MENTORAT","دورة الإرشاد"]];
+if(LANG!=="en")TX.forEach(([s,i,fr,ar])=>{const e=document.querySelectorAll(s)[i];if(e)e.innerHTML=LANG==="fr"?fr:ar});
+const chs=document.getElementById('chips');
+CH.forEach(([a,b,top,ic,t,s])=>{const d=document.createElement('div');d.className='chip';d.style.top=top+'px';d.innerHTML=`<i>${ic}</i><div>${t}${s?`<small>${s}</small>`:''}</div>`;
+ d.style.animation=`fadeUp .45s cubic-bezier(.2,1,.3,1) ${a}s both,outUp .35s ease ${b}s forwards`;chs.appendChild(d)});
+function seek(t){document.getAnimations().forEach(a=>{a.pause();a.currentTime=t*1000})}
+window.seek=seek;window.DUR=DUR;
+window.ready=Promise.all([document.fonts.ready,...[...document.images].map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r})),
+ ...["../brand/logo-512.png"].map(s=>new Promise(r=>{const i=new Image();i.onload=i.onerror=r;i.src=s}))]).then(()=>seek(0));
+</script></body></html>

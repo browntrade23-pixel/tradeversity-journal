@@ -357,6 +357,8 @@ const T={
 "Trading mentorship course":["Formation de mentorat en trading","دورة الإرشاد في التداول"],
 "The Tradeversity mentorship, step by step, by Brown Algo and ZN Trading.":["Le mentorat Tradeversity, étape par étape, par Brown Algo et ZN Trading.","إرشاد Tradeversity خطوة بخطوة، من Brown Algo و ZN Trading."],
 "Content still unavailable":["Contenu pas encore disponible","المحتوى غير متاح بعد"],
+"Watch: what is Cerebra by TDV?":["Regardez : c'est quoi Cerebra by TDV ?","شاهد: ما هو Cerebra by TDV؟"],
+"45 seconds · the secure player of the course":["45 secondes · le lecteur sécurisé de la formation","45 ثانية · المشغّل الآمن للدورة"],
 "The lessons are being prepared. They will appear here as soon as they are ready.":["Les leçons sont en préparation. Elles apparaîtront ici dès qu'elles seront prêtes.","الدروس قيد التحضير. ستظهر هنا فور جاهزيتها."],
 "Protected content":["Contenu protégé","محتوى محمي"],
 "Members only":["Réservé aux membres","للأعضاء فقط"],

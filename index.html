@@ -1328,6 +1328,14 @@ html[data-theme=light] .card>h3:first-child,html[data-theme=light] .card>.row:fi
 .tour-btn .tour-play{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:linear-gradient(180deg,#6e7cf5,#4655e6);color:#fff;font-size:13px;padding-inline-start:2px;animation:tourPulse 2s ease-in-out infinite}
 .tour-btn b{display:block;font-size:13.5px}.tour-btn small{display:block;font-size:11px;opacity:.75}
 @keyframes tourPulse{0%,100%{box-shadow:0 0 0 0 rgba(91,108,240,.6)}50%{box-shadow:0 0 0 8px rgba(91,108,240,0)}}
+/* ▶ Cerebra explainer button (course section): gold version of the tour button */
+.cv-intro{display:flex;justify-content:center;margin:2px 0 14px}
+.cer-btn{border-color:rgba(245,185,66,.55);background:linear-gradient(180deg,rgba(245,185,66,.2),rgba(98,70,190,.14));box-shadow:0 0 22px -8px rgba(245,185,66,.8)}
+.cer-btn:hover{box-shadow:0 0 28px -6px rgba(245,185,66,.95)}
+.cer-btn .tour-play{background:linear-gradient(180deg,#ffd27a,#f5b942);color:#1b1305;animation-name:cerPulse}
+@keyframes cerPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,185,66,.6)}50%{box-shadow:0 0 0 8px rgba(245,185,66,0)}}
+html[data-theme=light] .cer-btn{color:#1b1305}
+html.player .cv-intro{display:none}
 /* ---- demo mode (phone tour) ---- */
 html.demo :is(#logout,#instBtn,#shareBtn,.start-card,.inst-btn){display:none!important}
 html.demo .tour-tap{position:fixed;z-index:9999;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;pointer-events:none;
@@ -1880,7 +1888,7 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
 
 <script src="i18n.js"></script>
 <script src="news-info.js"></script>
-<script src="indicator-video.js"></script><script src="tour.js?v=5"></script><script src="propfirms.js"></script><script src="propfirms-sizes.js"></script><script src="propfirms-coupons.js"></script><script src="propfirms-updates.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
+<script src="indicator-video.js"></script><script src="tour.js?v=5"></script><script src="cerebra-intro.js?v=1"></script><script src="propfirms.js"></script><script src="propfirms-sizes.js"></script><script src="propfirms-coupons.js"></script><script src="propfirms-updates.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
 <script>
 /* =====================================================================
    CONFIG — your Supabase project (the anon key is public by design;
@@ -3467,7 +3475,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-20o";
+const APP_VER="2026-11-20p";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4962,6 +4970,8 @@ function resultsBtn(){return `<a class="tg-link res" href="${ABOUT.channel}" tar
 /* ▶ phone tour video of the platform (tour.js) */
 function tourBtn(){return `<button type="button" class="tour-btn" data-tour><span class="tour-play">▶</span><span><b>Watch the platform tour</b><small>1 minute · on a phone</small></span></button>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tour]");if(b&&window.Tour){e.preventDefault();Tour.open()}});
+/* ▶ Cerebra by TDV explainer (cerebra-intro.js): course section */
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-cerebra]");if(b&&window.CerebraIntro){e.preventDefault();CerebraIntro.open()}});
 /* About: our story (timeline) + FAQ */
 document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#indCopy")&&window.INDICATOR&&INDICATOR.url)copyText(INDICATOR.url)});
 function aboutExtra(){const tl=[["📈",`${ABOUT.yearsPrefix?ABOUT.yearsPrefix+" ":""}${ABOUT.years} years in the markets`,"Brown Algo and ZNtrading trade futures with a precise scalping system."],
@@ -5084,6 +5094,7 @@ const C_RULES=`<ul class="cv-rules">
   </ul>`;
 function vCourse(el){el.classList.add("course-v","cv-guard");
   el.innerHTML=`<h1>🎓 <span>Trading mentorship course</span></h1><p class="sub">The Tradeversity mentorship, step by step, by Brown Algo and ZN Trading.</p>
+   <div class="cv-intro"><button type="button" class="tour-btn cer-btn" data-cerebra><span class="tour-play">▶</span><span><b>Watch: what is Cerebra by TDV?</b><small>45 seconds · the secure player of the course</small></span></button></div>
    <div id="cvBody"><div class="card cv-soon"><div class="cv-load"></div></div></div>
    <div class="cv-wm" aria-hidden="true" data-notr>${Array.from({length:18},()=>`<span>${courseMark()}</span>`).join("")}</div>
    <div class="cv-shield hidden" id="cvShield"><div>🔒 <span>Content hidden. Click here to continue.</span></div></div>`;
