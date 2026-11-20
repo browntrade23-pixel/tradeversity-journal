@@ -127,6 +127,11 @@ Deno.serve(async (req) => {
   if (!m0) return json({ ok: true, member: false });
   let m: any = m0;
   if (m.status === "blocked") { if (action !== "status") await log(uid, action, false, "blocked"); return json({ ok: true, member: true, blocked: true }); }
+  // Windows PC: the course works only in the TRADEVERSITY app (its window is hidden from screen capture)
+  const fullUa = req.headers.get("user-agent") || "";
+  if (["activate", "lessons", "play", "resetConfirm"].includes(action) && /Windows NT/.test(fullUa) && !/TradeversityApp\//.test(fullUa)) {
+    await log(uid, action, false, "use_app"); return json({ ok: false, error: "use_app" });
+  }
 
   // a device change that waited 24 hours becomes the device now
   if (m.pend_pub && m.pend_at && Date.now() - new Date(m.pend_at).getTime() >= WAIT) {
