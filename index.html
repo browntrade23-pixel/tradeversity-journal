@@ -912,7 +912,7 @@ html[lang=ar] .astat .apre{letter-spacing:0}
 @media(prefers-reduced-motion:reduce){.rtrack,.about-mini{animation:none;opacity:1}}
 /* founder signature */
 .foot.founder{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:22px}
-.foot.founder span{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--dim)}
+.foot.founder span{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:color-mix(in srgb,var(--dim) 60%,var(--text))}
 .foot.founder b{font-size:17px;letter-spacing:.32em;color:var(--gold);font-weight:800;text-shadow:0 0 18px rgba(245,185,66,.35)}
 .foot.founder::before{content:"";width:90px;height:1px;margin-bottom:8px;background:linear-gradient(90deg,transparent,rgba(245,185,66,.7),transparent)}
 .founder-chip{font-size:10px;letter-spacing:.12em;text-transform:uppercase}
@@ -1938,7 +1938,7 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
       <span class="chip" id="whoChip" data-notr></span>
       <button class="btn sm inst-btn hidden" id="instBtn" type="button">📲 <span>Install app</span></button>
       <button type="button" class="hd-ic" id="cmdBtn" title="Search (Ctrl+K)" aria-label="Search">🔍</button>
-      <button class="ntf-bell" id="ntfBell" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="ntf-badge hidden" id="ntfBadge"></span></button>
+      <button class="ntf-bell" id="ntfBell" type="button" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="ntf-badge hidden" id="ntfBadge" aria-hidden="true"></span></button>
       <!-- ⚙️ one menu: theme, background, language, tour, log out -->
       <button type="button" class="hd-ic me-btn" id="meBtn" title="My profile" aria-label="My profile">👤</button>
       <span class="disp-w"><button type="button" class="hd-ic" id="dispBtn" title="Settings" aria-label="Settings" aria-expanded="false">⚙️</button><div class="disp-pop hidden" id="dispPop" role="dialog" aria-label="Settings"><div class="dp-row"><small>Language</small><span id="langTop"></span></div><div class="dp-row"><small>Theme</small><span class="theme-slot"></span></div><div class="dp-row"><small>Background</small><div class="seg dp-bg" id="bgSeg"><button type="button" data-bg="3d">✨ <span>3D</span></button><button type="button" data-bg="light">🖼 <span>Light</span></button><button type="button" data-bg="off">⬛ <span>Off</span></button></div><small class="mut dp-note">Light = still image, saves battery.</small></div><div class="dp-acts"><button type="button" class="btn sm" id="dpTour">❓ <span>Platform tour</span></button><button class="btn sm ghost" id="logout" type="button">↪ <span>Log out</span></button></div></div></span>
@@ -3569,7 +3569,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-21g";
+const APP_VER="2026-11-21h";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
