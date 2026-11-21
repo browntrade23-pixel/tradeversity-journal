@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /*.sql$
+Disallow: /supabase/
+Disallow: /preview/
+
+Sitemap: https://jointradeversity.com/sitemap.xml

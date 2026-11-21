@@ -1,0 +1,27 @@
+# TRADEVERSITY
+
+> TRADEVERSITY is a trading journal and trading mentorship built for prop firm traders (futures and CFD), by Brown Algo and ZN Trading. Available in English, French and Arabic. The platform is opening to the public soon; follow the socials for the launch.
+
+## What it does
+- Trading journal: log trades with P&L, prop firm commissions, emotions, rating and chart screenshots; import CSV from Tradovate, NinjaTrader and MT5.
+- Statistics: P&L calendar, win rate, profit factor, expectancy, streaks, best and worst day.
+- Prop firm rules: pick the firm, plan and size; profit target, daily loss and max drawdown fill in automatically, with live gauges and Telegram alerts at 80% and 100% of the daily loss.
+- Prop firm tracker: rules and hidden rules of 45 futures and CFD prop firms, prices per size, payouts, and which firms accept traders from Algeria.
+- News alerts: red and orange folder USD news with countdowns in New York and Algeria time, and a Telegram alert 5 minutes before red news.
+- Trading tools: risk calculator (contracts or lots for a stop) and consistency rule calculator.
+- Mentorship course: step-by-step scalping system with a mentor; lessons play in the protected Cerebra by TDV app (Windows and Android).
+
+## Links
+- [Website](https://jointradeversity.com/welcome.html)
+- [All links](https://jointradeversity.com/links)
+- [Cerebra by TDV app](https://jointradeversity.com/cerebra/intro.html)
+- [Privacy policy](https://jointradeversity.com/privacy.html)
+- [YouTube](https://youtube.com/@browndzcircletrader)
+- [Instagram](https://www.instagram.com/brown_algo)
+- [TikTok](https://www.tiktok.com/@brown_algo.ar)
+- [Telegram channel](https://t.me/brown_algo)
+- [Students' results](https://t.me/tradeversity_feedbackresult)
+
+## Notes
+- Education only, not financial advice. Trading is risky.
+- Questions: contact the support team from the website.

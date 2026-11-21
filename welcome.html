@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>TRADEVERSITY</title>
+<title>TRADEVERSITY · Trading journal for prop firm traders</title>
 <meta name="description" content="The trading journal built for prop firm traders: journal, statistics, prop firm rules, news alerts, risk tools. By Tradeversity.">
 <meta name="theme-color" content="#030407">
 <meta property="og:type" content="website">
@@ -16,9 +16,11 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://jointradeversity.com/brand/share-card.png">
 
+<link rel="canonical" href="https://jointradeversity.com/welcome.html">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "Organization", "name": "TRADEVERSITY", "url": "https://jointradeversity.com/", "logo": "https://jointradeversity.com/brand/logo-192.png", "founder": [{"@type": "Person", "name": "Brown Algo"}], "sameAs": ["https://youtube.com/@browndzcircletrader", "https://www.instagram.com/brown_algo", "https://www.tiktok.com/@brown_algo.ar", "https://kick.com/brown_algo_trader", "https://t.me/brown_algo", "https://discord.gg/4GmSAwuBZ"]}, {"@context": "https://schema.org", "@type": "WebSite", "name": "TRADEVERSITY", "url": "https://jointradeversity.com/", "inLanguage": ["en", "fr", "ar"]}, {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "TRADEVERSITY trading journal", "applicationCategory": "FinanceApplication", "operatingSystem": "Web, Windows, Android", "url": "https://jointradeversity.com/welcome.html", "description": "Trading journal for prop firm traders: statistics, prop firm rules, news alerts and risk tools, in English, French and Arabic."}]</script>
 <link rel="icon" href="brand/logo-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@500;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@500;700;800;900&family=JetBrains+Mono:wght@700&display=swap" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@500;700;800;900&family=JetBrains+Mono:wght@700&display=swap"></noscript>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--g:#f5b942;--g2:#ffd27a;--ind:#3a48e0;--ind2:#7c8bff;--tx:#f5f7fa;--mut:#a0a6b8;--bg:#030407}
@@ -86,6 +88,7 @@ section.r .phone{transform:rotateY(14deg) rotateX(6deg)}
 .phone div{width:100%;height:100%;border-radius:33px;background:#050608 top/100% auto no-repeat}
 .reveal{opacity:0;transform:translateY(40px);filter:blur(6px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.9,.3,1),filter .9s ease}
 .in .reveal{opacity:1;transform:none;filter:none}
+#hero .reveal{opacity:1;filter:none;transform:none;animation:heroIn .8s cubic-bezier(.2,.9,.3,1) both}@keyframes heroIn{from{transform:translateY(22px)}to{transform:none}}
 .in .reveal:nth-child(2){transition-delay:.08s}.in .reveal:nth-child(3){transition-delay:.16s}.in .reveal:nth-child(4){transition-delay:.24s}.in .reveal:nth-child(5){transition-delay:.32s}
 /* hero */
 #hero .wrap{grid-template-columns:1fr}
@@ -161,7 +164,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
     <li><i>✎</i><span data-t="j_3">Edit any trade, anytime · no-trade days count as $0</span></li>
     <li><i>📏</i><span data-t="j_4">Contracts for futures, lot size for CFD and personal accounts</span></li>
   </ul></div>
-  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/trade.jpg)"></div></div></div></div></section>
+  <div class="shot reveal"><div class="phone"><div data-bg="landing/trade.webp"></div></div></div></div></section>
 
 <section id="stats" class="r" data-shape="heatmap"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="s_k">Statistics</div>
@@ -173,7 +176,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
     <li><i>📅</i><span data-t="s_3">Green and red days at a glance on the calendar</span></li>
     <li><i>🔗</i><span data-t="s_4">Share your results with a link or a QR code, view only</span></li>
   </ul></div>
-  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/stats.jpg)"></div></div></div></div></section>
+  <div class="shot reveal"><div class="phone"><div data-bg="landing/stats.webp"></div></div></div></div></section>
 
 <section id="rules" data-shape="shield"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="r_k">Prop firm rules</div>
@@ -185,7 +188,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
     <li><i>🎯</i><span data-t="r_3">Live meters: profit target, daily loss limit, max drawdown</span></li>
     <li><i>⚠️</i><span data-t="r_4">Telegram alert at 80% and 100% of your daily loss</span></li>
   </ul></div>
-  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/rules-auto.jpg)"></div></div></div></div></section>
+  <div class="shot reveal"><div class="phone"><div data-bg="landing/rules-auto.webp"></div></div></div></div></section>
 
 <section id="firms" class="r" data-shape="orbit"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="f_k">Prop firm tracker</div>
@@ -197,7 +200,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
     <li><i>🏷️</i><span data-t="f_3">Discounts up to <b>-89%</b> with code <b>BROWN23</b></span></li>
     <li><i>🔄</i><span data-t="f_4">Updated twice a month</span></li>
   </ul></div>
-  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/propfirms.jpg)"></div></div></div></div></section>
+  <div class="shot reveal"><div class="phone"><div data-bg="landing/propfirms.webp"></div></div></div></div></section>
 
 <section id="news" data-shape="wave"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="n_k">News alerts</div>
@@ -209,7 +212,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
     <li><i>🔔</i><span data-t="n_3">Notifications: today's news, journal and plan reminders</span></li>
     <li><i>🌍</i><span data-t="n_4">In English, Français and العربية</span></li>
   </ul></div>
-  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/news.jpg)"></div></div></div></div></section>
+  <div class="shot reveal"><div class="phone"><div data-bg="landing/news.webp"></div></div></div></div></section>
 
 <section id="tools" class="r" data-shape="balance"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="t_k">Trading tools</div>
@@ -221,7 +224,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
     <li><i>🗓️</i><span data-t="t_3">Tomorrow's plan: bias, key levels, max loss</span></li>
     <li><i>📈</i><span data-t="t_4">Free ICT indicator for TradingView</span></li>
   </ul></div>
-  <div class="shot reveal"><div class="phone"><div style="background-image:url(landing/risk.jpg)"></div></div></div></div></section>
+  <div class="shot reveal"><div class="phone"><div data-bg="landing/risk.webp"></div></div></div></div></section>
 
 <section id="results" data-shape="trophy"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="a_k">About us</div>
@@ -277,14 +280,18 @@ const imgs=RES.map(n=>`<img src="results/thumbs/result-${n}.jpg" alt="Student re
 const secs=[...document.querySelectorAll("main section")];
 document.querySelector(".dots").innerHTML=secs.map(s=>`<a href="#${s.id}" aria-label="${s.id}"></a>`).join("");
 const dots=[...document.querySelectorAll(".dots a")];
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");dots.forEach((d,i)=>d.classList.toggle("on",secs[i]===e.target))}}),{threshold:.35});
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");e.target.querySelectorAll("[data-bg]").forEach(b=>{b.style.backgroundImage="url("+b.dataset.bg+")";b.removeAttribute("data-bg")});dots.forEach((d,i)=>d.classList.toggle("on",secs[i]===e.target))}}),{threshold:.35});
 secs.forEach(s=>io.observe(s));
+const pre=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll("[data-bg]").forEach(b=>{b.style.backgroundImage="url("+b.dataset.bg+")";b.removeAttribute("data-bg")});pre.unobserve(e.target)}}),{rootMargin:"600px 0px"});
+secs.forEach(s=>pre.observe(s));
 </script>
 
 <!-- 3D particles: one shape per section, morphing as you scroll -->
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"}}</script>
 <script type="module">
-import * as THREE from "three";
+await new Promise(r=>{const go=()=>("requestIdleCallback" in window?requestIdleCallback(r,{timeout:1500}):setTimeout(r,200));document.readyState==="complete"?go():addEventListener("load",go,{once:true})});
+const THREE=await import("three");
+const {buildShapes}=await import("./trade3d-shapes.js?v=3");
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canvas=document.getElementById("bg");
 let renderer;try{renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:true,powerPreference:"high-performance"})}catch(e){canvas.remove();throw e}
@@ -292,7 +299,6 @@ const small=innerWidth<860;
 const N=small?9000:15000;
 renderer.setPixelRatio(Math.min(devicePixelRatio,small?1.5:1.75));
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(55,1,.1,100);camera.position.set(0,0,8.5);
-import {buildShapes} from "./trade3d-shapes.js?v=3";
 const rnd=(a=1)=>(Math.random()*2-1)*a;
 const S=buildShapes(THREE,N);   /* TradingView-style chart scenes: candles, levels, P&L bars, position tool... */
 /* points */
