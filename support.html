@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Help center · TRADEVERSITY</title>
+<meta name="description" content="TRADEVERSITY help center: account, email and Telegram verification, the Mentorship course, the Cerebra by TDV app, the trading journal. Contact the support team.">
+<meta name="theme-color" content="#030407">
+<link rel="canonical" href="https://jointradeversity.com/support.html">
+<meta property="og:type" content="website"><meta property="og:site_name" content="TRADEVERSITY">
+<meta property="og:title" content="TRADEVERSITY · Help center"><meta property="og:description" content="Answers to common questions, and the support team.">
+<meta property="og:image" content="https://jointradeversity.com/brand/share-card.png">
+<link rel="icon" href="brand/logo-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cairo:wght@500;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<style>
+:root{--bg:#030407;--panel:rgba(16,18,28,.82);--line:rgba(255,255,255,.1);--tx:#f5f7fa;--mut:#a7adbf;--g:#f5b942;--g2:#ffd27a;--ok:#3ccf8e;--bad:#ff6b6b}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:radial-gradient(700px 480px at 15% -5%,rgba(58,72,224,.38),transparent 70%),radial-gradient(640px 460px at 95% 105%,rgba(245,185,66,.16),transparent 70%),var(--bg);color:var(--tx);font:15px/1.55 Inter,system-ui,sans-serif}
+html[lang=ar] body{font-family:Cairo,Inter,sans-serif}
+a{color:var(--g2)}
+main{max-width:760px;margin:0 auto;padding:18px 16px 40px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--tx);text-decoration:none;font-weight:800;letter-spacing:.4px}
+.brand i{width:34px;height:34px;border-radius:50%;background:url(brand/logo-192.png) center/cover;box-shadow:0 0 0 2px var(--g)}
+.langs{display:flex;gap:6px}
+.langs button{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--mut);border-radius:999px;padding:5px 11px;font:inherit;font-size:12.5px;cursor:pointer}
+.langs button.on{background:var(--g);color:#17130a;border-color:var(--g);font-weight:700}
+h1{font-size:28px;margin:6px 0 4px}
+.lead{color:var(--mut);margin:0 0 16px}
+.search{width:100%;padding:13px 15px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--tx);font:inherit;font-size:16px}
+.search:focus,.f input:focus,.f select:focus,.f textarea:focus{outline:2px solid var(--g);outline-offset:1px}
+.cat{margin:22px 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--g2)}
+details.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin:8px 0;padding:0 14px}
+details.q summary{cursor:pointer;padding:13px 0;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:10px}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary:after{content:"+";color:var(--g);font-weight:800}
+details.q[open] summary:after{content:"–"}
+details.q p{margin:0 0 14px;color:#d6dae5}
+.none{display:none;color:var(--mut);padding:10px 2px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:26px}
+.card h2{margin:0 0 4px;font-size:20px}
+.f{display:grid;gap:10px;margin-top:12px}
+.f label{display:grid;gap:5px;font-size:13px;color:var(--mut)}
+.f input,.f select,.f textarea{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--tx);font:inherit;font-size:15px}
+.f textarea{min-height:120px;resize:vertical}
+.hp{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;border:0;border-radius:12px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;background:var(--g);color:#17130a}
+.btn[disabled]{opacity:.6;cursor:wait}
+.msg{margin:6px 0 0;font-size:14px}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.note{font-size:12.5px;color:var(--mut);margin:10px 0 0}
+footer{margin-top:28px;display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;color:var(--mut);font-size:13px}
+footer a{color:var(--mut)}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><a class="brand" href="welcome.html" aria-label="TRADEVERSITY home"><i></i><span>TRADEVERSITY</span></a>
+    <div class="langs" role="group" aria-label="Language"><button data-l="en">EN</button><button data-l="fr">FR</button><button data-l="ar">AR</button></div></div>
+
+  <h1 data-t="h1">Help center</h1>
+  <p class="lead" data-t="lead">Quick answers to common questions. Still stuck? Write to the support team below.</p>
+  <input class="search" id="q" type="search" data-tp="search" placeholder="Search: password, Telegram, new phone, install…" aria-label="Search the help center">
+  <p class="none" id="none" data-t="none">No answer found. Write to the support team below.</p>
+
+  <div id="faq">
+    <div class="cat" data-t="c1">Account</div>
+    <details class="q"><summary data-t="q1">I didn't get the verification email</summary><p data-t="a1">Check your Spam and Promotions folders. The code expires after 1 hour: on the verification screen, tap "Send a new code". Make sure the email address is written correctly, or tap "Change email".</p></details>
+    <details class="q"><summary data-t="q2">I forgot my password</summary><p data-t="a2">On the login screen, type your email first, then tap "Forgot password?". You will receive an email to choose a new password.</p></details>
+    <details class="q"><summary data-t="q3">My account is waiting for approval</summary><p data-t="a3">After you verify your email and your Telegram, the team approves new members. You can use the app as soon as your account is approved.</p></details>
+    <div class="cat" data-t="c2">Telegram</div>
+    <details class="q"><summary data-t="q4">How do I verify my Telegram?</summary><p data-t="a4">Open our bot @Tardeversity_verify_bot on Telegram and press Start. It sends you a 6-digit code: type it in the app. The code works for 15 minutes, with 5 tries. Your Telegram username in your profile must be the one you use on Telegram.</p></details>
+    <div class="cat" data-t="c3">Mentorship course</div>
+    <details class="q"><summary data-t="q5">Where do I watch the course?</summary><p data-t="a5">On a Windows PC, in the Cerebra by TDV app. On Android, in the Cerebra by TDV app for Android. iPhone and iPad are not supported yet. Open the Mentorship course in your account: it shows the right download for your device.</p></details>
+    <details class="q"><summary data-t="q6">I have a new phone or PC</summary><p data-t="a6">Move the course yourself: on the new device, ask for a code sent to your Telegram and type it. The new device replaces the old one 24 hours later, and your old device can cancel the change. You can move it once every 90 days, 2 times a year.</p></details>
+    <details class="q"><summary data-t="q7">Why does the course open on one device only?</summary><p data-t="a7">To protect the lessons from sharing and leaks. Your name and email also appear on every video, so a leak shows who it came from.</p></details>
+    <details class="q"><summary data-t="q8">Windows says "Windows protected your PC"</summary><p data-t="a8">Click "More info", then "Run anyway". Windows shows this because the app is new and not yet signed with a paid certificate, not because it is harmful. Only download it from jointradeversity.com.</p></details>
+    <details class="q"><summary data-t="q9">Android or Play Protect warns me</summary><p data-t="a9">If Chrome asks, tap "Download anyway". If Play Protect warns, tap "More details", then "Install anyway". It warns about any app that doesn't come from Google Play.</p></details>
+    <div class="cat" data-t="c4">Trading journal</div>
+    <details class="q"><summary data-t="q10">How do I import my trades?</summary><p data-t="a10">In My trading, use "Import CSV". It reads exports from Tradovate, NinjaTrader and MT5, and detects your prop firm, platform and commissions.</p></details>
+    <details class="q"><summary data-t="q11">Who can see my journal?</summary><p data-t="a11">Only you. A share link is read-only and you can turn it off at any time. Read our privacy policy for the details.</p></details>
+    <details class="q"><summary data-t="q12">Is TRADEVERSITY financial advice?</summary><p data-t="a12">No. Everything is education only. Trading is risky: never risk money you can't afford to lose.</p></details>
+  </div>
+
+  <section class="card" id="contact">
+    <h2 data-t="ch">Contact the support team</h2>
+    <p class="lead" style="margin:0" data-t="cl">Tell us what happened. We answer every message by email, in English, French or Arabic.</p>
+    <form class="f" id="form" novalidate>
+      <label><span data-t="fe">Your email</span><input name="email" type="email" required maxlength="200" autocomplete="email"></label>
+      <label><span data-t="ft">Topic</span><select name="topic">
+        <option value="account" data-t="t1">Account and login</option><option value="telegram" data-t="t2">Telegram verification</option>
+        <option value="course" data-t="t3">Mentorship course</option><option value="app" data-t="t4">Cerebra by TDV app</option>
+        <option value="journal" data-t="t5">Trading journal</option><option value="other" data-t="t6">Something else</option></select></label>
+      <label><span data-t="fm">Your message</span><textarea name="message" required minlength="10" maxlength="2000"></textarea></label>
+      <div class="hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <button class="btn" type="submit" id="send" data-t="send">Send to the support team</button>
+      <p class="msg" id="msg" role="status"></p>
+    </form>
+    <p class="note" data-t="safe">Never send your password. The support team will never ask for it, and will never send you the app in a private message.</p>
+  </section>
+
+  <footer><span>© <span id="yr"></span> TRADEVERSITY</span><a href="welcome.html" data-t="home">Home</a><a href="privacy.html" data-t="priv">Privacy policy</a><a href="links" data-t="links">All links</a></footer>
+</main>
+<script>
+(function(){
+var SB="https://szovzzkukzuytkzieuae.supabase.co",KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6b3Z6emt1a3p1eXRremlldWFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ3ODIyMTgsImV4cCI6MjExMDM1ODIxOH0.hEcb4PhOIrKOZiwvMG6YQQHdR2zr1AhHOHmWeCSKJG0";
+var T={fr:{h1:"Centre d'aide",lead:"Des réponses rapides aux questions courantes. Toujours bloqué ? Écrivez à l'équipe support plus bas.",search:"Rechercher : mot de passe, Telegram, nouveau téléphone, installation…",none:"Aucune réponse trouvée. Écrivez à l'équipe support plus bas.",
+c1:"Compte",q1:"Je n'ai pas reçu l'e-mail de vérification",a1:"Vérifiez vos dossiers Spam et Promotions. Le code expire après 1 heure : sur l'écran de vérification, touchez « Envoyer un nouveau code ». Vérifiez que l'adresse e-mail est bien écrite, ou touchez « Changer d'e-mail ».",
+q2:"J'ai oublié mon mot de passe",a2:"Sur l'écran de connexion, tapez d'abord votre e-mail, puis touchez « Mot de passe oublié ? ». Vous recevrez un e-mail pour choisir un nouveau mot de passe.",
+q3:"Mon compte attend l'approbation",a3:"Après la vérification de votre e-mail et de votre Telegram, l'équipe approuve les nouveaux membres. Vous pouvez utiliser l'appli dès que votre compte est approuvé.",
+c2:"Telegram",q4:"Comment vérifier mon Telegram ?",a4:"Ouvrez notre bot @Tardeversity_verify_bot sur Telegram et appuyez sur Démarrer. Il vous envoie un code à 6 chiffres : tapez-le dans l'appli. Le code fonctionne 15 minutes, avec 5 essais. Le nom d'utilisateur Telegram de votre profil doit être celui que vous utilisez sur Telegram.",
+c3:"Formation Mentorship",q5:"Où regarder la formation ?",a5:"Sur un PC Windows, dans l'appli Cerebra by TDV. Sur Android, dans l'appli Cerebra by TDV pour Android. iPhone et iPad ne sont pas encore pris en charge. Ouvrez la formation dans votre compte : elle affiche le bon téléchargement pour votre appareil.",
+q6:"J'ai un nouveau téléphone ou PC",a6:"Déplacez la formation vous-même : sur le nouvel appareil, demandez un code envoyé sur votre Telegram et tapez-le. Le nouvel appareil remplace l'ancien 24 heures plus tard, et l'ancien appareil peut annuler. Vous pouvez la déplacer une fois tous les 90 jours, 2 fois par an.",
+q7:"Pourquoi la formation s'ouvre sur un seul appareil ?",a7:"Pour protéger les leçons du partage et des fuites. Votre nom et votre e-mail apparaissent aussi sur chaque vidéo : une fuite montre d'où elle vient.",
+q8:"Windows affiche « Windows a protégé votre ordinateur »",a8:"Cliquez sur « Informations complémentaires », puis « Exécuter quand même ». Windows l'affiche parce que l'appli est nouvelle et pas encore signée avec un certificat payant, pas parce qu'elle est dangereuse. Téléchargez-la uniquement sur jointradeversity.com.",
+q9:"Android ou Play Protect m'avertit",a9:"Si Chrome le demande, touchez « Télécharger quand même ». Si Play Protect avertit, touchez « Plus de détails », puis « Installer quand même ». Il avertit pour toute appli qui ne vient pas de Google Play.",
+c4:"Journal de trading",q10:"Comment importer mes trades ?",a10:"Dans Mon trading, utilisez « Importer CSV ». Il lit les exports de Tradovate, NinjaTrader et MT5, et détecte votre prop firm, la plateforme et les commissions.",
+q11:"Qui peut voir mon journal ?",a11:"Vous seul. Un lien de partage est en lecture seule et vous pouvez le désactiver à tout moment. Lisez notre politique de confidentialité pour les détails.",
+q12:"TRADEVERSITY est-il un conseil financier ?",a12:"Non. Tout est uniquement éducatif. Le trading est risqué : ne risquez jamais de l'argent que vous ne pouvez pas vous permettre de perdre.",
+ch:"Contacter l'équipe support",cl:"Dites-nous ce qui s'est passé. Nous répondons à chaque message par e-mail, en anglais, français ou arabe.",fe:"Votre e-mail",ft:"Sujet",fm:"Votre message",
+t1:"Compte et connexion",t2:"Vérification Telegram",t3:"Formation Mentorship",t4:"Appli Cerebra by TDV",t5:"Journal de trading",t6:"Autre chose",send:"Envoyer à l'équipe support",
+safe:"N'envoyez jamais votre mot de passe. L'équipe support ne vous le demandera jamais et ne vous enverra jamais l'appli en message privé.",home:"Accueil",priv:"Politique de confidentialité",links:"Tous les liens",
+m_ok:"Merci ! Votre message est arrivé à l'équipe support. Nous vous répondons par e-mail.",m_email:"Écrivez une adresse e-mail valide.",m_msg:"Votre message doit faire au moins 10 caractères.",m_many:"Vous avez déjà envoyé 3 messages cette heure. Réessayez plus tard.",m_soon:"Le formulaire de contact ouvre très bientôt. Réessayez un peu plus tard.",m_err:"Envoi impossible. Vérifiez votre connexion et réessayez."},
+ar:{h1:"مركز المساعدة",lead:"إجابات سريعة على الأسئلة الشائعة. ما زلت عالقاً؟ اكتب لفريق الدعم في الأسفل.",search:"ابحث: كلمة المرور، تيليغرام، هاتف جديد، التثبيت…",none:"لم نجد إجابة. اكتب لفريق الدعم في الأسفل.",
+c1:"الحساب",q1:"لم يصلني بريد التحقق",a1:"تحقق من مجلدات البريد المزعج والعروض. ينتهي الرمز بعد ساعة: في شاشة التحقق اضغط «إرسال رمز جديد». تأكد من كتابة بريدك بشكل صحيح، أو اضغط «تغيير البريد».",
+q2:"نسيت كلمة المرور",a2:"في شاشة تسجيل الدخول اكتب بريدك أولاً، ثم اضغط «نسيت كلمة المرور؟». ستصلك رسالة لاختيار كلمة مرور جديدة.",
+q3:"حسابي في انتظار الموافقة",a3:"بعد التحقق من بريدك وتيليغرام، يوافق الفريق على الأعضاء الجدد. يمكنك استخدام التطبيق بمجرد الموافقة على حسابك.",
+c2:"تيليغرام",q4:"كيف أتحقق من حساب تيليغرام؟",a4:"افتح البوت @Tardeversity_verify_bot على تيليغرام واضغط Start. سيرسل لك رمزاً من 6 أرقام: اكتبه في التطبيق. الرمز صالح 15 دقيقة مع 5 محاولات. يجب أن يكون اسم مستخدم تيليغرام في ملفك هو نفسه الذي تستعمله على تيليغرام.",
+c3:"دورة الإرشاد",q5:"أين أشاهد الدورة؟",a5:"على حاسوب ويندوز، في تطبيق Cerebra by TDV. على أندرويد، في تطبيق Cerebra by TDV لأندرويد. الآيفون والآيباد غير مدعومين بعد. افتح الدورة في حسابك: ستعرض التنزيل المناسب لجهازك.",
+q6:"لدي هاتف أو حاسوب جديد",a6:"انقل الدورة بنفسك: على الجهاز الجديد اطلب رمزاً يُرسل إلى تيليغرام واكتبه. يحلّ الجهاز الجديد محل القديم بعد 24 ساعة، ويمكن للجهاز القديم إلغاء النقل. يمكنك النقل مرة كل 90 يوماً، مرتين في السنة.",
+q7:"لماذا تُفتح الدورة على جهاز واحد فقط؟",a7:"لحماية الدروس من المشاركة والتسريب. يظهر اسمك وبريدك أيضاً على كل فيديو، فأي تسريب يكشف مصدره.",
+q8:"يظهر Windows رسالة «Windows protected your PC»",a8:"اضغط «More info» ثم «Run anyway». يظهرها Windows لأن التطبيق جديد ولم يُوقَّع بعد بشهادة مدفوعة، وليس لأنه ضار. حمّله فقط من jointradeversity.com.",
+q9:"أندرويد أو Play Protect يحذّرني",a9:"إذا طلب Chrome، اضغط «التنزيل على أي حال». إذا حذّر Play Protect، اضغط «مزيد من التفاصيل» ثم «التثبيت على أي حال». يحذّر من أي تطبيق لا يأتي من Google Play.",
+c4:"يوميات التداول",q10:"كيف أستورد صفقاتي؟",a10:"في «تداولي» استعمل «استيراد CSV». يقرأ ملفات Tradovate وNinjaTrader وMT5، ويكتشف شركة التمويل والمنصة والعمولات.",
+q11:"من يمكنه رؤية يومياتي؟",a11:"أنت فقط. رابط المشاركة للعرض فقط ويمكنك إيقافه في أي وقت. اقرأ سياسة الخصوصية للتفاصيل.",
+q12:"هل TRADEVERSITY نصيحة مالية؟",a12:"لا. كل شيء تعليمي فقط. التداول محفوف بالمخاطر: لا تخاطر أبداً بمال لا تستطيع خسارته.",
+ch:"تواصل مع فريق الدعم",cl:"أخبرنا بما حدث. نرد على كل رسالة عبر البريد الإلكتروني، بالإنجليزية أو الفرنسية أو العربية.",fe:"بريدك الإلكتروني",ft:"الموضوع",fm:"رسالتك",
+t1:"الحساب وتسجيل الدخول",t2:"التحقق من تيليغرام",t3:"دورة الإرشاد",t4:"تطبيق Cerebra by TDV",t5:"يوميات التداول",t6:"شيء آخر",send:"أرسل إلى فريق الدعم",
+safe:"لا ترسل كلمة مرورك أبداً. لن يطلبها فريق الدعم منك، ولن يرسل لك التطبيق في رسالة خاصة.",home:"الرئيسية",priv:"سياسة الخصوصية",links:"كل الروابط",
+m_ok:"شكراً! وصلت رسالتك إلى فريق الدعم. سنرد عليك عبر البريد الإلكتروني.",m_email:"اكتب بريداً إلكترونياً صحيحاً.",m_msg:"يجب أن تكون رسالتك 10 أحرف على الأقل.",m_many:"أرسلت 3 رسائل خلال هذه الساعة. حاول لاحقاً.",m_soon:"نموذج التواصل سيفتح قريباً جداً. حاول بعد قليل.",m_err:"تعذّر الإرسال. تحقق من اتصالك وحاول مجدداً."}};
+var EN={m_ok:"Thank you! Your message reached the support team. We will answer you by email.",m_email:"Write a valid email address.",m_msg:"Your message needs at least 10 characters.",m_many:"You already sent 3 messages this hour. Try again later.",m_soon:"The contact form opens very soon. Please try again a little later.",m_err:"Couldn't send. Check your connection and try again."};
+document.querySelectorAll("[data-t]").forEach(function(e){EN[e.dataset.t]=e.textContent});
+document.querySelectorAll("[data-tp]").forEach(function(e){EN[e.dataset.tp]=e.placeholder});
+var lang="en";function tr(k){var d=lang==="en"?EN:T[lang];return (d&&d[k])||EN[k]||k}
+function set(l){lang=["en","fr","ar"].indexOf(l)>=0?l:"en";document.querySelectorAll("[data-t]").forEach(function(e){e.textContent=tr(e.dataset.t)});
+  document.querySelectorAll("[data-tp]").forEach(function(e){e.placeholder=tr(e.dataset.tp)});
+  document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+  document.querySelectorAll("[data-l]").forEach(function(b){b.classList.toggle("on",b.dataset.l===lang)});try{localStorage.setItem("tvj_lang",lang)}catch(e){}filter()}
+document.querySelectorAll("[data-l]").forEach(function(b){b.onclick=function(){set(b.dataset.l)}});
+/* instant answers: filter the questions as you type */
+var q=document.getElementById("q");
+function norm(s){return (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}
+function filter(){var v=norm(q.value).trim(),shown=0;document.querySelectorAll("details.q").forEach(function(d){var hit=!v||norm(d.textContent).indexOf(v)>=0||v.split(/\s+/).every(function(w){return norm(d.textContent).indexOf(w)>=0});d.style.display=hit?"":"none";if(hit)shown++;if(v&&hit)d.open=true});
+  document.querySelectorAll("#faq .cat").forEach(function(c){var n=c.nextElementSibling,any=false;while(n&&!n.classList.contains("cat")){if(n.style.display!=="none")any=true;n=n.nextElementSibling}c.style.display=any?"":"none"});
+  document.getElementById("none").style.display=shown?"none":"block"}
+q.addEventListener("input",filter);
+/* contact form -> support_requests (the support team gets a Telegram alert) */
+var f=document.getElementById("form"),msg=document.getElementById("msg"),btn=document.getElementById("send");
+function say(k,ok){msg.textContent=tr(k);msg.className="msg "+(ok?"ok":"bad")}
+f.addEventListener("submit",function(e){e.preventDefault();
+  if(f.website.value){say("m_ok",true);f.reset();return}
+  var email=f.email.value.trim(),text=f.message.value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){say("m_email");f.email.focus();return}
+  if(text.length<10){say("m_msg");f.message.focus();return}
+  btn.disabled=true;
+  fetch(SB+"/rest/v1/support_requests",{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json",Prefer:"return=minimal"},
+    body:JSON.stringify({email:email,topic:f.topic.value,message:text.slice(0,2000),lang:lang})})
+  .then(function(r){if(r.ok){say("m_ok",true);f.reset();return}return r.text().then(function(t){say(/too_many/.test(t)?"m_many":/support_requests|PGRST205|42P01/.test(t)?"m_soon":"m_err")})})
+  .catch(function(){say("m_err")}).then(function(){btn.disabled=false})});
+var s=null;try{s=localStorage.getItem("tvj_lang")}catch(e){}var nav=(navigator.language||"en").slice(0,2);
+var h=new URLSearchParams(location.search).get("lang");
+set(["en","fr","ar"].indexOf(h)>=0?h:["en","fr","ar"].indexOf(s)>=0?s:(["fr","ar"].indexOf(nav)>=0?nav:"en"));
+document.getElementById("yr").textContent=new Date().getFullYear();
+})();
+</script>
+</body>
+</html>

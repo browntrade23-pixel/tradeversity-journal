@@ -15,6 +15,7 @@
 - [Website](https://jointradeversity.com/welcome.html)
 - [All links](https://jointradeversity.com/links)
 - [Cerebra by TDV app](https://jointradeversity.com/cerebra/intro.html)
+- [Help center and support](https://jointradeversity.com/support.html)
 - [Privacy policy](https://jointradeversity.com/privacy.html)
 - [YouTube](https://youtube.com/@browndzcircletrader)
 - [Instagram](https://www.instagram.com/brown_algo)
@@ -24,4 +25,4 @@
 
 ## Notes
 - Education only, not financial advice. Trading is risky.
-- Questions: contact the support team from the website.
+- Questions: the help center and support team at https://jointradeversity.com/support.html
