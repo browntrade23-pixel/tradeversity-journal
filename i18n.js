@@ -10,6 +10,15 @@ const LANGS={en:{label:"English",locale:"en-US",dir:"ltr"},fr:{label:"Français"
 
 /* exact text  →  [French, Arabic] */
 const T={
+// Cerebra download: "Is it safe?" box
+"Is it safe?":["Est-ce sûr ?","هل هو آمن؟"],
+"Cerebra by TDV is made by the TRADEVERSITY team, only for this course.":["Cerebra by TDV est fait par l'équipe TRADEVERSITY, uniquement pour cette formation.","تطبيق Cerebra by TDV من صنع فريق TRADEVERSITY، خصيصاً لهذه الدورة."],
+"It opens your TRADEVERSITY course and nothing else: it doesn't read your files, photos or other apps.":["Il ouvre votre formation TRADEVERSITY et rien d'autre : il ne lit pas vos fichiers, vos photos ni vos autres applis.","يفتح دورتك في TRADEVERSITY فقط: لا يقرأ ملفاتك ولا صورك ولا تطبيقاتك الأخرى."],
+"Updates come only from jointradeversity.com and are checked with a digital fingerprint before they install.":["Les mises à jour viennent uniquement de jointradeversity.com et sont vérifiées par une empreinte numérique avant l'installation.","التحديثات تأتي فقط من jointradeversity.com ويتم التحقق منها ببصمة رقمية قبل التثبيت."],
+"Only download it from jointradeversity.com. Nobody from TRADEVERSITY will send you the app in a private message.":["Téléchargez-le uniquement sur jointradeversity.com. Personne de TRADEVERSITY ne vous enverra l'appli en message privé.","حمّله فقط من jointradeversity.com. لن يرسل لك أي أحد من TRADEVERSITY التطبيق في رسالة خاصة."],
+"Windows shows \"Windows protected your PC\" because the app is new and not yet signed with a paid certificate, not because it is harmful.":["Windows affiche « Windows a protégé votre ordinateur » parce que l'appli est nouvelle et pas encore signée avec un certificat payant, pas parce qu'elle est dangereuse.","يظهر Windows رسالة «Windows protected your PC» لأن التطبيق جديد ولم يُوقَّع بعد بشهادة مدفوعة، وليس لأنه ضار."],
+"It asks for only two permissions: internet, and installing its own updates.":["Il ne demande que deux autorisations : internet, et l'installation de ses propres mises à jour.","يطلب إذنين فقط: الإنترنت، وتثبيت تحديثاته الخاصة."],
+"Play Protect warns about any app that doesn't come from Google Play. A Google Play version is planned.":["Play Protect avertit pour toute appli qui ne vient pas de Google Play. Une version Google Play est prévue.","يحذّر Play Protect من أي تطبيق لا يأتي من Google Play. نسخة Google Play مخطط لها."],
 // auth
 "Log in":["Se connecter","تسجيل الدخول"],
 "Create free account":["Créer un compte gratuit","إنشاء حساب مجاني"],

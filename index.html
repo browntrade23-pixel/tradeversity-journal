@@ -135,6 +135,7 @@ html.player .dp-row:has(#bgSeg){display:none!important}
 .cv-sb{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}.cv-sb small{font-size:12px;line-height:1.4}.cv-step:not(.on) .cv-go{display:none}
 .cv-app a.cv-go{display:flex;align-items:center;gap:8px;text-decoration:none;margin:4px 0 12px}.cv-app .cv-steps{margin:0 0 10px}
 .cv-code{font-size:22px;letter-spacing:.4em;text-align:center}.cv-steps{padding-inline-start:20px;font-size:13px;display:grid;gap:6px}
+.cv-safe{margin:12px 0 0;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;background:color-mix(in srgb,var(--panel) 85%,#22c55e 15%)}.cv-safe summary{cursor:pointer;font-weight:700;list-style:none}.cv-safe summary::-webkit-details-marker{display:none}.cv-safe ul{margin:8px 0 0;padding-inline-start:18px;display:grid;gap:6px}
 .cv-tag{display:inline-flex;gap:4px;font-size:11px;padding:2px 7px;border-radius:99px;border:1px solid var(--line2);font-weight:600}.cv-tag.bad{color:var(--red);border-color:var(--red)}.cv-tag.warn{color:var(--gold);border-color:var(--gold)}.cv-tag.ok{color:var(--green);border-color:var(--green)}.cv-tag.pend{color:var(--blue);border-color:var(--blue)}
 .cv-arow.susp{border-color:rgba(245,185,66,.55)}.cv-flag{font-size:12px;padding:2px 8px;border-radius:99px;background:rgba(245,185,66,.15);color:var(--gold)}.cv-flag-p{background:rgba(76,141,255,.15);color:var(--blue)}
 .t-admin{--c1:#ffd27a;--c2:#b07a1c}
@@ -3615,7 +3616,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-21e";
+const APP_VER="2026-11-21f";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -5284,7 +5285,7 @@ function cvGetAndroidApp(B,step){step=step||1;
     ${st(3,`<b>Open it and log in</b>
       <a class="btn pri cv-go" href="${CV_APK_OPEN}">▶ <span>Open the app</span></a>
       <small class="mut">Log in with your account: the Mentorship course opens.</small>`)}
-    <p class="mut" style="font-size:12px;margin:12px 0 0"><span>Can't find the downloaded file? Open the Files app → Downloads.</span></p></div>
+    <p class="mut" style="font-size:12px;margin:12px 0 0"><span>Can't find the downloaded file? Open the Files app → Downloads.</span></p>${cvSafe("android")}</div>
    <div class="card cv-how"><h3>How your course access works</h3>${C_RULES}</div>`;
   const g=$("#cvGetApk",B);if(g)g.addEventListener("click",()=>setTimeout(()=>cvGetAndroidApp(B,2),1200));
   const d=$("#cvOpenDl",B);if(d)d.addEventListener("click",()=>setTimeout(()=>cvGetAndroidApp(B,3),1500))}
@@ -5310,6 +5311,11 @@ function cvNoL1(B,lv){B.innerHTML=`<div class="card cv-act cv-nol1">
     <button class="btn" id="cvL1Retry">↻ <span>Check again</span></button></div>
    <div class="card cv-how"><h3>How your course access works</h3>${C_RULES}</div>`;
   $("#cvL1Retry",B).onclick=()=>{_cvDrm=null;CourseAPI._drm=null;const el=B.closest(".course-v");if(el)courseLoad(el)}}
+function cvSafe(kind){const L=["Cerebra by TDV is made by the TRADEVERSITY team, only for this course.","It opens your TRADEVERSITY course and nothing else: it doesn't read your files, photos or other apps.",
+  kind==="android"?"It asks for only two permissions: internet, and installing its own updates.":"Windows shows \"Windows protected your PC\" because the app is new and not yet signed with a paid certificate, not because it is harmful.",
+  ...(kind==="android"?["Play Protect warns about any app that doesn't come from Google Play. A Google Play version is planned."]:[]),
+  "Updates come only from jointradeversity.com and are checked with a digital fingerprint before they install.","Only download it from jointradeversity.com. Nobody from TRADEVERSITY will send you the app in a private message."];
+  return `<details class="cv-safe"><summary>🛡️ <span>Is it safe?</span></summary><ul>${L.map(t=>`<li><span>${esc(t)}</span></li>`).join("")}</ul></details>`}
 function cvGetApp(B){B.innerHTML=`<div class="card cv-act cv-app">
     <div class="cv-act-h"><div class="cv-lock">💻</div><div><h2>On PC, the course plays in Cerebra by TDV</h2><p class="mut">To protect the lessons, screen recorders and screenshots can't capture the app. On an Android phone, use the Cerebra by TDV app for Android.</p></div></div>
     <a class="btn pri cv-go" href="${CV_APP_URL}" download>⬇ <span>Download Cerebra by TDV for Windows</span></a>
@@ -5317,7 +5323,7 @@ function cvGetApp(B){B.innerHTML=`<div class="card cv-act cv-app">
      <li><span>If Windows shows "Windows protected your PC", click "More info", then "Run anyway".</span></li>
      <li><span>Press OK to install. The Cerebra by TDV icon appears on your desktop.</span></li>
      <li><span>Open it, log in with your account, and open the Mentorship course.</span></li></ol>
-    <p class="mut" style="font-size:12px;margin:0"><span>Windows 10 or 11 · free · no admin rights needed · about 65 MB</span></p></div>
+    <p class="mut" style="font-size:12px;margin:0"><span>Windows 10 or 11 · free · no admin rights needed · about 65 MB</span></p>${cvSafe("windows")}</div>
    <div class="card cv-how"><h3>How your course access works</h3>${C_RULES}</div>`}
 function cvSoon(B){B.innerHTML=`<div class="card cv-soon">
     <div class="cv-lock">🔒</div><h2>Content still unavailable</h2>
