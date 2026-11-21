@@ -305,9 +305,9 @@ export function earthBackground(el,opts={}){
   const ph=small(),r=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"}),dpr=Math.min(devicePixelRatio,ph?1.4:1.75);
   r.setPixelRatio(dpr);r.setSize(innerWidth,innerHeight);el.innerHTML="";el.appendChild(r.domElement);
   const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(ph?44:34,innerWidth/innerHeight,.1,500);cam.position.set(0,0,22);
-  const TX="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r164/examples/textures/planets/",L=new THREE.TextureLoader();L.setCrossOrigin("anonymous");
-  const tex=n=>{const t=L.load(TX+n);t.colorSpace=n.includes("normal")||n.includes("specular")?THREE.NoColorSpace:THREE.SRGBColorSpace;t.anisotropy=4;return t};
-  const day=tex("earth_atmos_2048.jpg"),night=tex("earth_lights_2048.png"),clouds=tex("earth_clouds_1024.png"),spec=tex("earth_specular_2048.jpg");
+  const TX="scene/earth/",L=new THREE.TextureLoader();L.setCrossOrigin("anonymous");
+  const tex=n=>{const t=L.load(TX+n);t.colorSpace=n.includes("normal")||n.includes("spec")?THREE.NoColorSpace:THREE.SRGBColorSpace;t.anisotropy=4;return t};
+  const day=tex("day.webp"),night=tex("night.webp"),clouds=tex("clouds.webp"),spec=tex("spec.webp");
   /* sun direction from the real date and time (subsolar point) */
   const sunDir=()=>{const d=new Date(),utc=d.getUTCHours()+d.getUTCMinutes()/60,doy=Math.floor((d-new Date(Date.UTC(d.getUTCFullYear(),0,0)))/864e5),lon=(12-utc)*15*Math.PI/180,lat=-23.44*Math.cos(2*Math.PI*(doy+10)/365)*Math.PI/180;
     return new THREE.Vector3(Math.cos(lat)*Math.sin(lon+Math.PI/2),Math.sin(lat),Math.cos(lat)*Math.cos(lon+Math.PI/2))};
