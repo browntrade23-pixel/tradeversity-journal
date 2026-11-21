@@ -32,7 +32,7 @@
 <script>/* apply the saved theme before the page paints (no white/dark flash) */
 try{var tm=localStorage.getItem("tv_theme")||"dark";if(tm==="light"||(tm==="system"&&matchMedia("(prefers-color-scheme: light)").matches))document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Cairo:wght@400;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Cairo:wght@400;600;700;800&display=swap"></noscript>
 <style>
 :root{
   --bg:#0a0e16;--panel:#111827;--panel2:#0f1522;--line:#1f2a3d;--line2:#2a3850;
@@ -907,6 +907,7 @@ html[lang=ar] .astat .apre{letter-spacing:0}
 .gate-results .rstrip{margin-top:4px}.gate-results .rtrack img{height:96px}
 @media(max-width:560px){.rstrip.big .rtrack img{height:160px}}
 .copyright{text-align:center;font-size:11px;color:var(--dim);padding:6px 0 4px;letter-spacing:.04em}
+.appfoot :is(.foot,.copyright){color:color-mix(in srgb,var(--dim) 60%,var(--text))}
 @media(prefers-reduced-motion:reduce){.rtrack,.about-mini{animation:none;opacity:1}}
 /* founder signature */
 .foot.founder{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:22px}
@@ -2407,7 +2408,7 @@ function ntfItems(){const out=[];if(!S.me)return out;const now=Date.now(),me=S.m
     if(!plans.some(p=>p.date===nd))out.push({id:"plan:"+today+":"+nd,ic:"🧭",lv:"info",go:"plan",t:I18N.t(nd===tm?"You haven't planned tomorrow":"You haven't planned your next session"),s:`${esc(fmtDate(nd))} · ${I18N.t("Bias, key levels, max loss and max trades.")}`})}
   return out}
 function ntfRefresh(){const b=$("#ntfBell");if(!b)return;const items=ntfItems(),seen=ntfSeen(),unread=items.filter(i=>!seen[i.id]).length;
-  b.classList.toggle("hidden",!S.me);const bd=$("#ntfBadge");bd.textContent=unread>9?"9+":unread;bd.classList.toggle("hidden",!unread);
+  b.classList.toggle("hidden",!S.me);const bd=$("#ntfBadge");bd.textContent=unread>9?"9+":unread;bd.classList.toggle("hidden",!unread);b.setAttribute("aria-label",unread?"Notifications ("+bd.textContent+")":"Notifications");
   b.classList.toggle("ring",items.some(i=>i.lv==="bad"&&!seen[i.id]));
   const p=$("#ntfPanel");if(p&&!p.classList.contains("hidden"))ntfDraw(items)}
 /* a notification stays unseen (red dot + counted on the bell) until the student clicks it */
@@ -2458,7 +2459,7 @@ function galaxyBg(){const m=BGM.mode(),light=document.documentElement.getAttribu
   if(g&&(g.dataset.k!==kind||g.dataset.m!==m)){g.remove();g=null}
   if(!kind){document.documentElement.classList.remove("gal-on");return}
   if(!g){g=document.createElement("div");g.id="galBg";g.dataset.k=kind;g.dataset.m=m;g.setAttribute("aria-hidden","true");$("#app").prepend(g);
-    const p=BG3D[S.view]?A3().then(x=>kind==="liquidity"?x.liquidityBackground(g,{still}):kind==="killzones"?x.killzonesBackground(g,{still}):kind==="stones"?x.stonesBackground(g,{still}):kind==="book"?x.bookBackground(g,{still}):kind==="pillars3d"?x.pillarsBackground(g,{still}):kind==="earth"?x.earthBackground(g,{still}):x.galaxyBackground(g,kind,{still})):import("./bg2d.js?v=12").then(x=>x.sectionBg(g,kind,{still}));
+    const p=BG3D[S.view]?A3().then(x=>kind==="liquidity"?x.liquidityBackground(g,{still}):kind==="killzones"?x.killzonesBackground(g,{still}):kind==="stones"?x.stonesBackground(g,{still}):kind==="book"?x.bookBackground(g,{still}):kind==="pillars3d"?x.pillarsBackground(g,{still}):kind==="earth"?x.earthBackground(g,{still}):x.galaxyBackground(g,kind,{still})):fxGate().then(()=>import("./bg2d.js?v=12")).then(x=>x.sectionBg(g,kind,{still}));
     p.then(()=>{if(g.isConnected)document.documentElement.classList.add("gal-on")}).catch(e=>{console.warn("bg off",e);g.remove();document.documentElement.classList.remove("gal-on")})}
   else document.documentElement.classList.add("gal-on")}
 setInterval(()=>{if(S.view==="news")bgStateNews()},20000);
@@ -3614,7 +3615,7 @@ function admSummary(D){const {profs,trades,students,pending,disc,rows}=D;const t
   return {txt,html:`<div class="card adm-sum"><h3>📨 <span>Weekly summary</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Ready to copy or share on Telegram. With your Telegram connected, it is also sent to you automatically every Sunday.</span></p>
    <pre class="adm-sum-t" data-notr>${esc(txt)}</pre><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" type="button" id="sumCopy">📋 <span>Copy</span></button><a class="btn sm pri" id="sumTg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent("https://jointradeversity.com")}&text=${encodeURIComponent(txt)}">✈️ <span>Share on Telegram</span></a></div></div>`}}
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-21d";
+const APP_VER="2026-11-21e";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3624,8 +3625,10 @@ const APP_VER="2026-11-21d";
   const check=()=>{if(location.protocol==="file:")return;fetch("version.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.v&&j.v!==APP_VER)show()}).catch(()=>{})};
   window.__updCheck=check;setTimeout(check,8000);setInterval(()=>{if(!document.hidden)check()},5*60000);
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)check()})})();
+/* animated backgrounds and 3D start after the app is visible and the phone is idle (first load only) */
+let _fxg=null;function fxGate(){return _fxg||(_fxg=new Promise(r=>{const go=()=>("requestIdleCallback" in window?requestIdleCallback(()=>r(),{timeout:2500}):setTimeout(r,700));document.readyState==="complete"?go():addEventListener("load",go,{once:true})}))}
 /* ============ IN-APP 3D (app3d.js, loaded only where shown; the flat version stays if 3D can't run) ============ */
-let _a3p=null;const A3=()=>_a3p||(_a3p=import("./app3d.js?v=34"));
+let _a3p=null;const A3=()=>_a3p||(_a3p=fxGate().then(()=>import("./app3d.js?v=34")));
 function mount3d(id,fn,...args){setTimeout(()=>{const el=document.getElementById(id);if(!el||el.dataset.a3)return;el.dataset.a3="1";
   A3().then(m=>{if(!el.isConnected)return;try{m[fn](el,...args)}catch(e){console.warn("3D",e)}}).catch(e=>console.warn("3D off",e))},40)}
 function newsClockState(){const now=Date.now(),reds=S.newsLoaded?newsFor(todayStr()).filter(n=>n.impact==="High"):[],W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,t,a:t-5*60000,b:t+5*60000}});
