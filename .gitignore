@@ -1,0 +1,4 @@
+
+# server code lives in the private folder ..	radeversity-server (never publish it here)
+*.sql
+supabase/
