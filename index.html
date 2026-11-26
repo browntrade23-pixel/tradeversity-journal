@@ -2012,6 +2012,22 @@ html:not([data-theme=light]) .hub-tabs button.on{background:linear-gradient(135d
 /* legal links in the app footer */
 .appfoot .legal{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-size:12px}
 .appfoot .legal a{color:var(--muted)!important;text-decoration:none}.appfoot .legal a:hover{color:var(--text)!important;text-decoration:underline}
+/* first-login checklist */
+.onb{margin:0 0 14px;padding:16px 18px;border-color:rgba(59,130,246,.35)!important;background:linear-gradient(135deg,rgba(59,130,246,.10),rgba(99,102,241,.04)),var(--panel)!important}
+.onb-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.onb-h b{font-size:15px;font-weight:600}.onb-h small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.onb-bar{margin:12px 0 10px}.onb-bar i{width:0}
+.onb-l{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.onb-s{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line2);background:rgba(255,255,255,.025);color:var(--text);font:inherit;text-align:start;cursor:pointer;transition:border-color .2s,background .2s,transform .15s}
+.onb-s:hover:not(:disabled){border-color:rgba(59,130,246,.55);background:rgba(59,130,246,.08);transform:translateY(-1px)}
+.onb-s.next{border-color:rgba(59,130,246,.6);box-shadow:0 0 0 1px rgba(59,130,246,.25)}
+.onb-s.ok{opacity:.62;cursor:default}.onb-s.ok .onb-t b{text-decoration:line-through;text-decoration-color:var(--dim)}
+.onb-c{width:20px;height:20px;flex:none;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff}
+.onb-s.ok .onb-c{background:var(--green);border-color:var(--green)}
+.onb-s .tico{width:30px;height:30px;border-radius:9px;background:linear-gradient(145deg,color-mix(in srgb,var(--c1) 24%,transparent),color-mix(in srgb,var(--c1) 6%,transparent));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c1) 30%,transparent)}
+.onb-s .tico .ico{width:17px;height:17px}
+.onb-t{flex:1;min-width:0}.onb-t b{display:block;font-size:13.5px;font-weight:600}.onb-t small{display:block;font-size:12px;color:var(--muted);line-height:1.4;margin-top:1px}
+.onb-go{font-size:20px;color:var(--dim)}html[dir=rtl] .onb-go{transform:scaleX(-1)}
+.onb-done{display:flex;align-items:center;gap:12px}.onb-done .onb-big{font-size:26px}.onb-done b{display:block;font-size:14.5px}.onb-done small{display:block;font-size:12.5px;color:var(--muted)}
 .tp-gate{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:16px;border:1px dashed var(--line2);border-radius:12px;background:var(--panel2);font-size:13px;line-height:1.5}
 .tp-gate b{font-size:14px;font-weight:600}.tp-gate small{font-size:11.5px}
 .pf-data .row .btn{min-width:0}
@@ -2147,7 +2163,7 @@ html:not([data-theme=light]) .hub-tabs button.on{background:linear-gradient(135d
 <div id="toast"></div>
 <div id="ntfPanel" class="ntf-panel hidden" role="dialog" aria-label="Notifications"></div>
 
-<script src="i18n.js?v=2026-11-26n"></script>
+<script src="i18n.js?v=2026-11-26o"></script>
 <!-- the firm list stays here (trade costs use it); news explanations, the indicator video, the tour video, the Cerebra intro and
      the prop firm prices / codes / translations load only when a page needs them (see need() in the app script) -->
 <script src="propfirms.js"></script>
@@ -3312,6 +3328,30 @@ function v3Levels(t){const e=num(t.entry),s=num(t.stop),tg=num(t.target),x=num(t
   const zone=(a,b,c)=>`<div class="v3-z ${c}" style="top:${Y(Math.max(a,b))}%;height:${(Math.abs(a-b)/(hi-lo)*100).toFixed(2)}%"></div>`;
   return `<div class="card v3-lv"><div class="v3-ch"><div><b>Price levels</b><small>${t.side==="Long"?"▲ Long":"▼ Short"}</small></div>${isFinite(x)?`<b class="v3-big ${cls(rOf(x))}" data-notr>${rTxt(x)}</b>`:""}</div>
    <div class="v3-lvb">${zone(e,s,"risk")}${isFinite(tg)&&tg!==e?zone(e,tg,"rew"):""}${L.map(([nm,v,c,raw])=>`<div class="v3-ln ${nm==="Exit"?"ex":""}" style="top:${Y(v)}%;--c:${c}"><span class="v3-lnl">${nm}</span><span class="v3-lnv" data-notr>${esc(String(raw))} · ${nm==="Entry"?"0R":rTxt(v)}</span></div>`).join("")}</div></div>`}
+/* ===== first-login checklist: 5 steps that make a new member active. Ticks itself from real data; hides when all done or when hidden ===== */
+const onbKey=()=>"tv_onb_"+((S.me&&S.me.id)||"x");
+function onbSteps(){const rk=calcLoad("risk")||{},R=rulesAll(),P=S.plans||[];return [
+  {k:"trade",ic:"journal",t:"Log your first trade",s:"Or import a CSV from your broker.",ok:(S.trades||[]).length>0},
+  {k:"rules",ic:"propfirms",t:"Set your prop firm rules",s:"See how close you are to the daily loss limit and the drawdown.",ok:Object.keys(R).length>0},
+  {k:"risk",ic:"risk",t:"Set your risk per trade",s:"The risk calculator remembers it for you.",ok:num(rk.risk)>0},
+  {k:"plan",ic:"plan",t:"Plan your next session",s:"Bias, levels, max trades and max loss.",ok:P.some(p=>!p.noTrade&&(num(p.maxLoss)>0||num(p.maxTrades)>0||Object.values(p.bias||{}).some(Boolean)||String(p.levels||"").trim()))},
+  {k:"eod",ic:"stats",t:"Do your first end-of-day review",s:"Did you follow your plan? One line is enough.",ok:P.some(p=>p.followed||String(p.review||"").trim())}]}
+function onbCard(){if(S.readonly||!S.me||S.me.role==="admin")return "";let st={};try{st=JSON.parse(localStorage.getItem(onbKey()))||{}}catch(e){}if(st.hide||st.done)return "";
+  const L=onbSteps(),n=L.filter(x=>x.ok).length;
+  if(n===L.length){try{localStorage.setItem(onbKey(),JSON.stringify({done:1}))}catch(e){}
+    return `<div class="card onb onb-done"><span class="onb-big">🎉</span><div><b>You're all set.</b><small>Your journal is ready: keep logging every trade and reviewing every day.</small></div></div>`}
+  const next=L.find(x=>!x.ok);
+  return `<div class="card onb"><div class="onb-h"><div><b>Get started</b><small><span data-notr>${n}/${L.length}</span> <span>steps done</span></small></div><button type="button" class="btn sm ghost" id="onbHide">Hide</button></div>
+   <div class="v3-bar onb-bar"><i style="width:${n/L.length*100}%;background:var(--gold)"></i></div>
+   <div class="onb-l">${L.map(x=>`<button type="button" class="onb-s ${x.ok?"ok":""} ${x===next?"next":""}" data-onb="${x.k}" ${x.ok?"disabled":""}><span class="onb-c">${x.ok?"✓":""}</span><span class="tico t-${x.ic}">${ico(x.ic)}</span><span class="onb-t"><b>${x.t}</b><small>${x.s}</small></span>${x.ok?"":`<span class="onb-go" aria-hidden="true">›</span>`}</button>`).join("")}</div></div>`}
+function bindOnb(el){const h=$("#onbHide",el);if(h)h.onclick=()=>{try{localStorage.setItem(onbKey(),JSON.stringify({hide:1}))}catch(e){}render()};
+  $$("[data-onb]",el).forEach(b=>b.onclick=()=>{const k=b.dataset.onb;
+    if(k==="trade")editTrade(null);
+    else if(k==="rules"){const ac=accounts()[0];if(!ac){toast(I18N.t("Log a trade first: the rules belong to its account."));return}
+      S.acct=ac;go("stats");setTimeout(()=>{const r=$("#rulesCard");if(r){r.scrollIntoView({behavior:"smooth",block:"center"});const s=$("#rSet",r);if(s)s.click()}},450)}
+    else if(k==="risk")go("risk");
+    else if(k==="plan"){S._planDate=nextTradingDay();go("plan")}
+    else if(k==="eod"){S._eodOpen=true;go("journal");setTimeout(()=>{const e=$("#eodBox");if(e){e.open=true;e.scrollIntoView({behavior:"smooth",block:"center"})}},300)}})}
 function vToday(el){
   if(S.readonly)return vJournal(el);
   const t=todayStr(),sc=dayScore(t),L=sc.L,p=L.p,ds=discStreak(S.trades,S.plans),js=journalStreak(),cd=coolDown(t),nd=nextTradingDay();
@@ -3343,6 +3383,7 @@ function vToday(el){
   el.innerHTML=`<div class="td">
    <div class="td-hero"><div><div class="td-hi"><span>${hello}</span>${name?`, <b data-notr>${name}</b>`:""}${isVerified(S.me)?" "+vCheck():""}</div><div class="td-date mut" data-notr>${esc(fmtDate(t))}</div></div>
     <div class="td-hr"><div class="td-q">“<span>${esc(q)}</span>” <small>— BROWN ALGO</small></div>${sessStarted()?`<span class="chip ss-on">✅ <span>Session started</span></span>`:`<button class="btn sm pri ss-btn" type="button" data-td="session">🚀 <span>Start my session</span></button>`}<button class="btn sm" type="button" id="tdFocusOn">🎯 <span>Focus mode</span></button></div></div>
+   ${onbCard()}
    ${profileNudge()}
    ${cd?`<div class="td-cool"><span class="td-cool-i">🛑</span><div><b>${cd.why==="loss"?"Max daily loss reached":"Max trades reached for today"}</b><small>${cd.why==="loss"?"You hit your daily loss limit. Close the platform, protect the account, come back tomorrow.":"Your plan is done for today. Closing the platform is the trade now."}</small></div></div>`:""}
    ${tHit?`<div class="td-win">🎉 <b>Daily target reached!</b> <span>Lock it in: no more trades today.</span></div>`:""}
@@ -3385,7 +3426,7 @@ function vToday(el){
     else if(a==="notrade"){S._ntdDate=t;go("journal");setTimeout(()=>{const n=$("#ntdSet");if(n)n.scrollIntoView({behavior:"smooth",block:"center"})},200)}
     else if(a==="share")shareWeek();else if(a==="session")startSession();
     else if(a==="rules"){const ac=accounts()[0];if(ac)S.acct=ac;go("stats");setTimeout(()=>{const r=$("#rulesCard");if(r)r.scrollIntoView({behavior:"smooth",block:"center"})},300)}});
-  bindWeekReview();v3BindToday(el);
+  bindWeekReview();v3BindToday(el);bindOnb(el);
   $("#tdFocusOn").onclick=()=>setFocus(true);{const tt=$("#tdTour");if(tt)tt.onclick=startTour}
   {const pn=$("#pfNudge");if(pn)pn.onclick=()=>{go("profile");window.scrollTo(0,0)}}
   mount3d("a3Orb","disciplineOrb",sc.score,I18N.t("score"));mount3d("a3Flame","streakFlame",ds.streak);
@@ -4017,7 +4058,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26n";
+const APP_VER="2026-11-26o";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
