@@ -134,7 +134,9 @@ html.player .dp-row:has(#bgSeg){display:none!important}
 .cv-sn{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--line2)}.cv-step.on .cv-sn{background:var(--gold);color:#1b1305}.cv-step.done .cv-sn{background:var(--green);color:#fff}
 .cv-sb{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}.cv-sb small{font-size:12px;line-height:1.4}.cv-step:not(.on) .cv-go{display:none}
 .cv-app a.cv-go{display:flex;align-items:center;gap:8px;text-decoration:none;margin:4px 0 12px}.cv-app .cv-steps{margin:0 0 10px}
-.cv-code{font-size:22px;letter-spacing:.4em;text-align:center}.cv-steps{padding-inline-start:20px;font-size:13px;display:grid;gap:6px}
+.cv-code{font-size:22px;letter-spacing:.4em;text-align:center}
+.mfa-gate{position:fixed;inset:0;z-index:100001;display:grid;place-items:center;padding:16px;background:rgba(5,7,12,.97)}.mfa-box{width:min(380px,100%);text-align:center}.mfa-box .cv-code{width:100%;margin-top:6px}.mfa-msg{min-height:18px;margin:8px 0;font-size:13px}
+.mfa-qr{display:block;width:180px;height:180px;margin:10px 0;padding:8px;border-radius:12px;background:#fff}.cv-steps{padding-inline-start:20px;font-size:13px;display:grid;gap:6px}
 .cv-safe{margin:12px 0 0;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;background:color-mix(in srgb,var(--panel) 85%,#22c55e 15%)}.cv-safe summary{cursor:pointer;font-weight:700;list-style:none}.cv-safe summary::-webkit-details-marker{display:none}.cv-safe ul{margin:8px 0 0;padding-inline-start:18px;display:grid;gap:6px}
 .cv-tag{display:inline-flex;gap:4px;font-size:11px;padding:2px 7px;border-radius:99px;border:1px solid var(--line2);font-weight:600}.cv-tag.bad{color:var(--red);border-color:var(--red)}.cv-tag.warn{color:var(--gold);border-color:var(--gold)}.cv-tag.ok{color:var(--green);border-color:var(--green)}.cv-tag.pend{color:var(--blue);border-color:var(--blue)}
 .cv-arow.susp{border-color:rgba(245,185,66,.55)}.cv-flag{font-size:12px;padding:2px 8px;border-radius:99px;background:rgba(245,185,66,.15);color:var(--gold)}.cv-flag-p{background:rgba(76,141,255,.15);color:var(--blue)}
@@ -2252,6 +2254,7 @@ $("#tgOut").onclick=async e=>{e.preventDefault();await API.signOut();hideTg();sh
 async function enter(u){
   if(!isApproved(u)){S.me=null;showWaiting(u);return}   /* waiting screen lists what is missing: email, Telegram, or both */
   if(needsTg(u)){S.me=null;showTg(u);return}
+  if(u.role==="admin"&&!S._demo&&!(await mfaGate())){S.me=null;showAuth();return}
   S.me=u;$("#auth").classList.add("hidden");$("#app").classList.remove("hidden");
   $("#whoChip").innerHTML=`${u.role==="admin"?"👑 ":""}${esc(u.name||u.email)}${isVerified(u)?" "+vCheck():""}${u.telegram?` · <span class="mono">${esc(u.telegram)}</span>`:""}`;meBtnDraw();
   if(PLAYER){await loadSubject(u,false);go("course")}
@@ -3147,6 +3150,52 @@ function vDayPage(el,d){const ts=filtered().filter(t=>t.date===d).sort(byDT);
   $("#dBack").onclick=()=>to(null);if(pv)$("#dPrev").onclick=()=>to(pv);if(nx)$("#dNext").onclick=()=>to(nx);
   $$("[data-open]",el).forEach(b=>b.onclick=()=>{S._fromDay=d;S.dayPage=null;S.view="journal";S.page=b.dataset.open;try{history.replaceState(null,"","#journal")}catch(e){}render();window.scrollTo(0,0)})}
 
+/* ============ admin two-step login (Supabase TOTP MFA) ============
+   Once the admin has a verified authenticator, every admin login must enter its 6-digit code (session level aal2).
+   The database and the course function also refuse admin rights without aal2, so skipping this screen gains nothing. */
+const MFA={
+  async level(){try{const{data}=await Cloud.sb.auth.mfa.getAuthenticatorAssuranceLevel();return data||{}}catch(e){return{}}},
+  async factors(){try{const{data}=await Cloud.sb.auth.mfa.listFactors();return(data&&data.all||[]).filter(f=>f.factor_type==="totp")}catch(e){return[]}}
+};
+const trE=k=>esc(I18N.t(k));
+function mfaGate(){return new Promise(async res=>{
+  const lv=await MFA.level();if(lv.currentLevel==="aal2"||lv.nextLevel!=="aal2"){res(true);return}
+  const f=(await MFA.factors()).find(x=>x.status==="verified");if(!f){res(true);return}
+  const w=document.createElement("div");w.className="mfa-gate";
+  w.innerHTML=`<div class="card mfa-box"><h2>🔐 ${trE("Two-step login")}</h2><p class="mut">${trE("Open your authenticator app and type the 6-digit code for TRADEVERSITY.")}</p>
+    <input class="i mono cv-code" id="mfaCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" aria-label="${trE("Two-step login")}">
+    <p class="neg mfa-msg" id="mfaMsg" role="alert"></p>
+    <div class="row" style="justify-content:space-between"><button class="btn" type="button" id="mfaOut">${trE("Log out")}</button><button class="btn pri" type="button" id="mfaGo">${trE("Confirm")}</button></div></div>`;
+  document.body.appendChild(w);const inp=w.querySelector("#mfaCode"),btn=w.querySelector("#mfaGo"),msg=w.querySelector("#mfaMsg");setTimeout(()=>inp.focus(),60);
+  const go=async()=>{const code=inp.value.replace(/\D/g,"");if(code.length!==6){msg.textContent=I18N.t("Type the 6 digits.");inp.focus();return}
+    btn.disabled=true;msg.textContent="";let err=null;try{const r=await Cloud.sb.auth.mfa.challengeAndVerify({factorId:f.id,code});err=r.error}catch(e){err=e}btn.disabled=false;
+    if(err){msg.textContent=I18N.t("Wrong code. Try the new code in your app.");inp.select();return}
+    w.remove();res(true)};
+  btn.onclick=go;inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();go()}});
+  inp.addEventListener("input",()=>{inp.value=inp.value.replace(/\D/g,"").slice(0,6);if(inp.value.length===6)go()});
+  w.querySelector("#mfaOut").onclick=async()=>{try{await API.signOut()}catch(e){}w.remove();res(false)};
+})}
+/* the admin profile card: set up the authenticator (shown only to the admin) */
+async function mfaCard(box){if(!box)return;
+  box.innerHTML=`<h2>🔐 ${trE("Two-step login")}</h2><div class="cv-load"></div>`;
+  const fs=await MFA.factors(),on=fs.find(x=>x.status==="verified");
+  if(on){box.innerHTML=`<h2>🔐 ${trE("Two-step login")}</h2><p class="pos" style="margin:0">✔ ${trE("Two-step login is on. Each admin login asks for a code from your authenticator app.")}</p>`;return}
+  box.innerHTML=`<h2>🔐 ${trE("Two-step login")}</h2><p class="mut" style="margin:0 0 12px">${trE("Protect the admin account: after your password, each login also asks for a 6-digit code from an authenticator app (Google Authenticator, Microsoft Authenticator, Authy).")}</p><button class="btn pri" type="button" id="mfaSet">${trE("Set up")}</button>`;
+  box.querySelector("#mfaSet").onclick=async e=>{const b=e.currentTarget;b.disabled=true;
+    try{for(const x of fs)if(x.status!=="verified")await Cloud.sb.auth.mfa.unenroll({factorId:x.id});   /* clear an unfinished setup */
+      const{data,error}=await Cloud.sb.auth.mfa.enroll({factorType:"totp",friendlyName:"TRADEVERSITY admin "+Date.now()});if(error)throw error;
+      box.innerHTML=`<h2>🔐 ${trE("Two-step login")}</h2><p style="margin:0 0 6px">${trE("Scan this QR code with your authenticator app, then type the 6-digit code it shows.")}</p>
+        <img class="mfa-qr" alt="QR code" src="${esc(data.totp.qr_code)}">
+        <p class="mut" style="font-size:12px;margin:0 0 4px">${trE("Can't scan? Enter this key in the app:")}</p><p class="mono" data-notr style="word-break:break-all;margin:0 0 12px;user-select:all">${esc(data.totp.secret)}</p>
+        <div class="row" style="gap:8px"><input class="i mono" id="mfaNew" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" style="max-width:140px"><button class="btn pri" type="button" id="mfaOk">${trE("Confirm")}</button></div><p class="neg mfa-msg" id="mfaNewMsg" role="alert"></p>`;
+      const inp=box.querySelector("#mfaNew"),ok=box.querySelector("#mfaOk"),m=box.querySelector("#mfaNewMsg");inp.focus();
+      const fin=async()=>{const code=inp.value.replace(/\D/g,"");if(code.length!==6){m.textContent=I18N.t("Type the 6 digits.");return}
+        ok.disabled=true;const r=await Cloud.sb.auth.mfa.challengeAndVerify({factorId:data.id,code}).catch(er=>({error:er}));ok.disabled=false;
+        if(r.error){m.textContent=I18N.t("Wrong code. Try the new code in your app.");inp.select();return}
+        toast("✔ "+I18N.t("Two-step login turned on"));mfaCard(box)};
+      ok.onclick=fin;inp.addEventListener("keydown",ev=>{if(ev.key==="Enter"){ev.preventDefault();fin()}});
+    }catch(err){b.disabled=false;toast(I18N.t("Something went wrong. Try again."))}};
+}
 /* ============ modal ============ */
 function openModal(h){$("#mbox").innerHTML=h;$("#modal").classList.remove("hidden");document.body.style.overflow="hidden"}
 function closeModal(){$("#modal").classList.add("hidden");document.body.style.overflow="";document.onpaste=null}
@@ -3569,7 +3618,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-21h";
+const APP_VER="2026-11-26a";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3827,9 +3876,10 @@ function vProfile(el){const u=S.me;if(!u){el.innerHTML="";return}
     ${inp("phone","Phone number","tel","+213 555 12 34 56",'maxlength="20" autocomplete="tel" inputmode="tel"')}
     ${inp("city","City","text","",'maxlength="60" autocomplete="address-level2"')}
     ${inp("zip","Zip code","text","",'maxlength="10" autocomplete="postal-code"')}
-   </div></div>
+   </div></div>${u.role==="admin"&&!S._demo?`<div class="card" id="mfaCard"></div>`:""}
    <div class="pf-savebar" id="pfBar2"><span class="pf-dirty" id="pfDirty"></span><button class="btn" type="button" id="pfBack">${T("Back")}</button><button class="btn pri" type="button" id="pfSave">💾 <span>${T("Save my profile")}</span></button></div>`;
   const q=s=>$(s,el),field=k=>q(`[data-pf="${k}"]`),msg=(k,m)=>{const s=q(`[data-msg="${k}"]`),i=field(k);if(s)s.textContent=m?I18N.t(m):"";if(i)i.classList.toggle("bad",!!m)};
+  mfaCard(q("#mfaCard"));
   const dirty=()=>PF_KEYS.some(([k])=>String(f[k]||"")!==String(saved[k]||""));
   /* update only what changed on screen (no page jump) */
   const refresh=()=>{const all={...u,...f},miss=pfMissing(all),ok=!miss.length,filled=PF_KEYS.filter(([k])=>String(f[k]||"").trim()).length;
