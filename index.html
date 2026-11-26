@@ -139,7 +139,8 @@ html.player .dp-row:has(#bgSeg){display:none!important}
 .cv-app a.cv-go{display:flex;align-items:center;gap:8px;text-decoration:none;margin:4px 0 12px}.cv-app .cv-steps{margin:0 0 10px}
 .cv-code{font-size:22px;letter-spacing:.4em;text-align:center}
 .mfa-gate{position:fixed;inset:0;z-index:100001;display:grid;place-items:center;padding:16px;background:rgba(5,7,12,.97)}.mfa-box{width:min(380px,100%);text-align:center}.mfa-box .cv-code{width:100%;margin-top:6px}.mfa-msg{min-height:18px;margin:8px 0;font-size:13px}
-.cap-box{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:100002}
+.cap-wrap{display:flex;justify-content:center;margin:0 0 12px}.cap-wrap:empty{display:none}
+#authCard:has(#otpForm:not(.hidden)) .cap-wrap,#authCard:has(#tgForm:not(.hidden)) .cap-wrap{display:none}
 .mfa-qr{display:block;width:180px;height:180px;margin:10px 0;padding:8px;border-radius:12px;background:#fff}.cv-steps{padding-inline-start:20px;font-size:13px;display:grid;gap:6px}
 .cv-safe{margin:12px 0 0;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;background:color-mix(in srgb,var(--panel) 85%,#22c55e 15%)}.cv-safe summary{cursor:pointer;font-weight:700;list-style:none}.cv-safe summary::-webkit-details-marker{display:none}.cv-safe ul{margin:8px 0 0;padding-inline-start:18px;display:grid;gap:6px}
 .cv-tag{display:inline-flex;gap:4px;font-size:11px;padding:2px 7px;border-radius:99px;border:1px solid var(--line2);font-weight:600}.cv-tag.bad{color:var(--red);border-color:var(--red)}.cv-tag.warn{color:var(--gold);border-color:var(--gold)}.cv-tag.ok{color:var(--green);border-color:var(--green)}.cv-tag.pend{color:var(--blue);border-color:var(--blue)}
@@ -1889,6 +1890,7 @@ html.gal-on #view h1,html.gal-on #view .sub{text-shadow:0 2px 16px rgba(0,0,0,.9
         <button id="tabLogin" class="on" style="flex:1">Log in</button>
         <button id="tabSignup" style="flex:1">Create free account</button>
       </div>
+      <div id="capWrap" class="cap-wrap" aria-label="Security check"></div>
       <form id="loginForm" class="grid">
         <label class="f">Email<input class="i" name="email" type="email" required autocomplete="email"></label>
         <label class="f">Password<input class="i" name="password" type="password" required autocomplete="current-password"></label>
@@ -1981,19 +1983,24 @@ const CONFIG = {
 /* ============ bot check (Cloudflare Turnstile) ============
    Each sign-up / login / reset gets a fresh one-time token. The box only appears when Cloudflare needs the visitor
    to click; most people never see it. Does nothing while CONFIG.TURNSTILE is empty. */
-const Captcha={_p:null,_id:null,_box:null,
-  load(){return this._p||(this._p=new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";s.async=true;s.onload=res;s.onerror=()=>{this._p=null;rej(new Error("The security check couldn't load. Check your connection and try again."))};document.head.appendChild(s)}))},
-  /* Never blocks the page: if Cloudflare doesn't answer, the request goes out without a token and Supabase
-     (the real gatekeeper) decides. 15 s to answer, or 2 minutes once Cloudflare asks the visitor to click. */
-  async token(){if(!CONFIG.TURNSTILE)return undefined;
-    try{await this.load()}catch(e){console.warn("captcha:",e.message);return undefined}
-    if(!this._box){this._box=document.createElement("div");this._box.className="cap-box";document.body.appendChild(this._box)}
-    if(this._id!=null){try{window.turnstile.remove(this._id)}catch(e){}this._id=null}
-    return new Promise(res=>{let done=false,to=null;const fin=t=>{if(done)return;done=true;clearTimeout(to);res(t||undefined)};
-      to=setTimeout(()=>fin(),15000);
-      try{this._id=window.turnstile.render(this._box,{sitekey:CONFIG.TURNSTILE,appearance:"interaction-only",
-        callback:t=>fin(t),"error-callback":()=>fin(),"expired-callback":()=>fin(),"timeout-callback":()=>fin(),
-        "before-interactive-callback":()=>{clearTimeout(to);to=setTimeout(()=>fin(),120000)}})}catch(e){fin()}})}};
+/* The check starts as soon as the login screen opens (Captcha.start in showAuth) and shows Cloudflare's small box
+   above the form, so it is finished while the visitor types. Pressing Log in / Create account / Forgot password uses
+   that token (one use each); the box then makes a fresh one for the next try. If Cloudflare can't load, the request
+   goes out without a token and Supabase shows a clear message. */
+const Captcha={_p:null,_id:null,_tok:null,_wait:[],_dead:false,
+  load(){return this._p||(this._p=new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";s.async=true;s.onload=res;s.onerror=()=>{this._p=null;rej(new Error("captcha_load"))};document.head.appendChild(s)}))},
+  _give(t){this._tok=t||null;if(t){const w=this._wait;this._wait=[];w.forEach(f=>f(t))}},
+  start(){if(!CONFIG.TURNSTILE||this._id!=null)return;const el=$("#capWrap");if(!el)return;
+    this.load().then(()=>{if(this._id!=null)return;this._dead=false;
+      this._id=window.turnstile.render(el,{sitekey:CONFIG.TURNSTILE,theme:"auto",size:"flexible","refresh-expired":"auto",
+        callback:t=>this._give(t),"expired-callback":()=>{this._tok=null},"error-callback":()=>{this._tok=null}})})
+      .catch(()=>{this._dead=true;const w=this._wait;this._wait=[];w.forEach(f=>f(undefined))})},
+  async token(){if(!CONFIG.TURNSTILE)return undefined;this.start();
+    let t=this._tok;
+    if(!t&&!this._dead)t=await new Promise(res=>{this._wait.push(res);setTimeout(()=>res(undefined),90000)});
+    this._tok=null;   /* one use per token: ask Cloudflare for the next one */
+    if(this._id!=null)setTimeout(()=>{try{window.turnstile.reset(this._id)}catch(e){}},0);
+    return t||undefined}};
 /* ============ helpers ============ */
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -2174,7 +2181,7 @@ const S={me:null,subject:null,trades:[],plans:[],view:"journal",page:null,acct:"
 
 /* ============ auth UI ============ */
 function showAuth(){$("#app").classList.add("hidden");$("#auth").classList.remove("hidden");
-  $("#waitBox").classList.add("hidden");$("#authCard").classList.remove("hidden")}
+  $("#waitBox").classList.add("hidden");$("#authCard").classList.remove("hidden");Captcha.start()}
 function showWaiting(u){showAuth();$("#authCard").classList.add("hidden");$("#waitBox").classList.remove("hidden");
   const rej=u.status==="rejected";$("#waitIcon").textContent=rej?"⛔":"⏳";
   $("#waitTitle").textContent=rej?"Request not accepted":"Waiting for approval";
@@ -3644,7 +3651,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26e";
+const APP_VER="2026-11-26f";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
