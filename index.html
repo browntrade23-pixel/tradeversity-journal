@@ -1922,6 +1922,48 @@ html:not([data-theme=light]) h3{color:var(--text)}
 @media(max-width:1100px){.v3-k4{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.v3-k4{gap:10px}.v3-k{padding:14px}.v3-v{font-size:21px}.v3-ses{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.v3-live{animation:none}}
+/* ---- step 2: prop strip, P&L chart, calendar, trade price levels ---- */
+.v3-prop{display:grid;grid-template-columns:minmax(170px,auto) repeat(auto-fit,minmax(150px,1fr));gap:16px 26px;align-items:center;margin:0 0 14px;padding:16px 18px}
+.v3-pt{display:flex;flex-direction:column;gap:6px;align-items:flex-start}.v3-pt b{font-size:14px;font-weight:600}.v3-pt small{display:block;font-size:12px;color:var(--dim);margin-top:2px}
+.v3-tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:6px}
+.v3-tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.v3-tag.ok{color:var(--green);background:rgba(47,191,113,.12)}.v3-tag.warn{color:#f5a524;background:rgba(245,165,36,.12)}.v3-tag.bad{color:var(--red);background:rgba(239,83,80,.12)}
+.v3-pmh{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);margin-bottom:8px}.v3-pmh b{color:var(--text);font:500 12.5px "Geist Mono","JetBrains Mono",monospace}
+.v3-bar{height:6px;border-radius:99px;background:var(--panel2);overflow:hidden}.v3-bar i{display:block;height:100%;width:0;border-radius:inherit;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.v3-pm small{display:block;font-size:11.5px;color:var(--dim);margin-top:6px}
+.v3-m2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;margin:0 0 14px}
+.v3-m2>.card{padding:16px 18px;min-width:0}
+.v3-ch{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}.v3-ch b{font-size:14px;font-weight:600}.v3-ch small{display:block;font-size:12px;color:var(--dim);margin-top:2px}
+.v3-big{font:600 20px "Geist Mono","JetBrains Mono",monospace!important}
+.v3-eqc{display:flex;flex-direction:column}
+.v3-eq{position:relative;flex:1;min-height:240px;direction:ltr}.v3-eq svg{display:block;position:absolute;inset:0}
+.v3-ax{fill:var(--dim);font:11px "Geist Mono",monospace}
+.v3-eqe{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-size:13px;margin:0;padding:20px}
+.v3-tip{position:absolute;pointer-events:none;background:var(--side);border:1px solid var(--line2);border-radius:10px;padding:8px 11px;font-size:12px;opacity:0;transition:opacity .12s;white-space:nowrap;transform:translate(-50%,calc(-100% - 12px));box-shadow:0 10px 30px -10px #000;display:flex;flex-direction:column;gap:1px;z-index:2}
+.v3-tip.on{opacity:1}.v3-tip b{font:600 13px "Geist Mono",monospace}
+.v3-cal{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) 78px;gap:5px}
+.v3-cdh{font-size:11px;color:var(--dim);padding:0 2px 2px;text-transform:capitalize}
+.v3-cd{height:54px;border-radius:9px;padding:6px 8px;background:var(--panel2);border:1px solid transparent;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;font:inherit;font-size:11px;color:var(--dim);text-align:start;min-width:0;overflow:hidden}
+button.v3-cd{cursor:pointer;transition:transform .15s}button.v3-cd:hover{transform:translateY(-1px)}
+.v3-cd b{font:500 11.5px "Geist Mono","JetBrains Mono",monospace;white-space:nowrap}
+.v3-cd.w{background:rgba(47,191,113,var(--a));border-color:rgba(47,191,113,.22)}.v3-cd.w b{color:#7fe0aa}
+.v3-cd.l{background:rgba(239,83,80,var(--a));border-color:rgba(239,83,80,.22)}.v3-cd.l b{color:#ff9a97}
+html[data-theme=light] .v3-cd.w b{color:#13914c}html[data-theme=light] .v3-cd.l b{color:#d6382f}
+.v3-cd.off,.v3-cd.fut{background:transparent;border:1px dashed var(--line)}.v3-cd.nt{background:transparent;border:1px solid var(--line2)}
+.v3-cd.td{box-shadow:0 0 0 1.5px var(--gold)}
+.v3-wk{height:54px;border-radius:9px;padding:6px 8px;border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;font-size:11px;color:var(--dim);min-width:0}
+.v3-wk b{font:600 11.5px "Geist Mono","JetBrains Mono",monospace;white-space:nowrap}.v3-wk small{font-size:10.5px}
+.v3-lv{margin:12px 0;padding:16px 18px}
+.v3-lvb{position:relative;height:190px;margin:6px 0 4px;border-radius:10px;background:var(--panel2);overflow:hidden;direction:ltr}
+.v3-z{position:absolute;left:0;right:0}.v3-z.risk{background:rgba(239,83,80,.12)}.v3-z.rew{background:rgba(47,191,113,.12)}
+.v3-ln{position:absolute;left:0;right:0;height:0;border-top:1.5px solid var(--c)}
+.v3-ln.ex{border-top-style:dashed}
+.v3-lnl,.v3-lnv{position:absolute;top:-10px;height:20px;line-height:20px;padding:0 8px;border-radius:5px;font-size:11px;font-weight:600;white-space:nowrap}
+.v3-lnl{left:8px;background:var(--c);color:#fff}.v3-ln.ex .v3-lnl{left:auto;right:8px;background:var(--panel);color:var(--text);border:1px solid var(--line2)}
+.v3-lnv{left:76px;background:var(--panel);color:var(--text);border:1px solid var(--line2);font-family:"Geist Mono","JetBrains Mono",monospace;font-weight:500}.v3-ln.ex .v3-lnv{left:auto;right:70px}
+@media(max-width:1100px){.v3-m2{grid-template-columns:1fr}}
+@media(max-width:760px){.v3-prop{grid-template-columns:1fr;gap:14px}.v3-pt{flex-direction:row;justify-content:space-between;align-items:center;width:100%}
+  .v3-eq{min-height:210px}.v3-cal{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.v3-wkc{display:none!important}.v3-cd{height:48px;padding:5px 6px}.v3-cd b{font-size:10px}}
 </style>
 </head>
 <body>
@@ -3082,6 +3124,76 @@ function v3Tick(){const now=$("#v3Now"),st=$("#v3Sst");if(!now||!st)return;const
   if(open.length){const o=open[open.length-1];st.innerHTML=`<span class="v3-live"></span>${open.map(x=>`<b>${esc(T(x[0]))}</b>`).join(" + ")} · ${esc(T("open"))}<br><span>${esc(T(o[0]))} ${esc(T("closes in"))} ${dur(o[2]*3600-s)}</span>`}
   else{const nx=S3.map(x=>[x[0],((x[1]*3600-s)+86400)%86400]).sort((a,b)=>a[1]-b[1])[0];st.innerHTML=`<span class="v3-live off"></span><b>${esc(T("Markets quiet"))}</b><br><span>${esc(T(nx[0]))} ${esc(T("opens in"))} ${dur(nx[1])}</span>`}}
 setInterval(v3Tick,30000);
+/* ===== v3 step 2: prop-account strip · cumulative P&L chart (hover) · P&L calendar of the month · trade price levels ===== */
+function v3Prop(){const L=limitRows();if(!L.length)return "";
+  return L.slice(0,3).map(x=>{const r=x.r,s=x.s,T=num(r.target),worst=Math.max(x.D>0?x.dl:0,x.M>0?x.dd:0);
+    const st=s.broke?["bad","Rule broken"]:worst>=.9?["bad","Stop trading"]:worst>=.7?["warn","Careful"]:["ok","On track"];
+    const bar=(lab,val,p,col,note)=>`<div class="v3-pm"><div class="v3-pmh"><span>${lab}</span><b data-notr>${val}</b></div><div class="v3-bar"><i data-w="${Math.max(0,Math.min(100,p*100)).toFixed(1)}" style="background:${col}"></i></div><small>${note}</small></div>`;
+    const c=[];
+    if(T>0)c.push(bar("Profit target",`${money(Math.max(0,s.net),0)} / ${money(T,0)}`,s.net/T,"var(--gold)",s.net>=T?`<span class="pos">Target reached</span>`:`<span data-notr>${money(T-s.net,0)}</span> <span>to go</span>`));
+    if(x.D>0)c.push(bar("Daily loss limit",`${money(Math.max(0,-s.tNet),0)} / ${money(x.D,0)}`,x.dl,x.dl>=.9?"var(--red)":"#f5a524",`<span data-notr>${money(Math.max(0,x.D+s.tNet),0)}</span> <span>left today</span>`));
+    if(x.M>0)c.push(bar("Drawdown left",`${money(Math.max(0,s.buffer),0)} / ${money(x.M,0)}`,Math.max(0,s.buffer)/x.M,x.dd>=.9?"var(--red)":x.dd>=.7?"#f5a524":"var(--green)",`<span>Limit at</span> <span data-notr>${money(s.floor,0)}</span>`));
+    c.push(`<div class="v3-pm"><div class="v3-pmh"><span>Balance</span><b data-notr>${money(s.bal,0)}</b></div><small><span data-notr class="${cls(s.net)}">${smoney(s.net,0)}</span> <span>since start</span> · <span data-notr>${s.days}</span> <span>trading days</span></small></div>`);
+    return `<div class="card v3-prop"><div class="v3-pt"><div><b data-notr>${esc(x.a)}</b>${r.firm?`<small data-notr>${esc(r.firm)}${r.size?" · "+esc(r.size):""}</small>`:""}</div><span class="v3-tag ${st[0]}">${st[1]}</span></div>${c.join("")}</div>`}).join("")}
+function v3MonthData(){const m0=todayStr().slice(0,7),days={},n={};
+  S.trades.forEach(t=>{const d=String(t.date||"");if(d.startsWith(m0)){days[d]=(days[d]||0)+tradeNet(t);n[d]=(n[d]||0)+1}});
+  const nt=new Set((S.plans||[]).filter(p=>p.noTrade&&String(p.date||"").startsWith(m0)).map(p=>p.date));return {m0,days,n,nt}}
+function v3Board(){const {m0,days,n,nt}=v3MonthData(),t=todayStr(),[y,m]=m0.split("-").map(Number),lastD=new Date(y,m,0);
+  const mon=new Date(y,m-1,1).toLocaleDateString(I18N.locale(),{month:"long",year:"numeric"});
+  const wd=[1,2,3,4,5].map(i=>new Date(2024,0,i).toLocaleDateString(I18N.locale(),{weekday:"short"}));
+  const mxA=Math.max(1,...Object.values(days).map(Math.abs));
+  let h=wd.map(w=>`<div class="v3-cdh" data-notr>${esc(w)}</div>`).join("")+`<div class="v3-cdh v3-wkc"><span>Week</span></div>`;
+  const d=new Date(y,m-1,1);d.setDate(d.getDate()-((d.getDay()+6)%7));
+  while(d<=lastD){let tot=0,cnt=0,any=false,wdIn=false,past=false;const h0=h;
+    for(let i=0;i<7;i++){const ds=ymd(d),inM=d.getMonth()===m-1;
+      if(inM&&days[ds]!=null){tot+=days[ds];cnt+=n[ds];any=true}
+      if(inM&&i<5)wdIn=true;if(inM&&ds<=t)past=true;
+      if(i<5){if(!inM)h+=`<div></div>`;
+        else if(days[ds]!=null){const v=days[ds],a=(.07+.28*Math.min(1,Math.abs(v)/mxA)).toFixed(2);
+          h+=`<button type="button" class="v3-cd ${v>=0?"w":"l"} ${ds===t?"td":""}" style="--a:${a}" data-cday="${ds}" title="${esc(fmtDate(ds))} · ${n[ds]} ${esc(I18N.t(n[ds]===1?"trade":"trades"))}"><span data-notr>${d.getDate()}</span><b data-notr>${smoney(v,0)}</b></button>`}
+        else if(nt.has(ds))h+=`<div class="v3-cd nt ${ds===t?"td":""}" title="${esc(I18N.t("No-trade day"))}"><span data-notr>${d.getDate()}</span><b data-notr>$0</b></div>`;
+        else h+=`<div class="v3-cd ${ds>t?"fut":"off"} ${ds===t?"td":""}"><span data-notr>${d.getDate()}</span></div>`}
+      d.setDate(d.getDate()+1)}
+    /* a week with no weekday in this month and no trade (e.g. only Sunday the 1st) is left out */
+    if(!wdIn&&!any){h=h0;continue}
+    h+=past||any?`<div class="v3-wk v3-wkc"><small><span data-notr>${cnt}</span> <span>${cnt===1?"trade":"trades"}</span></small><b data-notr class="${any?cls(tot):"mut"}">${any?smoney(tot,0):"—"}</b></div>`:`<div class="v3-wk v3-wkc" style="border-style:dashed"></div>`}
+  return `<div class="v3-m2">
+   <div class="card v3-eqc"><div class="v3-ch"><div><b>Cumulative P&L</b><small>This month, after fees</small></div><b class="v3-big ${cls(Object.values(days).reduce((a,b)=>a+b,0))}" data-notr>${Object.keys(days).length?smoney(Object.values(days).reduce((a,b)=>a+b,0),0):"—"}</b></div>
+    <div class="v3-eq" id="v3Eq">${Object.keys(days).length<2?`<p class="mut v3-eqe">Your P&L curve appears after 2 trading days this month.</p>`:""}<div class="v3-tip" id="v3Tip" data-notr></div></div></div>
+   <div class="card v3-calc"><div class="v3-ch"><div><b>P&L calendar</b><small data-notr>${esc(mon)}</small></div></div><div class="v3-cal">${h}</div></div></div>`}
+function v3DrawEq(){const box=$("#v3Eq");if(!box||!box.offsetWidth)return;const {days}=v3MonthData(),K=Object.keys(days).sort();if(K.length<2)return;
+  let run=0;const P=[["",0],...K.map(k=>[k,run+=days[k]])],W=box.clientWidth,H=box.clientHeight,Lp=52,Rp=10,Tp=12,Bp=24;
+  const vs=P.map(p=>p[1]),lo0=Math.min(0,...vs),hi0=Math.max(0,...vs),span=(hi0-lo0)||1,raw=span/4,mag=Math.pow(10,Math.floor(Math.log10(raw))),stp=[1,2,2.5,5,10].map(s=>s*mag).find(s=>s>=raw)||raw;
+  const lo=Math.floor(lo0/stp)*stp,hi=Math.ceil(hi0/stp)*stp||stp,X=i=>Lp+i*(W-Lp-Rp)/(P.length-1),Y=v=>Tp+(hi-v)/((hi-lo)||1)*(H-Tp-Bp);
+  const fmtA=v=>(v<0?"-":"")+"$"+(Math.abs(v)>=1000?(Math.abs(v)/1000).toFixed(Math.abs(v)%1000?1:0)+"k":Math.abs(v));
+  let s=`<defs><linearGradient id="v3ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b82f6" stop-opacity=".28"/><stop offset="1" stop-color="#3b82f6" stop-opacity="0"/></linearGradient></defs>`;
+  for(let v=lo;v<=hi+1e-9;v+=stp)s+=`<line x1="${Lp}" x2="${W-Rp}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text class="v3-ax" x="${Lp-8}" y="${Y(v)+4}" text-anchor="end">${fmtA(Math.round(v))}</text>`;
+  s+=`<line x1="${Lp}" x2="${W-Rp}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--dim)" stroke-dasharray="3 4"/>`;
+  [...new Set([1,Math.floor(P.length/2),P.length-1])].forEach(i=>{if(P[i]&&P[i][0])s+=`<text class="v3-ax" x="${X(i)}" y="${H-6}" text-anchor="middle">${+P[i][0].slice(8)}</text>`});
+  const line=P.map((p,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" ");
+  s+=`<path d="${line} L${X(P.length-1)} ${Y(lo)} L${X(0)} ${Y(lo)}Z" fill="url(#v3ga)"/><path d="${line}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  s+=`<g id="v3Hv" style="opacity:0"><line id="v3Hl" y1="${Tp}" y2="${H-Bp}" stroke="var(--line2)"/><circle id="v3Hc" r="4.5" fill="#3b82f6" stroke="var(--panel)" stroke-width="2.5"/></g><rect x="${Lp}" y="0" width="${W-Lp-Rp}" height="${H}" fill="transparent" id="v3Hit"/>`;
+  box.querySelector("svg")?.remove();box.insertAdjacentHTML("afterbegin",`<svg width="${W}" height="${H}" aria-hidden="true">${s}</svg>`);
+  const tip=$("#v3Tip"),hv=$("#v3Hv"),hl=$("#v3Hl"),hc=$("#v3Hc"),hit=$("#v3Hit");
+  const show=cx=>{const i=Math.max(1,Math.min(P.length-1,Math.round((cx-Lp)/((W-Lp-Rp)/(P.length-1))))),px=X(i),py=Y(P[i][1]),dv=days[P[i][0]];
+    hl.setAttribute("x1",px);hl.setAttribute("x2",px);hc.setAttribute("cx",px);hc.setAttribute("cy",py);hv.style.opacity=1;
+    tip.innerHTML=`<span class="mut">${esc(fmtDate(P[i][0]))}</span><b class="${cls(P[i][1])}">${smoney(P[i][1],0)}</b><span class="${cls(dv)}">${smoney(dv,0)} ${esc(I18N.t("Day"))}</span>`;
+    tip.style.left=Math.max(80,Math.min(W-80,px))+"px";tip.style.top=py+"px";tip.classList.add("on")};
+  const rx=e=>(e.touches?e.touches[0].clientX:e.clientX)-box.getBoundingClientRect().left;
+  hit.addEventListener("mousemove",e=>show(rx(e)));hit.addEventListener("touchstart",e=>show(rx(e)),{passive:true});hit.addEventListener("touchmove",e=>show(rx(e)),{passive:true});
+  hit.addEventListener("mouseleave",()=>{hv.style.opacity=0;tip.classList.remove("on")})}
+let v3Rz;addEventListener("resize",()=>{clearTimeout(v3Rz);v3Rz=setTimeout(v3DrawEq,150)});
+function v3BindToday(el){v3DrawEq();
+  $$(".v3-prop .v3-bar i",el).forEach(i=>requestAnimationFrame(()=>requestAnimationFrame(()=>i.style.width=i.dataset.w+"%")));
+  $$("[data-cday]",el).forEach(b=>b.onclick=()=>{go("stats");S.dayPage=b.dataset.cday;render();window.scrollTo(0,0)})}
+/* trade page: where the stop, entry, target and exit sit, with the R distance of each (from the prices the trader typed) */
+function v3Levels(t){const e=num(t.entry),s=num(t.stop),tg=num(t.target),x=num(t.exit);if(!isFinite(e)||!isFinite(s)||e===s)return "";
+  const L=[["Stop",s,"var(--red)",t.stop],["Entry",e,"var(--gold)",t.entry]];if(isFinite(tg)&&tg!==e)L.push(["Target",tg,"var(--green)",t.target]);if(isFinite(x))L.push(["Exit",x,"var(--text)",t.exit]);
+  const vs=L.map(l=>l[1]),mn=Math.min(...vs),mx=Math.max(...vs),pd=(mx-mn)*.14||1,lo=mn-pd,hi=mx+pd,Y=v=>((hi-v)/(hi-lo)*100).toFixed(2),dir=t.side==="Long"?1:-1,risk=Math.abs(e-s);
+  const rOf=v=>(v-e)*dir/risk,rTxt=v=>{const r=rOf(v);return (r>0?"+":r<0?"−":"")+Math.abs(r).toFixed(2)+"R"};
+  const zone=(a,b,c)=>`<div class="v3-z ${c}" style="top:${Y(Math.max(a,b))}%;height:${(Math.abs(a-b)/(hi-lo)*100).toFixed(2)}%"></div>`;
+  return `<div class="card v3-lv"><div class="v3-ch"><div><b>Price levels</b><small>${t.side==="Long"?"▲ Long":"▼ Short"}</small></div>${isFinite(x)?`<b class="v3-big ${cls(rOf(x))}" data-notr>${rTxt(x)}</b>`:""}</div>
+   <div class="v3-lvb">${zone(e,s,"risk")}${isFinite(tg)&&tg!==e?zone(e,tg,"rew"):""}${L.map(([nm,v,c,raw])=>`<div class="v3-ln ${nm==="Exit"?"ex":""}" style="top:${Y(v)}%;--c:${c}"><span class="v3-lnl">${nm}</span><span class="v3-lnv" data-notr>${esc(String(raw))} · ${nm==="Entry"?"0R":rTxt(v)}</span></div>`).join("")}</div></div>`}
 function vToday(el){
   if(S.readonly)return vJournal(el);
   const t=todayStr(),sc=dayScore(t),L=sc.L,p=L.p,ds=discStreak(S.trades,S.plans),js=journalStreak(),cd=coolDown(t),nd=nextTradingDay();
@@ -3116,7 +3228,7 @@ function vToday(el){
    ${profileNudge()}
    ${cd?`<div class="td-cool"><span class="td-cool-i">🛑</span><div><b>${cd.why==="loss"?"Max daily loss reached":"Max trades reached for today"}</b><small>${cd.why==="loss"?"You hit your daily loss limit. Close the platform, protect the account, come back tomorrow.":"Your plan is done for today. Closing the platform is the trade now."}</small></div></div>`:""}
    ${tHit?`<div class="td-win">🎉 <b>Daily target reached!</b> <span>Lock it in: no more trades today.</span></div>`:""}
-   ${v3Month()}${v3Sessions()}
+   ${v3Prop()}${v3Month()}${v3Board()}${v3Sessions()}
    <div class="td-grid">
     <div class="card td-score"><div class="td-sc-top"><div class="td-orbw" id="a3Orb">${ring(sc.score)}</div><div><h3>Today's discipline score</h3><p class="mut">${sc.score>=80?"Excellent. This is how funded traders work.":sc.score>=60?"Good. Fix the red points below.":"Follow the checklist below to raise it."}</p></div></div>
      <div class="td-parts">${sc.parts.map(([ic,l,ok])=>`<div class="td-pt ${ok?"ok":""}"><span>${ok?"✅":ic}</span><span>${l}</span><b>${ok?"+20":"0"}</b></div>`).join("")}</div></div>
@@ -3155,7 +3267,7 @@ function vToday(el){
     else if(a==="notrade"){S._ntdDate=t;go("journal");setTimeout(()=>{const n=$("#ntdSet");if(n)n.scrollIntoView({behavior:"smooth",block:"center"})},200)}
     else if(a==="share")shareWeek();else if(a==="session")startSession();
     else if(a==="rules"){const ac=accounts()[0];if(ac)S.acct=ac;go("stats");setTimeout(()=>{const r=$("#rulesCard");if(r)r.scrollIntoView({behavior:"smooth",block:"center"})},300)}});
-  bindWeekReview();
+  bindWeekReview();v3BindToday(el);
   $("#tdFocusOn").onclick=()=>setFocus(true);{const tt=$("#tdTour");if(tt)tt.onclick=startTour}
   {const pn=$("#pfNudge");if(pn)pn.onclick=()=>{go("profile");window.scrollTo(0,0)}}
   mount3d("a3Orb","disciplineOrb",sc.score,I18N.t("score"));mount3d("a3Flame","streakFlame",ds.streak);
@@ -3283,6 +3395,7 @@ function tradeDetail(t,h="h1"){const n=tradeNet(t),R=tradeR(t),risk=tradeRisk(t)
    <p class="sub">${fmtDate(t.date)} ${esc(t.time||"")} · ${esc(t.account||"No account")}</p>
    ${(t.shots||[]).map((s,i)=>`<img class="cover" src="${s}" alt="Trade screenshot ${i+1}" style="margin-top:${i?10:0}px">`).join("")||`<div class="card empty">No screenshot</div>`}
    ${t.remark?`<div class="remark">📝 ${esc(t.remark)}</div>`:""}
+   ${v3Levels(t)}
    <div class="props">
      <div>Result</div><div><span class="tag ${resultOf(t)==="Win"?"win":resultOf(t)==="Loss"?"loss":""}">${resultOf(t)}</span> ${isFinite(R)?`<b class="mono">${R.toFixed(2)}R</b>`:""}</div>
      <div>${isLots(t)?"Lot size":"Contracts"}</div><div class="mono">${esc(t.qty)} ${isLots(t)?I18N.t("lots"):"×"} ${esc(t.symbol)} ${m&&!isLots(t)?`<span class="mut">(${m.name}, $${m.pv}/pt)</span>`:""}</div>
@@ -3710,6 +3823,7 @@ function limBar(lab,used,left){const lv=used>=.9?"bad":used>=.7?"warn":"ok";
   return `<div class="lim-r ${lv}"><div class="lim-h"><span>${lab}</span><b class="mono" data-notr>${Math.round(used*100)}%</b></div><div class="lim-bar"><i style="width:${Math.min(100,used*100)}%"></i><em style="left:70%"></em><em style="left:90%"></em></div>
    <small class="mut">${left}${lv==="bad"?` · <b class="neg">🛑 <span>90% used: stop trading now</span></b>`:lv==="warn"?` · <b class="warn">⚠️ <span>70% used: slow down, A+ setups only</span></b>`:""}</small></div>`}
 function limitsCard(){const L=limitRows();
+  if(L.length&&S.view==="today")return "";/* shown at the top of Today as the prop-account strip */
   if(!L.length)return `<div class="card lim-card"><h3>🏦 <span>Prop firm limits</span></h3><p class="mut" style="margin:0 0 10px;font-size:13px"><span>Set the rules of your prop firm account once: you will see here how close you are to the daily loss limit and the max drawdown, with a warning at 70% and 90%.</span></p><button class="btn sm pri" type="button" data-td="rules">🏦 <span>Set my prop firm rules</span></button></div>`;
   return `<div class="card lim-card"><h3>🏦 <span>Prop firm limits</span></h3>${L.slice(0,3).map(x=>`<div class="lim-acc"><div class="lim-an"><b data-notr>${esc(x.a)}</b>${x.r.firm?` <span class="mut" data-notr>· ${esc(x.r.firm)}${x.r.size?" "+esc(x.r.size):""}</span>`:""}</div>
     ${x.D>0?limBar(I18N.t("Daily loss limit"),x.dl,`${money(Math.max(0,x.D+x.s.tNet),0)} <span>left today</span>`):""}
@@ -3785,7 +3899,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26h";
+const APP_VER="2026-11-26i";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
