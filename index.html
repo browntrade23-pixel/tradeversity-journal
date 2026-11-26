@@ -80,7 +80,7 @@ nav.tabs button.on .tico .ico :is(rect,circle,path[d$="z"]):not([fill="currentCo
 .t-stats{--c1:#34d17f;--c2:#13914c}
 .t-news{--c1:#ff6b5e;--c2:#d6382f}
 .t-plan{--c1:#5b9bff;--c2:#2b62d9}
-.t-risk{--c1:#b38cff;--c2:#7046d6}
+.t-risk,.t-riskmgmt{--c1:#b38cff;--c2:#7046d6}
 .t-propfirms{--c1:#2ec5c9;--c2:#12868a}.t-indicator{--c1:#f5b942;--c2:#c47f12}
 .t-consistency{--c1:#2fd3c8;--c2:#0d8a85}
 .t-course{--c1:#e6c27a;--c2:#a77a24}
@@ -975,6 +975,7 @@ html[lang=ar] body{font-family:Cairo,Inter,system-ui,sans-serif}
 .hub-tabs .tico{width:18px;height:18px}.hub-tabs .tico .ico{width:18px;height:18px}
 .hub-sh{display:none}
 .hub-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rhub .hub-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
 .hub-sum>*{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid var(--line,rgba(255,255,255,.07));text-align:start;font:inherit;color:inherit;min-width:0}
 .hub-sum button{cursor:pointer}.hub-sum button:hover{border-color:rgba(245,185,66,.45)}
 .hub-sum small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2323,14 +2324,18 @@ const ICON={
   moon:'<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>',
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
   system:'<rect x="3" y="4" width="18" height="12.5" rx="2"/><path d="M8.5 20.5h7M12 16.5v4"/>'};
-const ico=(k,cls)=>`<svg class="ico ${cls||""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+const ico=(k,cls)=>`<svg class="ico ${cls||""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k==="riskmgmt"?"risk":k]}</svg>`;
 /* "My trading" = one menu tab holding 3 sub-tabs in the trading cycle: record (Journal) → review (Statistics) → prepare (Tomorrow's plan).
    The sub-tabs keep their own views and links (#journal, #stats, #plan), so reminders, search and the tours still land on the right page. */
 const HUB=[["journal","Journal"],["stats","Statistics"],["plan","Tomorrow's plan"]],HUBK=HUB.map(x=>x[0]);
 const hubLastKey=()=>"tv_hub_"+((S.me&&S.me.id)||"x");
 function hubLast(){try{const v=localStorage.getItem(hubLastKey());return HUBK.includes(v)?v:"journal"}catch(e){return "journal"}}
-const navKey=v=>HUBK.includes(v)?"trading":v;
-const VIEWS=[["today","Today"],["trading","My trading"],["course","Mentorship course"],["news","News"],["risk","Risk calculator"],["consistency","Consistency rule"],["propfirms","Prop firm tracker"],["indicator","Free ICT indicator"],["about","About us"]];
+/* "Risk management" groups the risk calculator and the consistency rule the same way "My trading" groups its 3 pages */
+const RHUB=[["risk","Risk calculator"],["consistency","Consistency rule"]],RHUBK=RHUB.map(x=>x[0]);
+const rhubLastKey=()=>"tv_rhub_"+((S.me&&S.me.id)||"x");
+function rhubLast(){try{const v=localStorage.getItem(rhubLastKey());return RHUBK.includes(v)?v:"risk"}catch(e){return "risk"}}
+const navKey=v=>HUBK.includes(v)?"trading":RHUBK.includes(v)?"riskmgmt":v;
+const VIEWS=[["today","Today"],["trading","My trading"],["course","Mentorship course"],["news","News"],["riskmgmt","Risk management"],["propfirms","Prop firm tracker"],["indicator","Free ICT indicator"],["about","About us"]];
 function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button data-v="${k}" class="${c||""} ${navKey(S.view)===k?"on":""}"><span class="tico t-${k}">${ico(k)}</span><span>${l}</span></button>`;
   if(S.me.role==="admin")h+=tab("admin","Admin dashboard","admin");
   if(S.readonly)h+=tab("student","Student file","admin");
@@ -2399,12 +2404,12 @@ addEventListener("resize",()=>{if(innerWidth>760)bnSheetClose()});
     if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*1.8||Date.now()-st>800)return;
     if(window.getSelection&&String(window.getSelection()).length)return;
     /* inside "My trading" the swipe moves between Journal / Statistics / Tomorrow's plan first, then to the next menu tab */
-    const order=[...$$("#tabs button[data-v]:not(.tool-tab)"),...$$("#toolsMenu button[data-v]")].map(b=>b.dataset.v).flatMap(k=>k==="trading"?HUBK:[k]),i=order.indexOf(S.view);if(i<0)return;
+    const order=[...$$("#tabs button[data-v]:not(.tool-tab)"),...$$("#toolsMenu button[data-v]")].map(b=>b.dataset.v).flatMap(k=>k==="trading"?HUBK:k==="riskmgmt"?RHUBK:[k]),i=order.indexOf(S.view);if(i<0)return;
     const rtl=document.documentElement.dir==="rtl",step=(dx<0)!==rtl?1:-1,n=order[i+step];if(!n)return;
     go(n);const v=$("#view");v.classList.remove("sw-n","sw-p");void v.offsetWidth;v.classList.add(step>0?"sw-n":"sw-p")},{passive:true});
 })();
-function go(v){if(PLAYER)v="course";if(v==="import")v="stats";if(v==="trading")v=hubLast();if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),...HUBK,"admin","student","profile"].includes(v))v=S.me.role==="admin"?"admin":"journal";
-  if(HUBK.includes(v)){try{localStorage.setItem(hubLastKey(),v)}catch(e){}}if(v==="admin"&&S.me.role!=="admin")v="journal";if(v==="today"&&S.readonly)v="journal";
+function go(v){if(PLAYER)v="course";if(v==="import")v="stats";if(v==="trading")v=hubLast();if(v==="riskmgmt")v=rhubLast();if(v==="student"&&!S.readonly)v="admin";if(![...VIEWS.map(x=>x[0]),...HUBK,...RHUBK,"admin","student","profile"].includes(v))v=S.me.role==="admin"?"admin":"journal";
+  if(HUBK.includes(v)){try{localStorage.setItem(hubLastKey(),v)}catch(e){}}if(RHUBK.includes(v)){try{localStorage.setItem(rhubLastKey(),v)}catch(e){}}if(v==="admin"&&S.me.role!=="admin")v="journal";if(v==="today"&&S.readonly)v="journal";
   if(v==="admin"&&S.subject&&S.subject.id!==S.me.id){loadSubject(S.me,false).then(()=>{S.view="admin";render()});return}
   S.view=v;S.page=null;S.dayPage=null;S._fromDay=null;S._pfId=null;S._planCopy=null;try{if(location.hash.slice(1)!==v)history.replaceState(null,"","#"+v)}catch(e){}render();window.scrollTo(0,0)}
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(S.me&&h&&h!==S.view)go(h)});
@@ -2506,6 +2511,7 @@ function render(){setTimeout(galaxyBg,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
   const fn={profile:vProfile,today:vToday,journal:vJournal,stats:vStats,news:vNews,plan:vPlan,risk:vRisk,consistency:vConsistency,propfirms:vPropFirms,indicator:vIndicator,course:vCourse,import:vImport,about:vAbout,admin:vAdmin,student:vStudent}[S.view];
   if(HUBK.includes(S.view)&&!S.page&&!S.dayPage)h+=hubBar();
+  if(RHUBK.includes(S.view))h+=rhubBar();
   v.innerHTML=h+'<div id="vb"></div>';Promise.resolve(fn($("#vb"))).then(()=>bindNotify(v)).catch(()=>{});
   if(S.readonly)$("#backAdmin").onclick=()=>go("admin");
   /* phones: floating + to log a trade from any student page */
@@ -2521,6 +2527,11 @@ function hubBar(){const ts=S.trades||[],today=todayStr(),tt=ts.filter(t=>t.date=
     <div class="hub-sum"><div><small>Today</small><b class="mono ${pnl>0?"pos":pnl<0?"neg":""}" data-notr>${tt.length?money(pnl,0):"—"}</b></div>
      <div><small><span class="hub-lg">Win rate · 30 days</span><span class="hub-sh">Win rate</span></small><b class="mono" data-notr>${wr==null?"—":wr+"%"}</b></div>
      <button type="button" data-hub="plan"><small><span class="hub-lg">Tomorrow's plan</span><span class="hub-sh">Plan</span></small><b class="${planned?"pos":"hub-todo"}">${planned?"✓ <span>Ready</span>":"<span>To do</span>"}</b></button></div></div>`}
+/* "Risk management" header: its 2 sub-tabs */
+function rhubBar(){const SHORT={risk:"Risk",consistency:"Consistency"};
+  return `<div class="hub rhub"><div class="hub-tabs" role="tablist" aria-label="Risk management">${RHUB.map(([k,l],i)=>`<button type="button" role="tab" data-rhub="${k}" aria-selected="${S.view===k}" class="${S.view===k?"on":""}"><span class="hub-n" data-notr>${i+1}</span><span class="tico t-${k}">${ico(k)}</span><span class="hub-l"><span class="hub-lg">${l}</span><span class="hub-sh">${SHORT[k]}</span></span></button>`).join("")}</div></div>`}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-rhub]");if(!b||!S.me)return;const k=b.dataset.rhub;if(k===S.view)return;
+  const step=RHUBK.indexOf(k)>RHUBK.indexOf(S.view)?1:-1;go(k);const v=$("#view");v.classList.remove("sw-n","sw-p");void v.offsetWidth;v.classList.add(step>0?"sw-n":"sw-p")});
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-hub]");if(!b||!S.me)return;const k=b.dataset.hub;if(k===S.view)return;
   const step=HUBK.indexOf(k)>HUBK.indexOf(S.view)?1:-1;go(k);const v=$("#view");v.classList.remove("sw-n","sw-p");void v.offsetWidth;v.classList.add(step>0?"sw-n":"sw-p")});
 
@@ -3651,7 +3662,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26f";
+const APP_VER="2026-11-26g";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -3689,7 +3700,7 @@ function tourSteps(){const ph=innerWidth<821,nav=k=>ph?`#bnav [data-v="${k}"]`:`
     [ph?"#fab":'[data-td="trade"]',"＋","Log a trade","Tap here after each trade. ⚡ Quick log takes a few taps; add screenshots and notes later."],
     [nav("trading"),"📓","My trading","Your trading routine in one place. Journal: every trade with notes, emotions and screenshots. Statistics: win rate, calendar, CSV import. Tomorrow's plan: bias, key levels, max loss."],
     [nav("news"),"📰","Red news","Countdown, no-trade windows and what each news means."],
-    [ph?"#bnMore":nav("risk"),"🧰","Tools","Risk calculator, consistency rule, prop firm tracker with discounts, and our free ICT indicator."],
+    [ph?"#bnMore":nav("riskmgmt"),"🧰","Tools","Risk management (risk calculator + consistency rule), prop firm tracker with discounts, and our free ICT indicator."],
     ["#ntfBell","🔔","Notifications","Red news, journal and plan reminders, and announcements from Brown Algo."],
     ["#dispBtn","⚙️","Settings","Language, theme, background, this tour and log out are all here."],
     [null,"🚀","You're ready","Turn on the Telegram reminders in Tomorrow's plan, then log your first trade. Discipline is the edge nobody can copy."]]}
