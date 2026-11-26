@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
+<script>/* never run inside another site's frame (clickjacking): break out, or hide if the browser blocks that */
+if(window.top!==window.self){try{window.top.location.replace(window.self.location.href)}catch(e){document.documentElement.style.display="none"}}</script>
 <script>
 /* 3D welcome page first for logged-out visitors on the bare address. Never for: logged-in users (saved session),
    links with ?params or #hash (share, demo, auth=..., email confirm / password reset), or the installed app. */
@@ -136,6 +139,7 @@ html.player .dp-row:has(#bgSeg){display:none!important}
 .cv-app a.cv-go{display:flex;align-items:center;gap:8px;text-decoration:none;margin:4px 0 12px}.cv-app .cv-steps{margin:0 0 10px}
 .cv-code{font-size:22px;letter-spacing:.4em;text-align:center}
 .mfa-gate{position:fixed;inset:0;z-index:100001;display:grid;place-items:center;padding:16px;background:rgba(5,7,12,.97)}.mfa-box{width:min(380px,100%);text-align:center}.mfa-box .cv-code{width:100%;margin-top:6px}.mfa-msg{min-height:18px;margin:8px 0;font-size:13px}
+.cap-box{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:100002}
 .mfa-qr{display:block;width:180px;height:180px;margin:10px 0;padding:8px;border-radius:12px;background:#fff}.cv-steps{padding-inline-start:20px;font-size:13px;display:grid;gap:6px}
 .cv-safe{margin:12px 0 0;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;background:color-mix(in srgb,var(--panel) 85%,#22c55e 15%)}.cv-safe summary{cursor:pointer;font-weight:700;list-style:none}.cv-safe summary::-webkit-details-marker{display:none}.cv-safe ul{margin:8px 0 0;padding-inline-start:18px;display:grid;gap:6px}
 .cv-tag{display:inline-flex;gap:4px;font-size:11px;padding:2px 7px;border-radius:99px;border:1px solid var(--line2);font-weight:600}.cv-tag.bad{color:var(--red);border-color:var(--red)}.cv-tag.warn{color:var(--gold);border-color:var(--gold)}.cv-tag.ok{color:var(--green);border-color:var(--green)}.cv-tag.pend{color:var(--blue);border-color:var(--blue)}
@@ -1968,9 +1972,22 @@ const CONFIG = {
   SUPABASE_URL: "https://szovzzkukzuytkzieuae.supabase.co",
   /* Telegram verification bot (username without @). Empty = the Telegram code step is switched off. */
   TG_BOT: "Tardeversity_verify_bot",
+  /* Cloudflare Turnstile SITE key (public) for the bot check on sign-up, login and password reset.
+     Empty = off. Turn on: put the site key here AND the secret key in Supabase → Auth → Attack Protection → CAPTCHA. */
+  TURNSTILE: "",
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6b3Z6emt1a3p1eXRremlldWFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ3ODIyMTgsImV4cCI6MjExMDM1ODIxOH0.hEcb4PhOIrKOZiwvMG6YQQHdR2zr1AhHOHmWeCSKJG0"
 };
 
+/* ============ bot check (Cloudflare Turnstile) ============
+   Each sign-up / login / reset gets a fresh one-time token. The box only appears when Cloudflare needs the visitor
+   to click; most people never see it. Does nothing while CONFIG.TURNSTILE is empty. */
+const Captcha={_p:null,_id:null,_box:null,
+  load(){return this._p||(this._p=new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";s.async=true;s.onload=res;s.onerror=()=>{this._p=null;rej(new Error("The security check couldn't load. Check your connection and try again."))};document.head.appendChild(s)}))},
+  async token(){if(!CONFIG.TURNSTILE)return undefined;await this.load();
+    if(!this._box){this._box=document.createElement("div");this._box.className="cap-box";document.body.appendChild(this._box)}
+    if(this._id!=null){try{window.turnstile.remove(this._id)}catch(e){}this._id=null}
+    return new Promise((res,rej)=>{this._id=window.turnstile.render(this._box,{sitekey:CONFIG.TURNSTILE,appearance:"interaction-only",
+      callback:t=>res(t),"error-callback":()=>rej(new Error("The security check failed. Refresh the page and try again."))})})}};
 /* ============ helpers ============ */
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -2095,12 +2112,13 @@ const Cloud={
   async requestAgain(){const{error}=await this.sb.rpc("request_access_again");if(error)throw error},
   async setTelegram(id,tg){const{error}=await this.sb.from("profiles").update({telegram:tg}).eq("id",id);if(error)throw error},
   async session(){const{data}=await this.sb.auth.getSession();if(!data.session)return null;return this.profile(data.session.user.id)},
-  async signIn(email,password){const{data,error}=await this.sb.auth.signInWithPassword({email,password});if(error)throw error;return this.profile(data.user.id)},
+  async signIn(email,password){const captchaToken=await Captcha.token();const{data,error}=await this.sb.auth.signInWithPassword({email,password,options:{captchaToken}});if(error)throw error;return this.profile(data.user.id)},
   async emailTaken(email){try{const{data,error}=await this.sb.rpc("email_registered",{p_email:email});return error?null:!!data}catch(e){return null}},
   async signUp({email,password,name,telegram}){
     /* this email already has an account: say it before trying (no email is sent, no rate limit used) */
     if(await this.emailTaken(email))throw new Error("already registered");
-    const{data,error}=await this.sb.auth.signUp({email,password,options:{data:{full_name:name,telegram},emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
+    const captchaToken=await Captcha.token();
+    const{data,error}=await this.sb.auth.signUp({email,password,options:{data:{full_name:name,telegram},emailRedirectTo:location.origin+location.pathname,captchaToken}});if(error)throw error;
     if(data.user&&Array.isArray(data.user.identities)&&!data.user.identities.length)throw new Error("already registered");   /* Supabase's hidden "email taken" answer */
     if(!data.session)return {needsConfirm:true};return {user:await this.profile(data.user.id),needsConfirm:false}},
   async verifyCode(email,token){const{data,error}=await this.sb.auth.verifyOtp({email,token,type:"signup"});if(error)throw error;return await this.profile(data.user.id)},
@@ -2133,7 +2151,7 @@ const Cloud={
   async createShare(o){const{data,error}=await this.sb.from("shares").insert(o).select().single();if(error)throw error;return data},
   async revokeShare(token){const{error}=await this.sb.from("shares").update({revoked:true}).eq("token",token);if(error)throw error},
   async getShare(t){const{data,error}=await this.sb.rpc("get_share",{t});if(error)throw error;return data},
-  async resetPassword(email){const{error}=await this.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error}
+  async resetPassword(email){const captchaToken=await Captcha.token();const{error}=await this.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname,captchaToken});if(error)throw error}
 };
 
 let API=Cloud;
