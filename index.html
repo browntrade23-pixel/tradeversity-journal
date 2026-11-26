@@ -1983,11 +1983,17 @@ const CONFIG = {
    to click; most people never see it. Does nothing while CONFIG.TURNSTILE is empty. */
 const Captcha={_p:null,_id:null,_box:null,
   load(){return this._p||(this._p=new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";s.async=true;s.onload=res;s.onerror=()=>{this._p=null;rej(new Error("The security check couldn't load. Check your connection and try again."))};document.head.appendChild(s)}))},
-  async token(){if(!CONFIG.TURNSTILE)return undefined;await this.load();
+  /* Never blocks the page: if Cloudflare doesn't answer, the request goes out without a token and Supabase
+     (the real gatekeeper) decides. 15 s to answer, or 2 minutes once Cloudflare asks the visitor to click. */
+  async token(){if(!CONFIG.TURNSTILE)return undefined;
+    try{await this.load()}catch(e){console.warn("captcha:",e.message);return undefined}
     if(!this._box){this._box=document.createElement("div");this._box.className="cap-box";document.body.appendChild(this._box)}
     if(this._id!=null){try{window.turnstile.remove(this._id)}catch(e){}this._id=null}
-    return new Promise((res,rej)=>{this._id=window.turnstile.render(this._box,{sitekey:CONFIG.TURNSTILE,appearance:"interaction-only",
-      callback:t=>res(t),"error-callback":()=>rej(new Error("The security check failed. Refresh the page and try again."))})})}};
+    return new Promise(res=>{let done=false,to=null;const fin=t=>{if(done)return;done=true;clearTimeout(to);res(t||undefined)};
+      to=setTimeout(()=>fin(),15000);
+      try{this._id=window.turnstile.render(this._box,{sitekey:CONFIG.TURNSTILE,appearance:"interaction-only",
+        callback:t=>fin(t),"error-callback":()=>fin(),"expired-callback":()=>fin(),"timeout-callback":()=>fin(),
+        "before-interactive-callback":()=>{clearTimeout(to);to=setTimeout(()=>fin(),120000)}})}catch(e){fin()}})}};
 /* ============ helpers ============ */
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -3637,7 +3643,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26c";
+const APP_VER="2026-11-26d";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
