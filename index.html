@@ -2078,7 +2078,8 @@ function calc(ts){
 /* ============ backend: Supabase ============ */
 const Cloud={
   sb:null,
-  async init(){await new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+  async init(){await new Promise((res,rej)=>{const s=document.createElement("script");/* exact version + integrity hash: a changed or hijacked CDN file is refused instead of running with the login session */
+    s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js";s.integrity="sha384-A97u3Qnt9GZHURO9YJZRe7VQgGUeFzcv6I1oIGnUTxQrCxnpQMwR0/G8F2zt9abZ";s.crossOrigin="anonymous";s.onload=res;s.onerror=rej;document.head.appendChild(s)});
     this.sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
     this.sb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY")openNewPassword()});},
   async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,status:data.status,created_at:data.created_at,tgOk:!!data.telegram_verified,emailOk:await this.emailOk(id),...pfFields(data)}},
@@ -3957,7 +3958,7 @@ function delStats(a){if(!a||a==="all")return;const ids=S.trades.filter(t=>t.acco
 /* ============ SHARE (public view-only link + QR code) ============ */
 const shareURL=tok=>`${location.origin}${location.pathname}?share=${tok}`;
 let _qrLib=null;
-function loadQR(){return _qrLib||(_qrLib=new Promise((res,rej)=>{if(window.qrcode)return res(window.qrcode);const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js";s.onload=()=>res(window.qrcode);s.onerror=()=>{_qrLib=null;rej(new Error("QR library didn't load"))};document.head.appendChild(s)}))}
+function loadQR(){return _qrLib||(_qrLib=new Promise((res,rej)=>{if(window.qrcode)return res(window.qrcode);const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js";s.integrity="sha384-8FWZA6BGMXhsfO+BLtrJK0We6gg5o1JyO8xQm6peWDEUs17ACA5ziE/NIAkl9z2k";s.crossOrigin="anonymous";s.onload=()=>res(window.qrcode);s.onerror=()=>{_qrLib=null;rej(new Error("QR library didn't load"))};document.head.appendChild(s)}))}
 // Branded QR card (PNG-ready canvas): logo in the middle, high error correction so it still scans
 async function qrCard(url,label){const qrcode=await loadQR();const q=qrcode(0,"H");q.addData(url);q.make();
   const n=q.getModuleCount(),cs=Math.max(8,Math.floor(360/n)),m=3,qs=(n+2*m)*cs,P=44,W=qs+P*2,H=qs+P+170;
