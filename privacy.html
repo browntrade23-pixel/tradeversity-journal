@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
 <title>Privacy policy · TRADEVERSITY & Cerebra by TDV</title>
 <meta name="description" content="How TRADEVERSITY and the Cerebra by TDV apps (Windows, Android) handle your data.">
-<link rel="icon" href="brand/cerebra-fg-512.png">
+<link rel="icon" type="image/png" href="brand/logo-192.png?v=hq">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="TRADEVERSITY">
 <meta property="og:url" content="https://jointradeversity.com/privacy.html">
@@ -15,34 +16,35 @@
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://jointradeversity.com/brand/share-card.png">
-
 <style>
-:root{--bg:#05060b;--panel:#0d0f17;--line:#232634;--text:#e9ecf4;--muted:#9aa1b4;--gold:#f5b942}
+:root{--bg:#090b11;--panel:#0f131c;--line:#1b2130;--line2:#273043;--text:#e7eaf0;--muted:#8b94a7;--blue:#3b82f6;--blue2:#7cb0ff}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(900px 420px at 50% -120px,rgba(245,185,66,.10),transparent 70%),var(--bg);color:var(--text);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+body{margin:0;background:radial-gradient(900px 420px at 50% -160px,rgba(59,130,246,.12),transparent 70%),var(--bg);color:var(--text);font:16px/1.7 Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 .wrap{max-width:820px;margin:0 auto;padding:28px 20px 60px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
-.brand{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:800;letter-spacing:.5px}
-.brand img{width:40px;height:40px;border-radius:50%}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:700;letter-spacing:.5px}
+.brand img{width:38px;height:38px;border-radius:50%}
 .langs{display:flex;gap:6px}
-.langs button{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
-.langs button.on{color:#111;background:var(--gold);border-color:var(--gold);font-weight:700}
-h1{font-size:30px;line-height:1.2;margin:8px 0 4px}
+.langs button{border:1px solid var(--line2);background:var(--panel);color:var(--muted);border-radius:10px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.langs button.on{color:#fff;background:var(--blue);border-color:var(--blue);font-weight:600}
+h1{font-size:30px;line-height:1.2;margin:8px 0 4px;letter-spacing:-.02em}
 .date{color:var(--muted);font-size:14px;margin:0 0 22px}
-h2{font-size:19px;margin:28px 0 8px;color:var(--gold)}
-p,li{color:#d6dae6}
+h2{font-size:18px;margin:30px 0 8px;color:var(--blue2);font-weight:600}
+p,li{color:#d3d8e3}
 ul{padding-inline-start:22px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
-a{color:var(--gold)}
+a{color:var(--blue2)}
 [lang=ar]{font-family:"Segoe UI",Tahoma,"Noto Naskh Arabic",Arial,sans-serif}
 section[hidden]{display:none}
-footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px;display:flex;gap:6px 16px;flex-wrap:wrap}
+footer a{color:var(--muted)}
+@media(max-width:600px){h1{font-size:25px}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
-  <a class="brand" href="https://jointradeversity.com/"><img src="brand/cerebra-fg-512.png" alt="">TRADEVERSITY</a>
+  <a class="brand" href="https://jointradeversity.com/"><img src="brand/logo-192.png?v=hq" alt="">TRADEVERSITY</a>
   <div class="langs" role="group" aria-label="Language">
     <button type="button" data-l="en">English</button><button type="button" data-l="fr">Français</button><button type="button" data-l="ar">العربية</button>
   </div>
@@ -51,24 +53,31 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <!-- ================= ENGLISH ================= -->
 <section lang="en" dir="ltr" data-sec="en">
 <h1>Privacy policy</h1>
-<p class="date">TRADEVERSITY website and the Cerebra by TDV apps (Windows and Android) · Last updated: November 21, 2026</p>
+<p class="date">TRADEVERSITY website and the Cerebra by TDV apps (Windows and Android) · Last updated: November 26, 2026</p>
 
-<div class="card"><b>In short:</b> we collect only what the trading journal and the protected Mentorship course need. We don't sell your data, we don't show ads, and the apps can't read your contacts, files, camera, microphone or location.</div>
+<div class="card"><b>In short:</b> we collect only what the trading journal, the tools and the protected Mentorship course need. We don't sell your data, we don't show ads, we don't use advertising trackers, and the apps can't read your contacts, files, camera, microphone or location.</div>
 
 <h2>Who we are</h2>
-<p>TRADEVERSITY (jointradeversity.com) is a trading journal and a Mentorship course by Brown Algo · ZN Trading. Cerebra by TDV is our app for Windows and Android that plays the course in a protected window. Questions? Our support team is here to help: contact it from <a href="support.html">jointradeversity.com/support</a>.</p>
+<p>TRADEVERSITY (jointradeversity.com) is a trading journal, a set of trading tools and a Mentorship course by Brown Algo · ZN Trading. We are responsible for the personal data described here. Cerebra by TDV is our app for Windows and Android that plays the course in a protected window. Questions? Our support team is here to help: contact it from <a href="support.html">jointradeversity.com/support</a>.</p>
 
 <h2>What we collect</h2>
 <ul>
-  <li><b>Your account:</b> email address, name and Telegram username. If you link our Telegram bot, your Telegram chat ID so it can send you the messages you choose. Your password is handled by our login provider and stored only in encrypted (hashed) form: we never see it.</li>
-  <li><b>Your trading journal:</b> the trades, plans, notes, emotions, screenshots and settings you enter.</li>
+  <li><b>Your account:</b> email address, name and Telegram username, and the profile details you choose to add (for example username, country, city, date of birth, phone number, photo). If you link our Telegram bot, your Telegram chat ID so it can send you the messages you choose. Your password is handled by our login provider and stored only in encrypted (hashed) form: we never see it.</li>
+  <li><b>Your trading journal:</b> the trades, plans, notes, emotions, screenshots, imported CSV files, reviews and settings you enter.</li>
   <li><b>The Mentorship course (members only):</b> your course device record (a security key created on your device and a device name such as "Windows PC · Cerebra by TDV"), a course security log (date and time, action, IP address, country, browser or app type), your lesson progress, your assignments and your mentor's feedback.</li>
+  <li><b>Help center form:</b> your email, the topic and your message, and the IP address the message was sent from. We use the IP address only to stop spam (a limited number of messages per hour).</li>
+  <li><b>Security check:</b> when you sign up, log in or reset your password, Cloudflare Turnstile checks that you are a person and not a bot. Cloudflare looks at technical signals from your browser for this.</li>
+  <li><b>Two-step login (admin accounts):</b> the secret for the authenticator app is kept by our login provider.</li>
   <li><b>Partner links:</b> when you click a prop firm link, which firm and where on the page, to count referrals.</li>
   <li><b>Links you share:</b> the share links you create yourself.</li>
+  <li><b>Discord (optional):</b> if you join our Discord server and open a support ticket, Discord and our own ticket bot handle your Discord username and the messages in that ticket.</li>
 </ul>
 
+<h2>Stored on your device</h2>
+<p>The platform saves some things in your browser so it works the way you left it: your login session, language, theme, background, last opened tab, risk calculator presets, prop firm rules, notification status and similar settings. They stay on your device and you can remove them by clearing the site data in your browser. We don't use advertising or tracking cookies.</p>
+
 <h2>What we don't collect</h2>
-<p>No contacts, no files from your device, no camera, no microphone, no GPS location, no advertising ID. No ads and no selling or renting of your data.</p>
+<p>No contacts, no files from your device (only the files you choose to upload), no camera, no microphone, no GPS location, no advertising ID. No ads and no selling or renting of your data.</p>
 
 <h2>The Cerebra by TDV apps</h2>
 <ul>
@@ -78,61 +87,73 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
   <li>The versions downloaded from our website check jointradeversity.com for updates. The Microsoft Store and Google Play versions are updated by the store.</li>
 </ul>
 
-<h2>Why we use it</h2>
+<h2>Why we use it (and on what basis)</h2>
 <ul>
-  <li>To run your account and your trading journal.</li>
-  <li>To protect the course: one device per member, encrypted videos, and your name and email shown on the videos, so any leak can be traced.</li>
-  <li>To send the Telegram reminders and notifications you turn on.</li>
-  <li>To keep the service secure and improve it.</li>
+  <li>To run your account, your journal and the tools you use (needed to provide the service you asked for).</li>
+  <li>To protect the course: one device per member, encrypted videos, and your name and email shown on the videos, so any leak can be traced (needed to provide the course and to protect our rights).</li>
+  <li>To send the Telegram reminders and notifications you turn on (your choice, you can turn them off).</li>
+  <li>To keep the service secure, stop spam and abuse, and improve it (our legitimate interest).</li>
 </ul>
 
 <h2>Services we use</h2>
 <ul>
-  <li><b>Supabase:</b> login and database.</li>
+  <li><b>Supabase:</b> login, database and server functions.</li>
+  <li><b>Cloudflare Turnstile:</b> the security check on sign-up, login and password reset.</li>
   <li><b>VdoCipher:</b> encrypted video streaming for the course.</li>
-  <li><b>Telegram:</b> the messages you choose to receive.</li>
+  <li><b>Telegram and Discord:</b> the messages you choose to receive, and support tickets.</li>
   <li><b>GitHub Pages:</b> website hosting.</li>
-  <li><b>TradingView, Forex Factory, Google Fonts, jsDelivr:</b> news widgets, the economic calendar, fonts and scripts loaded by your browser.</li>
+  <li><b>TradingView, Forex Factory, Google Fonts, jsDelivr:</b> news widgets, the economic calendar, fonts and scripts loaded by your browser (these services can see your IP address when your browser loads them).</li>
 </ul>
-<p>Each of these services processes data only to provide its part of the service, under its own privacy policy.</p>
+<p>Each of these services processes data only to provide its part of the service, under its own privacy policy. Some of them process data outside Algeria (for example in the European Union or the United States).</p>
 
 <h2>How long we keep it</h2>
-<p>As long as your account exists. When your account is deleted, your profile, journal and course data are deleted with it.</p>
+<ul>
+  <li>Your account, journal and course data: as long as your account exists. When your account is deleted, they are deleted with it.</li>
+  <li>Help center messages: as long as needed to answer you and keep a record of the request.</li>
+  <li>Backups: we keep private weekly backups of the database to restore the service after a failure. They are stored securely by the TRADEVERSITY team, and data you deleted can remain in an older backup for a limited time until that backup is replaced.</li>
+</ul>
 
 <h2>Your choices and rights</h2>
-<p>You can see and edit your profile and journal in the platform at any time. To get a copy of your data, correct it, or delete your account, contact our support team from <a href="support.html">jointradeversity.com/support</a>.</p>
+<p>You can see and edit your profile and journal in the platform at any time, and export your trades as a CSV file. You can also ask to get a copy of your data, correct it, delete your account, or object to a use of your data, as provided by the data protection law that applies to you, including Algerian Law No. 18-07 of June 10, 2018 on the protection of personal data. Contact our support team from <a href="support.html">jointradeversity.com/support</a>. If you are not satisfied with our answer, you can contact the data protection authority of your country (in Algeria, the ANPDP).</p>
 
 <h2>Security</h2>
-<p>All connections use HTTPS. Each member can only access their own data, and course videos are encrypted.</p>
+<p>All connections use HTTPS. Each member can only access their own data (access rules in the database), the login has a security check against bots, admin accounts use two-step login, the support form is protected against spam, course videos are encrypted, and the database is backed up every week.</p>
 
 <h2>Age</h2>
 <p>TRADEVERSITY is for adults (18+). We don't knowingly collect data from children.</p>
 
 <h2>Changes</h2>
-<p>If this policy changes, we update this page and the date at the top.</p>
+<p>When we add a feature or change how we use data, we update this page and the date at the top. For important changes, we also tell you in the platform. See also our <a href="terms.html">Terms and conditions</a>.</p>
 </section>
 
 <!-- ================= FRANÇAIS ================= -->
 <section lang="fr" dir="ltr" data-sec="fr" hidden>
 <h1>Politique de confidentialité</h1>
-<p class="date">Site TRADEVERSITY et applications Cerebra by TDV (Windows et Android) · Dernière mise à jour : 21 novembre 2026</p>
+<p class="date">Site TRADEVERSITY et applications Cerebra by TDV (Windows et Android) · Dernière mise à jour : 26 novembre 2026</p>
 
-<div class="card"><b>En bref :</b> nous collectons uniquement ce dont le journal de trading et la formation protégée ont besoin. Nous ne vendons pas vos données, nous n'affichons pas de publicité, et les applications ne peuvent pas lire vos contacts, fichiers, caméra, micro ni votre position.</div>
+<div class="card"><b>En bref :</b> nous collectons uniquement ce dont le journal de trading, les outils et la formation protégée ont besoin. Nous ne vendons pas vos données, nous n'affichons pas de publicité, nous n'utilisons pas de traceurs publicitaires, et les applications ne peuvent pas lire vos contacts, fichiers, caméra, micro ni votre position.</div>
 
 <h2>Qui sommes-nous</h2>
-<p>TRADEVERSITY (jointradeversity.com) est un journal de trading et une formation (Mentorship) par Brown Algo · ZN Trading. Cerebra by TDV est notre application Windows et Android qui lit la formation dans une fenêtre protégée. Une question ? Notre équipe support est là pour vous aider : contactez-la depuis <a href="support.html">jointradeversity.com/support</a>.</p>
+<p>TRADEVERSITY (jointradeversity.com) est un journal de trading, un ensemble d'outils de trading et une formation (Mentorship) par Brown Algo · ZN Trading. Nous sommes responsables des données personnelles décrites ici. Cerebra by TDV est notre application Windows et Android qui lit la formation dans une fenêtre protégée. Une question ? Notre équipe support est là pour vous aider : contactez-la depuis <a href="support.html">jointradeversity.com/support</a>.</p>
 
 <h2>Ce que nous collectons</h2>
 <ul>
-  <li><b>Votre compte :</b> adresse e-mail, nom et nom d'utilisateur Telegram. Si vous reliez notre bot Telegram, votre identifiant de discussion Telegram pour vous envoyer les messages que vous choisissez. Votre mot de passe est géré par notre service de connexion et stocké uniquement sous forme chiffrée (hachée) : nous ne le voyons jamais.</li>
-  <li><b>Votre journal de trading :</b> les trades, plans, notes, émotions, captures et réglages que vous saisissez.</li>
+  <li><b>Votre compte :</b> adresse e-mail, nom et nom d'utilisateur Telegram, et les informations de profil que vous choisissez d'ajouter (par exemple nom d'utilisateur, pays, ville, date de naissance, téléphone, photo). Si vous reliez notre bot Telegram, votre identifiant de discussion Telegram pour vous envoyer les messages que vous choisissez. Votre mot de passe est géré par notre service de connexion et stocké uniquement sous forme chiffrée (hachée) : nous ne le voyons jamais.</li>
+  <li><b>Votre journal de trading :</b> les trades, plans, notes, émotions, captures, fichiers CSV importés, bilans et réglages que vous saisissez.</li>
   <li><b>La formation (membres uniquement) :</b> l'enregistrement de votre appareil (une clé de sécurité créée sur votre appareil et un nom comme « Windows PC · Cerebra by TDV »), un journal de sécurité (date et heure, action, adresse IP, pays, type de navigateur ou d'application), votre progression, vos devoirs et les retours de votre mentor.</li>
+  <li><b>Formulaire du centre d'aide :</b> votre e-mail, le sujet et votre message, ainsi que l'adresse IP d'envoi. Nous utilisons l'adresse IP uniquement contre le spam (nombre de messages limité par heure).</li>
+  <li><b>Vérification de sécurité :</b> à l'inscription, à la connexion et à la réinitialisation du mot de passe, Cloudflare Turnstile vérifie que vous êtes une personne et non un robot. Cloudflare analyse pour cela des signaux techniques de votre navigateur.</li>
+  <li><b>Connexion en deux étapes (comptes admin) :</b> le secret de l'application d'authentification est conservé par notre service de connexion.</li>
   <li><b>Liens partenaires :</b> quand vous cliquez sur le lien d'une prop firm, laquelle et à quel endroit de la page, pour compter les parrainages.</li>
   <li><b>Liens partagés :</b> les liens de partage que vous créez vous-même.</li>
+  <li><b>Discord (facultatif) :</b> si vous rejoignez notre serveur Discord et ouvrez un ticket, Discord et notre propre bot de tickets traitent votre nom d'utilisateur Discord et les messages de ce ticket.</li>
 </ul>
 
+<h2>Enregistré sur votre appareil</h2>
+<p>La plateforme enregistre certaines choses dans votre navigateur pour fonctionner comme vous l'avez laissée : votre session de connexion, la langue, le thème, l'arrière-plan, le dernier onglet ouvert, les préréglages du calculateur de risque, les règles de prop firm, l'état des notifications et réglages similaires. Ils restent sur votre appareil et vous pouvez les supprimer en effaçant les données du site dans votre navigateur. Nous n'utilisons pas de cookies publicitaires ou de suivi.</p>
+
 <h2>Ce que nous ne collectons pas</h2>
-<p>Aucun contact, aucun fichier de votre appareil, ni caméra, ni micro, ni position GPS, ni identifiant publicitaire. Aucune publicité, aucune vente ni location de vos données.</p>
+<p>Aucun contact, aucun fichier de votre appareil (seulement ceux que vous choisissez de téléverser), ni caméra, ni micro, ni position GPS, ni identifiant publicitaire. Aucune publicité, aucune vente ni location de vos données.</p>
 
 <h2>Les applications Cerebra by TDV</h2>
 <ul>
@@ -142,61 +163,73 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
   <li>Les versions téléchargées sur notre site vérifient les mises à jour sur jointradeversity.com. Les versions Microsoft Store et Google Play sont mises à jour par le store.</li>
 </ul>
 
-<h2>Pourquoi nous les utilisons</h2>
+<h2>Pourquoi nous les utilisons (et sur quelle base)</h2>
 <ul>
-  <li>Pour faire fonctionner votre compte et votre journal.</li>
-  <li>Pour protéger la formation : un appareil par membre, vidéos chiffrées, et votre nom et e-mail affichés sur les vidéos pour retrouver l'origine d'une fuite.</li>
-  <li>Pour envoyer les rappels et notifications Telegram que vous activez.</li>
-  <li>Pour sécuriser et améliorer le service.</li>
+  <li>Pour faire fonctionner votre compte, votre journal et les outils que vous utilisez (nécessaire pour fournir le service demandé).</li>
+  <li>Pour protéger la formation : un appareil par membre, vidéos chiffrées, et votre nom et e-mail affichés sur les vidéos pour retrouver l'origine d'une fuite (nécessaire pour fournir la formation et protéger nos droits).</li>
+  <li>Pour envoyer les rappels et notifications Telegram que vous activez (votre choix, vous pouvez les désactiver).</li>
+  <li>Pour sécuriser le service, bloquer le spam et les abus, et l'améliorer (notre intérêt légitime).</li>
 </ul>
 
 <h2>Services utilisés</h2>
 <ul>
-  <li><b>Supabase :</b> connexion et base de données.</li>
+  <li><b>Supabase :</b> connexion, base de données et fonctions serveur.</li>
+  <li><b>Cloudflare Turnstile :</b> la vérification de sécurité à l'inscription, à la connexion et à la réinitialisation du mot de passe.</li>
   <li><b>VdoCipher :</b> diffusion chiffrée des vidéos de la formation.</li>
-  <li><b>Telegram :</b> les messages que vous choisissez de recevoir.</li>
+  <li><b>Telegram et Discord :</b> les messages que vous choisissez de recevoir, et les tickets de support.</li>
   <li><b>GitHub Pages :</b> hébergement du site.</li>
-  <li><b>TradingView, Forex Factory, Google Fonts, jsDelivr :</b> widgets d'actualité, calendrier économique, polices et scripts chargés par votre navigateur.</li>
+  <li><b>TradingView, Forex Factory, Google Fonts, jsDelivr :</b> widgets d'actualité, calendrier économique, polices et scripts chargés par votre navigateur (ces services peuvent voir votre adresse IP quand votre navigateur les charge).</li>
 </ul>
-<p>Chacun de ces services traite les données uniquement pour fournir sa partie du service, selon sa propre politique de confidentialité.</p>
+<p>Chacun de ces services traite les données uniquement pour fournir sa partie du service, selon sa propre politique de confidentialité. Certains traitent des données hors d'Algérie (par exemple dans l'Union européenne ou aux États-Unis).</p>
 
 <h2>Durée de conservation</h2>
-<p>Tant que votre compte existe. Quand votre compte est supprimé, votre profil, votre journal et vos données de formation sont supprimés avec lui.</p>
+<ul>
+  <li>Votre compte, votre journal et vos données de formation : tant que votre compte existe. Quand votre compte est supprimé, ils sont supprimés avec lui.</li>
+  <li>Messages du centre d'aide : le temps nécessaire pour vous répondre et garder une trace de la demande.</li>
+  <li>Sauvegardes : nous gardons des sauvegardes hebdomadaires privées de la base de données pour restaurer le service après une panne. Elles sont conservées en sécurité par l'équipe TRADEVERSITY, et des données que vous avez supprimées peuvent rester dans une ancienne sauvegarde pendant une durée limitée, jusqu'à son remplacement.</li>
+</ul>
 
 <h2>Vos choix et vos droits</h2>
-<p>Vous pouvez consulter et modifier votre profil et votre journal à tout moment sur la plateforme. Pour obtenir une copie de vos données, les corriger ou supprimer votre compte, contactez notre équipe support depuis <a href="support.html">jointradeversity.com/support</a>.</p>
+<p>Vous pouvez consulter et modifier votre profil et votre journal à tout moment sur la plateforme, et exporter vos trades en fichier CSV. Vous pouvez aussi demander une copie de vos données, leur correction, la suppression de votre compte, ou vous opposer à une utilisation de vos données, selon la loi sur la protection des données qui s'applique à vous, notamment la loi algérienne n° 18-07 du 10 juin 2018 relative à la protection des données à caractère personnel. Contactez notre équipe support depuis <a href="support.html">jointradeversity.com/support</a>. Si notre réponse ne vous satisfait pas, vous pouvez saisir l'autorité de protection des données de votre pays (en Algérie, l'ANPDP).</p>
 
 <h2>Sécurité</h2>
-<p>Toutes les connexions utilisent HTTPS. Chaque membre n'a accès qu'à ses propres données, et les vidéos de la formation sont chiffrées.</p>
+<p>Toutes les connexions utilisent HTTPS. Chaque membre n'a accès qu'à ses propres données (règles d'accès dans la base de données), la connexion a une vérification de sécurité contre les robots, les comptes admin utilisent la connexion en deux étapes, le formulaire de support est protégé contre le spam, les vidéos de la formation sont chiffrées, et la base de données est sauvegardée chaque semaine.</p>
 
 <h2>Âge</h2>
 <p>TRADEVERSITY est réservé aux adultes (18 ans et plus). Nous ne collectons pas sciemment de données d'enfants.</p>
 
 <h2>Modifications</h2>
-<p>Si cette politique change, nous mettons à jour cette page et la date en haut.</p>
+<p>Quand nous ajoutons une fonctionnalité ou changeons l'utilisation des données, nous mettons à jour cette page et la date en haut. Pour les changements importants, nous vous prévenons aussi dans la plateforme. Voir aussi nos <a href="terms.html">Conditions générales</a>.</p>
 </section>
 
 <!-- ================= العربية ================= -->
 <section lang="ar" dir="rtl" data-sec="ar" hidden>
 <h1>سياسة الخصوصية</h1>
-<p class="date">موقع TRADEVERSITY وتطبيقات Cerebra by TDV (ويندوز وأندرويد) · آخر تحديث: 21 نوفمبر 2026</p>
+<p class="date">موقع TRADEVERSITY وتطبيقات Cerebra by TDV (ويندوز وأندرويد) · آخر تحديث: 26 نوفمبر 2026</p>
 
-<div class="card"><b>باختصار:</b> نجمع فقط ما يحتاجه دفتر التداول والدورة المحمية. لا نبيع بياناتك، ولا نعرض إعلانات، ولا تستطيع التطبيقات قراءة جهات اتصالك أو ملفاتك أو الكاميرا أو الميكروفون أو موقعك.</div>
+<div class="card"><b>باختصار:</b> نجمع فقط ما يحتاجه دفتر التداول والأدوات والدورة المحمية. لا نبيع بياناتك، ولا نعرض إعلانات، ولا نستخدم أدوات تتبّع إعلانية، ولا تستطيع التطبيقات قراءة جهات اتصالك أو ملفاتك أو الكاميرا أو الميكروفون أو موقعك.</div>
 
 <h2>من نحن</h2>
-<p>TRADEVERSITY (jointradeversity.com) دفتر تداول ودورة إرشاد من Brown Algo · ZN Trading. وCerebra by TDV هو تطبيقنا لويندوز وأندرويد الذي يعرض الدورة في نافذة محمية. لديك سؤال؟ فريق الدعم لدينا جاهز لمساعدتك: تواصل معه من <a href="support.html">jointradeversity.com/support</a>.</p>
+<p>TRADEVERSITY (jointradeversity.com) دفتر تداول ومجموعة أدوات تداول ودورة إرشاد من Brown Algo · ZN Trading. نحن المسؤولون عن البيانات الشخصية الموصوفة هنا. وCerebra by TDV هو تطبيقنا لويندوز وأندرويد الذي يعرض الدورة في نافذة محمية. لديك سؤال؟ فريق الدعم لدينا جاهز لمساعدتك: تواصل معه من <a href="support.html">jointradeversity.com/support</a>.</p>
 
 <h2>ما الذي نجمعه</h2>
 <ul>
-  <li><b>حسابك:</b> البريد الإلكتروني والاسم واسم المستخدم في تيليغرام. وإذا ربطت بوت تيليغرام الخاص بنا، معرّف محادثتك في تيليغرام لنرسل لك الرسائل التي تختارها. كلمة المرور تتولاها خدمة تسجيل الدخول وتُحفظ مشفّرة فقط: لا نراها أبداً.</li>
-  <li><b>دفتر التداول:</b> الصفقات والخطط والملاحظات والمشاعر ولقطات الشاشة والإعدادات التي تُدخلها.</li>
+  <li><b>حسابك:</b> البريد الإلكتروني والاسم واسم المستخدم في تيليغرام، ومعلومات الملف الشخصي التي تختار إضافتها (مثل اسم المستخدم والبلد والمدينة وتاريخ الميلاد ورقم الهاتف والصورة). وإذا ربطت بوت تيليغرام الخاص بنا، معرّف محادثتك في تيليغرام لنرسل لك الرسائل التي تختارها. كلمة المرور تتولاها خدمة تسجيل الدخول وتُحفظ مشفّرة فقط: لا نراها أبداً.</li>
+  <li><b>دفتر التداول:</b> الصفقات والخطط والملاحظات والمشاعر ولقطات الشاشة وملفات CSV المستوردة والمراجعات والإعدادات التي تُدخلها.</li>
   <li><b>دورة الإرشاد (للأعضاء فقط):</b> سجلّ جهازك (مفتاح أمان يُنشأ على جهازك واسم جهاز مثل «Windows PC · Cerebra by TDV»)، وسجلّ أمان الدورة (التاريخ والوقت، الإجراء، عنوان IP، البلد، نوع المتصفح أو التطبيق)، وتقدّمك في الدروس، وتمارينك وملاحظات مرشدك.</li>
+  <li><b>نموذج مركز المساعدة:</b> بريدك والموضوع ورسالتك، وعنوان IP الذي أُرسلت منه الرسالة. نستخدم عنوان IP فقط لمنع الرسائل المزعجة (عدد محدود من الرسائل في الساعة).</li>
+  <li><b>التحقق الأمني:</b> عند إنشاء حساب أو تسجيل الدخول أو إعادة تعيين كلمة المرور، يتحقق Cloudflare Turnstile من أنك شخص وليس برنامجاً آلياً، ويعتمد في ذلك على إشارات تقنية من متصفحك.</li>
+  <li><b>تسجيل الدخول بخطوتين (حسابات المشرفين):</b> يحتفظ مزوّد تسجيل الدخول بالمفتاح السري لتطبيق المصادقة.</li>
   <li><b>روابط الشركاء:</b> عند الضغط على رابط شركة تمويل، أي شركة وفي أي مكان من الصفحة، لحساب الإحالات.</li>
   <li><b>الروابط التي تشاركها:</b> روابط المشاركة التي تنشئها بنفسك.</li>
+  <li><b>ديسكورد (اختياري):</b> إذا انضممت إلى خادم ديسكورد الخاص بنا وفتحت تذكرة دعم، يعالج ديسكورد وبوت التذاكر الخاص بنا اسم المستخدم والرسائل في تلك التذكرة.</li>
 </ul>
 
+<h2>ما يُحفظ على جهازك</h2>
+<p>تحفظ المنصة بعض الأشياء في متصفحك لتعمل كما تركتها: جلسة تسجيل الدخول، اللغة، السمة، الخلفية، آخر تبويب مفتوح، إعدادات حاسبة المخاطرة المحفوظة، قواعد شركة التمويل، حالة الإشعارات وإعدادات مشابهة. تبقى على جهازك ويمكنك حذفها بمسح بيانات الموقع من متصفحك. لا نستخدم ملفات تعريف ارتباط إعلانية أو للتتبّع.</p>
+
 <h2>ما لا نجمعه</h2>
-<p>لا جهات اتصال، ولا ملفات من جهازك، ولا كاميرا، ولا ميكروفون، ولا موقع GPS، ولا معرّف إعلانات. لا إعلانات ولا بيع أو تأجير لبياناتك.</p>
+<p>لا جهات اتصال، ولا ملفات من جهازك (إلا الملفات التي تختار رفعها)، ولا كاميرا، ولا ميكروفون، ولا موقع GPS، ولا معرّف إعلانات. لا إعلانات ولا بيع أو تأجير لبياناتك.</p>
 
 <h2>تطبيقات Cerebra by TDV</h2>
 <ul>
@@ -206,49 +239,55 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
   <li>النسخ المحمّلة من موقعنا تبحث عن التحديثات على jointradeversity.com. أما نسخ Microsoft Store وGoogle Play فيحدّثها المتجر.</li>
 </ul>
 
-<h2>لماذا نستخدمها</h2>
+<h2>لماذا نستخدمها (وعلى أي أساس)</h2>
 <ul>
-  <li>لتشغيل حسابك ودفتر تداولك.</li>
-  <li>لحماية الدورة: جهاز واحد لكل عضو، فيديوهات مشفّرة، واسمك وبريدك يظهران على الفيديوهات لمعرفة مصدر أي تسريب.</li>
-  <li>لإرسال تذكيرات وإشعارات تيليغرام التي تفعّلها.</li>
-  <li>لتأمين الخدمة وتحسينها.</li>
+  <li>لتشغيل حسابك ودفتر تداولك والأدوات التي تستخدمها (ضروري لتقديم الخدمة التي طلبتها).</li>
+  <li>لحماية الدورة: جهاز واحد لكل عضو، فيديوهات مشفّرة، واسمك وبريدك يظهران على الفيديوهات لمعرفة مصدر أي تسريب (ضروري لتقديم الدورة وحماية حقوقنا).</li>
+  <li>لإرسال تذكيرات وإشعارات تيليغرام التي تفعّلها (باختيارك، ويمكنك إيقافها).</li>
+  <li>لتأمين الخدمة ومنع الرسائل المزعجة وإساءة الاستخدام وتحسين الخدمة (مصلحتنا المشروعة).</li>
 </ul>
 
 <h2>الخدمات التي نستخدمها</h2>
 <ul>
-  <li><b>Supabase:</b> تسجيل الدخول وقاعدة البيانات.</li>
+  <li><b>Supabase:</b> تسجيل الدخول وقاعدة البيانات ووظائف الخادم.</li>
+  <li><b>Cloudflare Turnstile:</b> التحقق الأمني عند إنشاء الحساب وتسجيل الدخول وإعادة تعيين كلمة المرور.</li>
   <li><b>VdoCipher:</b> بثّ مشفّر لفيديوهات الدورة.</li>
-  <li><b>Telegram:</b> الرسائل التي تختار استلامها.</li>
+  <li><b>تيليغرام وديسكورد:</b> الرسائل التي تختار استلامها، وتذاكر الدعم.</li>
   <li><b>GitHub Pages:</b> استضافة الموقع.</li>
-  <li><b>TradingView وForex Factory وGoogle Fonts وjsDelivr:</b> أدوات الأخبار، الأجندة الاقتصادية، الخطوط والسكربتات التي يحمّلها متصفحك.</li>
+  <li><b>TradingView وForex Factory وGoogle Fonts وjsDelivr:</b> أدوات الأخبار، الأجندة الاقتصادية، الخطوط والسكربتات التي يحمّلها متصفحك (يمكن لهذه الخدمات رؤية عنوان IP الخاص بك عند تحميلها).</li>
 </ul>
-<p>كل خدمة تعالج البيانات فقط لتقديم جزئها من الخدمة، وفق سياسة الخصوصية الخاصة بها.</p>
+<p>كل خدمة تعالج البيانات فقط لتقديم جزئها من الخدمة، وفق سياسة الخصوصية الخاصة بها. بعضها يعالج البيانات خارج الجزائر (مثلاً في الاتحاد الأوروبي أو الولايات المتحدة).</p>
 
 <h2>مدة الاحتفاظ</h2>
-<p>طالما بقي حسابك موجوداً. عند حذف حسابك، يُحذف معه ملفك ودفترك وبيانات الدورة.</p>
+<ul>
+  <li>حسابك ودفترك وبيانات الدورة: طالما بقي حسابك موجوداً. عند حذف حسابك، تُحذف معه.</li>
+  <li>رسائل مركز المساعدة: المدة اللازمة للردّ عليك والاحتفاظ بسجلّ الطلب.</li>
+  <li>النسخ الاحتياطية: نحتفظ بنسخ احتياطية أسبوعية خاصة لقاعدة البيانات لاستعادة الخدمة بعد أي عطل. يحفظها فريق TRADEVERSITY بشكل آمن، وقد تبقى بيانات حذفتها في نسخة احتياطية قديمة لمدة محدودة حتى يتم استبدالها.</li>
+</ul>
 
 <h2>خياراتك وحقوقك</h2>
-<p>يمكنك الاطلاع على ملفك ودفترك وتعديلهما في أي وقت على المنصة. للحصول على نسخة من بياناتك أو تصحيحها أو حذف حسابك، تواصل مع فريق الدعم من <a href="support.html">jointradeversity.com/support</a>.</p>
+<p>يمكنك الاطلاع على ملفك ودفترك وتعديلهما في أي وقت على المنصة، وتصدير صفقاتك كملف CSV. ويمكنك أيضاً طلب نسخة من بياناتك أو تصحيحها أو حذف حسابك أو الاعتراض على استخدام بياناتك، وفق قانون حماية البيانات المطبّق عليك، ومنه القانون الجزائري رقم 18-07 المؤرخ في 10 يونيو 2018 المتعلق بحماية الأشخاص الطبيعيين في مجال معالجة المعطيات ذات الطابع الشخصي. تواصل مع فريق الدعم من <a href="support.html">jointradeversity.com/support</a>. وإذا لم يرضك ردّنا، يمكنك التوجه إلى سلطة حماية البيانات في بلدك (في الجزائر: السلطة الوطنية لحماية المعطيات ذات الطابع الشخصي ANPDP).</p>
 
 <h2>الأمان</h2>
-<p>كل الاتصالات تستخدم HTTPS. كل عضو يصل فقط إلى بياناته، وفيديوهات الدورة مشفّرة.</p>
+<p>كل الاتصالات تستخدم HTTPS. كل عضو يصل فقط إلى بياناته (قواعد وصول في قاعدة البيانات)، وتسجيل الدخول محمي بتحقق أمني ضد البرامج الآلية، وحسابات المشرفين تستخدم تسجيل الدخول بخطوتين، ونموذج الدعم محمي من الرسائل المزعجة، وفيديوهات الدورة مشفّرة، وتُنسخ قاعدة البيانات احتياطياً كل أسبوع.</p>
 
 <h2>العمر</h2>
 <p>TRADEVERSITY مخصّص للبالغين (18 سنة فأكثر). لا نجمع عن قصد بيانات الأطفال.</p>
 
 <h2>التغييرات</h2>
-<p>إذا تغيّرت هذه السياسة، نحدّث هذه الصفحة والتاريخ في الأعلى.</p>
+<p>عندما نضيف ميزة أو نغيّر طريقة استخدام البيانات، نحدّث هذه الصفحة والتاريخ في الأعلى. وفي التغييرات المهمة، نُعلمك أيضاً داخل المنصة. اطّلع أيضاً على <a href="terms.html">الشروط والأحكام</a>.</p>
 </section>
 
-<footer>© 2026 TRADEVERSITY · <a href="https://jointradeversity.com/">jointradeversity.com</a></footer>
+<footer><span>© 2026 TRADEVERSITY</span><a href="https://jointradeversity.com/">jointradeversity.com</a><a href="terms.html" data-ft="terms">Terms and conditions</a><a href="support.html" data-ft="sup">Help center</a></footer>
 </div>
 <script>
 (function(){
-  var ok=["en","fr","ar"],q=(location.search.match(/[?&]lang=(en|fr|ar)/)||[])[1],
-      s=null;try{s=localStorage.getItem("tvj_lang")}catch(e){}
+  var ok=["en","fr","ar"],q=(location.search.match(/[?&]lang=(en|fr|ar)/)||[])[1],s=null;try{s=localStorage.getItem("tvj_lang")}catch(e){}
   var nav=(navigator.language||"en").slice(0,2),l=q||(ok.indexOf(s)>=0?s:null)||(ok.indexOf(nav)>=0?nav:"en");
+  var FT={en:{terms:"Terms and conditions",sup:"Help center"},fr:{terms:"Conditions générales",sup:"Centre d'aide"},ar:{terms:"الشروط والأحكام",sup:"مركز المساعدة"}};
   function set(x){document.querySelectorAll("[data-sec]").forEach(function(e){e.hidden=e.dataset.sec!==x});
     document.querySelectorAll("[data-l]").forEach(function(b){b.classList.toggle("on",b.dataset.l===x)});
+    document.querySelectorAll("[data-ft]").forEach(function(a){a.textContent=FT[x][a.dataset.ft]});
     document.documentElement.lang=x;document.documentElement.dir=x==="ar"?"rtl":"ltr"}
   document.querySelectorAll("[data-l]").forEach(function(b){b.onclick=function(){set(b.dataset.l)}});
   set(l);

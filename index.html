@@ -1461,7 +1461,6 @@ html:not([data-theme=light]) #app header.top{box-shadow:0 1px 0 rgba(255,255,255
 html:not([data-theme=light]) #app header.top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(91,108,240,.7),transparent)}
 /* selected top tab: indigo pill */
 html:not([data-theme=light]) nav.tabs button.on{background:linear-gradient(180deg,rgba(110,124,245,.28),rgba(58,72,224,.18));color:#fff;box-shadow:inset 0 0 0 1px rgba(110,124,245,.55),0 0 22px -6px var(--ind-glow)}
-nav.tabs button.on .tico,#bnav button.on .bn-ic{--c1:#8f9bff;--c2:#8f9bff}
 html[data-theme=light] nav.tabs button.on{box-shadow:inset 0 0 0 1px rgba(58,72,224,.45);color:#2b38c4}
 /* section labels: "— LABEL" in indigo */
 .card>h3:first-child::before,.card>.row:first-child>h3::before{content:"";display:inline-block;width:14px;height:1.5px;margin-inline-end:8px;vertical-align:middle;background:currentColor;opacity:.8}
@@ -1867,7 +1866,6 @@ html:not([data-theme=light]) .card>h3:first-child,html:not([data-theme=light]) .
 html:not([data-theme=light]) .btn:not(.pri):not(.danger):hover{border-color:#34405a;background:var(--panel2)}
 /* menu: selected item = quiet panel, no glow */
 html:not([data-theme=light]) nav.tabs button.on{background:var(--panel2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line2)}
-nav.tabs button.on .tico,#bnav button.on .bn-ic{--c1:#7cb0ff;--c2:#7cb0ff}
 .tabs-arr{border-color:var(--line2);background:var(--panel);color:var(--text)}.tabs-arr:hover{background:var(--panel2)}
 nav.tabs .tg-h{display:none}
 /* PC: the menu becomes a left sidebar (right side in Arabic) */
@@ -1979,6 +1977,44 @@ table.t tbody tr:hover td{background:rgba(127,140,170,.05)}
 /* win/loss bar inside the KPI cards */
 .kpi .v3-wl{margin-top:12px}
 .kpi .v3-spark{margin-top:10px}
+/* ---- icons on glass tiles + glass tabs (2026-11-26) ---- */
+/* one colour per section, matched to the blue design */
+.t-today{--c1:#60a5fa}.t-trading,.t-journal{--c1:#a78bfa}.t-stats{--c1:#34d399}.t-plan{--c1:#60a5fa}.t-course{--c1:#fbbf24}.t-news{--c1:#f87171}
+.t-riskmgmt,.t-risk{--c1:#c084fc}.t-consistency{--c1:#2dd4bf}.t-propfirms{--c1:#2dd4bf}.t-indicator{--c1:#f472b6}.t-about{--c1:#94a3b8}.t-admin,.t-student{--c1:#fbbf24}
+nav.tabs .tico{width:30px;height:30px;border-radius:9px;background:linear-gradient(145deg,color-mix(in srgb,var(--c1) 24%,transparent),color-mix(in srgb,var(--c1) 6%,transparent));
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c1) 30%,transparent),inset 0 1px 0 rgba(255,255,255,.10);color:var(--c1);transition:transform .2s,box-shadow .25s,background .25s}
+nav.tabs .tico .ico{width:17px;height:17px;stroke-width:1.75}
+nav.tabs .tico .ico :is(rect,circle,path[d$="z"]):not([fill="currentColor"]){fill-opacity:.16}
+nav.tabs button:hover .tico{transform:translateY(-1px) scale(1.04)}
+nav.tabs button.on .tico{background:linear-gradient(145deg,color-mix(in srgb,var(--c1) 42%,transparent),color-mix(in srgb,var(--c1) 12%,transparent));
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c1) 55%,transparent),inset 0 1px 0 rgba(255,255,255,.18),0 6px 18px -6px color-mix(in srgb,var(--c1) 70%,transparent)}
+nav.tabs button.on .tico{color:#fff}
+/* the selected menu item is a frosted-glass pill */
+html:not([data-theme=light]) nav.tabs button.on{background:linear-gradient(135deg,rgba(255,255,255,.085),rgba(255,255,255,.02))!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.09),inset 0 1px 0 rgba(255,255,255,.08),0 10px 26px -14px rgba(0,0,0,.9)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+html[data-theme=light] nav.tabs button.on{background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.7))!important;box-shadow:inset 0 0 0 1px rgba(15,23,42,.08),0 8px 20px -12px rgba(15,23,42,.35)!important}
+@media(min-width:1100px){
+  html:not([data-theme=light]):not(.player) #app #tabsWrap,html:not([data-theme=light]):not(.player) #app header.top .brand{background:rgba(11,14,21,.78);backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2)}
+  html:not(.player) #app nav.tabs button{gap:11px;padding:6px 10px}
+  html:not(.player) #app nav.tabs button.on::before{top:12px;bottom:12px}
+  nav.tabs .tg-legal{display:flex!important;flex-wrap:wrap;gap:4px 10px;padding:14px 10px 0;font-size:11.5px}
+  nav.tabs .tg-legal a{color:var(--dim)!important;text-decoration:none}nav.tabs .tg-legal a:hover{color:var(--text)!important}
+}
+nav.tabs .tg-legal{display:none}
+/* phone bottom bar + "More" sheet: same coloured icons */
+#bnav .bn-ic{color:var(--c1,currentColor)}#bnav>button:not(.on) .bn-ic{opacity:.85}
+.bn-tic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--c1);background:linear-gradient(145deg,color-mix(in srgb,var(--c1) 24%,transparent),color-mix(in srgb,var(--c1) 6%,transparent));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c1) 30%,transparent),inset 0 1px 0 rgba(255,255,255,.1)}
+/* sub-tabs (Journal · Statistics · Plan, Risk calculator · Consistency): frosted glass */
+html:not([data-theme=light]) .hub-tabs{background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 12px 30px -20px rgba(0,0,0,.9)}
+html:not([data-theme=light]) .hub-tabs button.on{background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.03))!important;border-color:rgba(255,255,255,.13)!important;color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(59,130,246,.28),0 10px 24px -12px rgba(59,130,246,.55)!important}
+.hub-tabs button .tico,.hub-tabs button .ico{transition:transform .2s}.hub-tabs button.on .ico{color:#7cb0ff}
+/* legal links in the app footer */
+.appfoot .legal{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-size:12px}
+.appfoot .legal a{color:var(--muted)!important;text-decoration:none}.appfoot .legal a:hover{color:var(--text)!important;text-decoration:underline}
+.su-agree{display:flex;align-items:flex-start;gap:10px;font-size:12.5px;line-height:1.5;color:var(--muted);cursor:pointer;text-align:start}
+.su-agree input{width:18px;height:18px;margin-top:1px;flex:none;accent-color:var(--gold)}.su-agree a{color:var(--lnk,#7cb0ff)}
+.su-legal{font-size:12px;color:var(--muted);text-align:center;margin:10px 0 0;line-height:1.5}.su-legal a{color:var(--lnk,#7cb0ff)}
 @media(max-width:760px){.v3-prop{grid-template-columns:1fr;gap:14px}.v3-pt{flex-direction:row;justify-content:space-between;align-items:center;width:100%}
   .v3-eq{min-height:210px}.v3-cal{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.v3-wkc{display:none!important}.v3-cd{height:48px;padding:5px 6px}.v3-cd b{font-size:10px}}
 </style>
@@ -2046,8 +2082,11 @@ table.t tbody tr:hover td{background:rgba(127,140,170,.05)}
         <label class="f">Telegram username (required)<input class="i" name="telegram" placeholder="@username" required pattern="@?[A-Za-z0-9_]{5,32}" title="Your Telegram username, e.g. @brown_algo (5-32 letters, numbers or _)"></label>
         <label class="f">Password<input class="i" name="password" type="password" minlength="8" required autocomplete="new-password"></label>
         <label class="f">Confirm password<input class="i" name="password2" type="password" minlength="8" required autocomplete="new-password"></label>
+        <label class="su-agree"><input type="checkbox" name="agree" required><span><span>I am 18 or older and I accept the</span> <a href="terms.html" target="_blank" rel="noopener">Terms and conditions</a> <span>and the</span> <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a>.</span></label>
         <button class="btn pri" type="submit">Create my free account</button>
+        <p class="su-legal"><span>Trading is risky. TRADEVERSITY is education and a journal, not financial advice.</span></p>
       </form>
+      <p class="su-legal" id="loginLegal"><a href="terms.html" target="_blank" rel="noopener">Terms and conditions</a> · <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a></p>
       <form id="otpForm" class="grid hidden" autocomplete="off">
         <div class="otp-head"><div class="otp-ic">✉️</div><b>Check your email</b><span class="mut">We sent a verification code to</span><b class="otp-mail mono" id="otpMail" data-notr></b></div>
         <label class="f">Verification code<input class="i otp-in mono" id="otpCode" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="••••••" required></label>
@@ -2097,7 +2136,7 @@ table.t tbody tr:hover td{background:rgba(127,140,170,.05)}
     <div class="tabs-wrap" id="tabsWrap"><button type="button" class="tabs-arr l" id="tabsL" aria-label="Previous sections">‹</button><nav class="tabs" id="tabs"></nav><button type="button" class="tabs-arr r" id="tabsR" aria-label="More sections">›</button></div>
   </header>
   <main id="view"></main>
-  <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div id="socFoot" class="soc"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>
+  <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div id="socFoot" class="soc"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div><nav class="legal" aria-label="Legal"><a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a><a href="terms.html" target="_blank" rel="noopener">Terms and conditions</a><a href="support.html" target="_blank" rel="noopener">Help center</a></nav><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>
 </section>
 
 <div id="modal" class="modal hidden"><div class="box" id="mbox"></div></div>
@@ -2105,7 +2144,7 @@ table.t tbody tr:hover td{background:rgba(127,140,170,.05)}
 <div id="toast"></div>
 <div id="ntfPanel" class="ntf-panel hidden" role="dialog" aria-label="Notifications"></div>
 
-<script src="i18n.js"></script>
+<script src="i18n.js?v=2026-11-26k"></script>
 <script src="news-info.js"></script>
 <script src="indicator-video.js"></script><script src="tour.js?v=5"></script><script src="cerebra-intro.js?v=1"></script><script src="propfirms.js"></script><script src="propfirms-sizes.js"></script><script src="propfirms-coupons.js"></script><script src="propfirms-updates.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
 <script>
@@ -2449,16 +2488,18 @@ S.ann=[];async function loadAnn(){try{if(!API||!API.announcements)return;S.ann=a
 /* ============ nav ============ */
 /* crisp line icons (24×24, drawn with the current text colour) */
 const ICON={
-  trading:'<rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7.5h8"/><path d="m7.5 16.5 3-3.5 2.5 2 3.5-4.5"/><circle cx="16.5" cy="10.5" r=".6" fill="currentColor"/>',
-  today:'<path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5v10h12v-10"/><path d="M10 19.5v-5h4v5"/>',
-  journal:'<path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v14.5H7.5A2.5 2.5 0 0 0 5 20z"/><path d="M5 20a1.5 1.5 0 0 0 1.5 1.5H19v-4"/><path d="M9 7.5h6M9 11h4"/>',
-  stats:'<path d="M3.5 20.5h17"/><rect x="5" y="13" width="3.2" height="5" rx="1"/><rect x="10.4" y="10" width="3.2" height="8" rx="1"/><rect x="15.8" y="11.5" width="3.2" height="6.5" rx="1"/><path d="M4.5 9 9.5 5l4 3 6-4.5"/><path d="M16.5 3.5h3v3"/>',
-  news:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M12.8 11.5 10.5 15h3l-2.3 3.5"/>',
-  plan:'<circle cx="12" cy="12" r="9"/><path d="m15.8 8.2-2.3 5.3-5.3 2.3 2.3-5.3z"/><circle cx="12" cy="12" r=".6" fill="currentColor"/>',
-  risk:'<path d="M12 3 19.5 6v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="m9.3 14.7 5.4-5.4"/><circle cx="9.6" cy="9.6" r="1"/><circle cx="14.4" cy="14.4" r="1"/>',
+  /* v3 icon set: one stroke weight, rounded, one idea per icon */
+  today:'<rect x="3.5" y="3.5" width="7" height="8" rx="2"/><rect x="13.5" y="3.5" width="7" height="5" rx="2"/><rect x="13.5" y="11.5" width="7" height="9" rx="2"/><rect x="3.5" y="14.5" width="7" height="6" rx="2"/>',
+  trading:'<path d="M7 3v3.5M7 16v5"/><rect x="4.5" y="6.5" width="5" height="9.5" rx="1.5"/><path d="M17 3v5.5M17 17v4"/><rect x="14.5" y="8.5" width="5" height="8.5" rx="1.5"/>',
+  journal:'<path d="M12 6.5C10.5 5 8.3 4.5 4 4.5v14c4.3 0 6.5.5 8 2 1.5-1.5 3.7-2 8-2v-14c-4.3 0-6.5.5-8 2z"/><path d="M12 6.5v14"/>',
+  stats:'<path d="M3.5 20.5h17"/><rect x="5" y="12" width="3.5" height="6" rx="1"/><rect x="10.25" y="8" width="3.5" height="10" rx="1"/><rect x="15.5" y="4" width="3.5" height="14" rx="1"/>',
+  news:'<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h11A1.5 1.5 0 0 1 18 5.5V18a2.5 2.5 0 0 0 2.5 2.5h-14A2.5 2.5 0 0 1 4 18z"/><path d="M18 9h2.5V18"/><path d="M7.5 8h7M7.5 12h7M7.5 16h4"/>',
+  plan:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.1" fill="currentColor"/>',
+  riskmgmt:'<path d="M12 3 19.5 6v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="m8.8 12.2 2.2 2.2 4.3-4.6"/>',
+  risk:'<rect x="5" y="3" width="14" height="18" rx="2.5"/><rect x="8" y="6" width="8" height="3.5" rx="1"/><path d="M8.5 13.2h.01M12 13.2h.01M15.5 13.2h.01M8.5 16.8h.01M12 16.8h.01M15.5 16.8h.01"/>',
   consistency:'<path d="M12 4v16M7.5 20.5h9M5 7h14"/><circle cx="12" cy="4" r="1"/><path d="M5 7 2.5 13a2.5 2.5 0 0 0 5 0z"/><path d="M19 7l-2.5 6a2.5 2.5 0 0 0 5 0z"/>',
-  indicator:'<path d="M3 20.5h18"/><path d="M4 16l4.5-5 4 3.5L20 6" /><circle cx="20" cy="6" r="1.6" fill="currentColor"/>',
-  propfirms:'<path d="M4 20.5V9.5L12 4l8 5.5v11"/><path d="M8 20.5v-6h8v6" fill="currentColor" fill-opacity=".18"/><path d="M2.5 20.5h19M9.5 10h5"/>',
+  indicator:'<path d="M3 12h3.5l2.5-6.5 4 13 2.5-6.5H21"/>',
+  propfirms:'<path d="M3 9.5 12 4l9 5.5z"/><path d="M5.5 9.5v8M10 9.5v8M14 9.5v8M18.5 9.5v8"/><path d="M3 20.5h18M4 17.5h16"/>',
   course:'<path d="M2.5 9 12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11v5c1.5 1.6 3.4 2.4 5.5 2.4s4-.8 5.5-2.4v-5"/><path d="M21.5 9v5"/>',
   about:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".7" fill="currentColor"/>',
   admin:'<path d="M3.5 8.5 8 12l4-6.5 4 6.5 4.5-3.5-1.8 10H5.3z"/><path d="M6 21.5h12"/>',
@@ -2466,7 +2507,7 @@ const ICON={
   moon:'<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>',
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
   system:'<rect x="3" y="4" width="18" height="12.5" rx="2"/><path d="M8.5 20.5h7M12 16.5v4"/>'};
-const ico=(k,cls)=>`<svg class="ico ${cls||""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k==="riskmgmt"?"risk":k]}</svg>`;
+const ico=(k,cls)=>`<svg class="ico ${cls||""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]||ICON.about}</svg>`;
 /* "My trading" = one menu tab holding 3 sub-tabs in the trading cycle: record (Journal) → review (Statistics) → prepare (Tomorrow's plan).
    The sub-tabs keep their own views and links (#journal, #stats, #plan), so reminders, search and the tours still land on the right page. */
 const HUB=[["journal","Journal"],["stats","Statistics"],["plan","Tomorrow's plan"]],HUBK=HUB.map(x=>x[0]);
@@ -2485,6 +2526,7 @@ function renderTabs(){const t=$("#tabs");let h="";const tab=(k,l,c)=>`<button da
   /* group titles: shown only when the menu is the PC sidebar */
   const GRP={today:"Overview",trading:"My trading",course:"Learn",riskmgmt:"Tools",about:""};
   VIEWS.forEach(([k,l])=>{if(k in GRP)h+=GRP[k]?`<div class="tg-h" aria-hidden="true">${GRP[k]}</div>`:`<div class="tg-h sep" aria-hidden="true"></div>`;h+=tab(k,l)});
+  h+=`<div class="tg-legal"><a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a><a href="terms.html" target="_blank" rel="noopener">Terms and conditions</a><a href="support.html" target="_blank" rel="noopener">Help center</a></div>`;
   t.innerHTML=h;$$("button[data-v]",t).forEach(b=>b.onclick=()=>go(b.dataset.v));
   const on=$("button.on",t);if(on&&t.scrollWidth>t.clientWidth)t.scrollTo({left:on.offsetLeft-(t.clientWidth-on.offsetWidth)/2,behavior:"smooth"});
   renderBottomNav();tabsArrows()}
@@ -3916,7 +3958,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26j";
+const APP_VER="2026-11-26k";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4340,7 +4382,7 @@ async function bootShare(tok){SH.tok=tok;$("#auth").classList.add("hidden");$("#
   const sec=document.createElement("section");sec.id="share";
   sec.innerHTML=`<header class="top"><div class="topin"><a class="brand" href="${location.pathname}" style="color:inherit;text-decoration:none"><div class="logo" role="img" aria-label="TRADEVERSITY"></div><div>TRADEVERSITY<small class="byline" data-notr>by <b>Brown Algo</b> · <b>ZN Trading</b></small></div></a><div class="spacer"></div><span class="soc icons" id="socShare"></span><span class="theme-slot"></span><span id="langShare"></span></div></header>
    <main id="shMain"><div class="empty">Loading results…</div></main>
-   <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div class="soc" id="socShare2"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>`;
+   <footer class="appfoot"><div data-promo style="width:100%;max-width:520px;margin:6px 0 4px"></div><div class="soc" id="socShare2"></div><div class="foot founder"><span>Founder</span> <b>BROWN ALGO</b></div><nav class="legal" aria-label="Legal"><a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a><a href="terms.html" target="_blank" rel="noopener">Terms and conditions</a></nav><div class="copyright">© 2026 Tradeversity. All rights reserved.</div></footer>`;
   document.body.insertBefore(sec,$("#modal"));
   $("#langShare").innerHTML=I18N.picker();Theme.mount();$("#socShare").innerHTML=socialHTML();$("#socShare2").innerHTML=socialHTML();$$("[data-promo]",sec).forEach(e=>e.innerHTML=promoHTML());
   window.onLangChange=()=>{if(SH.data!==undefined)drawShare()};
