@@ -1962,6 +1962,23 @@ html[data-theme=light] .v3-cd.w b{color:#13914c}html[data-theme=light] .v3-cd.l 
 .v3-lnl{left:8px;background:var(--c);color:#fff}.v3-ln.ex .v3-lnl{left:auto;right:8px;background:var(--panel);color:var(--text);border:1px solid var(--line2)}
 .v3-lnv{left:76px;background:var(--panel);color:var(--text);border:1px solid var(--line2);font-family:"Geist Mono","JetBrains Mono",monospace;font-weight:500}.v3-ln.ex .v3-lnv{left:auto;right:70px}
 @media(max-width:1100px){.v3-m2{grid-template-columns:1fr}}
+/* ---- step 3: every section in the same calm style ---- */
+/* small labels in normal case (they were in capitals with wide spacing) */
+:is(.rpk-step>small,table.t th,.res .l,.cmix .l,.rp span,.ct-ty,.ct-n span,.ne-l,.nday,.coach-t,.id-grid small,.pf-lb,.about-t,.astat .apre,.dp-n,.det-chip small,.tp-ex span,.ni-l,.sz-l,.imf-s small,.td-fbig>small,.edge-d,.disp-pop .dp-row>small){text-transform:none!important;letter-spacing:0!important}
+table.t th{font-size:11.5px;font-weight:500;color:var(--dim)!important}
+:is(.res .l,.cmix .l,.imf-s small){font-weight:500;font-size:12px}
+.sub{color:var(--muted);font-size:13.5px}
+/* page titles a touch calmer, no glow */
+#view h1{font-size:24px;font-weight:600;letter-spacing:-.02em;text-shadow:none!important}
+@media(max-width:760px){#view h1{font-size:21px}}
+/* tables: quiet rows with a soft hover */
+table.t td{border-bottom-color:var(--line)}
+table.t tbody tr:hover td{background:rgba(127,140,170,.05)}
+/* inputs and selects: same rounded fields everywhere, blue focus ring */
+:is(input.i,select.i,textarea.i){border-radius:10px;border-color:var(--line2)}
+/* win/loss bar inside the KPI cards */
+.kpi .v3-wl{margin-top:12px}
+.kpi .v3-spark{margin-top:10px}
 @media(max-width:760px){.v3-prop{grid-template-columns:1fr;gap:14px}.v3-pt{flex-direction:row;justify-content:space-between;align-items:center;width:100%}
   .v3-eq{min-height:210px}.v3-cal{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.v3-wkc{display:none!important}.v3-cd{height:48px;padding:5px 6px}.v3-cd b{font-size:10px}}
 </style>
@@ -3313,7 +3330,7 @@ function vJournal(el){
    ${jfBar(allF)}
    <div class="grid g4" style="margin-bottom:16px">
      ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,`${st.n} trades`,v3Spark([0,...st.curve.map(c=>c.eq)],st.net>=0?"#2fbf71":"#ef5350"))}
-     ${kpi("Win rate",pct(st.wr),`${st.w}W · ${st.l}L · ${st.be}BE`)}
+     ${kpi("Win rate",pct(st.wr),`${st.w}W · ${st.l}L · ${st.be}BE`,`<div class="v3-wl"><i style="flex:${st.w};background:var(--green)"></i><i style="flex:${st.l};background:var(--red)"></i></div>`)}
      ${S.readonly?"":kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):st.pf===Infinity?"∞":"—","gross win ÷ gross loss")}
      ${kpi("Avg R",isFinite(st.avgR)?st.avgR.toFixed(2)+"R":"—","from trades with a stop")}
    </div>
@@ -3776,8 +3793,8 @@ function vStats(el){if(S.dayPage)return vDayPage(el,S.dayPage);const ts=filtered
   ${filterBar(true)}
   ${S.acct!=="all"&&!S.readonly?rulesCard(S.acct,aSize):""}
   <div class="grid g4" style="margin-bottom:12px">
-   ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,(aSize?`${(st.net>0?"+":"")+pct(st.net/aSize,2)} of the account · ${st.nDays} trading days`:`${st.nDays} trading days`)+(st.ntDays?` · 🚫 ${st.ntDays} ${I18N.t(st.ntDays===1?"no-trade day":"no-trade days")} ($0)`:""))}
-   ${kpi("Win rate",pct(st.wr),`${st.w} wins · ${st.l} losses`)}
+   ${kpi("Net P&L",`<span class="${cls(st.net)}">${money(st.net)}</span>`,(aSize?`${(st.net>0?"+":"")+pct(st.net/aSize,2)} of the account · ${st.nDays} trading days`:`${st.nDays} trading days`)+(st.ntDays?` · 🚫 ${st.ntDays} ${I18N.t(st.ntDays===1?"no-trade day":"no-trade days")} ($0)`:""),v3Spark([0,...st.curve.map(c=>c.eq)],st.net>=0?"#2fbf71":"#ef5350"))}
+   ${kpi("Win rate",pct(st.wr),`${st.w} wins · ${st.l} losses`,`<div class="v3-wl"><i style="flex:${st.w};background:var(--green)"></i><i style="flex:${st.l};background:var(--red)"></i></div>`)}
    ${S.readonly?"":kpi("Profit factor",isFinite(st.pf)?st.pf.toFixed(2):"—","above 1.5 is solid")}
    ${kpi("Expectancy",`<span class="${cls(st.exp)}">${money(st.exp)}</span>`,"average per trade")}
    ${kpi("Avg win / loss",`<span class="pos">${money(st.avgW,0)}</span> <span class="mut">/</span> <span class="neg">${money(st.avgL,0)}</span>`,isFinite(st.avgW/st.avgL)?`ratio ${Math.abs(st.avgW/st.avgL).toFixed(2)}`:"")}
@@ -3899,7 +3916,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26i";
+const APP_VER="2026-11-26j";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
