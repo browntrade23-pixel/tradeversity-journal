@@ -34,8 +34,8 @@ if(window.top!==window.self){try{window.top.location.replace(window.self.locatio
 <meta name="apple-mobile-web-app-title" content="Tradeversity">
 <script>/* apply the saved theme before the page paints (no white/dark flash) */
 try{var tm=localStorage.getItem("tv_theme")||"dark";if(tm==="light"||(tm==="system"&&matchMedia("(prefers-color-scheme: light)").matches))document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Cairo:wght@400;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Cairo:wght@400;600;700;800&display=swap"></noscript>
+
+<link rel="stylesheet" href="fonts/fonts.css?v=1">
 <style>
 :root{
   --bg:#0a0e16;--panel:#111827;--panel2:#0f1522;--line:#1f2a3d;--line2:#2a3850;
@@ -2147,7 +2147,7 @@ html:not([data-theme=light]) .hub-tabs button.on{background:linear-gradient(135d
 <div id="toast"></div>
 <div id="ntfPanel" class="ntf-panel hidden" role="dialog" aria-label="Notifications"></div>
 
-<script src="i18n.js?v=2026-11-26l"></script>
+<script src="i18n.js?v=2026-11-26m"></script>
 <script src="news-info.js"></script>
 <script src="indicator-video.js"></script><script src="tour.js?v=5"></script><script src="cerebra-intro.js?v=1"></script><script src="propfirms.js"></script><script src="propfirms-sizes.js"></script><script src="propfirms-coupons.js"></script><script src="propfirms-updates.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
 <script>
@@ -2294,7 +2294,7 @@ function calc(ts){
 const Cloud={
   sb:null,
   async init(){await new Promise((res,rej)=>{const s=document.createElement("script");/* exact version + integrity hash: a changed or hijacked CDN file is refused instead of running with the login session */
-    s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js";s.integrity="sha384-A97u3Qnt9GZHURO9YJZRe7VQgGUeFzcv6I1oIGnUTxQrCxnpQMwR0/G8F2zt9abZ";s.crossOrigin="anonymous";s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+    s.src="vendor/supabase.js";s.integrity="sha384-A97u3Qnt9GZHURO9YJZRe7VQgGUeFzcv6I1oIGnUTxQrCxnpQMwR0/G8F2zt9abZ";s.crossOrigin="anonymous";s.onload=res;s.onerror=rej;document.head.appendChild(s)});
     this.sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
     this.sb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY")openNewPassword()});},
   async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,status:data.status,created_at:data.created_at,tgOk:!!data.telegram_verified,emailOk:await this.emailOk(id),...pfFields(data)}},
@@ -4000,7 +4000,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26l";
+const APP_VER="2026-11-26m";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4339,7 +4339,7 @@ function delStats(a){if(!a||a==="all")return;const ids=S.trades.filter(t=>t.acco
 /* ============ SHARE (public view-only link + QR code) ============ */
 const shareURL=tok=>`${location.origin}${location.pathname}?share=${tok}`;
 let _qrLib=null;
-function loadQR(){return _qrLib||(_qrLib=new Promise((res,rej)=>{if(window.qrcode)return res(window.qrcode);const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js";s.integrity="sha384-8FWZA6BGMXhsfO+BLtrJK0We6gg5o1JyO8xQm6peWDEUs17ACA5ziE/NIAkl9z2k";s.crossOrigin="anonymous";s.onload=()=>res(window.qrcode);s.onerror=()=>{_qrLib=null;rej(new Error("QR library didn't load"))};document.head.appendChild(s)}))}
+function loadQR(){return _qrLib||(_qrLib=new Promise((res,rej)=>{if(window.qrcode)return res(window.qrcode);const s=document.createElement("script");s.src="vendor/qrcode.js";s.integrity="sha384-8FWZA6BGMXhsfO+BLtrJK0We6gg5o1JyO8xQm6peWDEUs17ACA5ziE/NIAkl9z2k";s.crossOrigin="anonymous";s.onload=()=>res(window.qrcode);s.onerror=()=>{_qrLib=null;rej(new Error("QR library didn't load"))};document.head.appendChild(s)}))}
 // Branded QR card (PNG-ready canvas): logo in the middle, high error correction so it still scans
 async function qrCard(url,label){const qrcode=await loadQR();const q=qrcode(0,"H");q.addData(url);q.make();
   const n=q.getModuleCount(),cs=Math.max(8,Math.floor(360/n)),m=3,qs=(n+2*m)*cs,P=44,W=qs+P*2,H=qs+P+170;
@@ -5774,7 +5774,7 @@ let _admP=null;function loadAdmin(){return _admP||(_admP=new Promise((res,rej)=>
 const _vAdminStub=vAdmin,_vStudentStub=vStudent;
 </script>
 <!-- 3D particles behind login / sign-up (falls back to the night scene if 3D is not supported) -->
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"}}</script>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
 <script type="module">/* load the 3D background only when the login / sign-up page is on screen (logged-in students never download it) */
 let __a3=false;const __a3t=setInterval(()=>{const a=document.getElementById("auth");if(__a3||!a||a.classList.contains("hidden"))return;__a3=true;clearInterval(__a3t);
   import("./auth3d.js?v=6").then(()=>{if(document.documentElement.classList.contains("auth3d")&&typeof openGate==="function")openGate(true)}).catch(e=>console.warn("3D background off:",e))},250)</script>

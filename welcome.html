@@ -19,8 +19,7 @@
 <link rel="canonical" href="https://jointradeversity.com/welcome.html">
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "Organization", "name": "TRADEVERSITY", "url": "https://jointradeversity.com/", "logo": "https://jointradeversity.com/brand/logo-192.png", "founder": [{"@type": "Person", "name": "Brown Algo"}], "sameAs": ["https://youtube.com/@browndzcircletrader", "https://www.instagram.com/brown_algo", "https://www.tiktok.com/@brown_algo.ar", "https://kick.com/brown_algo_trader", "https://t.me/brown_algo", "https://discord.gg/4GmSAwuBZ"]}, {"@context": "https://schema.org", "@type": "WebSite", "name": "TRADEVERSITY", "url": "https://jointradeversity.com/", "inLanguage": ["en", "fr", "ar"]}, {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "TRADEVERSITY trading journal", "applicationCategory": "FinanceApplication", "operatingSystem": "Web, Windows, Android", "url": "https://jointradeversity.com/welcome.html", "description": "Trading journal for prop firm traders: statistics, prop firm rules, news alerts and risk tools, in English, French and Arabic."}]</script>
 <link rel="icon" href="brand/logo-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@500;700;800;900&family=JetBrains+Mono:wght@700&display=swap" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@500;700;800;900&family=JetBrains+Mono:wght@700&display=swap"></noscript>
+<link rel="stylesheet" href="fonts/fonts.css?v=1">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--g:#f5b942;--g2:#ffd27a;--ind:#3a48e0;--ind2:#7c8bff;--tx:#f5f7fa;--mut:#a0a6b8;--bg:#030407}
@@ -287,7 +286,7 @@ secs.forEach(s=>pre.observe(s));
 </script>
 
 <!-- 3D particles: one shape per section, morphing as you scroll -->
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"}}</script>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
 <script type="module">
 await new Promise(r=>{const go=()=>("requestIdleCallback" in window?requestIdleCallback(r,{timeout:1500}):setTimeout(r,200));document.readyState==="complete"?go():addEventListener("load",go,{once:true})});
 const THREE=await import("three");
