@@ -2207,6 +2207,7 @@ function authErr(err){const m=String((err&&err.message)||err||"");
     /email not confirmed/i.test(m)?"Your email isn't confirmed yet. Contact us on Telegram and we'll activate your account.":
     /password should be at least|weak password|password.*characters/i.test(m)?"Your password must be at least 6 characters.":
     /invalid.*email|unable to validate email|email address.*invalid/i.test(m)?"This email address isn't valid. Check it and try again.":
+    /captcha/i.test(m)?"The security check didn't pass. Refresh the page and try again.":
     /network|failed to fetch|load failed/i.test(m)?"No connection. Check your internet and try again.":"";
   return `<span class="neg">${esc(k?I18N.t(k):m)}</span>`}
 $("#loginForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);$("#authMsg").textContent="Logging in…";
@@ -3643,7 +3644,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26d";
+const APP_VER="2026-11-26e";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
