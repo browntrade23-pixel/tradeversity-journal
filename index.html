@@ -2147,9 +2147,10 @@ html:not([data-theme=light]) .hub-tabs button.on{background:linear-gradient(135d
 <div id="toast"></div>
 <div id="ntfPanel" class="ntf-panel hidden" role="dialog" aria-label="Notifications"></div>
 
-<script src="i18n.js?v=2026-11-26m"></script>
-<script src="news-info.js"></script>
-<script src="indicator-video.js"></script><script src="tour.js?v=5"></script><script src="cerebra-intro.js?v=1"></script><script src="propfirms.js"></script><script src="propfirms-sizes.js"></script><script src="propfirms-coupons.js"></script><script src="propfirms-updates.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
+<script src="i18n.js?v=2026-11-26n"></script>
+<!-- the firm list stays here (trade costs use it); news explanations, the indicator video, the tour video, the Cerebra intro and
+     the prop firm prices / codes / translations load only when a page needs them (see need() in the app script) -->
+<script src="propfirms.js"></script>
 <script>
 /* =====================================================================
    CONFIG — your Supabase project (the anon key is public by design;
@@ -2706,7 +2707,8 @@ setInterval(rqReadyLoad,180000);
 const BG3D={propfirms:"galaxy",stats:"fibc",consistency:"stones",news:"earth",journal:"book",indicator:"liquidity"},BG2D={today:"aurora",journal:"streak",news:"map",plan:"aurora2",risk:"shield",consistency:"pillars",course:"dawn",about:"dust"};
 const BGM={key:"tv_bg",
   auto(){const n=navigator,ph=innerWidth<821;if(matchMedia("(prefers-reduced-motion: reduce)").matches||(n.connection&&n.connection.saveData))return "light";
-    if(ph&&((n.deviceMemory&&n.deviceMemory<=3)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)))return "light";return "3d"},
+    if(ph&&((n.deviceMemory&&n.deviceMemory<=3)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4)))return "light";
+    if(ph&&n.connection&&/^(slow-2g|2g|3g)$/.test(n.connection.effectiveType||""))return "light";/* slow mobile network: no 3D download */return "3d"},
   mode(){try{return localStorage.getItem(this.key)||this.auto()}catch(e){return this.auto()}},
   set(m){try{localStorage.setItem(this.key,m)}catch(e){}const g=document.getElementById("galBg");if(g)g.remove();this.btn();galaxyBg();
     toast(I18N.t(m==="3d"?"Background: 3D":m==="light"?"Background: Light (still image, saves battery)":"Background: Off"))},
@@ -2731,7 +2733,20 @@ function galaxyBg(){const m=BGM.mode(),light=document.documentElement.getAttribu
     p.then(()=>{if(g.isConnected)document.documentElement.classList.add("gal-on")}).catch(e=>{console.warn("bg off",e);g.remove();document.documentElement.classList.remove("gal-on")})}
   else document.documentElement.classList.add("gal-on")}
 setInterval(()=>{if(S.view==="news")bgStateNews()},20000);
+/* ===== lighter app: optional parts load only when a page or a tap needs them (scripts run in their original order) ===== */
+const LAZY={news:["news-info.js"],tvx:["indicator-video.js"],tour:["tour.js?v=5"],cere:["cerebra-intro.js?v=1"],
+  pfx:["propfirms-sizes.js","propfirms-coupons.js","propfirms-updates.js","propfirms-fr.js","propfirms-ar.js"]};
+const _lz={},_lzOk={};
+function need(k){if(_lz[k])return _lz[k];
+  _lz[k]=LAZY[k].reduce((p,src)=>p.then(()=>new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error(src+" didn't load"));document.head.appendChild(s)})),Promise.resolve())
+    .then(()=>{_lzOk[k]=true;if(k==="pfx"){PF_AFF=window.PF_AFF_LINKS||{};COUPONS=window.PF_COUPONS||{}}})
+    .catch(e=>{delete _lz[k];throw e});
+  return _lz[k]}
+/* pages that use the prop firm prices, discount codes or translations: wait for them, then draw */
+const VIEW_NEEDS={propfirms:"pfx",stats:"pfx",admin:"pfx",student:"pfx"};
 function render(){setTimeout(galaxyBg,0);
+  {const nk=VIEW_NEEDS[S.view];if(nk&&!_lzOk[nk]){const v0=$("#view");if(v0&&!v0.dataset.lzWait){v0.dataset.lzWait="1";v0.innerHTML='<div class="card empty" style="margin-top:20px">Loading…</div>'}
+    need(nk).then(()=>{const v1=$("#view");if(v1)delete v1.dataset.lzWait;render()}).catch(()=>{const v1=$("#view");if(v1){delete v1.dataset.lzWait;v1.innerHTML='<div class="card empty" style="margin-top:20px">Couldn\'t load this page. Check your connection and try again.</div>'}});return}}
   /* full footer (partner offer, social links, founder) only on Today, Prop firms and About; a slim one elsewhere */
   document.documentElement.classList.toggle("foot-full",["today","propfirms","about"].includes(S.view));const _tr=document.getElementById("pfTray");if(_tr&&S.view!=="propfirms")_tr.className="";document.documentElement.classList.toggle("focus-on",S.view==="today"&&(()=>{try{return localStorage.getItem("tv_focus")==="1"}catch(e){return false}})());renderTabs();const v=$("#view");setTimeout(ntfRefresh,0);
   let h="";if(S.readonly)h+=`<div class="banner"><span>👀 Viewing <b>${esc(S.subject.name)}</b> ${esc(S.subject.telegram||"")} — read-only</span><button class="btn sm" id="backAdmin">← Back to admin</button></div>`;
@@ -2832,7 +2847,7 @@ function coachNewsHTML(){const today=todayStr(),nd=nextTradingDay(),now=new Date
 /* clickable trading words → animated explanation bubble (Glossary in news-info.js) */
 function term(k,label,cls){return `<button type="button" class="term ${cls||""}" data-term="${k}">${label}<i class="ti" aria-hidden="true">?</i></button>`}
 function closeTerm(){const p=$("#termPop");if(p){p.classList.remove("show");$$(".term.on").forEach(t=>t.classList.remove("on"))}}
-function openTerm(el){const g=window.Glossary&&Glossary.get(el.dataset.term);if(!g)return;
+function openTerm(el){if(!window.Glossary){need("news").then(()=>{if(el.isConnected)openTerm(el)}).catch(()=>{});return}const g=Glossary.get(el.dataset.term);if(!g)return;
   let p=$("#termPop");if(!p){p=document.createElement("div");p.id="termPop";p.className="tpop";p.setAttribute("role","dialog");document.body.appendChild(p)}
   const same=el.classList.contains("on")&&p.classList.contains("show");closeTerm();if(same)return;
   p.classList.remove("show");void p.offsetWidth;
@@ -2870,14 +2885,14 @@ function niBox(U,x,head,meta,rule,cls){return `<div class="ni ${cls}" data-notr>
   <div class="ni-rule"><b>🛡 ${esc(U.rule)}</b><span>${esc(rule)}</span></div>
   <p class="ni-note">${esc(U.note)}</p>
   <div class="row" style="justify-content:flex-end"><button class="btn" id="niOk">${esc(U.close)}</button></div></div>`}
-function openNewsInfo(n){if(!window.NewsInfo)return;const U=NewsInfo.ui(),x=NewsInfo.event(n.title,n.impact),red=n.impact==="High";
+function openNewsInfo(n){if(!window.NewsInfo){need("news").then(()=>openNewsInfo(n)).catch(()=>{});return}const U=NewsInfo.ui(),x=NewsInfo.event(n.title,n.impact),red=n.impact==="High";
   const d=tzDate(n.starts_at,NY);
   const head=`<i class="fold ${red?"red":"org"}"></i><div><h2>${esc(x.name)}</h2><div class="ni-orig mono">${esc(n.title)}</div></div>`;
   const meta=`<div class="ni-meta"><span class="ni-badge ${red?"red":"org"}">${esc(red?U.red:U.org)}</span>
     <span class="chip mono">${esc(fmtDate(d))}</span><span class="chip mono">${tzTime(n.starts_at,NY)} NY · ${tzTime(n.starts_at,DZ)} DZ</span>
     ${n.forecast?`<span class="chip"><span>${esc(U.f)}</span> <b class="mono">${esc(n.forecast)}</b></span>`:""}${n.previous?`<span class="chip"><span>${esc(U.p)}</span> <b class="mono">${esc(n.previous)}</b></span>`:""}</div>`;
   openModal(niBox(U,x,head,meta,red?U.ruleRed:U.ruleOrg,red?"is-red":"is-org"));$("#niX").onclick=closeModal;$("#niOk").onclick=closeModal}
-function openHolInfo(kind,title){if(!window.NewsInfo)return;const U=NewsInfo.ui(),x=NewsInfo.holiday(kind);
+function openHolInfo(kind,title){if(!window.NewsInfo){need("news").then(()=>openHolInfo(kind,title)).catch(()=>{});return}const U=NewsInfo.ui(),x=NewsInfo.holiday(kind);
   const head=`<span style="font-size:24px">🏦</span><div><h2>${esc(x.name)}</h2><div class="ni-orig mono">${esc(title)}</div></div>`;
   openModal(niBox(U,x,head,`<div class="ni-meta"><span class="ni-badge hol">${esc(U.hol)}</span></div>`,U.ruleHol,"is-hol"));$("#niX").onclick=closeModal;$("#niOk").onclick=closeModal}
 /* inline fold-out explanation under the clicked row (animated) */
@@ -2895,7 +2910,9 @@ function closeNx(w){w.classList.remove("show");const r=w.previousElementSibling;
 function toggleNx(row,html){const was=row.classList.contains("open");$$(".nx").forEach(closeNx);if(was)return;
   const w=document.createElement("div");w.className="nx";w.innerHTML=`<div class="nx-wrap">${html}</div>`;row.after(w);row.classList.add("open");
   requestAnimationFrame(()=>requestAnimationFrame(()=>w.classList.add("show")))}
-document.addEventListener("click",e=>{if(!e.target.closest||!window.NewsInfo)return;const r=e.target.closest("[data-ni]");
+document.addEventListener("click",e=>{if(!e.target.closest)return;const r=e.target.closest("[data-ni]");
+  if(r&&!window.NewsInfo){e.preventDefault();need("news").then(()=>{if(r.isConnected)r.click()}).catch(()=>{});return}
+  if(!window.NewsInfo)return;
   if(r){const n=S.news[+r.dataset.ni];if(!n)return;e.preventDefault();if(r.classList.contains("nrow"))toggleNx(r,nxNews(n));else openNewsInfo(n);return}
   const h=e.target.closest("[data-hk]");if(h)toggleNx(h,nxHol(h.dataset.hk,h.dataset.ht))});
 
@@ -4000,7 +4017,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26m";
+const APP_VER="2026-11-26n";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4014,7 +4031,8 @@ const APP_VER="2026-11-26m";
 let _fxg=null;function fxGate(){return _fxg||(_fxg=new Promise(r=>{const go=()=>("requestIdleCallback" in window?requestIdleCallback(()=>r(),{timeout:2500}):setTimeout(r,700));document.readyState==="complete"?go():addEventListener("load",go,{once:true})}))}
 /* ============ IN-APP 3D (app3d.js, loaded only where shown; the flat version stays if 3D can't run) ============ */
 let _a3p=null;const A3=()=>_a3p||(_a3p=fxGate().then(()=>import("./app3d.js?v=34")));
-function mount3d(id,fn,...args){setTimeout(()=>{const el=document.getElementById(id);if(!el||el.dataset.a3)return;el.dataset.a3="1";
+function mount3d(id,fn,...args){if(BGM.mode()!=="3d")return;/* Light / Off (chosen, or automatic on low-end phones, data saver, slow networks): keep the flat version, don't download 3D */
+  setTimeout(()=>{const el=document.getElementById(id);if(!el||el.dataset.a3)return;el.dataset.a3="1";
   A3().then(m=>{if(!el.isConnected)return;try{m[fn](el,...args)}catch(e){console.warn("3D",e)}}).catch(e=>console.warn("3D off",e))},40)}
 function newsClockState(){const now=Date.now(),reds=S.newsLoaded?newsFor(todayStr()).filter(n=>n.impact==="High"):[],W=reds.map(n=>{const t=new Date(n.starts_at).getTime();return {n,t,a:t-5*60000,b:t+5*60000}});
   const inW=W.find(w=>now>=w.a&&now<=w.b),next=W.find(w=>w.a>now);
@@ -4906,9 +4924,9 @@ function sizeCard(f){const D=(window.PF_SIZES||{})[f.id],progs=D?D.progs:[];
 /* ---------- partner coupon codes: which firm each code works on, the discount and the offer link ----------
    To add a code for another firm: COUPONS.CODE = { firmId:{pct:XX, url:"https://..."} } */
 /* partner affiliate links: used by the firm's "Official website" button */
-const PF_AFF=window.PF_AFF_LINKS||{};  /* from propfirms-coupons.js */
+let PF_AFF=window.PF_AFF_LINKS||{};  /* from propfirms-coupons.js (filled again by need("pfx") when it loads) */
 /* prog = the code only works on plans whose name starts with this text */
-const COUPONS=window.PF_COUPONS||{};  /* from propfirms-coupons.js (updated by the twice-monthly check) */
+let COUPONS=window.PF_COUPONS||{};  /* from propfirms-coupons.js (updated by the twice-monthly check; filled again by need("pfx")) */
 const dealFor=(code,fid,P)=>{const d=COUPONS[code]&&COUPONS[code][fid];return d&&(!d.prog||(P&&P.name.startsWith(d.prog)))?d:null};
 /* the coupon box only shows on firms that have one of my codes, already filled in */
 const firmCode=fid=>Object.keys(COUPONS).find(k=>COUPONS[k][fid]);
@@ -5218,9 +5236,9 @@ function resultsStripHTML(mod){if(!RESULTS.length)return "";const list=String(mo
 function resultsBtn(){return `<a class="tg-link res" href="${ABOUT.channel}" target="_blank" rel="noopener">${SOCIAL[0].icon}<span>See all results on Telegram</span></a>`}
 /* ▶ phone tour video of the platform (tour.js) */
 function tourBtn(){return `<button type="button" class="tour-btn" data-tour><span class="tour-play">▶</span><span><b>Watch the platform tour</b><small>1 minute · on a phone</small></span></button>`}
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tour]");if(b&&window.Tour){e.preventDefault();Tour.open()}});
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tour]");if(b){e.preventDefault();need("tour").then(()=>window.Tour&&Tour.open()).catch(()=>toast("Couldn't load the tour. Check your connection."))}});
 /* ▶ Cerebra by TDV explainer (cerebra-intro.js): course section */
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-cerebra]");if(b&&window.CerebraIntro){e.preventDefault();CerebraIntro.open()}});
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-cerebra]");if(b){e.preventDefault();need("cere").then(()=>window.CerebraIntro&&CerebraIntro.open()).catch(()=>toast("Couldn't load the video. Check your connection."))}});
 /* About: our story (timeline) + FAQ */
 document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#indCopy")&&window.INDICATOR&&INDICATOR.url)copyText(INDICATOR.url)});
 function aboutExtra(){const tl=[["📈",`${ABOUT.yearsPrefix?ABOUT.yearsPrefix+" ":""}${ABOUT.years} years in the markets`,"Brown Algo and ZNtrading trade futures with a precise scalping system."],
@@ -5641,7 +5659,7 @@ function vIndicator(el){const has=!!INDICATOR.url;
      <li><span>Use it on NQ or MNQ. The levels update by themselves every session.</span></li>
     </ol></div>
    <p class="mut pf-disc">ℹ️ <span>An indicator is a tool, not a signal service. Always follow your plan and your risk rules.</span></p>`;
-  if(window.TVX)TVX.mount($("#tvxRoot",el))}
+  need("tvx").then(()=>{const r=$("#tvxRoot",el);if(r&&r.isConnected&&window.TVX)TVX.mount(r)}).catch(()=>{})}
 /* ============ Earn2Trade partner promo ============ */
 const PROMO={url:"https://www.earn2trade.com/?a_pid=BROWN23",code:"BROWN23",pct:60};
 function promoHTML(){return `<div class="promo"><div class="promo-l"><div class="promo-tag">Partner offer</div>
