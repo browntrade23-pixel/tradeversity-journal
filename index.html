@@ -2012,6 +2012,9 @@ html:not([data-theme=light]) .hub-tabs button.on{background:linear-gradient(135d
 /* legal links in the app footer */
 .appfoot .legal{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-size:12px}
 .appfoot .legal a{color:var(--muted)!important;text-decoration:none}.appfoot .legal a:hover{color:var(--text)!important;text-decoration:underline}
+.tp-gate{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:16px;border:1px dashed var(--line2);border-radius:12px;background:var(--panel2);font-size:13px;line-height:1.5}
+.tp-gate b{font-size:14px;font-weight:600}.tp-gate small{font-size:11.5px}
+.pf-data .row .btn{min-width:0}
 .su-agree{display:flex;align-items:flex-start;gap:10px;font-size:12.5px;line-height:1.5;color:var(--muted);cursor:pointer;text-align:start}
 .su-agree input{width:18px;height:18px;margin-top:1px;flex:none;accent-color:var(--gold)}.su-agree a{color:var(--lnk,#7cb0ff)}
 .su-legal{font-size:12px;color:var(--muted);text-align:center;margin:10px 0 0;line-height:1.5}.su-legal a{color:var(--lnk,#7cb0ff)}
@@ -2144,7 +2147,7 @@ html:not([data-theme=light]) .hub-tabs button.on{background:linear-gradient(135d
 <div id="toast"></div>
 <div id="ntfPanel" class="ntf-panel hidden" role="dialog" aria-label="Notifications"></div>
 
-<script src="i18n.js?v=2026-11-26k"></script>
+<script src="i18n.js?v=2026-11-26l"></script>
 <script src="news-info.js"></script>
 <script src="indicator-video.js"></script><script src="tour.js?v=5"></script><script src="cerebra-intro.js?v=1"></script><script src="propfirms.js"></script><script src="propfirms-sizes.js"></script><script src="propfirms-coupons.js"></script><script src="propfirms-updates.js"></script><script src="propfirms-fr.js"></script><script src="propfirms-ar.js"></script>
 <script>
@@ -2313,7 +2316,7 @@ const Cloud={
     /* this email already has an account: say it before trying (no email is sent, no rate limit used) */
     if(await this.emailTaken(email))throw new Error("already registered");
     const captchaToken=await Captcha.token();
-    const{data,error}=await this.sb.auth.signUp({email,password,options:{data:{full_name:name,telegram},emailRedirectTo:location.origin+location.pathname,captchaToken}});if(error)throw error;
+    const{data,error}=await this.sb.auth.signUp({email,password,options:{data:{full_name:name,telegram,terms_version:LEGAL_VER,terms_accepted_at:new Date().toISOString()},emailRedirectTo:location.origin+location.pathname,captchaToken}});if(error)throw error;
     if(data.user&&Array.isArray(data.user.identities)&&!data.user.identities.length)throw new Error("already registered");   /* Supabase's hidden "email taken" answer */
     if(!data.session)return {needsConfirm:true};return {user:await this.profile(data.user.id),needsConfirm:false}},
   async verifyCode(email,token){const{data,error}=await this.sb.auth.verifyOtp({email,token,type:"signup"});if(error)throw error;return await this.profile(data.user.id)},
@@ -2476,7 +2479,44 @@ async function enter(u){
   else if(u.role==="admin"){S.view="admin";await loadSubject(u,false);go("admin")}
   else{await loadSubject(u,false);go(location.hash.slice(1)||"today");setTimeout(maybeTour,1500)}
   S._commR=null;settingsPull();rqReadyLoad();
+  if(!S._demo)setTimeout(legalCheck,4000);
 }
+/* ===== Legal: proof of consent. The version + date of the accepted terms are saved on the account (sign-up and every
+   re-acceptance). When the terms change (new LEGAL_VER), members are asked to read and accept them again. ===== */
+const LEGAL_VER="2026-11-26";
+async function legalMeta(){try{const{data}=await Cloud.sb.auth.getUser();return (data&&data.user&&data.user.user_metadata)||{}}catch(e){return null}}
+async function legalCheck(){if(S._demo||!S.me||!Cloud.sb)return;const md=await legalMeta();if(!md||md.terms_version===LEGAL_VER)return;
+  if(!$("#modal").classList.contains("hidden")||$("#tour")){setTimeout(legalCheck,6000);return}
+  openModal(`<div class="mhead"><h2>📜 <span>We updated our Terms and Privacy policy</span></h2></div>
+   <p class="mut" style="margin:0 0 12px"><span>Please read them and accept them to keep using TRADEVERSITY. We save the date and the version you accept.</span></p>
+   <div class="row" style="gap:8px;flex-wrap:wrap;margin:0 0 14px"><a class="btn sm" href="terms.html" target="_blank" rel="noopener">📄 <span>Terms and conditions</span></a><a class="btn sm" href="privacy.html" target="_blank" rel="noopener">🔒 <span>Privacy policy</span></a></div>
+   <label class="su-agree"><input type="checkbox" id="lgOk"><span><span>I am 18 or older and I accept the</span> <a href="terms.html" target="_blank" rel="noopener">Terms and conditions</a> <span>and the</span> <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a>.</span></label>
+   <div class="row" style="justify-content:flex-end;gap:8px;margin-top:14px"><button type="button" class="btn" id="lgLater">Not now</button><button type="button" class="btn pri" id="lgAcc" disabled>I accept</button></div>`);
+  const ok=$("#lgOk"),acc=$("#lgAcc");ok.onchange=()=>{acc.disabled=!ok.checked};$("#lgLater").onclick=closeModal;
+  acc.onclick=async()=>{acc.disabled=true;try{const{error}=await Cloud.sb.auth.updateUser({data:{terms_version:LEGAL_VER,terms_accepted_at:new Date().toISOString()}});if(error)throw error;closeModal();toast(I18N.t("Thank you, saved."))}catch(e){acc.disabled=false;toast("Couldn't save: "+(e.message||e))}}}
+/* third-party content (TradingView widgets) loads only after the member agrees; the choice is kept on this device and can be withdrawn in My profile */
+const TP_KEY="tv_3p_ok",tpOk=()=>{try{return localStorage.getItem(TP_KEY)==="1"}catch(e){return false}};
+function tpGate(box,load){if(tpOk()){load();return}
+  box.innerHTML=`<div class="tp-gate"><b>📈 <span>Live TradingView content</span></b><span class="mut"><span>This part is loaded from TradingView. TradingView receives your IP address and may set its own cookies.</span></span>
+   <button type="button" class="btn sm pri">▶ <span>Load TradingView content</span></button><small class="mut"><span>Your choice is remembered on this device. You can change it in My profile.</span> <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a></small></div>`;
+  $("button",box).onclick=()=>{try{localStorage.setItem(TP_KEY,"1")}catch(e){}load()}}
+/* My profile → Your data: download everything, ask for account deletion, withdraw the TradingView consent */
+function pfDataCard(){return `<div class="card pf-data"><h3>🛡 <span>Your data</span></h3>
+  <p class="mut" style="font-size:13px;margin:0 0 12px"><span>Download a copy of everything you saved, or ask the support team to delete your account and all its data.</span></p>
+  <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" type="button" id="pfExport">⬇ <span>Download my data</span></button><button class="btn danger" type="button" id="pfDelReq">🗑 <span>Delete my account</span></button><button class="btn sm" type="button" id="pfTp"></button></div>
+  <small class="mut" style="display:block;margin-top:10px"><span>Terms accepted</span>: <span id="pfLegal" data-notr>—</span> · <a href="terms.html" target="_blank" rel="noopener">Terms and conditions</a> · <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a></small></div>`}
+function bindPfData(el){const q=s=>$(s,el),u=S.me;if(!q("#pfExport"))return;
+  const tpBtn=q("#pfTp"),tpDraw=()=>{tpBtn.innerHTML=tpOk()?`📈 <span>${esc(I18N.t("TradingView content: allowed · turn off"))}</span>`:`📈 <span>${esc(I18N.t("TradingView content: off"))}</span>`;tpBtn.disabled=!tpOk()};tpDraw();
+  tpBtn.onclick=()=>{try{localStorage.removeItem(TP_KEY)}catch(e){}tpDraw();toast(I18N.t("TradingView content turned off on this device."))};
+  if(!S._demo)legalMeta().then(md=>{const l=q("#pfLegal");if(l&&md&&md.terms_accepted_at)l.textContent=`${md.terms_version||""} · ${new Date(md.terms_accepted_at).toLocaleDateString(I18N.locale())}`});
+  q("#pfExport").onclick=()=>{const keep={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(/^tv/.test(k))keep[k]=localStorage.getItem(k)}}catch(e){}
+    const acct={};["id","email","name","telegram","role","status","created_at","username","first","last","birth","country","city","zip","phone","avatar"].forEach(k=>{if(u[k]!=null)acct[k]=u[k]});
+    const out={exported_at:new Date().toISOString(),service:"TRADEVERSITY · jointradeversity.com",account:acct,trades:S.subject&&S.subject.id===u.id?S.trades:[],plans:S.subject&&S.subject.id===u.id?S.plans:[],settings_on_this_device:keep};
+    const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"}));a.download=`tradeversity-my-data-${todayStr()}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);toast(I18N.t("Your data file is downloading."))};
+  q("#pfDelReq").onclick=()=>{if(S._demo){toast(I18N.t("Not available in the demo."));return}
+    confirmBox("Delete your account? The support team will delete your account and all its data (journal, plans, course progress) within 30 days and confirm it to you. This can't be undone.",async()=>{
+      try{const{error}=await Cloud.sb.from("support_requests").insert({email:u.email,topic:"account",message:`ACCOUNT DELETION REQUEST from My profile. User: ${u.email} (id ${u.id}). Sent ${new Date().toISOString()}. Delete the account and all its data within 30 days, then confirm to the member.`,lang:(window.I18N&&I18N.lang)||"en"});if(error)throw error;
+        toast(I18N.t("Request sent. The support team will delete your account within 30 days and confirm it."))}catch(e){toast("Couldn't send: "+(e.message||e))}})}}
 async function loadSubject(u,readonly){
   S.subject=u;S.readonly=readonly;S.acct="all";S.page=null;S._planDate=null;
   try{[S.trades,S.plans]=await Promise.all([API.listTrades(u.id),API.listPlans(u.id)])}catch(e){toast("Couldn't load data: "+(e.message||e));S.trades=[];S.plans=[]}
@@ -2883,7 +2923,8 @@ function newsNextWeekBody(){const days=nextWeekDays(),any=days.some(d=>newsFor(d
   return head+strip+`<div class="nwk-wait">⏳ <span><b>Forex Factory publishes next week's USD calendar on Sunday.</b> <span>It appears here automatically.</span></span></div>`+
     (list?`<div class="nwk-sub">🏦 <b>Already known</b></div>`+list:"")+
     `<div class="nwk-sub">📆 <b>Preview: US economic calendar</b> <span class="mut">· TradingView</span></div><div id="nwkCal" class="tradingview-widget-container nwk-cal"></div>`}
-function mountNextCal(){const box=$("#nwkCal");if(!box||box.dataset.on)return;box.dataset.on="1";
+function mountNextCal(){const box=$("#nwkCal");if(!box||box.dataset.on)return;box.dataset.on="1";tpGate(box,()=>mountNextCalNow(box))}
+function mountNextCalNow(box){
   const loc={en:"en",fr:"fr",ar:"ar_AE"}[(window.I18N&&I18N.lang)||"en"]||"en",light=document.documentElement.getAttribute("data-theme")==="light";
   box.innerHTML='<div class="tradingview-widget-container__widget"></div>';const s=document.createElement("script");s.src="https://s3.tradingview.com/external-embedding/embed-widget-events.js";s.async=true;
   s.textContent=JSON.stringify({colorTheme:light?"light":"dark",isTransparent:true,width:"100%",height:innerWidth<821?480:560,locale:loc,importanceFilter:"0,1",countryFilter:"us"});box.appendChild(s)}
@@ -2923,7 +2964,8 @@ function worldMonitorCard(){return `<div class="card wm-card" style="margin-bott
   <p class="mut" style="font-size:13px;margin:6px 0 10px"><span>The headlines that move the markets right now. Open World Monitor for the full map: conflicts, sanctions, central banks, energy and markets.</span></p>
   <div class="wm-links">${WM_LINKS.map(([ic,l,u])=>`<a class="btn sm" href="${u}" target="_blank" rel="noopener">${ic} <span>${l}</span> ↗</a>`).join("")}</div>
   <div id="wmFeed" class="tradingview-widget-container wm-feed"></div></div>`}
-function mountWorldFeed(){const box=$("#wmFeed");if(!box||box.dataset.on)return;box.dataset.on="1";
+function mountWorldFeed(){const box=$("#wmFeed");if(!box||box.dataset.on)return;box.dataset.on="1";tpGate(box,()=>mountWorldFeedNow(box))}
+function mountWorldFeedNow(box){
   const loc={en:"en",fr:"fr",ar:"ar_AE"}[(window.I18N&&I18N.lang)||"en"]||"en",light=document.documentElement.getAttribute("data-theme")==="light";
   box.innerHTML='<div class="tradingview-widget-container__widget"></div>';const s=document.createElement("script");s.src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js";s.async=true;
   s.textContent=JSON.stringify({feedMode:"all_symbols",isTransparent:true,displayMode:"regular",width:"100%",height:innerWidth<821?460:540,colorTheme:light?"light":"dark",locale:loc});box.appendChild(s)}function vNews(el){
@@ -3958,7 +4000,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26k";
+const APP_VER="2026-11-26l";
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
@@ -4192,7 +4234,7 @@ function pfCheck(k,v){v=String(v||"").trim();if(!v)return "";
   if(k==="zip")return /^[A-Za-z0-9][A-Za-z0-9 \-]{1,9}$/.test(v)?"":"2 to 10 letters or numbers.";
   if(k==="phone"){const d=v.replace(/\D/g,"");return /^\+?[0-9 ()\-]+$/.test(v)&&d.length>=8&&d.length<=15?"":"Digits only, with the country code (e.g. +213)."}
   if(k==="birth"){const t=todayStr();if(!/^\d{4}-\d{2}-\d{2}$/.test(v)||v>t)return "Check your date of birth.";const [y,m,dd]=v.split("-").map(Number),n=new Date(),age=n.getFullYear()-y-((n.getMonth()+1<m||(n.getMonth()+1===m&&n.getDate()<dd))?1:0);
-    return age<13?"You must be at least 13 years old.":age>110?"Check your date of birth.":""}
+    return age<18?"You must be at least 18 years old.":age>110?"Check your date of birth.":""}
   if(k==="country")return PF_CC.includes(v)?"":"Choose a country.";return ""}
 function vProfile(el){const u=S.me;if(!u){el.innerHTML="";return}
   const fromMe=()=>({username:u.username||"",first:u.first||"",last:u.last||"",birth:u.birth||"",country:u.country||"",city:u.city||"",zip:u.zip||"",phone:u.phone||"",avatar:u.avatar||""});
@@ -4216,10 +4258,10 @@ function vProfile(el){const u=S.me;if(!u){el.innerHTML="";return}
     ${inp("phone","Phone number","tel","+213 555 12 34 56",'maxlength="20" autocomplete="tel" inputmode="tel"')}
     ${inp("city","City","text","",'maxlength="60" autocomplete="address-level2"')}
     ${inp("zip","Zip code","text","",'maxlength="10" autocomplete="postal-code"')}
-   </div></div>${u.role==="admin"&&!S._demo?`<div class="card" id="mfaCard"></div>`:""}
+   </div></div>${u.role==="admin"&&!S._demo?`<div class="card" id="mfaCard"></div>`:""}${S.readonly?"":pfDataCard()}
    <div class="pf-savebar" id="pfBar2"><span class="pf-dirty" id="pfDirty"></span><button class="btn" type="button" id="pfBack">${T("Back")}</button><button class="btn pri" type="button" id="pfSave">💾 <span>${T("Save my profile")}</span></button></div>`;
   const q=s=>$(s,el),field=k=>q(`[data-pf="${k}"]`),msg=(k,m)=>{const s=q(`[data-msg="${k}"]`),i=field(k);if(s)s.textContent=m?I18N.t(m):"";if(i)i.classList.toggle("bad",!!m)};
-  mfaCard(q("#mfaCard"));
+  mfaCard(q("#mfaCard"));bindPfData(el);
   const dirty=()=>PF_KEYS.some(([k])=>String(f[k]||"")!==String(saved[k]||""));
   /* update only what changed on screen (no page jump) */
   const refresh=()=>{const all={...u,...f},miss=pfMissing(all),ok=!miss.length,filled=PF_KEYS.filter(([k])=>String(f[k]||"").trim()).length;
@@ -5607,7 +5649,7 @@ function promoHTML(){return `<div class="promo"><div class="promo-l"><div class=
   <div class="promo-s">Use code <span class="promo-code" data-notr>${PROMO.code}</span></div></div>
   <div class="promo-r"><button type="button" class="btn sm promo-copy">Copy code</button>
   <a class="btn sm pri" href="${PROMO.url}" target="_blank" rel="sponsored noopener">Get 60% off</a></div>
-  <div class="promo-gw"><span class="gw-ic">🎁</span><span>Buy an account with this code and you enter the giveaway draw</span></div></div>`}
+  </div>`}/* the "buy with this code = giveaway draw" line is hidden until the giveaway has written official rules (a draw tied to a purchase is regulated) */
 $$("[data-promo]").forEach(el=>el.innerHTML=promoHTML());
 document.addEventListener("click",async e=>{const b=e.target.closest&&e.target.closest(".promo-copy");if(!b)return;
   try{await navigator.clipboard.writeText(PROMO.code)}catch(err){const t=document.createElement("textarea");t.value=PROMO.code;document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(_){}t.remove()}
