@@ -1,3 +1,4 @@
+[hidden]{display:none!important}
 /* Public free-tool pages (risk calculator, consistency rule, prop firm coupons). Same look as the phone app v4:
    black base with blue + crimson light, glass cards, white pill actions, champagne for numbers. */
 :root{--bg:#07080c;--glass:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));--edge:rgba(255,255,255,.09);--tx:#f3f4f7;--mut:#9ea3b0;

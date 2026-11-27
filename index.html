@@ -8,6 +8,7 @@ if(window.top!==window.self){try{window.top.location.replace(window.self.locatio
 <script>
 /* 3D welcome page first for logged-out visitors on the bare address. Never for: logged-in users (saved session),
    links with ?params or #hash (share, demo, auth=..., email confirm / password reset), or the installed app. */
+(function(){try{if(/(^|[#&])type=recovery(&|$)/.test(location.hash)){location.replace("reset-password.html"+location.hash);return}}catch(e){}})();
 (function(){try{if(location.search||location.hash)return;if(matchMedia("(display-mode: standalone)").matches||navigator.standalone)return;
   for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i)||"";if(k.startsWith("sb-")&&k.includes("auth-token"))return}
   location.replace("welcome.html")}catch(e){}})();
@@ -2267,7 +2268,7 @@ html:not([data-theme=light]) input[type=checkbox],html:not([data-theme=light]) i
  addEventListener("error",function(e){if(e&&e.message)push(e.message,e.filename,e.lineno)});
  addEventListener("unhandledrejection",function(e){var r=e&&e.reason;push("Unhandled: "+(r&&(r.message||r)),r&&r.stack&&(String(r.stack).match(/https?:[^\s)]+?\.js/)||[])[0],0)});
  window.__errSend=send})();</script>
-<script src="i18n.js?v=2026-11-27d"></script>
+<script src="i18n.js?v=2026-11-27e"></script>
 <!-- the firm list stays here (trade costs use it); news explanations, the indicator video, the tour video, the Cerebra intro and
      the prop firm prices / codes / translations load only when a page needs them (see need() in the app script) -->
 <script src="propfirms.js"></script>
@@ -2473,7 +2474,7 @@ const Cloud={
   async createShare(o){const{data,error}=await this.sb.from("shares").insert(o).select().single();if(error)throw error;return data},
   async revokeShare(token){const{error}=await this.sb.from("shares").update({revoked:true}).eq("token",token);if(error)throw error},
   async getShare(t){const{data,error}=await this.sb.rpc("get_share",{t});if(error)throw error;return data},
-  async resetPassword(email){const captchaToken=await Captcha.token();const{error}=await this.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname,captchaToken});if(error)throw error}
+  async resetPassword(email){const captchaToken=await Captcha.token();const{error}=await this.sb.auth.resetPasswordForEmail(email,{redirectTo:new URL("reset-password.html",location.href).href,captchaToken});if(error)throw error}
 };
 
 let API=Cloud;
@@ -2563,8 +2564,8 @@ $("#otpForm").onsubmit=async e=>{e.preventDefault();const code=$("#otpCode").val
 $("#otpResend").onclick=async e=>{e.preventDefault();if(Date.now()<_otpCool)return;$("#authMsg").textContent=I18N.t("Sending a new code…");
   try{await API.resendCode(_otpMail);otpCooldown();$("#authMsg").innerHTML=`<span class="ok">${esc(I18N.t("New code sent. Check your email."))}</span>`}catch(err){$("#authMsg").innerHTML=authErr(err)}};
 $("#otpBack").onclick=e=>{e.preventDefault();hideOtp();$("#tabSignup").click()};
-$("#forgot").onclick=async e=>{e.preventDefault();const em=$("#loginForm [name=email]").value.trim();if(!em){$("#authMsg").textContent="Type your email above first.";return}
-  try{await API.resetPassword(em);$("#authMsg").innerHTML='<span class="ok">Reset link sent — check your email.</span>'}catch(err){$("#authMsg").innerHTML=authErr(err)}};
+$("#forgot").onclick=async e=>{e.preventDefault();const em=$("#loginForm [name=email]").value.trim();if(!em){$("#authMsg").textContent=I18N.t("Type your email above first.");return}
+  try{await API.resetPassword(em);$("#authMsg").innerHTML='<span class="ok">'+esc(I18N.t("Reset link sent. Check your email (and Spam): the link works for 1 hour."))+'</span>'}catch(err){$("#authMsg").innerHTML=authErr(err)}};
 $("#logout").onclick=async()=>{await API.signOut();S.me=null;S.subject=null;try{history.replaceState(null,"",location.pathname)}catch(e){}showAuth()};
 function openNewPassword(){openModal(`<div class="mhead"><h2>Set a new password</h2></div><form id="npf" class="grid"><input class="i" type="password" minlength="8" name="p" placeholder="New password" required><button class="btn pri">Save password</button></form>`);
   $("#npf").onsubmit=async e=>{e.preventDefault();const{error}=await Cloud.sb.auth.updateUser({password:new FormData(e.target).get("p")});if(error)toast(error.message);else{toast("Password updated");closeModal()}}}
@@ -4169,7 +4170,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-27d";window.APP_V=APP_VER;
+const APP_VER="2026-11-27e";window.APP_V=APP_VER;
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
