@@ -2037,6 +2037,97 @@ html:not([data-theme=light]) .hub-tabs button.on{background:linear-gradient(135d
 @media(max-width:760px){.v3-prop{grid-template-columns:1fr;gap:14px}.v3-pt{flex-direction:row;justify-content:space-between;align-items:center;width:100%}
   .v3-eq{min-height:210px}.v3-cal{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.v3-wkc{display:none!important}.v3-cd{height:48px;padding:5px 6px}.v3-cd b{font-size:10px}}
 </style>
+<style id="v4phone">
+.td-bal{display:none}
+/* ===== v4 phone design (2026-11-27): black base with a deep blue + crimson glow, frosted glass cards, white pill actions,
+   floating bottom bar with a round active button, big balance number. Champagne only on charts and bars. Phones + dark theme only ===== */
+@media(max-width:760px){
+html:not([data-theme=light]){--bg:#07080c;--panel:#12141a;--panel2:#191c24;--line:#22252e;--line2:#2e323d;--text:#f3f4f7;--muted:#9a9fac;--dim:#636875;
+  --gold:#dcbd8e;--gold2:#f2dfbd;--ind:#e9ebf1;--ind2:#cfd3dc;--ind-glow:rgba(255,255,255,.22);--lnk:#c9d4ff;--blue:#8fa6ff;--green:#5fc28d;--red:#ef6a5a;--side:#0b0c10;--r:22px;
+  --v4-glass:linear-gradient(180deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.025) 100%);--v4-edge:rgba(255,255,255,.09);
+  --v4-pearl:linear-gradient(180deg,#ffffff,#e6e8ee);--v4-ink:#0d0f14}
+html:not([data-theme=light]) body{background:#07080c}
+/* background: deep blue light from the top-left, a touch of crimson top-right, black below */
+html:not([data-theme=light]) #app::before,html:not([data-theme=light]) #share::before{background:
+   radial-gradient(80% 45% at 0% 0%,rgba(46,72,170,.42),transparent 62%),
+   radial-gradient(60% 38% at 100% 4%,rgba(178,40,58,.26),transparent 60%),
+   radial-gradient(90% 40% at 50% 100%,rgba(30,44,110,.22),transparent 70%),
+   linear-gradient(180deg,#0b0d16 0%,#07080c 60%,#050608 100%)!important;opacity:1!important;filter:none!important;animation:none!important}
+html:not([data-theme=light]) #app::after{opacity:.035!important}
+html:not([data-theme=light]).gal-on #app::before{opacity:1!important}
+html:not([data-theme=light]) #galBg{display:none!important}
+/* header: see-through */
+html:not([data-theme=light]) #app header.top{background:rgba(8,9,14,.55)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;border-bottom:1px solid rgba(255,255,255,.05)!important;box-shadow:none!important}
+html:not([data-theme=light]) #app header.top :is(.hd-ic,.ntf-bell){background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.12)!important}
+html:not([data-theme=light]) #app header.top .hd-ic{color:transparent!important;text-shadow:0 0 0 #eef0f5}
+html:not([data-theme=light]) #app header.top .ntf-bell{color:#eef0f5!important}
+/* frosted glass cards (no blur needed: the background is a smooth glow, so this stays light on phones) */
+html:not([data-theme=light]) #app :is(.card,.kpi),html:not([data-theme=light]) #app #view :is(.card,.kpi){background:var(--v4-glass)!important;border:1px solid var(--v4-edge)!important;border-radius:22px!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 20px 40px -26px rgba(0,0,0,.9)!important}
+html:not([data-theme=light]) #app .card h3{letter-spacing:-.01em;font-weight:600}
+/* inner panels: lighter glass */
+html:not([data-theme=light]) #app :is(.imf-row,.pf-item,.pf-mini,.pf-sz,.pfc,.tcard,.insight,.edge-r,.mc-c,.astat,.ab-st,.a3-box,.bias-row,.mk-chip,.nw-d,.newsbox,.nextev,.ncd,.today-cnt,.v3-cd,.v3-rail,.tg-link,.drop,.st-tab,.tc-edit,.td-fl,.ctile,.ind-b,.pf-dz,.tvx-panel,.tour-btn,.td-pt:not(.ok),details>summary){
+  background:rgba(255,255,255,.04)!important;border-color:rgba(255,255,255,.09)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html:not([data-theme=light]) #app .pf-savebar{background:rgba(10,11,16,.94)!important;border-color:rgba(255,255,255,.09)!important}
+/* buttons: white pill = main action, glass outline pill = secondary */
+html:not([data-theme=light]) #app .btn{border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--text)}
+html:not([data-theme=light]) #app .btn.pri{background:var(--v4-pearl)!important;color:var(--v4-ink)!important;border-color:transparent!important;
+  box-shadow:0 10px 26px -14px rgba(255,255,255,.55),inset 0 1px 0 #fff!important;font-weight:650}
+html:not([data-theme=light]) #app :is(.chip,.tag){border-radius:999px}
+/* progress bars + charts: champagne line on a glass track */
+html:not([data-theme=light]) #app :is(.td-bar,.pbar,.bar,.v3-bar){background:rgba(255,255,255,.08)!important;border-radius:999px}
+html:not([data-theme=light]) #app :is(.td-bar,.pbar,.bar)>i{background:linear-gradient(90deg,#b8935f,#f0d9b0)!important;box-shadow:0 0 12px rgba(240,217,176,.35)}
+html:not([data-theme=light]) #app .td-bar.loss>i,html:not([data-theme=light]) #app .td-bar.bad>i{background:linear-gradient(90deg,#a8483a,#ef6a5a)!important;box-shadow:none}
+html:not([data-theme=light]) #app [stroke="#3b82f6"]{stroke:#dcbd8e}html:not([data-theme=light]) #app [fill="#3b82f6"]{fill:#dcbd8e}
+html:not([data-theme=light]) #app stop[stop-color="#3b82f6"]{stop-color:#dcbd8e}
+/* Today hero: glass card, light from the corner, big balance number */
+html:not([data-theme=light]) #app .td-hero{position:relative;overflow:hidden;padding:22px 18px 18px;border-radius:28px;border:1px solid rgba(255,255,255,.10);
+  background:
+   radial-gradient(55% 65% at 100% 0%,rgba(190,50,70,.28),transparent 62%),
+   radial-gradient(70% 80% at 0% 0%,rgba(60,90,200,.30),transparent 65%),
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 160'%3E%3Cg fill='%23ffffff' opacity='.06'%3E%3Crect x='200' y='70' width='10' height='40' rx='2'/%3E%3Crect x='204' y='58' width='2' height='64'/%3E%3Crect x='224' y='60' width='10' height='34' rx='2'/%3E%3Crect x='228' y='48' width='2' height='56'/%3E%3Crect x='248' y='44' width='10' height='38' rx='2'/%3E%3Crect x='252' y='32' width='2' height='60'/%3E%3Crect x='272' y='52' width='10' height='22' rx='2'/%3E%3Crect x='276' y='42' width='2' height='40'/%3E%3Crect x='296' y='24' width='10' height='40' rx='2'/%3E%3Crect x='300' y='12' width='2' height='62'/%3E%3Crect x='320' y='14' width='10' height='30' rx='2'/%3E%3Crect x='324' y='4' width='2' height='48'/%3E%3C/g%3E%3C/svg%3E") right 0 bottom 0/100% auto no-repeat,
+   linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 24px 50px -28px rgba(0,0,0,.95)}
+html:not([data-theme=light]) #app .td-hi{font-weight:600;letter-spacing:-.02em;color:#f5f6f9}
+html:not([data-theme=light]) #app .td-hi b{color:#ffffff}
+html:not([data-theme=light]) #app .td-q{border-left-color:rgba(255,255,255,.35)!important;color:#cfd2da}
+html:not([data-theme=light]) #app .td-q small{color:var(--gold)!important}
+html:not([data-theme=light]) #app .td-bal{display:block;margin:14px 0 4px}
+html:not([data-theme=light]) #app .td-bal .tb-l{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:#cfd2da;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
+html:not([data-theme=light]) #app .td-bal .tb-v{display:block;margin-top:8px;font-family:Geist,Inter,system-ui,sans-serif;font-size:40px;line-height:1.05;font-weight:600;letter-spacing:-.035em;color:#fff;font-variant-numeric:tabular-nums}
+html:not([data-theme=light]) #app .td-bal .tb-v small{font-size:.62em;color:rgba(255,255,255,.38);font-weight:500;letter-spacing:-.02em}
+html:not([data-theme=light]) #app .td-bal .tb-d{display:block;margin-top:4px;font-size:12.5px;color:var(--muted)}
+/* tab switchers: glass track, the open tab = white pill */
+html:not([data-theme=light]) #app :is(.hub-tabs,.rtabs,.st-tabs){background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,255,255,.09)!important;border-radius:999px!important;padding:5px!important}
+html:not([data-theme=light]) #app :is(.hub-tabs,.rtabs,.st-tabs) button{border-radius:999px!important;background:transparent!important;border-color:transparent!important;box-shadow:none!important;color:#a3a8b5!important}
+html:not([data-theme=light]) #app :is(.hub-tabs,.rtabs,.st-tabs) button.on{background:var(--v4-pearl)!important;color:var(--v4-ink)!important;box-shadow:0 8px 20px -10px rgba(255,255,255,.45)!important}
+html:not([data-theme=light]) #app :is(.hub-tabs,.rtabs,.st-tabs) button.on *{color:var(--v4-ink)!important}
+html:not([data-theme=light]) #app :is(.hub-tabs,.rtabs,.st-tabs) button .tico{--c1:currentColor!important;--c2:currentColor!important}
+/* floating glass bottom bar, icons only, the open tab sits in a white circle */
+html:not([data-theme=light]) #bnav{left:12px!important;right:12px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;padding:7px!important;border-radius:32px!important;
+  background:rgba(22,24,32,.62)!important;border:1px solid rgba(255,255,255,.12)!important;backdrop-filter:blur(20px) saturate(1.4)!important;-webkit-backdrop-filter:blur(20px) saturate(1.4)!important;
+  box-shadow:0 18px 40px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.10)!important}
+html:not([data-theme=light]) #bnav .bn-pill{display:none!important}
+html:not([data-theme=light]) #bnav>button{min-height:50px!important;padding:0!important;gap:0!important;color:#b4b8c3!important}
+html:not([data-theme=light]) #bnav>button .bn-l{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+html:not([data-theme=light]) #bnav>button .bn-ic{width:46px;height:46px!important;border-radius:50%;transition:background .25s,transform .3s cubic-bezier(.3,1.5,.5,1)!important;--c1:#c3c7d0!important;--c2:#c3c7d0!important;opacity:1!important}
+html:not([data-theme=light]) #bnav>button.on .bn-ic{background:var(--v4-pearl);--c1:var(--v4-ink)!important;--c2:var(--v4-ink)!important;color:var(--v4-ink)!important;transform:none!important;
+  box-shadow:0 8px 20px -8px rgba(255,255,255,.5),inset 0 1px 0 #fff}
+html:not([data-theme=light]) #bnav>button.on .bn-ic *{color:var(--v4-ink)}
+/* the + button: white, above the floating bar */
+html:not([data-theme=light]) #fab{bottom:calc(84px + env(safe-area-inset-bottom))!important;background:var(--v4-pearl)!important;color:var(--v4-ink)!important;
+  box-shadow:0 14px 30px -10px rgba(255,255,255,.4),inset 0 1px 0 #fff!important}
+html:not([data-theme=light]) #app main,html:not([data-theme=light]) #view{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+/* More sheet: glass tiles, white line icons */
+html:not([data-theme=light]) #bnSheet{border-radius:28px 28px 0 0!important;border-top:1px solid rgba(255,255,255,.10)!important;background:rgba(16,18,25,.92)!important;backdrop-filter:blur(20px)!important;-webkit-backdrop-filter:blur(20px)!important}
+html:not([data-theme=light]) #bnSheet .bn-tile{background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,255,255,.09)!important;border-radius:20px!important;color:#f3f4f7!important}
+html:not([data-theme=light]) #bnSheet .bn-tile.on{background:var(--v4-pearl)!important;color:var(--v4-ink)!important}
+html:not([data-theme=light]) #bnSheet .bn-tic{background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.10)!important;box-shadow:none!important;color:#eef0f5!important;--c1:#eef0f5!important;--c2:#eef0f5!important}
+html:not([data-theme=light]) #bnSheet .bn-tile.on .bn-tic{background:rgba(13,15,20,.08)!important;color:var(--v4-ink)!important;--c1:var(--v4-ink)!important;--c2:var(--v4-ink)!important}
+html:not([data-theme=light]) #bnSheet .bn-tile .bn-tl{color:inherit!important}
+html:not([data-theme=light]) input[type=checkbox],html:not([data-theme=light]) input[type=radio]{accent-color:#e9ebf1}
+}
+</style>
 </head>
 <body>
 
@@ -2176,7 +2267,7 @@ html:not([data-theme=light]) .hub-tabs button.on{background:linear-gradient(135d
  addEventListener("error",function(e){if(e&&e.message)push(e.message,e.filename,e.lineno)});
  addEventListener("unhandledrejection",function(e){var r=e&&e.reason;push("Unhandled: "+(r&&(r.message||r)),r&&r.stack&&(String(r.stack).match(/https?:[^\s)]+?\.js/)||[])[0],0)});
  window.__errSend=send})();</script>
-<script src="i18n.js?v=2026-11-27b"></script>
+<script src="i18n.js?v=2026-11-27c"></script>
 <!-- the firm list stays here (trade costs use it); news explanations, the indicator video, the tour video, the Cerebra intro and
      the prop firm prices / codes / translations load only when a page needs them (see need() in the app script) -->
 <script src="propfirms.js"></script>
@@ -3275,6 +3366,9 @@ function v3Tick(){const now=$("#v3Now"),st=$("#v3Sst");if(!now||!st)return;const
   else{const nx=S3.map(x=>[x[0],((x[1]*3600-s)+86400)%86400]).sort((a,b)=>a[1]-b[1])[0];st.innerHTML=`<span class="v3-live off"></span><b>${esc(T("Markets quiet"))}</b><br><span>${esc(T(nx[0]))} ${esc(T("opens in"))} ${dur(nx[1])}</span>`}}
 setInterval(v3Tick,30000);
 /* ===== v3 step 2: prop-account strip · cumulative P&L chart (hover) · P&L calendar of the month · trade price levels ===== */
+/* phone Today hero: big balance of the first prop account, cents in grey */
+function tdBal(){try{const L=limitRows();if(!L.length)return "";const x=L[0],s=x.s,m=money(s.bal,2),k=m.lastIndexOf(".");
+  return `<div class="td-bal"><span class="tb-l" data-notr>${esc(x.a)}</span><span class="tb-v" data-notr>${k>0?m.slice(0,k)+"<small>"+m.slice(k)+"</small>":m}</span><span class="tb-d"><span data-notr class="${cls(s.net)}">${smoney(s.net,0)}</span> <span>since start</span></span></div>`}catch(e){return ""}}
 function v3Prop(){const L=limitRows();if(!L.length)return "";
   return L.slice(0,3).map(x=>{const r=x.r,s=x.s,T=num(r.target),worst=Math.max(x.D>0?x.dl:0,x.M>0?x.dd:0);
     const st=s.broke?["bad","Rule broken"]:worst>=.9?["bad","Stop trading"]:worst>=.7?["warn","Careful"]:["ok","On track"];
@@ -3397,7 +3491,7 @@ function vToday(el){
     $$("[data-td]",el).forEach(b=>b.onclick=()=>{const a=b.dataset.td;if(a==="trade")editTrade(null);else if(a==="planToday"){S._planDate=t;go("plan")}});
     celebrate(B,tHit);return}
   el.innerHTML=`<div class="td">
-   <div class="td-hero"><div><div class="td-hi"><span>${hello}</span>${name?`, <b data-notr>${name}</b>`:""}${isVerified(S.me)?" "+vCheck():""}</div><div class="td-date mut" data-notr>${esc(fmtDate(t))}</div></div>
+   <div class="td-hero"><div><div class="td-hi"><span>${hello}</span>${name?`, <b data-notr>${name}</b>`:""}${isVerified(S.me)?" "+vCheck():""}</div><div class="td-date mut" data-notr>${esc(fmtDate(t))}</div>${tdBal()}</div>
     <div class="td-hr"><div class="td-q">“<span>${esc(q)}</span>” <small>— BROWN ALGO</small></div>${sessStarted()?`<span class="chip ss-on">✅ <span>Session started</span></span>`:`<button class="btn sm pri ss-btn" type="button" data-td="session">🚀 <span>Start my session</span></button>`}<button class="btn sm" type="button" id="tdFocusOn">🎯 <span>Focus mode</span></button></div></div>
    ${onbCard()}
    ${profileNudge()}
@@ -4075,7 +4169,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-27b";window.APP_V=APP_VER;
+const APP_VER="2026-11-27c";window.APP_V=APP_VER;
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
