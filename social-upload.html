@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Upload a video for social media · TRADEVERSITY admin</title>
+<link rel="icon" href="brand/logo-192.png">
+<link rel="stylesheet" href="fonts/fonts.css?v=1">
+<style>
+:root{--tx:#f3f4f7;--mut:#9ea3b0;--edge:rgba(255,255,255,.1);--ok:#5fc28d;--bad:#ef6a5a}
+*{box-sizing:border-box}html,body{margin:0}
+body{min-height:100vh;color:var(--tx);font:15px/1.5 Geist,Inter,system-ui,sans-serif;background:radial-gradient(80% 45% at 0% 0%,rgba(46,72,170,.4),transparent 62%),radial-gradient(60% 38% at 100% 4%,rgba(178,40,58,.24),transparent 60%),#07080c}
+main{max-width:520px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:22px;margin:0 0 4px}p{color:#cfd2da}.mut{color:var(--mut);font-size:13px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));border:1px solid var(--edge);border-radius:20px;padding:16px;margin:12px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;padding:11px 18px;font:inherit;font-weight:650;cursor:pointer;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--tx);text-decoration:none}
+.btn.pri{background:linear-gradient(180deg,#fff,#e6e8ee);color:#0d0f14;border-color:transparent}
+.btn:disabled{opacity:.5;cursor:default}
+.drop{display:block;border:1.5px dashed rgba(255,255,255,.25);border-radius:18px;padding:26px 14px;text-align:center;cursor:pointer}
+.drop.on{border-color:#e8cfa5;background:rgba(232,207,165,.06)}
+.bar{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin:10px 0}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#b8935f,#f0d9b0);transition:width .2s}
+.link{word-break:break-all;font:13px "Geist Mono",ui-monospace,monospace;background:rgba(0,0,0,.3);border-radius:10px;padding:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+ul{list-style:none;padding:0;margin:0}li{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px}
+.err{color:var(--bad)}.ok{color:var(--ok)}
+</style>
+</head>
+<body>
+<main>
+ <h1>Upload for social media</h1>
+ <p class="mut">Admins only. The file gets a public link that Metricool downloads to post it. Max 50 MB · mp4, mov, webm, jpg, png, webp. Files are deleted automatically after 14 days.</p>
+ <div id="gate" class="card">Checking your admin login…</div>
+ <div id="up" hidden>
+  <div class="card">
+   <label class="drop" id="drop"><input id="file" type="file" accept="video/mp4,video/quicktime,video/webm,image/jpeg,image/png,image/webp" hidden>
+    <b>Choose a video or photo</b><br><span class="mut">or drop it here</span></label>
+   <div id="prog" hidden><div class="mut" id="pname"></div><div class="bar"><i id="pbar"></i></div><div class="mut" id="pst"></div></div>
+   <div id="done" hidden><p class="ok"><b>Uploaded.</b></p><div class="link" id="plink"></div>
+    <div class="row" style="margin-top:10px"><button class="btn pri" id="send" type="button" hidden>Use it in my post</button><button class="btn" id="copy" type="button">Copy link</button></div>
+    <p class="mut" id="sent"></p></div>
+  </div>
+  <div class="card"><b>Recent uploads</b><ul id="list"><li class="mut">Loading…</li></ul></div>
+ </div>
+</main>
+<script src="vendor/supabase.js" integrity="sha384-A97u3Qnt9GZHURO9YJZRe7VQgGUeFzcv6I1oIGnUTxQrCxnpQMwR0/G8F2zt9abZ" crossorigin="anonymous"></script>
+<script>
+(function(){
+if(window.top!==window.self){document.body.innerHTML="";return}
+var URL0="https://szovzzkukzuytkzieuae.supabase.co",KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6b3Z6emt1a3p1eXRremlldWFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ3ODIyMTgsImV4cCI6MjExMDM1ODIxOH0.hEcb4PhOIrKOZiwvMG6YQQHdR2zr1AhHOHmWeCSKJG0";
+var BUCKET="social",MAX=52428800,KEEP_DAYS=14,TYPES=["video/mp4","video/quicktime","video/webm","image/jpeg","image/png","image/webp"];
+var sb=window.supabase.createClient(URL0,KEY),$=function(id){return document.getElementById(id)},token=null,lastUrl="";
+/* the command center that opened this window gets the link back (only to claude.ai / claudeusercontent pages) */
+var opener=window.opener,openerOk=!!opener;
+function pub(path){return URL0+"/storage/v1/object/public/"+BUCKET+"/"+path.split("/").map(encodeURIComponent).join("/")}
+function gate(html){$("gate").innerHTML=html;$("gate").hidden=false;$("up").hidden=true}
+async function start(){
+  var s=await sb.auth.getSession(),ses=s&&s.data&&s.data.session;
+  if(!ses){gate('You are not logged in here. <a class="btn" href="index.html" target="_blank" rel="noopener" style="margin-top:8px">Log in to TRADEVERSITY</a><p class="mut">Log in as admin (with your 6-digit code), then come back and reload this page.</p>');return}
+  var lv=await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+  if(!lv.data||lv.data.currentLevel!=="aal2"){gate('Your 6-digit code is needed. Open the app, go to Admin and enter the code, then reload this page. <a class="btn" href="index.html#admin" target="_blank" rel="noopener" style="margin-top:8px">Open Admin</a>');return}
+  var me=await sb.from("profiles").select("role").eq("id",ses.user.id).maybeSingle();
+  if(!me.data||me.data.role!=="admin"){gate('Only TRADEVERSITY admins can upload here.');return}
+  token=ses.access_token;$("gate").hidden=true;$("up").hidden=false;list(true)}
+async function list(clean){
+  var r=await sb.storage.from(BUCKET).list("",{limit:100,sortBy:{column:"created_at",order:"desc"}});
+  if(r.error){$("list").innerHTML='<li class="err">'+(String(r.error.message).indexOf("not found")>=0?"The upload folder isn't set up yet: run social_uploads_2026-11-27.sql in Supabase.":esc(r.error.message))+'</li>';return}
+  var files=(r.data||[]).filter(function(f){return f.id}),old=files.filter(function(f){return Date.now()-new Date(f.created_at).getTime()>KEEP_DAYS*864e5});
+  if(clean&&old.length){await sb.storage.from(BUCKET).remove(old.map(function(f){return f.name}));files=files.filter(function(f){return old.indexOf(f)<0})}
+  $("list").innerHTML=files.slice(0,20).map(function(f){var mb=((f.metadata&&f.metadata.size)||0)/1048576;
+    return '<li><span>'+esc(f.name.replace(/^\d+-/,""))+' <span class="mut">· '+mb.toFixed(1)+' MB · '+new Date(f.created_at).toLocaleDateString()+'</span></span><span class="row"><button class="btn" data-use="'+esc(f.name)+'" type="button">'+(openerOk?"Use":"Copy")+'</button><button class="btn" data-del="'+esc(f.name)+'" type="button" aria-label="Delete">✕</button></span></li>'}).join("")||'<li class="mut">No upload yet.</li>';
+  [].forEach.call(document.querySelectorAll("[data-use]"),function(b){b.onclick=function(){use(pub(b.dataset.use))}});
+  [].forEach.call(document.querySelectorAll("[data-del]"),function(b){b.onclick=async function(){b.disabled=true;await sb.storage.from(BUCKET).remove([b.dataset.del]);list(false)}})}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function use(u){lastUrl=u;if(openerOk){try{opener.postMessage({type:"tv-social-upload",url:u},"*");$("sent").textContent="Sent to the command center. You can close this window.";$("sent").className="ok";return}catch(e){openerOk=false}}
+  copy(u)}
+function copy(u){(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){$("sent").textContent="Link copied: paste it in the post's link box.";$("sent").className="ok"},function(){$("sent").textContent="Select the link above and copy it.";$("sent").className="mut"})}
+function upload(f){
+  if(!f)return;if(TYPES.indexOf(f.type)<0){alertMsg("This file type isn't accepted. Use mp4, mov, webm, jpg, png or webp.");return}
+  if(f.size>MAX){alertMsg("This file is "+(f.size/1048576).toFixed(0)+" MB: the limit is 50 MB. Export it smaller (1080p, shorter) and try again.");return}
+  var name=Date.now()+"-"+f.name.toLowerCase().replace(/[^a-z0-9._-]+/g,"-").slice(-60);
+  $("prog").hidden=false;$("done").hidden=true;$("pname").textContent=f.name;$("pbar").style.width="0";$("pst").textContent="Uploading…";
+  var x=new XMLHttpRequest();x.open("POST",URL0+"/storage/v1/object/"+BUCKET+"/"+encodeURIComponent(name));
+  x.setRequestHeader("Authorization","Bearer "+token);x.setRequestHeader("apikey",KEY);x.setRequestHeader("x-upsert","false");x.setRequestHeader("Content-Type",f.type);
+  x.upload.onprogress=function(e){if(e.lengthComputable){var p=Math.round(e.loaded/e.total*100);$("pbar").style.width=p+"%";$("pst").textContent=p+"% · "+(e.loaded/1048576).toFixed(1)+" / "+(e.total/1048576).toFixed(1)+" MB"}};
+  x.onload=function(){if(x.status>=200&&x.status<300){var u=pub(name);lastUrl=u;$("pst").textContent="Done";$("done").hidden=false;$("plink").textContent=u;$("send").hidden=!openerOk;list(false);if(openerOk)use(u)}
+    else{var m="";try{m=JSON.parse(x.responseText).message}catch(e){}alertMsg("Upload refused"+(m?": "+m:" (HTTP "+x.status+")")+(x.status===403?". Log in again as admin with your 6-digit code.":""))}};
+  x.onerror=function(){alertMsg("The upload stopped (connection). Try again.")};x.send(f)}
+function alertMsg(m){$("prog").hidden=false;$("pst").innerHTML='<span class="err">'+esc(m)+'</span>'}
+$("file").onchange=function(){upload(this.files[0]);this.value=""};
+var d=$("drop");["dragover","dragenter"].forEach(function(e){d.addEventListener(e,function(ev){ev.preventDefault();d.classList.add("on")})});
+["dragleave","drop"].forEach(function(e){d.addEventListener(e,function(ev){ev.preventDefault();d.classList.remove("on")})});
+d.addEventListener("drop",function(ev){var f=ev.dataTransfer&&ev.dataTransfer.files[0];upload(f)});
+$("send").onclick=function(){use(lastUrl)};$("copy").onclick=function(){copy(lastUrl)};
+sb.auth.onAuthStateChange(function(ev,ses){if(ses)token=ses.access_token});
+start().catch(function(e){gate('<span class="err">'+esc(e.message||e)+'</span>')});
+})();
+</script>
+</body>
+</html>
