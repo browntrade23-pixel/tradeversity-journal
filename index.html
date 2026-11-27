@@ -2176,7 +2176,7 @@ html:not([data-theme=light]) .hub-tabs button.on{background:linear-gradient(135d
  addEventListener("error",function(e){if(e&&e.message)push(e.message,e.filename,e.lineno)});
  addEventListener("unhandledrejection",function(e){var r=e&&e.reason;push("Unhandled: "+(r&&(r.message||r)),r&&r.stack&&(String(r.stack).match(/https?:[^\s)]+?\.js/)||[])[0],0)});
  window.__errSend=send})();</script>
-<script src="i18n.js?v=2026-11-27a"></script>
+<script src="i18n.js?v=2026-11-27b"></script>
 <!-- the firm list stays here (trade costs use it); news explanations, the indicator video, the tour video, the Cerebra intro and
      the prop firm prices / codes / translations load only when a page needs them (see need() in the app script) -->
 <script src="propfirms.js"></script>
@@ -3614,7 +3614,8 @@ const MFA={
 };
 const trE=k=>esc(I18N.t(k));
 function mfaGate(){return new Promise(async res=>{
-  const lv=await MFA.level();if(lv.currentLevel==="aal2"||lv.nextLevel!=="aal2"){res(true);return}
+  const lv=await MFA.level();S._needMfa=lv.currentLevel!=="aal2";if(lv.currentLevel==="aal2"||lv.nextLevel!=="aal2"){res(true);return}
+  /* no authenticator yet: let them in, Admin shows the set-up card (admin rights need the code for every admin) */
   const f=(await MFA.factors()).find(x=>x.status==="verified");if(!f){res(true);return}
   const w=document.createElement("div");w.className="mfa-gate";
   w.innerHTML=`<div class="card mfa-box"><h2>🔐 ${trE("Two-step login")}</h2><p class="mut">${trE("Open your authenticator app and type the 6-digit code for TRADEVERSITY.")}</p>
@@ -4074,7 +4075,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-27a";window.APP_V=APP_VER;
+const APP_VER="2026-11-27b";window.APP_V=APP_VER;
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;

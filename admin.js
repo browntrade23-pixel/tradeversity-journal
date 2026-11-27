@@ -86,7 +86,16 @@ function affCard(C){if(!C)return "";const now=Date.now(),inD=(c,d)=>now-new Date
    <div class="tw"><table class="t"><tr><th>Prop firm</th><th>Link clicks · 7 days</th><th>30 days</th><th>90 days</th><th>Code copied · 30 days</th><th>Coupon applied · 30 days</th><th>Clicked from</th></tr>
    ${per.map(p=>`<tr><td><b data-notr>${esc(p.name)}</b></td><td class="mono"><b>${p.l7}</b></td><td class="mono">${p.l30}</td><td class="mono">${p.l90}</td><td class="mono">${p.c30}</td><td class="mono">${p.a30}</td><td style="font-size:12px">${p.top.map(([k,v])=>`<span data-notr>${esc(I18N.t(k))}</span> <span class="mut">${v}</span>`).join(" · ")||"—"}</td></tr>`).join("")}</table></div>
    <p class="mut" style="font-size:12px;margin:8px 0 0">${I18N.t("Counts clicks on your affiliate links and BROWN23 buttons (login page, About, Prop firm tracker). A click is not a purchase: check sales in each firm's affiliate dashboard.")}</p></div>`}
-async function vAdmin(el){el.innerHTML='<div class="empty">Loading students…</div>';
+async function vAdmin(el){
+  /* every admin needs the two-step login: without it the database gives no admin rights, so ask for it first */
+  if(S._needMfa){const lv=await MFA.level();if(lv.currentLevel==="aal2")S._needMfa=false}
+  if(S._needMfa){el.innerHTML=`<div class="card" style="max-width:560px;margin:18px auto"><div id="admMfa"></div>
+      <p class="mut" style="font-size:12.5px;margin:12px 0 0"><span>Two-step login is required for every admin. Set it up above with an authenticator app, then open Admin.</span></p>
+      <button class="btn pri" type="button" id="admMfaGo" style="margin-top:12px">🔐 <span>Open Admin</span></button></div>`;
+    mfaCard(el.querySelector("#admMfa"));
+    el.querySelector("#admMfaGo").onclick=async()=>{const lv=await MFA.level();if(lv.currentLevel==="aal2"){S._needMfa=false;vAdmin(el)}else toast(I18N.t("Set up the two-step login first."))};
+    return}
+  el.innerHTML='<div class="empty">Loading students…</div>';
   let profs,trades,plans;try{[profs,trades,plans]=await Promise.all([API.listProfiles(),API.allTradesLite(),API.allPlans()])}catch(e){el.innerHTML=`<div class="card empty">Couldn't load: ${esc(e.message||e)}</div>`;return}
   let clicks=null;try{clicks=API.affClicks?await API.affClicks():null}catch(e){clicks=null}
   S._rqReady=profs.filter(p=>p.role!=="admin"&&p.status==="pending"&&p.tgOk&&p.emailOk!==false).map(p=>({id:p.id,name:p.name}));setTimeout(ntfRefresh,0);
