@@ -172,6 +172,8 @@ var s=null;try{s=localStorage.getItem("tvj_lang")}catch(e){}var nav=(navigator.l
 var h=new URLSearchParams(location.search).get("lang");
 set(["en","fr","ar"].indexOf(h)>=0?h:["en","fr","ar"].indexOf(s)>=0?s:(["fr","ar"].indexOf(nav)>=0?nav:"en"));
 document.getElementById("yr").textContent=new Date().getFullYear();
+/* ?topic=course (e.g. the Mentorship button on the landing page) pre-selects the topic */
+var tp=new URLSearchParams(location.search).get("topic");if(["account","telegram","course","app","journal","other"].indexOf(tp)>=0)f.topic.value=tp;
 })();
 </script>
 </body>

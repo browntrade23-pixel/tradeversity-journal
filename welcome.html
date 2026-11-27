@@ -109,6 +109,16 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
 #join .cta,#results .cta{justify-content:center}
 .foot{position:relative;z-index:5;text-align:center;padding:30px 20px 40px;color:#6b7891;font-size:13px}
 .foot a{color:var(--mut);margin:0 8px}
+/* mentorship card */
+.mcard{width:min(440px,100%);padding:22px;border-radius:24px;background:linear-gradient(160deg,rgba(20,24,40,.82),rgba(8,10,16,.88));border:1px solid rgba(245,185,66,.32);box-shadow:0 40px 90px -30px rgba(245,185,66,.35),0 0 0 1px rgba(255,255,255,.04) inset;backdrop-filter:blur(10px)}
+.mcard .mh{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.mcard .mh img{width:54px;height:54px;border-radius:50%;flex:none;box-shadow:0 0 22px rgba(124,139,255,.55)}
+.mcard .mh b{display:block;font-size:17px;font-weight:800}.mcard .mh small{color:var(--mut);font-size:12.5px}
+.msteps{list-style:none;display:grid;gap:10px;counter-reset:ms}
+.msteps li{counter-increment:ms;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.msteps li:before{content:counter(ms);display:grid;place-items:center;width:34px;height:34px;border-radius:10px;font-weight:900;color:#1b1305;background:linear-gradient(180deg,var(--g2),var(--g))}
+.msteps b{display:block;font-size:15px}.msteps span{display:block;color:#c9cede;font-size:13.5px;line-height:1.45;margin-top:2px}
+.mnote{margin-top:16px;font-size:12.5px;line-height:1.55;color:var(--mut);max-width:520px}
 /* phones */
 @media(max-width:860px){
   section{min-height:auto;padding:96px 20px 60px;align-items:flex-end}
@@ -149,11 +159,34 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   <div class="kick reveal" data-t="hero_k">by Brown Algo · ZN Trading</div>
   <h1 class="reveal" data-t="hero_h"><em>TRADEVERSITY</em></h1>
   <p class="lead reveal" data-t="hero_p">The trading journal built for prop firm traders. Journal every trade, know your real numbers, never break a rule, and get funded.</p>
-  <div class="cta reveal"><a class="btn pri" href="index.html?auth=signup" data-t="join2">Join free</a><a class="btn" href="index.html?auth=login" data-t="login">Log in</a></div>
+  <div class="cta reveal"><a class="btn pri" href="index.html?auth=signup" data-t="join2">Join free</a><a class="btn" href="#mentorship" data-t="m_go">🎓 The Mentorship</a><a class="btn" href="index.html?auth=login" data-t="login">Log in</a></div>
   <div class="stats3 reveal"><div><b data-t="yrs_n">~7</b><span data-t="yrs">years in the markets</span></div><div><b>350+</b><span data-t="stu">students</span></div><div><b>3</b><span data-t="langs">languages · EN FR AR</span></div></div>
 </div></div><div class="scroll" data-t="scroll">SCROLL</div></section>
 
-<section id="journal" data-shape="book"><div class="wrap"><div class="txt">
+<section id="mentorship" data-shape="trophy"><div class="wrap"><div class="txt">
+  <div class="kick reveal" data-t="m_k">TRADEVERSITY Mentorship</div>
+  <h2 class="reveal" data-t="m_h">Learn the system. <em>Trade it with discipline.</em></h2>
+  <p class="lead reveal" data-t="m_p">The Tradeversity mentorship by Brown Algo and ZN Trading: one precise scalping system on futures, a clear daily bias, a written plan, strict risk and an honest journal, taught step by step.</p>
+  <ul class="feats reveal">
+    <li><i>🎯</i><span data-t="m_1">A precise scalping system, explained step by step</span></li>
+    <li><i>🧭</i><span data-t="m_2">A daily bias and a written plan before every session</span></li>
+    <li><i>📝</i><span data-t="m_3">Assignments reviewed by your mentor, with feedback</span></li>
+    <li><i>🛡️</i><span data-t="m_4">Lessons in the Cerebra by TDV app on PC and Android, with protected videos</span></li>
+    <li><i>📒</i><span data-t="m_5">The TRADEVERSITY trading journal to track every trade</span></li>
+  </ul>
+  <div class="cta reveal"><a class="btn pri" href="support.html?topic=course#form" data-t="m_ask">Ask about the Mentorship</a><a class="btn" href="#results" data-t="m_res">See student results</a></div>
+  <p class="mnote reveal" data-t="m_note">PC (Windows) and Android only for now, not iPhone or iPad. Trading is risky: this is education, not financial advice, and results are never guaranteed.</p>
+  </div>
+  <div class="shot reveal"><div class="mcard">
+    <div class="mh"><img src="brand/cerebra-orb-384.png" alt="" width="54" height="54" loading="lazy"><div><b data-t="mc_t">How the mentorship works</b><small data-t="mc_s">by Brown Algo · ZN Trading</small></div></div>
+    <ol class="msteps">
+      <li><div><b data-t="mc_1">Learn</b><span data-t="mc_1d">Lessons step by step in Cerebra by TDV</span></div></li>
+      <li><div><b data-t="mc_2">Plan</b><span data-t="mc_2d">Daily bias, key levels and your max loss, written before you trade</span></div></li>
+      <li><div><b data-t="mc_3">Trade</b><span data-t="mc_3d">The system with strict risk and your prop firm rules</span></div></li>
+      <li><div><b data-t="mc_4">Review</b><span data-t="mc_4d">Your journal, assignments and your mentor's feedback</span></div></li>
+    </ol></div></div></div></section>
+
+<section id="journal" class="r" data-shape="book"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="j_k">Trading journal</div>
   <h2 class="reveal" data-t="j_h">Every trade. <em>In your pocket.</em></h2>
   <p class="lead reveal" data-t="j_p">Log a trade in seconds: P&amp;L, commissions of your prop firm, emotions, rating and your chart screenshot.</p>
@@ -165,7 +198,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   </ul></div>
   <div class="shot reveal"><div class="phone"><div data-bg="landing/trade.webp"></div></div></div></div></section>
 
-<section id="stats" class="r" data-shape="heatmap"><div class="wrap"><div class="txt">
+<section id="stats" data-shape="heatmap"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="s_k">Statistics</div>
   <h2 class="reveal" data-t="s_h">Know your <em>real numbers.</em></h2>
   <p class="lead reveal" data-t="s_p">Your P&amp;L calendar, win rate, profit factor, expectancy, streaks, best and worst day. All calculated for you.</p>
@@ -177,7 +210,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   </ul></div>
   <div class="shot reveal"><div class="phone"><div data-bg="landing/stats.webp"></div></div></div></div></section>
 
-<section id="rules" data-shape="shield"><div class="wrap"><div class="txt">
+<section id="rules" class="r" data-shape="shield"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="r_k">Prop firm rules</div>
   <h2 class="reveal" data-t="r_h">Pick your firm. <em>The rules fill in.</em></h2>
   <p class="lead reveal" data-t="r_p">Choose futures or CFD, your prop firm, plan and size. Profit target, daily loss and max drawdown appear by themselves.</p>
@@ -189,7 +222,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   </ul></div>
   <div class="shot reveal"><div class="phone"><div data-bg="landing/rules-auto.webp"></div></div></div></div></section>
 
-<section id="firms" class="r" data-shape="orbit"><div class="wrap"><div class="txt">
+<section id="firms" data-shape="orbit"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="f_k">Prop firm tracker</div>
   <h2 class="reveal" data-t="f_h">45 prop firms. <em>No secrets.</em></h2>
   <p class="lead reveal" data-t="f_p">Rules and hidden rules of every futures and CFD prop firm, prices for every size, payouts and Algeria availability.</p>
@@ -201,7 +234,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   </ul></div>
   <div class="shot reveal"><div class="phone"><div data-bg="landing/propfirms.webp"></div></div></div></div></section>
 
-<section id="news" data-shape="wave"><div class="wrap"><div class="txt">
+<section id="news" class="r" data-shape="wave"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="n_k">News alerts</div>
   <h2 class="reveal" data-t="n_h">Red news? <em>You know first.</em></h2>
   <p class="lead reveal" data-t="n_p">Every red and orange folder USD news with a countdown in New York and Algeria time, and what each news means.</p>
@@ -213,7 +246,7 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
   </ul></div>
   <div class="shot reveal"><div class="phone"><div data-bg="landing/news.webp"></div></div></div></div></section>
 
-<section id="tools" class="r" data-shape="balance"><div class="wrap"><div class="txt">
+<section id="tools" data-shape="balance"><div class="wrap"><div class="txt">
   <div class="kick reveal" data-t="t_k">Trading tools</div>
   <h2 class="reveal" data-t="t_h">Size every trade <em>right.</em></h2>
   <p class="lead reveal" data-t="t_p">Contracts or lots for your stop, on futures or CFD. Know if you pass the consistency rule before you trade.</p>
@@ -245,7 +278,8 @@ html[dir=rtl] .strip .tr{animation-direction:reverse}
 <script>
 /* ---------- texts: English / Français / العربية ---------- */
 const T={
-fr:{login:"Se connecter",join:"Rejoindre",join2:"Rejoindre gratuitement",scroll:"DÉFILER",hero_k:"by Brown Algo · ZN Trading",hero_h:"<em>TRADEVERSITY</em>",hero_p:"Le journal de trading conçu pour les traders de prop firms. Notez chaque trade, connaissez vos vrais chiffres, ne cassez jamais une règle et soyez financé.",yrs_n:"~7",yrs:"ans sur les marchés",stu:"étudiants",langs:"langues · EN FR AR",
+fr:{m_go:"🎓 Le Mentorat",m_k:"Mentorat TRADEVERSITY",m_h:"Apprenez le système. <em>Tradez-le avec discipline.</em>",m_p:"Le mentorat Tradeversity par Brown Algo et ZN Trading : un système de scalping précis sur les futures, un biais journalier clair, un plan écrit, un risque strict et un journal honnête, enseignés étape par étape.",m_1:"Un système de scalping précis, expliqué étape par étape",m_2:"Un biais journalier et un plan écrit avant chaque session",m_3:"Des exercices corrigés par votre mentor, avec retour",m_4:"Les leçons dans l'application Cerebra by TDV sur PC et Android, vidéos protégées",m_5:"Le journal de trading TRADEVERSITY pour suivre chaque trade",m_ask:"Se renseigner sur le Mentorat",m_res:"Voir les résultats des étudiants",m_note:"PC (Windows) et Android uniquement pour l'instant, pas iPhone ni iPad. Le trading est risqué : c'est de la formation, pas un conseil financier, et les résultats ne sont jamais garantis.",mc_t:"Comment fonctionne le mentorat",mc_s:"par Brown Algo · ZN Trading",mc_1:"Apprendre",mc_1d:"Les leçons étape par étape dans Cerebra by TDV",mc_2:"Planifier",mc_2d:"Biais journalier, niveaux clés et perte max, écrits avant de trader",mc_3:"Trader",mc_3d:"Le système avec un risque strict et les règles de votre prop firm",mc_4:"Analyser",mc_4d:"Votre journal, vos exercices et le retour de votre mentor",
+login:"Se connecter",join:"Rejoindre",join2:"Rejoindre gratuitement",scroll:"DÉFILER",hero_k:"by Brown Algo · ZN Trading",hero_h:"<em>TRADEVERSITY</em>",hero_p:"Le journal de trading conçu pour les traders de prop firms. Notez chaque trade, connaissez vos vrais chiffres, ne cassez jamais une règle et soyez financé.",yrs_n:"~7",yrs:"ans sur les marchés",stu:"étudiants",langs:"langues · EN FR AR",
 j_k:"Journal de trading",j_h:"Chaque trade. <em>Dans votre poche.</em>",j_p:"Ajoutez un trade en quelques secondes : P&L, commissions de votre prop firm, émotions, note et capture du graphique.",j_1:"Captures de graphique et notes sur chaque trade",j_2:"Commissions de votre prop firm calculées, ou « déjà incluses »",j_3:"Modifiez n'importe quel trade · un jour sans trade compte pour 0 $",j_4:"Contrats pour les futures, taille de lot pour CFD et comptes perso",
 s_k:"Statistiques",s_h:"Connaissez vos <em>vrais chiffres.</em>",s_p:"Calendrier P&L, win rate, profit factor, espérance, séries, meilleur et pire jour. Tout est calculé pour vous.",s_1:"Importez le CSV de n'importe quelle prop firm : Tradovate, NinjaTrader, MT5",s_2:"Prop firm, plateforme et commissions détectées",s_3:"Jours verts et rouges en un coup d'œil",s_4:"Partagez vos résultats par lien ou QR code, en lecture seule",
 r_k:"Règles des prop firms",r_h:"Choisissez votre firme. <em>Les règles se remplissent.</em>",r_p:"Futures ou CFD, votre prop firm, le plan et la taille. Objectif, perte journalière et drawdown max apparaissent tout seuls.",r_1:"Drawdown trailing ou fin de journée réglé automatiquement",r_2:"Évaluation ou Funded : les bonnes règles pour chacun",r_3:"Jauges en direct : objectif, perte journalière, drawdown max",r_4:"Alerte Telegram à 80 % et 100 % de votre perte journalière",
@@ -254,7 +288,8 @@ n_k:"Alertes news",n_h:"News rouge ? <em>Vous le savez en premier.</em>",n_p:"Ch
 t_k:"Outils de trading",t_h:"La bonne taille <em>à chaque trade.</em>",t_p:"Contrats ou lots selon votre stop, en futures ou CFD. Sachez si vous passez la règle de consistance avant de trader.",t_1:"Calculateur de risque : NQ, ES, YM, GC, or, forex, indices, BTC",t_2:"Calculateur de règle de consistance, rempli depuis votre journal",t_3:"Plan de demain : biais, niveaux clés, perte max",t_4:"Indicateur ICT gratuit pour TradingView",
 a_k:"À propos de nous",a_h:"De vrais étudiants. <em>De vrais résultats.</em>",a_p:"Un mentorat de trading fondé par Brown Algo et ZNtrading : un système de scalping précis, un biais journalier clair, un plan écrit, un risque strict et un journal honnête.",res_btn:"Voir tous les résultats sur Telegram",
 z_k:"Commencez aujourd'hui",z_h:"Journal. Plan. <em>Financé.</em>",z_p:"Gratuit pour les étudiants Tradeversity. Créez votre compte, vérifiez votre e-mail et Telegram, et obtenez l'accès.",founder:"Fondateur"},
-ar:{login:"تسجيل الدخول",join:"انضم",join2:"انضم مجاناً",scroll:"مرّر",hero_k:"by Brown Algo · ZN Trading",hero_h:"<em>TRADEVERSITY</em>",hero_p:"يوميات التداول المصممة لمتداولي شركات التمويل. سجّل كل صفقة، اعرف أرقامك الحقيقية، لا تكسر أي قاعدة، واحصل على التمويل.",yrs_n:"~7",yrs:"سنوات في الأسواق",stu:"طالب",langs:"لغات · EN FR AR",
+ar:{m_go:"🎓 البرنامج التدريبي",m_k:"برنامج TRADEVERSITY التدريبي",m_h:"تعلّم النظام. <em>وتداوله بانضباط.</em>",m_p:"برنامج Tradeversity التدريبي مع Brown Algo وZN Trading: نظام سكالبينغ دقيق على العقود الآجلة، اتجاه يومي واضح، خطة مكتوبة، مخاطرة صارمة ويوميات صادقة، خطوة بخطوة.",m_1:"نظام سكالبينغ دقيق، مشروح خطوة بخطوة",m_2:"اتجاه يومي وخطة مكتوبة قبل كل جلسة",m_3:"تمارين يراجعها مدرّبك مع ملاحظاته",m_4:"الدروس في تطبيق Cerebra by TDV على الكمبيوتر وأندرويد، بفيديوهات محمية",m_5:"يوميات التداول TRADEVERSITY لمتابعة كل صفقة",m_ask:"استفسر عن البرنامج التدريبي",m_res:"شاهد نتائج الطلاب",m_note:"على الكمبيوتر (ويندوز) وأندرويد فقط حالياً، وليس على آيفون أو آيباد. التداول محفوف بالمخاطر: هذا تعليم وليس نصيحة مالية، والنتائج غير مضمونة أبداً.",mc_t:"كيف يعمل البرنامج التدريبي",mc_s:"مع Brown Algo · ZN Trading",mc_1:"تعلّم",mc_1d:"الدروس خطوة بخطوة في Cerebra by TDV",mc_2:"خطّط",mc_2d:"الاتجاه اليومي والمستويات المهمة وأقصى خسارة، مكتوبة قبل التداول",mc_3:"تداول",mc_3d:"النظام بمخاطرة صارمة وقواعد شركة التمويل",mc_4:"راجع",mc_4d:"يومياتك وتمارينك وملاحظات مدرّبك",
+login:"تسجيل الدخول",join:"انضم",join2:"انضم مجاناً",scroll:"مرّر",hero_k:"by Brown Algo · ZN Trading",hero_h:"<em>TRADEVERSITY</em>",hero_p:"يوميات التداول المصممة لمتداولي شركات التمويل. سجّل كل صفقة، اعرف أرقامك الحقيقية، لا تكسر أي قاعدة، واحصل على التمويل.",yrs_n:"~7",yrs:"سنوات في الأسواق",stu:"طالب",langs:"لغات · EN FR AR",
 j_k:"يوميات التداول",j_h:"كل صفقة. <em>في جيبك.</em>",j_p:"سجّل صفقة في ثوانٍ: الربح والخسارة، عمولات شركة التمويل، المشاعر، التقييم وصورة الشارت.",j_1:"صور الشارت والملاحظات لكل صفقة",j_2:"عمولات شركة التمويل تُحسب تلقائياً، أو «مشمولة مسبقاً»",j_3:"عدّل أي صفقة في أي وقت · يوم بلا تداول يُحسب 0$",j_4:"عقود للعقود الآجلة، وحجم اللوت لحسابات CFD والحسابات الشخصية",
 s_k:"الإحصائيات",s_h:"اعرف <em>أرقامك الحقيقية.</em>",s_p:"تقويم الأرباح، نسبة النجاح، معامل الربح، التوقع، السلاسل، أفضل وأسوأ يوم. كل شيء يُحسب لك.",s_1:"استورد ملف CSV من أي شركة تمويل: Tradovate وNinjaTrader وMT5",s_2:"اكتشاف شركة التمويل والمنصة والعمولات",s_3:"الأيام الخضراء والحمراء في لمحة على التقويم",s_4:"شارك نتائجك برابط أو رمز QR، للعرض فقط",
 r_k:"قواعد شركات التمويل",r_h:"اختر شركتك. <em>القواعد تُملأ وحدها.</em>",r_p:"اختر العقود الآجلة أو CFD، شركة التمويل، الخطة والحجم. هدف الربح وحد الخسارة اليومي وأقصى سحب تظهر تلقائياً.",r_1:"نوع السحب (متحرك أو نهاية اليوم) يُضبط تلقائياً",r_2:"تقييم أو حساب ممول: القواعد الصحيحة لكل منهما",r_3:"مؤشرات مباشرة: هدف الربح، حد الخسارة اليومي، أقصى سحب",r_4:"تنبيه تيليغرام عند 80% و100% من خسارتك اليومية",
