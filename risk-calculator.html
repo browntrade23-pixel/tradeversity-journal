@@ -26,42 +26,6 @@
 {"@type":"Question","name":"What is the dollar value per point of NQ, ES, YM and Gold futures?","acceptedAnswer":{"@type":"Answer","text":"NQ $20, MNQ $2, ES $50, MES $5, YM $5, MYM $0.50, GC $100 and MGC $10 per point (CME standard contracts)."}},
 {"@type":"Question","name":"How much should I risk per trade on a prop firm account?","acceptedAnswer":{"@type":"Answer","text":"Many prop traders risk a small, fixed part of the daily loss limit or drawdown on each trade, often 0.25% to 1% of the account. Pick an amount that lets you survive several losing trades in a row without breaking a rule."}},
 {"@type":"Question","name":"Does this calculator work for CFD lots (XAUUSD, NAS100, EURUSD)?","acceptedAnswer":{"@type":"Answer","text":"Yes. Switch to CFD lots: the calculator uses the dollar value of one pip for 1.00 lot. Brokers differ, so you can change that value to match your broker's contract specifications."}}]}]</script>
-</head>
-<body>
-<main class="wrap">
- <div class="top"><a class="brand" href="welcome.html"><i></i>TRADEVERSITY</a>
-  <div class="langs" role="group" aria-label="Language"><button type="button" data-l="en">EN</button><button type="button" data-l="fr">FR</button><button type="button" data-l="ar">ع</button></div></div>
- <nav class="crumbs" aria-label="Breadcrumb"><a href="welcome.html">TRADEVERSITY</a> › <span data-t="crumb">Free tools</span></nav>
- <nav class="tnav" aria-label="Free tools"><a class="on" href="risk-calculator.html" data-t="n1">Risk calculator</a><a href="consistency-rule.html" data-t="n2">Consistency rule</a><a href="prop-firm-coupons.html" data-t="n3">Prop firm coupons</a></nav>
-
- <h1 data-t="h1">Free futures & CFD risk calculator</h1>
- <p class="lead" data-t="lead">How many contracts or lots can I take for this stop? Enter your account, your risk and your stop: the calculator uses each market's dollar value per point, so you never risk more than you planned. Free, no login.</p>
-
- <div class="seg" id="mode" style="margin-bottom:12px"><button type="button" data-m="fut" class="on" data-t="m_fut">Futures contracts</button><button type="button" data-m="cfd" data-t="m_cfd">CFD lots</button></div>
- <div class="cols">
-  <div class="card grid" id="form"></div>
-  <div id="out"></div>
- </div>
- <div class="card" style="margin-top:14px"><h2 class="h3" id="specT"></h2><div class="tw" id="specs"></div>
-  <p class="mut" style="font-size:12.5px;margin:8px 0 0" id="specN"></p></div>
-
- <section class="prose">
-  <h2 data-t="s1h">How the position size is calculated</h2>
-  <p data-t="s1p">Risk in dollars ÷ (stop size × dollar value per point + fees) = number of contracts. Example: you risk $250 on Nasdaq with a 20-point stop. One MNQ is $2 per point, so 20 points = $40 per contract → 6 MNQ ($240). One NQ is $20 per point, so 20 points = $400: you can't take even 1 NQ.</p>
-  <h2 data-t="s2h">Why prop firm traders need it</h2>
-  <p data-t="s2p">Prop firms close the account when you hit the daily loss limit or the drawdown. Sizing every trade from your stop keeps each loss small and the same size, so one bad trade can't end the evaluation.</p>
- </section>
-
- <h2 data-t="fh">Questions</h2>
- <details class="q"><summary data-t="q1">How many MNQ contracts can I trade with a 20-point stop?</summary><p data-t="a1">One MNQ point is worth $2, so a 20-point stop risks $40 per contract. With $250 of risk you can take 6 MNQ ($240). One NQ is worth $20 per point, so the same stop risks $400 per NQ: too much for $250.</p></details>
- <details class="q"><summary data-t="q2">What is the dollar value per point of NQ, ES, YM and Gold futures?</summary><p data-t="a2">NQ $20, MNQ $2, ES $50, MES $5, YM $5, MYM $0.50, GC $100 and MGC $10 per point (CME standard contracts).</p></details>
- <details class="q"><summary data-t="q3">How much should I risk per trade on a prop firm account?</summary><p data-t="a3">Many prop traders risk a small, fixed part of the daily loss limit or drawdown on each trade, often 0.25% to 1% of the account. Pick an amount that lets you survive several losing trades in a row without breaking a rule.</p></details>
- <details class="q"><summary data-t="q4">Does this calculator work for CFD lots (XAUUSD, NAS100, EURUSD)?</summary><p data-t="a4">Yes. Switch to CFD lots: the calculator uses the dollar value of one pip for 1.00 lot. Brokers differ, so you can change that value to match your broker's contract specifications.</p></details>
-
- <div class="card cta"><div><b data-t="ctah">Track every trade in the free TRADEVERSITY journal</b><p data-t="ctap">Journal, statistics, prop firm rules, news alerts and this calculator saved to your account.</p></div><a class="btn pri" href="index.html" data-t="ctab">Open the free journal</a></div>
- <p class="risk" data-t="risk">Education only, not financial advice. Trading futures and CFDs is risky: you can lose more than you expect. Check your broker's and prop firm's contract specifications.</p>
- <footer><span>© <span id="yr"></span> TRADEVERSITY</span><a href="welcome.html" data-t="home">Home</a><a href="support.html" data-t="help">Help</a><a href="privacy.html" data-t="priv">Privacy policy</a><a href="terms.html" data-t="terms">Terms and conditions</a></footer>
-</main>
 <script>
 window.T={
 fr:{crumb:"Outils gratuits",n1:"Calculateur de risque",n2:"Règle de consistance",n3:"Codes promo prop firms",h1:"Calculateur de risque gratuit futures & CFD",
@@ -104,6 +68,43 @@ spec_fut:"مواصفات العقود الآجلة",spec_cfd:"مواصفات ل�
 th_sym:"الرمز",th_c:"العقد",th_dpp:"$ / نقطة",th_tick:"تيك",th_dpt:"$ / تيك",th_mk:"السوق",th_lot:"1.00 لوت =",th_pip:"بيب",pmove:"حركة سعر",wide4:"الستوب واسع جداً: حتى 0.01 لوت يخاطر بـ"}};
 </script>
 <script src="tools.js?v=2"></script>
+</head>
+<body>
+<main class="wrap">
+ <div class="top"><a class="brand" href="welcome.html"><i></i>TRADEVERSITY</a>
+  <div class="langs" role="group" aria-label="Language"><button type="button" data-l="en">EN</button><button type="button" data-l="fr">FR</button><button type="button" data-l="ar">ع</button></div></div>
+ <nav class="crumbs" aria-label="Breadcrumb"><a href="welcome.html">TRADEVERSITY</a> › <span data-t="crumb">Free tools</span></nav>
+ <nav class="tnav" aria-label="Free tools"><a class="on" href="risk-calculator.html" data-t="n1">Risk calculator</a><a href="consistency-rule.html" data-t="n2">Consistency rule</a><a href="prop-firm-coupons.html" data-t="n3">Prop firm coupons</a></nav>
+
+ <h1 data-t="h1">Free futures & CFD risk calculator</h1>
+ <p class="lead" data-t="lead">How many contracts or lots can I take for this stop? Enter your account, your risk and your stop: the calculator uses each market's dollar value per point, so you never risk more than you planned. Free, no login.</p>
+
+ <div class="seg" id="mode" style="margin-bottom:12px"><button type="button" data-m="fut" class="on" data-t="m_fut">Futures contracts</button><button type="button" data-m="cfd" data-t="m_cfd">CFD lots</button></div>
+ <div class="cols">
+  <div class="card grid" id="form"></div>
+  <div id="out"></div>
+ </div>
+ <div class="card" style="margin-top:14px"><h2 class="h3" id="specT"></h2><div class="tw" id="specs"></div>
+  <p class="mut" style="font-size:12.5px;margin:8px 0 0" id="specN"></p></div>
+
+ <section class="prose">
+  <h2 data-t="s1h">How the position size is calculated</h2>
+  <p data-t="s1p">Risk in dollars ÷ (stop size × dollar value per point + fees) = number of contracts. Example: you risk $250 on Nasdaq with a 20-point stop. One MNQ is $2 per point, so 20 points = $40 per contract → 6 MNQ ($240). One NQ is $20 per point, so 20 points = $400: you can't take even 1 NQ.</p>
+  <h2 data-t="s2h">Why prop firm traders need it</h2>
+  <p data-t="s2p">Prop firms close the account when you hit the daily loss limit or the drawdown. Sizing every trade from your stop keeps each loss small and the same size, so one bad trade can't end the evaluation.</p>
+ </section>
+
+ <h2 data-t="fh">Questions</h2>
+ <details class="q"><summary data-t="q1">How many MNQ contracts can I trade with a 20-point stop?</summary><p data-t="a1">One MNQ point is worth $2, so a 20-point stop risks $40 per contract. With $250 of risk you can take 6 MNQ ($240). One NQ is worth $20 per point, so the same stop risks $400 per NQ: too much for $250.</p></details>
+ <details class="q"><summary data-t="q2">What is the dollar value per point of NQ, ES, YM and Gold futures?</summary><p data-t="a2">NQ $20, MNQ $2, ES $50, MES $5, YM $5, MYM $0.50, GC $100 and MGC $10 per point (CME standard contracts).</p></details>
+ <details class="q"><summary data-t="q3">How much should I risk per trade on a prop firm account?</summary><p data-t="a3">Many prop traders risk a small, fixed part of the daily loss limit or drawdown on each trade, often 0.25% to 1% of the account. Pick an amount that lets you survive several losing trades in a row without breaking a rule.</p></details>
+ <details class="q"><summary data-t="q4">Does this calculator work for CFD lots (XAUUSD, NAS100, EURUSD)?</summary><p data-t="a4">Yes. Switch to CFD lots: the calculator uses the dollar value of one pip for 1.00 lot. Brokers differ, so you can change that value to match your broker's contract specifications.</p></details>
+
+ <div class="card cta"><div><b data-t="ctah">Track every trade in the free TRADEVERSITY journal</b><p data-t="ctap">Journal, statistics, prop firm rules, news alerts and this calculator saved to your account.</p></div><a class="btn pri" href="index.html" data-t="ctab">Open the free journal</a></div>
+ <p class="risk" data-t="risk">Education only, not financial advice. Trading futures and CFDs is risky: you can lose more than you expect. Check your broker's and prop firm's contract specifications.</p>
+ <footer><span>© <span id="yr"></span> TRADEVERSITY</span><a href="welcome.html" data-t="home">Home</a><a href="support.html" data-t="help">Help</a><a href="privacy.html" data-t="priv">Privacy policy</a><a href="terms.html" data-t="terms">Terms and conditions</a></footer>
+</main>
+
 <script>
 (function(){
 var t=function(k,en){return TV.t(k,en)},M=TV.money,N=TV.num,P=TV.pct,E=TV.esc;
