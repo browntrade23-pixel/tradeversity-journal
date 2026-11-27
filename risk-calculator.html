@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Free futures & CFD risk calculator (position size) · TRADEVERSITY</title>
+<meta name="description" content="Free position size calculator for futures and CFD traders: how many NQ, MNQ, ES, MES, YM, GC contracts or lots you can take for your stop and risk. Built for prop firm traders. No login.">
+<meta name="theme-color" content="#07080c">
+<link rel="canonical" href="https://jointradeversity.com/risk-calculator.html">
+<meta property="og:type" content="website"><meta property="og:site_name" content="TRADEVERSITY">
+<meta property="og:url" content="https://jointradeversity.com/risk-calculator.html">
+<meta property="og:title" content="Free futures & CFD risk calculator · TRADEVERSITY">
+<meta property="og:description" content="How many contracts or lots can I take for this stop? Futures (NQ, ES, YM, Gold) and CFD (XAUUSD, NAS100, EURUSD). Free, no login.">
+<meta property="og:image" content="https://jointradeversity.com/brand/share-card.png?v=2">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="brand/logo-192.png">
+<link rel="stylesheet" href="fonts/fonts.css?v=1">
+<link rel="stylesheet" href="tools.css?v=1">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebApplication","name":"Futures & CFD risk calculator","url":"https://jointradeversity.com/risk-calculator.html","applicationCategory":"FinanceApplication","operatingSystem":"Any","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"TRADEVERSITY","url":"https://jointradeversity.com/"}},
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"TRADEVERSITY","item":"https://jointradeversity.com/welcome.html"},{"@type":"ListItem","position":2,"name":"Risk calculator","item":"https://jointradeversity.com/risk-calculator.html"}]},
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"How many MNQ contracts can I trade with a 20-point stop?","acceptedAnswer":{"@type":"Answer","text":"One MNQ point is worth $2, so a 20-point stop risks $40 per contract. With $250 of risk you can take 6 MNQ ($240). One NQ is worth $20 per point, so the same stop risks $400 per NQ: too much for $250."}},
+{"@type":"Question","name":"What is the dollar value per point of NQ, ES, YM and Gold futures?","acceptedAnswer":{"@type":"Answer","text":"NQ $20, MNQ $2, ES $50, MES $5, YM $5, MYM $0.50, GC $100 and MGC $10 per point (CME standard contracts)."}},
+{"@type":"Question","name":"How much should I risk per trade on a prop firm account?","acceptedAnswer":{"@type":"Answer","text":"Many prop traders risk a small, fixed part of the daily loss limit or drawdown on each trade, often 0.25% to 1% of the account. Pick an amount that lets you survive several losing trades in a row without breaking a rule."}},
+{"@type":"Question","name":"Does this calculator work for CFD lots (XAUUSD, NAS100, EURUSD)?","acceptedAnswer":{"@type":"Answer","text":"Yes. Switch to CFD lots: the calculator uses the dollar value of one pip for 1.00 lot. Brokers differ, so you can change that value to match your broker's contract specifications."}}]}]</script>
+</head>
+<body>
+<div class="wrap">
+ <div class="top"><a class="brand" href="welcome.html"><i></i>TRADEVERSITY</a>
+  <div class="langs" role="group" aria-label="Language"><button type="button" data-l="en">EN</button><button type="button" data-l="fr">FR</button><button type="button" data-l="ar">ع</button></div></div>
+ <nav class="crumbs" aria-label="Breadcrumb"><a href="welcome.html">TRADEVERSITY</a> › <span data-t="crumb">Free tools</span></nav>
+ <nav class="tnav" aria-label="Free tools"><a class="on" href="risk-calculator.html" data-t="n1">Risk calculator</a><a href="consistency-rule.html" data-t="n2">Consistency rule</a><a href="prop-firm-coupons.html" data-t="n3">Prop firm coupons</a></nav>
+
+ <h1 data-t="h1">Free futures & CFD risk calculator</h1>
+ <p class="lead" data-t="lead">How many contracts or lots can I take for this stop? Enter your account, your risk and your stop: the calculator uses each market's dollar value per point, so you never risk more than you planned. Free, no login.</p>
+
+ <div class="seg" id="mode" style="margin-bottom:12px"><button type="button" data-m="fut" class="on" data-t="m_fut">Futures contracts</button><button type="button" data-m="cfd" data-t="m_cfd">CFD lots</button></div>
+ <div class="cols">
+  <div class="card grid" id="form"></div>
+  <div id="out"></div>
+ </div>
+ <div class="card" style="margin-top:14px"><h3 id="specT"></h3><div class="tw" id="specs"></div>
+  <p class="mut" style="font-size:12.5px;margin:8px 0 0" id="specN"></p></div>
+
+ <section class="prose">
+  <h2 data-t="s1h">How the position size is calculated</h2>
+  <p data-t="s1p">Risk in dollars ÷ (stop size × dollar value per point + fees) = number of contracts. Example: you risk $250 on Nasdaq with a 20-point stop. One MNQ is $2 per point, so 20 points = $40 per contract → 6 MNQ ($240). One NQ is $20 per point, so 20 points = $400: you can't take even 1 NQ.</p>
+  <h2 data-t="s2h">Why prop firm traders need it</h2>
+  <p data-t="s2p">Prop firms close the account when you hit the daily loss limit or the drawdown. Sizing every trade from your stop keeps each loss small and the same size, so one bad trade can't end the evaluation.</p>
+ </section>
+
+ <h2 data-t="fh">Questions</h2>
+ <details class="q"><summary data-t="q1">How many MNQ contracts can I trade with a 20-point stop?</summary><p data-t="a1">One MNQ point is worth $2, so a 20-point stop risks $40 per contract. With $250 of risk you can take 6 MNQ ($240). One NQ is worth $20 per point, so the same stop risks $400 per NQ: too much for $250.</p></details>
+ <details class="q"><summary data-t="q2">What is the dollar value per point of NQ, ES, YM and Gold futures?</summary><p data-t="a2">NQ $20, MNQ $2, ES $50, MES $5, YM $5, MYM $0.50, GC $100 and MGC $10 per point (CME standard contracts).</p></details>
+ <details class="q"><summary data-t="q3">How much should I risk per trade on a prop firm account?</summary><p data-t="a3">Many prop traders risk a small, fixed part of the daily loss limit or drawdown on each trade, often 0.25% to 1% of the account. Pick an amount that lets you survive several losing trades in a row without breaking a rule.</p></details>
+ <details class="q"><summary data-t="q4">Does this calculator work for CFD lots (XAUUSD, NAS100, EURUSD)?</summary><p data-t="a4">Yes. Switch to CFD lots: the calculator uses the dollar value of one pip for 1.00 lot. Brokers differ, so you can change that value to match your broker's contract specifications.</p></details>
+
+ <div class="card cta"><div><b data-t="ctah">Track every trade in the free TRADEVERSITY journal</b><p data-t="ctap">Journal, statistics, prop firm rules, news alerts and this calculator saved to your account.</p></div><a class="btn pri" href="index.html" data-t="ctab">Open the free journal</a></div>
+ <p class="risk" data-t="risk">Education only, not financial advice. Trading futures and CFDs is risky: you can lose more than you expect. Check your broker's and prop firm's contract specifications.</p>
+ <footer><span>© <span id="yr"></span> TRADEVERSITY</span><a href="welcome.html" data-t="home">Home</a><a href="support.html" data-t="help">Help</a><a href="privacy.html" data-t="priv">Privacy policy</a><a href="terms.html" data-t="terms">Terms and conditions</a></footer>
+</div>
+<script>
+window.T={
+fr:{crumb:"Outils gratuits",n1:"Calculateur de risque",n2:"Règle de consistance",n3:"Codes promo prop firms",h1:"Calculateur de risque gratuit futures & CFD",
+lead:"Combien de contrats ou de lots puis-je prendre pour ce stop ? Entrez votre compte, votre risque et votre stop : le calculateur utilise la valeur en dollars par point de chaque marché, pour ne jamais risquer plus que prévu. Gratuit, sans connexion.",
+m_fut:"Contrats futures",m_cfd:"Lots CFD",s1h:"Comment la taille de position est calculée",
+s1p:"Risque en dollars ÷ (taille du stop × valeur en dollars par point + frais) = nombre de contrats. Exemple : vous risquez 250 $ sur le Nasdaq avec un stop de 20 points. Un MNQ vaut 2 $ par point, donc 20 points = 40 $ par contrat → 6 MNQ (240 $). Un NQ vaut 20 $ par point, donc 20 points = 400 $ : vous ne pouvez même pas prendre 1 NQ.",
+s2h:"Pourquoi les traders de prop firms en ont besoin",s2p:"Les prop firms ferment le compte quand vous touchez la perte max journalière ou le drawdown. Calculer chaque trade à partir du stop garde chaque perte petite et identique : un mauvais trade ne peut pas terminer l'évaluation.",
+fh:"Questions",q1:"Combien de contrats MNQ avec un stop de 20 points ?",a1:"Un point MNQ vaut 2 $, donc un stop de 20 points risque 40 $ par contrat. Avec 250 $ de risque, vous pouvez prendre 6 MNQ (240 $). Un NQ vaut 20 $ par point : le même stop risque 400 $ par NQ, trop pour 250 $.",
+q2:"Quelle est la valeur par point des futures NQ, ES, YM et Or ?",a2:"NQ 20 $, MNQ 2 $, ES 50 $, MES 5 $, YM 5 $, MYM 0,50 $, GC 100 $ et MGC 10 $ par point (contrats standard CME).",
+q3:"Combien risquer par trade sur un compte prop firm ?",a3:"Beaucoup de traders risquent une petite partie fixe de la perte max journalière ou du drawdown à chaque trade, souvent 0,25 % à 1 % du compte. Choisissez un montant qui vous laisse survivre à plusieurs pertes d'affilée sans casser une règle.",
+q4:"Le calculateur fonctionne-t-il pour les lots CFD (XAUUSD, NAS100, EURUSD) ?",a4:"Oui. Passez sur Lots CFD : le calculateur utilise la valeur en dollars d'un pip pour 1,00 lot. Les brokers diffèrent, vous pouvez donc modifier cette valeur selon les spécifications de votre broker.",
+ctah:"Suivez chaque trade dans le journal TRADEVERSITY gratuit",ctap:"Journal, statistiques, règles des prop firms, alertes news et ce calculateur enregistré dans votre compte.",ctab:"Ouvrir le journal gratuit",
+risk:"Uniquement éducatif, pas un conseil financier. Le trading des futures et des CFD est risqué : vous pouvez perdre plus que prévu. Vérifiez les spécifications de contrat de votre broker et de votre prop firm.",
+home:"Accueil",help:"Aide",priv:"Politique de confidentialité",terms:"Conditions générales",
+market:"Marché",bal:"Solde du compte $",riskpt:"Risque par trade",stop:"Stop loss",pts:"Points",ticks:"Ticks",px:"Prix d'entrée et de stop",pips:"Pips",stopin_pts:"Taille du stop en points",stopin_ticks:"Taille du stop en ticks",stopin_pips:"Taille du stop en pips",
+entry:"Prix d'entrée",stoppx:"Prix du stop",rr:"Gain : risque (objectif)",fees:"Frais par contrat (aller-retour) $",comm:"Commission par lot $",pvlot:"$ par pip pour 1,00 lot",opt:"optionnel",
+enter:"Entrez votre risque et la taille du stop.",maxrisk:"Risque max",of:"de",ofacct:"du compte",contracts:"contrats",contract:"contrat",riskeach:"Risque par contrat",totrisk:"Risque total",target:"Objectif",
+mix:"Meilleur mélange (le plus proche de votre risque)",yourmax:"de votre max",tp:"Take profit à",wide1:"Stop trop large : même 1",wide2:"risque",wide3:"Resserrez le stop ou passez le trade.",
+lotsize:"Taille de lot",lots:"lots",microlots:"Micro lots",perlot:"Risque par 1,00 lot",permic:"Risque par 0,01 lot",dpp:"$ par pip (votre taille)",split:"Votre taille en lots standard / mini / micro",
+spec_fut:"Spécifications des contrats futures",spec_cfd:"Spécifications des lots CFD",specn_fut:"Contrats standard CME. Vérifiez les limites de contrats et les frais de votre prop firm.",specn_cfd:"Valeurs courantes chez les brokers : elles changent selon le broker et la prop firm. Vérifiez toujours les spécifications de votre broker.",
+th_sym:"Symbole",th_c:"Contrat",th_dpp:"$ / point",th_tick:"Tick",th_dpt:"$ / tick",th_mk:"Marché",th_lot:"1,00 lot =",th_pip:"Pip",pmove:"de mouvement de prix",wide4:"Stop trop large : même 0,01 lot risque"},
+ar:{crumb:"أدوات مجانية",n1:"حاسبة المخاطرة",n2:"قاعدة الثبات",n3:"أكواد خصم شركات التمويل",h1:"حاسبة مخاطرة مجانية للعقود الآجلة و CFD",
+lead:"كم عقداً أو لوتاً يمكنني فتحه بهذا الستوب؟ أدخل حسابك ومخاطرتك والستوب: الحاسبة تستعمل قيمة النقطة بالدولار لكل سوق، حتى لا تخاطر بأكثر مما خططت. مجانية وبدون تسجيل دخول.",
+m_fut:"عقود آجلة",m_cfd:"لوتات CFD",s1h:"كيف يُحسب حجم الصفقة",
+s1p:"المخاطرة بالدولار ÷ (حجم الستوب × قيمة النقطة بالدولار + الرسوم) = عدد العقود. مثال: تخاطر بـ 250$ على الناسداك بستوب 20 نقطة. نقطة MNQ تساوي 2$، إذن 20 نقطة = 40$ للعقد ← 6 عقود MNQ (240$). نقطة NQ تساوي 20$، إذن 20 نقطة = 400$: لا يمكنك فتح حتى عقد NQ واحد.",
+s2h:"لماذا يحتاجها متداولو شركات التمويل",s2p:"شركات التمويل تغلق الحساب عند بلوغ حد الخسارة اليومية أو الـ drawdown. حساب كل صفقة انطلاقاً من الستوب يجعل كل خسارة صغيرة وبنفس الحجم، فلا تُنهي صفقة سيئة واحدة التقييم.",
+fh:"أسئلة",q1:"كم عقد MNQ يمكنني فتحه بستوب 20 نقطة؟",a1:"نقطة MNQ تساوي 2$، إذن ستوب 20 نقطة يخاطر بـ 40$ للعقد. بمخاطرة 250$ يمكنك فتح 6 عقود MNQ (240$). نقطة NQ تساوي 20$، فنفس الستوب يخاطر بـ 400$ للعقد: أكثر من 250$.",
+q2:"ما قيمة النقطة بالدولار لعقود NQ و ES و YM والذهب؟",a2:"NQ ‏20$، MNQ ‏2$، ES ‏50$، MES ‏5$، YM ‏5$، MYM ‏0.50$، GC ‏100$ و MGC ‏10$ للنقطة (عقود CME القياسية).",
+q3:"كم أخاطر في كل صفقة على حساب شركة تمويل؟",a3:"كثير من المتداولين يخاطرون بجزء صغير وثابت من حد الخسارة اليومية أو الـ drawdown في كل صفقة، غالباً من 0.25% إلى 1% من الحساب. اختر مبلغاً يسمح لك بتحمّل عدة خسائر متتالية دون كسر أي قاعدة.",
+q4:"هل تعمل الحاسبة مع لوتات CFD ‏(XAUUSD و NAS100 و EURUSD)؟",a4:"نعم. انتقل إلى لوتات CFD: الحاسبة تستعمل قيمة البيب بالدولار للوت 1.00. الوسطاء يختلفون، لذا يمكنك تغيير هذه القيمة حسب مواصفات وسيطك.",
+ctah:"سجّل كل صفقة في يوميات TRADEVERSITY المجانية",ctap:"اليوميات، الإحصائيات، قواعد شركات التمويل، تنبيهات الأخبار وهذه الحاسبة محفوظة في حسابك.",ctab:"افتح اليوميات المجانية",
+risk:"للتعليم فقط، وليس نصيحة مالية. تداول العقود الآجلة و CFD محفوف بالمخاطر: قد تخسر أكثر مما تتوقع. تحقق من مواصفات العقود لدى وسيطك وشركة التمويل.",
+home:"الرئيسية",help:"المساعدة",priv:"سياسة الخصوصية",terms:"الشروط والأحكام",
+market:"السوق",bal:"رصيد الحساب $",riskpt:"المخاطرة لكل صفقة",stop:"وقف الخسارة",pts:"نقاط",ticks:"تيكات",px:"سعر الدخول والستوب",pips:"بيبات",stopin_pts:"حجم الستوب بالنقاط",stopin_ticks:"حجم الستوب بالتيكات",stopin_pips:"حجم الستوب بالبيبات",
+entry:"سعر الدخول",stoppx:"سعر الستوب",rr:"العائد : المخاطرة (الهدف)",fees:"رسوم العقد (ذهاب وإياب) $",comm:"العمولة لكل لوت $",pvlot:"$ لكل بيب للوت 1.00",opt:"اختياري",
+enter:"أدخل المخاطرة وحجم الستوب.",maxrisk:"أقصى مخاطرة",of:"من",ofacct:"من الحساب",contracts:"عقود",contract:"عقد",riskeach:"مخاطرة العقد",totrisk:"المخاطرة الكلية",target:"الهدف",
+mix:"أفضل مزيج (الأقرب لمخاطرتك)",yourmax:"من حدّك",tp:"جني الربح عند",wide1:"الستوب واسع جداً: حتى 1",wide2:"يخاطر بـ",wide3:"ضيّق الستوب أو اترك الصفقة.",
+lotsize:"حجم اللوت",lots:"لوت",microlots:"مايكرو لوت",perlot:"المخاطرة للوت 1.00",permic:"المخاطرة للوت 0.01",dpp:"$ لكل بيب (حجمك)",split:"حجمك باللوت القياسي / الميني / المايكرو",
+spec_fut:"مواصفات العقود الآجلة",spec_cfd:"مواصفات لوتات CFD",specn_fut:"عقود CME القياسية. تحقق من حدود العقود والرسوم لدى شركة التمويل.",specn_cfd:"قيم شائعة لدى الوسطاء: تتغير حسب الوسيط وشركة التمويل. تحقق دائماً من مواصفات وسيطك.",
+th_sym:"الرمز",th_c:"العقد",th_dpp:"$ / نقطة",th_tick:"تيك",th_dpt:"$ / تيك",th_mk:"السوق",th_lot:"1.00 لوت =",th_pip:"بيب",pmove:"حركة سعر",wide4:"الستوب واسع جداً: حتى 0.01 لوت يخاطر بـ"}};
+</script>
+<script src="tools.js?v=1"></script>
+<script>
+(function(){
+var t=function(k,en){return TV.t(k,en)},M=TV.money,N=TV.num,P=TV.pct,E=TV.esc;
+var MK={NQ:{name:"E-mini Nasdaq-100",pv:20,tick:.25,grp:"Nasdaq",type:"Mini"},MNQ:{name:"Micro Nasdaq-100",pv:2,tick:.25,grp:"Nasdaq",type:"Micro"},
+ ES:{name:"E-mini S&P 500",pv:50,tick:.25,grp:"S&P 500",type:"Mini"},MES:{name:"Micro S&P 500",pv:5,tick:.25,grp:"S&P 500",type:"Micro"},
+ YM:{name:"E-mini Dow ($5)",pv:5,tick:1,grp:"Dow Jones",type:"Mini"},MYM:{name:"Micro Dow",pv:.5,tick:1,grp:"Dow Jones",type:"Micro"},
+ GC:{name:"Gold (100 oz)",pv:100,tick:.1,grp:"Gold",type:"Mini"},MGC:{name:"Micro Gold (10 oz)",pv:10,tick:.1,grp:"Gold",type:"Micro"}};
+var GROUPS={"Nasdaq":["NQ","MNQ"],"S&P 500":["ES","MES"],"Dow Jones":["YM","MYM"],"Gold":["GC","MGC"]};
+var CFD={XAUUSD:{name:"Gold",grp:"Metals",size:"100 oz",pip:.1,pv:10,dg:2},XAGUSD:{name:"Silver",grp:"Metals",size:"5,000 oz",pip:.01,pv:50,dg:3},
+ NAS100:{name:"Nasdaq 100 (US100)",grp:"Indices",size:"1 × index",pip:1,pv:1,dg:1},US30:{name:"Dow Jones (US30)",grp:"Indices",size:"1 × index",pip:1,pv:1,dg:1},
+ US500:{name:"S&P 500 (US500)",grp:"Indices",size:"1 × index",pip:1,pv:1,dg:1},EURUSD:{name:"Euro / Dollar",grp:"Forex",size:"100,000 EUR",pip:.0001,pv:10,dg:5},
+ GBPUSD:{name:"Pound / Dollar",grp:"Forex",size:"100,000 GBP",pip:.0001,pv:10,dg:5},BTCUSD:{name:"Bitcoin",grp:"Crypto",size:"1 BTC",pip:1,pv:1,dg:1}};
+var KEY="tv_pub_risk";var st;try{st=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+st=st||{m:"fut",f:{grp:"Nasdaq",bal:50000,mode:"$",risk:250,sm:"pts",stop:20,entry:"",stopPx:"",rr:2,fees:""},c:{sym:"XAUUSD",bal:10000,mode:"%",risk:1,sm:"pips",stop:50,entry:"",stopPx:"",rr:2,comm:"",pv:""}};
+var save=function(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+var $=function(s){return document.querySelector(s)},$$=function(s){return [].slice.call(document.querySelectorAll(s))};
+function seg(id,items,cur,attr){return '<div class="seg" id="'+id+'">'+items.map(function(x){return '<button type="button" data-'+attr+'="'+E(x[0])+'" class="'+(x[0]===cur?"on":"")+'">'+x[1]+'</button>'}).join("")+'</div>'}
+function inp(k,v,ph){return '<input class="i rk" type="number" inputmode="decimal" step="any" data-k="'+k+'" value="'+E(v)+'"'+(ph?' placeholder="'+E(ph)+'"':'')+'>'}
+function form(){var c=st.m==="fut"?st.f:st.c,fut=st.m==="fut";
+ var mk=fut?seg("mk",Object.keys(GROUPS).map(function(g){return [g,g]}),c.grp,"v"):seg("mk",Object.keys(CFD).map(function(k){return [k,k]}),c.sym,"v");
+ var sms=fut?[["pts",t("pts","Points")],["ticks",t("ticks","Ticks")],["px",t("px","Entry & stop price")]]:[["pips",t("pips","Pips")],["px",t("px","Entry & stop price")]];
+ var stopIn=c.sm==="px"?'<div class="grid g2"><label class="f">'+t("entry","Entry price")+inp("entry",c.entry)+'</label><label class="f">'+t("stoppx","Stop price")+inp("stopPx",c.stopPx)+'</label></div>'
+  :'<label class="f">'+(c.sm==="pts"?t("stopin_pts","Stop size in points"):c.sm==="ticks"?t("stopin_ticks","Stop size in ticks"):t("stopin_pips","Stop size in pips"))+inp("stop",c.stop)+'</label>';
+ var extra=fut?'<div class="grid g2"><label class="f">'+t("rr","Reward : risk (target)")+inp("rr",c.rr)+'</label><label class="f">'+t("fees","Fees per contract (round trip) $")+inp("fees",c.fees,t("opt","optional"))+'</label></div>'
+  :'<div class="grid g3"><label class="f">'+t("pvlot","$ per pip for 1.00 lot")+inp("pv",c.pv!==""?c.pv:CFD[c.sym].pv)+'</label><label class="f">'+t("rr","Reward : risk (target)")+inp("rr",c.rr)+'</label><label class="f">'+t("comm","Commission per lot $")+inp("comm",c.comm,t("opt","optional"))+'</label></div>';
+ $("#form").innerHTML='<div><div class="k">'+t("market","Market")+'</div>'+mk+'</div>'
+  +'<div class="grid g2"><label class="f">'+t("bal","Account balance $")+inp("bal",c.bal)+'</label><label class="f">'+t("riskpt","Risk per trade")+'<div class="row">'+inp("risk",c.risk)+seg("rm",[["$","$"],["%","%"]],c.mode,"v")+'</div></label></div>'
+  +'<div><div class="k">'+t("stop","Stop loss")+'</div>'+seg("sm",sms,c.sm,"v")+'</div>'+stopIn+extra;
+ $$("#form .rk").forEach(function(i){i.oninput=function(){c[i.dataset.k]=i.value;save();out()}});
+ $$("#mk button").forEach(function(b){b.onclick=function(){if(fut){c.grp=b.dataset.v;if(c.grp==="Gold"&&c.sm==="pts"&&N(c.stop)>20)c.stop=5}else{var was=CFD[c.sym].grp;c.sym=b.dataset.v;c.pv="";var g=CFD[c.sym].grp;if(was!==g)c.stop=g==="Forex"?20:g==="Indices"?30:g==="Crypto"?300:50}save();all()}});
+ $$("#rm button").forEach(function(b){b.onclick=function(){c.mode=b.dataset.v;if(c.mode==="%"&&N(c.risk)>10)c.risk=fut?.5:1;save();all()}});
+ $$("#sm button").forEach(function(b){b.onclick=function(){c.sm=b.dataset.v;save();all()}})}
+function out(){var o=$("#out");if(st.m==="fut"){var c=st.f,g=GROUPS[c.grp],mini=MK[g[0]],micro=MK[g[1]];
+  var R=c.mode==="%"?N(c.bal)*N(c.risk)/100:N(c.risk),pts=c.sm==="pts"?N(c.stop):c.sm==="ticks"?N(c.stop)*mini.tick:Math.abs(N(c.entry)-N(c.stopPx)),fee=N(c.fees)||0,rr=N(c.rr)||0;
+  if(!(R>0)||!(pts>0)){o.innerHTML='<div class="card mut">'+t("enter","Enter your risk and stop size.")+'</div>';return}
+  var pMini=pts*mini.pv+fee,pMicro=pts*micro.pv+fee,nMini=Math.floor(R/pMini),nMicro=Math.floor(R/pMicro),mxM=nMini,mxm=Math.floor((R-mxM*pMini)/pMicro),mixR=mxM*pMini+mxm*pMicro;
+  var dir=c.sm==="px"&&N(c.entry)>N(c.stopPx)?1:-1,tp=c.sm==="px"&&isFinite(N(c.entry))?N(c.entry)+dir*pts*rr:null;
+  var tile=function(ty,sym,n,per,mk){return '<div class="tile '+(n?"":"zero")+'"><div class="ty">'+ty+' · <span class="mono">'+sym+'</span></div><div class="n mono">'+n+'<small>'+(n===1?t("contract","contract"):t("contracts","contracts"))+'</small></div>'
+   +'<div class="kv"><span>'+t("riskeach","Risk each")+'</span><b class="mono">'+M(per)+'</b></div><div class="kv"><span>'+t("totrisk","Total risk")+'</span><b class="mono">'+M(n*per)+'</b></div><div class="kv"><span>'+t("target","Target")+' ('+rr+'R)</span><b class="mono" style="color:var(--ok)">'+M(n*(pts*mk.pv*rr-fee))+'</b></div></div>'};
+  o.innerHTML='<div class="card grid"><div class="row" style="justify-content:space-between"><span class="mut">'+t("maxrisk","Max risk")+'</span><span class="big mono">'+M(R,0)+'</span></div>'
+   +'<div class="mut" style="font-size:13px">'+t("stop","Stop")+': <b class="mono">'+(+pts.toFixed(4))+' pts</b> = <b class="mono">'+(+(pts/mini.tick).toFixed(1))+' ticks</b> · '+(c.mode==="%"?c.risk+"% "+t("of","of")+" "+M(N(c.bal),0):P(R/N(c.bal),2)+" "+t("ofacct","of account"))+'</div>'
+   +'<div class="tiles">'+tile("Micro",g[1],nMicro,pMicro,micro)+tile("Mini",g[0],nMini,pMini,mini)+'</div>'
+   +'<div><div class="k">'+t("mix","Best mix (closest to your risk)")+'</div><div class="mono" style="font-size:20px;font-weight:650">'+(mxM?mxM+" × "+g[0]:"")+(mxM&&mxm?" + ":"")+(mxm||!mxM?mxm+" × "+g[1]:"")+'</div><div class="bar"><i style="width:'+Math.min(100,mixR/R*100)+'%"></i></div>'
+   +'<div class="mut" style="font-size:12.5px">'+M(mixR)+' · '+P(mixR/R,0)+' '+t("yourmax","of your max")+(tp!=null?' · '+t("tp","Take profit at")+' <b class="mono">'+(+tp.toFixed(2))+'</b>':'')+'</div></div>'
+   +(nMicro===0?'<div class="status bad">✖ '+t("wide1","Stop is too wide: even 1")+' '+g[1]+' '+t("wide2","risks")+' '+M(pMicro)+'. '+t("wide3","Tighten the stop or skip the trade.")+'</div>':'')+'</div>'}
+ else{var c=st.c,m=CFD[c.sym],pv=N(c.pv)>0?N(c.pv):m.pv,R=c.mode==="%"?N(c.bal)*N(c.risk)/100:N(c.risk),pips=c.sm==="pips"?N(c.stop):Math.abs(N(c.entry)-N(c.stopPx))/m.pip,comm=N(c.comm)||0,rr=N(c.rr)||0;
+  if(!(R>0)||!(pips>0)){o.innerHTML='<div class="card mut">'+t("enter","Enter your risk and stop size.")+'</div>';return}
+  var perLot=pips*pv+comm,lots=Math.floor(R/perLot*100+1e-9)/100,mic=Math.round(lots*100),used=lots*perLot,sd=Math.floor(mic/100),mn=Math.floor((mic%100)/10),mc=mic%10;
+  var dir=c.sm==="px"&&N(c.entry)>N(c.stopPx)?1:-1,tp=c.sm==="px"&&isFinite(N(c.entry))?N(c.entry)+dir*pips*m.pip*rr:null;
+  o.innerHTML='<div class="card grid"><div class="row" style="justify-content:space-between"><span class="mut">'+t("maxrisk","Max risk")+'</span><span class="big mono">'+M(R,0)+'</span></div>'
+   +'<div class="mut" style="font-size:13px">'+t("stop","Stop")+': <b class="mono">'+(+pips.toFixed(1))+' pips</b> = <b class="mono">'+(+(pips*m.pip).toFixed(m.dg))+'</b> '+t("pmove","price move")+' · '+(c.mode==="%"?c.risk+"% "+t("of","of")+" "+M(N(c.bal),0):P(R/N(c.bal),2)+" "+t("ofacct","of account"))+'</div>'
+   +'<div class="tiles"><div class="tile '+(mic?"":"zero")+'"><div class="ty">'+t("lotsize","Lot size")+' · <span class="mono">'+c.sym+'</span></div><div class="n mono">'+lots.toFixed(2)+'<small>'+t("lots","lots")+'</small></div>'
+   +'<div class="kv"><span>'+t("perlot","Risk per 1.00 lot")+'</span><b class="mono">'+M(perLot)+'</b></div><div class="kv"><span>'+t("totrisk","Total risk")+'</span><b class="mono">'+M(used)+'</b></div><div class="kv"><span>'+t("target","Target")+' ('+rr+'R)</span><b class="mono" style="color:var(--ok)">'+M(lots*(pips*pv*rr-comm))+'</b></div></div>'
+   +'<div class="tile '+(mic?"":"zero")+'"><div class="ty">'+t("microlots","Micro lots")+'</div><div class="n mono">'+mic+'<small>× 0.01</small></div><div class="kv"><span>'+t("permic","Risk per 0.01 lot")+'</span><b class="mono">'+M(perLot/100)+'</b></div><div class="kv"><span>'+t("dpp","$ per pip (your size)")+'</span><b class="mono">'+M(lots*pv)+'</b></div></div></div>'
+   +'<div><div class="k">'+t("split","Your lot size in standard / mini / micro lots")+'</div><div class="mono" style="font-size:20px;font-weight:650">'+([[sd,"1.00"],[mn,"0.10"],[mc,"0.01"]].filter(function(x){return x[0]}).map(function(x){return x[0]+" × "+x[1]}).join(" + ")||"0 × 0.01")+'</div><div class="bar"><i style="width:'+Math.min(100,used/R*100)+'%"></i></div>'
+   +'<div class="mut" style="font-size:12.5px">'+M(used)+' · '+P(used/R,0)+' '+t("yourmax","of your max")+(tp!=null?' · '+t("tp","Take profit at")+' <b class="mono">'+(+tp.toFixed(m.dg))+'</b>':'')+'</div></div>'
+   +(mic===0?'<div class="status bad">✖ '+t("wide4","Stop is too wide: even 0.01 lot risks")+' '+M(perLot/100)+'. '+t("wide3","Tighten the stop or skip the trade.")+'</div>':'')+'</div>'}}
+function specs(){if(st.m==="fut"){$("#specT").textContent=t("spec_fut","Futures contract specs");$("#specN").textContent=t("specn_fut","CME standard contracts. Check your prop firm's contract limits and fees.");
+  $("#specs").innerHTML='<table class="t"><tr><th>'+t("th_sym","Symbol")+'</th><th>'+t("th_c","Contract")+'</th><th>'+t("th_dpp","$ / point")+'</th><th>'+t("th_tick","Tick")+'</th><th>'+t("th_dpt","$ / tick")+'</th></tr>'
+  +Object.keys(MK).map(function(k){var m=MK[k];return '<tr><td class="mono"><b>'+k+'</b></td><td>'+m.name+'</td><td class="mono">$'+m.pv+'</td><td class="mono">'+m.tick+'</td><td class="mono">$'+(m.pv*m.tick).toFixed(2)+'</td></tr>'}).join("")+'</table>'}
+ else{$("#specT").textContent=t("spec_cfd","CFD lot specs");$("#specN").textContent=t("specn_cfd","Typical broker values: they change between brokers and prop firms. Always check your broker's contract specifications.");
+  $("#specs").innerHTML='<table class="t"><tr><th>'+t("th_sym","Symbol")+'</th><th>'+t("th_mk","Market")+'</th><th>'+t("th_lot","1.00 lot =")+'</th><th>'+t("th_pip","Pip")+'</th><th>$ / pip 1.00</th><th>$ / pip 0.01</th></tr>'
+  +Object.keys(CFD).map(function(k){var c=CFD[k];return '<tr><td class="mono"><b>'+k+'</b></td><td>'+c.name+'</td><td class="mono">'+c.size+'</td><td class="mono">'+c.pip+'</td><td class="mono">$'+c.pv.toFixed(2)+'</td><td class="mono">$'+(c.pv/100).toFixed(2)+'</td></tr>'}).join("")+'</table>'}}
+function all(){$$("#mode button").forEach(function(b){b.classList.toggle("on",b.dataset.m===st.m)});form();out();specs()}
+$$("#mode button").forEach(function(b){b.onclick=function(){st.m=b.dataset.m;save();all()}});
+window.onLang=all;all();
+})();
+</script>
+</body>
+</html>

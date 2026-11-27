@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Prop firm consistency rule calculator (free) · TRADEVERSITY</title>
+<meta name="description" content="Free consistency rule calculator for prop firm traders: check if your best day is under 20%, 30%, 40% or 50% of your total profit, how much more you need, and the most you should make on your next day. No login.">
+<meta name="theme-color" content="#07080c">
+<link rel="canonical" href="https://jointradeversity.com/consistency-rule.html">
+<meta property="og:type" content="website"><meta property="og:site_name" content="TRADEVERSITY">
+<meta property="og:url" content="https://jointradeversity.com/consistency-rule.html">
+<meta property="og:title" content="Prop firm consistency rule calculator · TRADEVERSITY">
+<meta property="og:description" content="Is your best day too big? Enter your daily P/L and see if you pass the consistency rule. Free, no login.">
+<meta property="og:image" content="https://jointradeversity.com/brand/share-card.png?v=2">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="brand/logo-192.png">
+<link rel="stylesheet" href="fonts/fonts.css?v=1">
+<link rel="stylesheet" href="tools.css?v=1">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebApplication","name":"Prop firm consistency rule calculator","url":"https://jointradeversity.com/consistency-rule.html","applicationCategory":"FinanceApplication","operatingSystem":"Any","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"TRADEVERSITY","url":"https://jointradeversity.com/"}},
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"TRADEVERSITY","item":"https://jointradeversity.com/welcome.html"},{"@type":"ListItem","position":2,"name":"Consistency rule calculator","item":"https://jointradeversity.com/consistency-rule.html"}]},
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"What is the consistency rule in prop firms?","acceptedAnswer":{"@type":"Answer","text":"It limits how much of your total profit can come from one day. With a 30% rule, your best day must be 30% or less of your total net profit. If one day is bigger, you must keep trading until the total is large enough."}},
+{"@type":"Question","name":"How do I calculate if I pass a 30% consistency rule?","acceptedAnswer":{"@type":"Answer","text":"Divide your best day by your total net profit. Example: best day $900, total $2,500 → 36%, above 30%. You need a total of $900 ÷ 0.30 = $3,000, so $500 more without beating your best day."}},
+{"@type":"Question","name":"How many days do I need to pass with a consistency rule?","acceptedAnswer":{"@type":"Answer","text":"At least 1 ÷ rule: 4 days with a 30% rule (the best day can't be more than 30%), 5 days with 20%, 3 days with 40%, 2 days with 50%. Spreading the target evenly over those days is the safest plan."}},
+{"@type":"Question","name":"Do all prop firms count the consistency rule the same way?","acceptedAnswer":{"@type":"Answer","text":"No. Most compare the best day with total net profit, some compare it with the profit target, and some only apply it on funded accounts or before a payout. Always read your firm's rules."}}]}]</script>
+</head>
+<body>
+<div class="wrap">
+ <div class="top"><a class="brand" href="welcome.html"><i></i>TRADEVERSITY</a>
+  <div class="langs" role="group" aria-label="Language"><button type="button" data-l="en">EN</button><button type="button" data-l="fr">FR</button><button type="button" data-l="ar">ع</button></div></div>
+ <nav class="crumbs" aria-label="Breadcrumb"><a href="welcome.html">TRADEVERSITY</a> › <span data-t="crumb">Free tools</span></nav>
+ <nav class="tnav" aria-label="Free tools"><a href="risk-calculator.html" data-t="n1">Risk calculator</a><a class="on" href="consistency-rule.html" data-t="n2">Consistency rule</a><a href="prop-firm-coupons.html" data-t="n3">Prop firm coupons</a></nav>
+
+ <h1 data-t="h1">Prop firm consistency rule calculator</h1>
+ <p class="lead" data-t="lead">Most prop firms say your best day can't be more than X% of your total profit. Enter your daily P/L: you see if you pass, how much more you need, and the most you should make on your next day. Free, no login.</p>
+
+ <div class="cols">
+  <div class="grid">
+   <div class="card grid">
+    <div class="grid g3">
+     <label class="f"><span data-t="size">Account size</span><select class="i" id="size"></select></label>
+     <label class="f"><span data-t="tgt">Profit target $</span><input class="i" id="tgt" type="number" inputmode="decimal" step="any"></label>
+     <label class="f"><span data-t="rule">Consistency rule %</span><input class="i" id="pct" type="number" inputmode="decimal" step="any"></label>
+    </div>
+    <div class="pills" id="pills"></div>
+   </div>
+   <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0" data-t="dpl">Daily P/L</h3><button class="btn" id="add" type="button" data-t="add">+ Add day</button></div>
+    <div id="rows"></div>
+    <div class="row" style="justify-content:space-between;margin-top:10px"><span class="mut" data-t="tot">Total net P/L</span><b class="mono" id="tot"></b></div>
+   </div>
+  </div>
+  <div class="grid"><div id="out"></div><div id="side"></div></div>
+ </div>
+
+ <section class="prose">
+  <h2 data-t="s1h">How the consistency rule works</h2>
+  <p data-t="s1p">Best day ÷ total net profit must stay at or under the rule. Example with a 30% rule: best day $900 and total $2,500 → 36%: not consistent yet. You need a total of $900 ÷ 0.30 = $3,000, so $500 more, without making another day bigger than $900.</p>
+  <h2 data-t="s2h">The plan that passes</h2>
+  <p data-t="s2p">With a 30% rule you need at least 4 profitable days (1 ÷ 0.30). Split the target over those days, stop trading for the day once you reach your daily goal, and keep every day under the limit shown above.</p>
+ </section>
+
+ <h2 data-t="fh">Questions</h2>
+ <details class="q"><summary data-t="q1">What is the consistency rule in prop firms?</summary><p data-t="a1">It limits how much of your total profit can come from one day. With a 30% rule, your best day must be 30% or less of your total net profit. If one day is bigger, you must keep trading until the total is large enough.</p></details>
+ <details class="q"><summary data-t="q2">How do I calculate if I pass a 30% consistency rule?</summary><p data-t="a2">Divide your best day by your total net profit. Example: best day $900, total $2,500 → 36%, above 30%. You need a total of $900 ÷ 0.30 = $3,000, so $500 more without beating your best day.</p></details>
+ <details class="q"><summary data-t="q3">How many days do I need to pass with a consistency rule?</summary><p data-t="a3">At least 1 ÷ rule: 4 days with a 30% rule (the best day can't be more than 30%), 5 days with 20%, 3 days with 40%, 2 days with 50%. Spreading the target evenly over those days is the safest plan.</p></details>
+ <details class="q"><summary data-t="q4">Do all prop firms count the consistency rule the same way?</summary><p data-t="a4">No. Most compare the best day with total net profit, some compare it with the profit target, and some only apply it on funded accounts or before a payout. Always read your firm's rules.</p></details>
+
+ <div class="card cta"><div><b data-t="ctah">Let the journal fill this for you</b><p data-t="ctap">In the free TRADEVERSITY journal, the consistency check reads your real daily P/L from your trades, per prop account.</p></div><a class="btn pri" href="index.html" data-t="ctab">Open the free journal</a></div>
+ <p class="risk" data-t="risk">Education only, not financial advice. Prop firm rules change often: always check your firm's official rules before you trade.</p>
+ <footer><span>© <span id="yr"></span> TRADEVERSITY</span><a href="welcome.html" data-t="home">Home</a><a href="support.html" data-t="help">Help</a><a href="privacy.html" data-t="priv">Privacy policy</a><a href="terms.html" data-t="terms">Terms and conditions</a></footer>
+</div>
+<script>
+window.T={
+fr:{crumb:"Outils gratuits",n1:"Calculateur de risque",n2:"Règle de consistance",n3:"Codes promo prop firms",h1:"Calculateur de la règle de consistance des prop firms",
+lead:"La plupart des prop firms disent que votre meilleur jour ne peut pas dépasser X % de votre profit total. Entrez votre P/L par jour : vous voyez si vous passez, combien il vous manque et le maximum à faire le prochain jour. Gratuit, sans connexion.",
+size:"Taille du compte",tgt:"Objectif de profit $",rule:"Règle de consistance %",dpl:"P/L par jour",add:"+ Ajouter un jour",tot:"P/L net total",
+s1h:"Comment fonctionne la règle de consistance",s1p:"Meilleur jour ÷ profit net total doit rester sous la règle. Exemple avec 30 % : meilleur jour 900 $ et total 2 500 $ → 36 % : pas encore consistant. Il faut un total de 900 $ ÷ 0,30 = 3 000 $, donc 500 $ de plus, sans faire un autre jour plus gros que 900 $.",
+s2h:"Le plan qui passe",s2p:"Avec une règle de 30 %, il faut au moins 4 jours gagnants (1 ÷ 0,30). Répartissez l'objectif sur ces jours, arrêtez de trader une fois l'objectif du jour atteint, et gardez chaque jour sous la limite affichée.",
+fh:"Questions",q1:"Qu'est-ce que la règle de consistance des prop firms ?",a1:"Elle limite la part de votre profit total qui peut venir d'un seul jour. Avec une règle de 30 %, votre meilleur jour doit faire 30 % ou moins de votre profit net total. Si un jour est plus gros, vous devez continuer jusqu'à ce que le total soit assez grand.",
+q2:"Comment savoir si je passe une règle de 30 % ?",a2:"Divisez votre meilleur jour par votre profit net total. Exemple : meilleur jour 900 $, total 2 500 $ → 36 %, au-dessus de 30 %. Il faut un total de 900 $ ÷ 0,30 = 3 000 $, donc 500 $ de plus sans battre votre meilleur jour.",
+q3:"Combien de jours faut-il pour passer avec une règle de consistance ?",a3:"Au moins 1 ÷ règle : 4 jours avec 30 %, 5 jours avec 20 %, 3 jours avec 40 %, 2 jours avec 50 %. Répartir l'objectif de façon égale sur ces jours est le plan le plus sûr.",
+q4:"Toutes les prop firms comptent-elles la règle de la même façon ?",a4:"Non. La plupart comparent le meilleur jour au profit net total, certaines à l'objectif de profit, et certaines ne l'appliquent que sur les comptes financés ou avant un retrait. Lisez toujours les règles de votre prop firm.",
+ctah:"Laissez le journal remplir ça pour vous",ctap:"Dans le journal TRADEVERSITY gratuit, la vérification de consistance lit votre vrai P/L par jour depuis vos trades, par compte prop.",ctab:"Ouvrir le journal gratuit",
+risk:"Uniquement éducatif, pas un conseil financier. Les règles des prop firms changent souvent : vérifiez toujours les règles officielles de votre prop firm avant de trader.",
+home:"Accueil",help:"Aide",priv:"Politique de confidentialité",terms:"Conditions générales",
+day:"Jour",ph:"P/L du jour",rm:"Retirer",ruleTxt:"règle",enterT:"Entrez l'objectif et le % de la règle.",enterD:"Entrez d'abord votre P/L par jour.",
+pass:"✔ Objectif atteint et consistant : vous pouvez demander le retrait / passer",soFar:"✔ Consistant pour l'instant. Continuez : il reste",notYet1:"✖ Pas encore consistant : le meilleur jour fait",notYet2:"du total (max",notYet3:"Faites",notYet4:"de plus sans battre votre meilleur jour.",
+share:"Part du meilleur jour",bestday:"meilleur jour",max:"max",need:"Profit total nécessaire",eqT:"= objectif de profit",yourBest:"votre meilleur jour",today:"Prochain jour : ne faites pas plus de",todaySub:"Au-delà, il devient votre nouveau meilleur jour et augmente le profit nécessaire.",
+tipT:"Conseil",tip1:"Pour passer un compte",tip2:"en",tip3:"jours, visez des jours de",rules:"Règles",maxDay:"Profit max en un jour",noDay:"Aucun jour ne peut dépasser",noDay2:"de votre profit net total.",diff:"Certaines prop firms comptent autrement (par ex. % de l'objectif). Vérifiez toujours les règles de votre prop firm."},
+ar:{crumb:"أدوات مجانية",n1:"حاسبة المخاطرة",n2:"قاعدة الثبات",n3:"أكواد خصم شركات التمويل",h1:"حاسبة قاعدة الثبات لشركات التمويل",
+lead:"معظم شركات التمويل تشترط ألا يتجاوز أفضل يوم X% من ربحك الكلي. أدخل ربحك/خسارتك اليومية: ترى هل تنجح، كم يلزمك بعد، وأقصى ربح ليومك التالي. مجانية وبدون تسجيل دخول.",
+size:"حجم الحساب",tgt:"هدف الربح $",rule:"قاعدة الثبات %",dpl:"الربح/الخسارة اليومية",add:"+ إضافة يوم",tot:"صافي الربح الكلي",
+s1h:"كيف تعمل قاعدة الثبات",s1p:"أفضل يوم ÷ صافي الربح الكلي يجب أن يبقى عند القاعدة أو تحتها. مثال بقاعدة 30%: أفضل يوم 900$ والمجموع 2500$ ← 36%: غير ثابت بعد. تحتاج مجموعاً قدره 900$ ÷ 0.30 = 3000$، أي 500$ إضافية دون أن يتجاوز أي يوم آخر 900$.",
+s2h:"الخطة التي تنجح",s2p:"بقاعدة 30% تحتاج 4 أيام رابحة على الأقل (1 ÷ 0.30). وزّع الهدف على هذه الأيام، توقف عن التداول عند بلوغ هدف اليوم، وأبقِ كل يوم تحت الحد المعروض.",
+fh:"أسئلة",q1:"ما هي قاعدة الثبات في شركات التمويل؟",a1:"تحدّ من نسبة ربحك الكلي التي يمكن أن تأتي من يوم واحد. بقاعدة 30%، يجب أن يكون أفضل يوم 30% أو أقل من صافي ربحك الكلي. إن كان يوم أكبر، عليك مواصلة التداول حتى يكبر المجموع بما يكفي.",
+q2:"كيف أعرف إن كنت أنجح في قاعدة 30%؟",a2:"اقسم أفضل يوم على صافي ربحك الكلي. مثال: أفضل يوم 900$، المجموع 2500$ ← 36%، فوق 30%. تحتاج مجموعاً قدره 900$ ÷ 0.30 = 3000$، أي 500$ إضافية دون تجاوز أفضل يوم.",
+q3:"كم يوماً أحتاج للنجاح مع قاعدة الثبات؟",a3:"على الأقل 1 ÷ القاعدة: 4 أيام بقاعدة 30%، 5 أيام بـ 20%، 3 أيام بـ 40%، يومان بـ 50%. توزيع الهدف بالتساوي على هذه الأيام هو الخطة الأكثر أماناً.",
+q4:"هل تحسب كل شركات التمويل القاعدة بنفس الطريقة؟",a4:"لا. معظمها يقارن أفضل يوم بصافي الربح الكلي، بعضها يقارنه بهدف الربح، وبعضها يطبقها فقط على الحسابات الممولة أو قبل السحب. اقرأ دائماً قواعد شركتك.",
+ctah:"دع اليوميات تملأ هذا عنك",ctap:"في يوميات TRADEVERSITY المجانية، فحص الثبات يقرأ ربحك اليومي الحقيقي من صفقاتك، لكل حساب تمويل.",ctab:"افتح اليوميات المجانية",
+risk:"للتعليم فقط، وليس نصيحة مالية. قواعد شركات التمويل تتغير كثيراً: تحقق دائماً من القواعد الرسمية لشركتك قبل التداول.",
+home:"الرئيسية",help:"المساعدة",priv:"سياسة الخصوصية",terms:"الشروط والأحكام",
+day:"يوم",ph:"ربح/خسارة اليوم",rm:"حذف",ruleTxt:"قاعدة",enterT:"أدخل الهدف ونسبة القاعدة.",enterD:"أدخل ربحك/خسارتك اليومية أولاً.",
+pass:"✔ تم بلوغ الهدف مع الثبات: يمكنك طلب السحب / النجاح",soFar:"✔ ثابت حتى الآن. واصل: يتبقى",notYet1:"✖ غير ثابت بعد: أفضل يوم يمثل",notYet2:"من المجموع (الحد",notYet3:"حقق",notYet4:"إضافية دون تجاوز أفضل يوم.",
+share:"نسبة أفضل يوم",bestday:"أفضل يوم",max:"الحد",need:"الربح الكلي المطلوب",eqT:"= هدف الربح",yourBest:"أفضل يوم لك",today:"اليوم التالي: لا تتجاوز",todaySub:"فوق هذا المبلغ يصبح أفضل يوم جديد ويرفع الربح المطلوب.",
+tipT:"نصيحة",tip1:"للنجاح في حساب",tip2:"خلال",tip3:"أيام، استهدف أياماً بربح",rules:"القواعد",maxDay:"أقصى ربح في يوم واحد",noDay:"لا يمكن لأي يوم أن يتجاوز",noDay2:"من صافي ربحك الكلي.",diff:"بعض الشركات تحسبها بطريقة أخرى (مثلاً % من الهدف). تحقق دائماً من قواعد شركتك."}};
+</script>
+<script src="tools.js?v=1"></script>
+<script>
+(function(){
+var t=function(k,en){return TV.t(k,en)},M=TV.money,N=TV.num,P=TV.pct,E=TV.esc,$=function(s){return document.querySelector(s)},$$=function(s){return [].slice.call(document.querySelectorAll(s))};
+var SIZES=[25000,50000,75000,100000,150000,200000],kT=function(v){return v>=1000?"$"+(+(v/1000).toFixed(1))+"K":M(v,0)};
+var KEY="tv_pub_cons",c;try{c=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+c=c||{size:50000,target:3000,pct:30,days:["",""]};if(!Array.isArray(c.days)||!c.days.length)c.days=["",""];
+var save=function(){try{localStorage.setItem(KEY,JSON.stringify(c))}catch(e){}};
+var vals=function(){return c.days.map(function(v){var n=N(v);return isFinite(n)?n:0})};
+function head(){$("#size").innerHTML=SIZES.map(function(s){return '<option value="'+s+'"'+(N(c.size)===s?" selected":"")+'>'+kT(s)+'</option>'}).join("");$("#tgt").value=c.target;$("#pct").value=c.pct;
+ $("#pills").innerHTML=[20,30,40,50].map(function(p){return '<button type="button" class="btn'+(N(c.pct)===p?" pri":"")+'" data-p="'+p+'"><b class="mono">'+p+'%</b>&nbsp;'+t("ruleTxt","rule")+'</button>'}).join("");
+ $$("#pills button").forEach(function(b){b.onclick=function(){c.pct=+b.dataset.p;save();head();rows();calc()}})}
+function rows(){$("#rows").innerHTML=c.days.map(function(v,i){return '<div class="cs-row" data-r="'+i+'"><span class="d">'+t("day","Day")+' <b>'+(i+1)+'</b></span><input class="i mono" type="number" inputmode="decimal" step="any" data-i="'+i+'" value="'+E(v)+'" placeholder="'+E(t("ph","Daily P/L"))+'"><span class="cs-sh mono"><span>0%</span><i></i></span><button class="cs-x" type="button" data-x="'+i+'" aria-label="'+E(t("rm","Remove"))+'">✕</button></div>'}).join("");
+ $$("#rows input").forEach(function(inp){inp.oninput=function(){c.days[+inp.dataset.i]=inp.value;save();calc()}});
+ $$("#rows .cs-x").forEach(function(b){b.onclick=function(){c.days.splice(+b.dataset.x,1);if(!c.days.length)c.days=[""];save();rows();calc()}})}
+function calc(){var Pc=N(c.pct)/100,T=N(c.target),vs=vals(),tot=vs.reduce(function(a,b){return a+b},0),best=Math.max.apply(null,[0].concat(vs));
+ $$("#rows .cs-row").forEach(function(r,i){var x=vs[i],sh=tot>0&&x>0?x/tot:0;r.classList.toggle("over",Pc>0&&sh>Pc+1e-9);r.querySelector(".cs-sh span").textContent=P(sh,0);r.querySelector(".cs-sh i").style.width=Math.min(100,sh*100)+"%"});
+ $("#tot").textContent=M(tot);$("#tot").style.color=tot>0?"var(--ok)":tot<0?"var(--bad)":"";
+ var n=Pc>0?Math.ceil(1/Pc-1e-9):0;
+ $("#side").innerHTML=(Pc>0&&T>0?'<div class="card" style="margin-bottom:12px"><b>💡 '+t("tipT","Tip")+'</b><p style="margin:6px 0 0;color:#cfd2da">'+t("tip1","To pass a")+' <b>'+kT(N(c.size))+'</b> '+t("tip2","account in")+' <b>'+n+'</b> '+t("tip3","days, aim for")+' <b class="mono">'+M(T/n,0)+'</b>.</p></div>':"")
+  +'<div class="card"><h3>'+t("rules","Rules")+'</h3><div class="row" style="justify-content:space-between"><span class="mut">'+t("size","Account size")+'</span><b>'+kT(N(c.size))+'</b></div>'
+  +'<div class="row" style="justify-content:space-between"><span class="mut">'+t("tgt","Profit target $").replace(" $","")+'</span><b class="mono">'+M(T,0)+'</b></div>'
+  +'<div class="row" style="justify-content:space-between"><span class="mut">'+t("rule","Consistency rule %").replace(" %","")+'</span><b>'+c.pct+'%</b></div>'
+  +'<div class="row" style="justify-content:space-between"><span class="mut">'+t("maxDay","Max profit in one day")+'</span><b class="mono">'+M(T*Pc,0)+'</b></div>'
+  +'<p style="color:#cfd2da">'+t("noDay","No single day's profit may exceed")+' <b>'+c.pct+'%</b> '+t("noDay2","of your total net profit.")+'</p><p class="mut" style="font-size:12.5px;margin:0">'+t("diff","Some firms count it differently (e.g. % of the profit target). Always check your firm's rules.")+'</p></div>';
+ if(!(Pc>0&&Pc<=1)||!(T>0)){$("#out").innerHTML='<div class="card mut">'+t("enterT","Enter the target and rule %.")+'</div>';return}
+ if(!vs.some(function(v){return v})){$("#out").innerHTML='<div class="card mut">'+t("enterD","Enter your daily P/L first.")+'</div>';return}
+ var need=Math.max(T,best>0?best/Pc:0),remain=Math.max(0,need-tot),ratio=tot>0?best/tot:NaN,ok=tot>0&&best<=tot*Pc+1e-9,maxToday=Math.max(0,(Pc*tot-best)/(1-Pc));
+ var stt=ok&&tot>=T?'<div class="status good">'+t("pass","✔ Target reached and consistent: you can request a payout / pass")+'</div>'
+  :ok?'<div class="status mid">'+t("soFar","✔ Consistent so far. Keep going:")+' <b class="mono">'+M(remain,0)+'</b></div>'
+  :'<div class="status bad">'+t("notYet1","✖ Not consistent yet: best day is")+' '+P(ratio,1)+' '+t("notYet2","of total (max")+' '+c.pct+'%). '+t("notYet3","Make")+' <b class="mono">'+M(remain,0)+'</b> '+t("notYet4","more without beating your best day.")+'</div>';
+ var tile=function(lab,val,sub,col){return '<div class="tile"><div class="ty">'+lab+'</div><div class="n mono" style="font-size:30px'+(col?";color:"+col:"")+'">'+val+'</div><div class="mut" style="font-size:12.5px">'+sub+'</div></div>'};
+ $("#out").innerHTML='<div class="card grid" style="margin-bottom:12px">'+stt+'<div class="tiles">'
+  +tile(t("share","Best day share"),isFinite(ratio)?P(ratio,1):"—",t("bestday","best day")+" "+M(best,0)+" · "+t("max","max")+" "+c.pct+"%",ok?"var(--ok)":"var(--bad)")
+  +tile(t("need","Total profit you need"),M(need,0),best>0&&best/Pc>T?t("yourBest","your best day")+" "+M(best,0)+" ÷ "+c.pct+"%":t("eqT","= profit target"))
+  +'</div>'+(remain>0?tile(t("today","Next day: don't make more than"),M(Math.max(maxToday,best),0),t("todaySub","Above this, it becomes your new best day and raises the profit you need.")):"")+'</div>'}
+$("#size").onchange=function(){c.size=+this.value;var d={25000:1500,50000:3000,75000:4500,100000:6000,150000:9000,200000:12000}[c.size];if(d)c.target=d;save();head();calc()};
+$("#tgt").oninput=function(){c.target=this.value;save();calc()};
+$("#pct").oninput=function(){c.pct=this.value;save();calc()};
+$("#add").onclick=function(){c.days.push("");save();rows();calc();var l=$$("#rows input");if(l.length)l[l.length-1].focus()};
+window.onLang=function(){head();rows();calc()};head();rows();calc();
+})();
+</script>
+</body>
+</html>
