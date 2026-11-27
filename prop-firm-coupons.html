@@ -97,14 +97,15 @@ function render(){
  $("#coupons").innerHTML=cards.map(function(x){return '<div class="card cp"><div class="hd"><div><b style="font-size:18px">'+E(x.f.name)+'</b><div style="margin-top:4px"><span class="tag">'+t("partner","Partner offer")+'</span> '
    +(x.f.dz==="yes"?'<span class="tag dz">'+t("accepts","Accepts Algeria")+'</span>':'')+'</div></div><div class="pct mono">'+(x.c.prog?'<small>'+t("upto","up to")+' </small>':'')+'-'+x.c.pct+'%</div></div>'
    +(x.c.prog?'<div class="mut" style="font-size:13px">'+t("only","Only plans")+' “'+E(x.c.prog)+'”</div>':'')
-   +'<div class="code"><b class="mono">'+E(x.code)+'</b><button class="btn" type="button" data-copy="'+E(x.code)+'">'+t("copy","Copy")+'</button></div>'
+   +'<div class="code"><b class="mono">'+E(x.code)+'</b><button class="btn" type="button" data-copy="'+E(x.code)+'" data-firm="'+E(x.id)+'">'+t("copy","Copy")+'</button></div>'
    +'<a class="btn pri" href="'+E(x.c.url)+'" target="_blank" rel="sponsored noopener">'+t("get","Get the discount")+' ↗</a></div>'}).join("");
- [].forEach.call(document.querySelectorAll("[data-copy]"),function(b){b.onclick=function(){var v=b.dataset.copy;(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(function(){TV.toast(t("copied","Code BROWN23 copied"))},function(){TV.toast(v)})}});
+ [].forEach.call(document.querySelectorAll("[data-copy]"),function(b){b.onclick=function(){var v=b.dataset.copy;(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(function(){TV.toast(t("copied","Code BROWN23 copied"))},function(){TV.toast(v)});if(window.TVAff)TVAff.track("copy",b.dataset.firm||"","coupons page")}});
  var ok=PF.firms.filter(function(f){return f.dz==="yes"});
  $("#dz").innerHTML=ok.map(function(f){var url=AFF[f.id]||("https://"+f.site);return '<div class="firm"><b>'+E(f.name)+'</b><small>'+(f.type==="futures"?t("fut","Futures"):t("cfd","CFD"))+(f.sizes?' · '+E(f.sizes.join(", ")):'')+'</small><div style="margin-top:6px"><a href="'+E(url)+'" target="_blank" rel="'+(AFF[f.id]?"sponsored ":"")+'noopener">'+E(f.site)+' ↗</a></div></div>'}).join("");
  if(PF.checked){var p=PF.checked.split("-"),d=new Date(+p[0],+p[1]-1,1);$("#checked").textContent=t("checked","Checked:")+" "+d.toLocaleDateString(TV.lang==="ar"?"ar-DZ":TV.lang==="fr"?"fr-FR":"en-US",{month:"long",year:"numeric"})}}
 window.onLang=render;render();
 })();
 </script>
+<script src="promo-e2t.js?v=1" data-place="coupons page" data-popup="0" defer></script>
 </body>
 </html>

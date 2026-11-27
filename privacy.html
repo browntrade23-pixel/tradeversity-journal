@@ -69,7 +69,7 @@ footer a{color:var(--muted)}
   <li><b>Security check:</b> when you sign up, log in or reset your password, Cloudflare Turnstile checks that you are a person and not a bot. Cloudflare looks at technical signals from your browser for this.</li>
   <li><b>Two-step login (admin accounts):</b> the secret for the authenticator app is kept by our login provider.</li>
   <li><b>App error reports:</b> when a screen of the website breaks, the technical error is sent to our database so we can fix it: the error message, the file and line, the page (for example "#journal"), the app version, your browser type and, if you are logged in, your account ID. Email addresses and long numbers in the message are masked, and no journal content is sent.</li>
-  <li><b>Partner links:</b> when you click a prop firm link, which firm and where on the page, to count referrals.</li>
+  <li><b>Partner links and offers:</b> when you see the partner offer pop-up, copy a partner code or click a prop firm link: what happened, which firm and which page, to count referrals. On the public pages this count is anonymous (no account, no IP address, no cookie); inside the app it is linked to your account.</li>
   <li><b>Links you share:</b> the share links you create yourself.</li>
   <li><b>Your consent:</b> the version and date of the terms and privacy policy you accepted, saved on your account as proof.</li>
   <li><b>Discord (optional):</b> if you join our Discord server and open a support ticket, Discord and our own ticket bot handle your Discord username and the messages in that ticket.</li>
@@ -116,6 +116,7 @@ footer a{color:var(--muted)}
   <li>Your account, journal and course data: as long as your account exists. When your account is deleted, they are deleted with it.</li>
   <li>Help center messages: as long as needed to answer you and keep a record of the request.</li>
   <li>App error reports: 30 days, then deleted automatically.</li>
+  <li>Partner click counts: 13 months, then deleted automatically.</li>
   <li>Backups: we keep private weekly backups of the database to restore the service after a failure. They are stored securely by the TRADEVERSITY team, and data you deleted can remain in an older backup for a limited time until that backup is replaced.</li>
 </ul>
 
@@ -152,7 +153,7 @@ footer a{color:var(--muted)}
   <li><b>Vérification de sécurité :</b> à l'inscription, à la connexion et à la réinitialisation du mot de passe, Cloudflare Turnstile vérifie que vous êtes une personne et non un robot. Cloudflare analyse pour cela des signaux techniques de votre navigateur.</li>
   <li><b>Connexion en deux étapes (comptes admin) :</b> le secret de l'application d'authentification est conservé par notre service de connexion.</li>
   <li><b>Rapports d'erreurs de l'app :</b> quand un écran du site plante, l'erreur technique est envoyée à notre base de données pour que nous la corrigions : le message d'erreur, le fichier et la ligne, la page (par exemple « #journal »), la version de l'app, le type de navigateur et, si vous êtes connecté, l'identifiant de votre compte. Les adresses e-mail et les longs nombres dans le message sont masqués, et aucun contenu de votre journal n'est envoyé.</li>
-  <li><b>Liens partenaires :</b> quand vous cliquez sur le lien d'une prop firm, laquelle et à quel endroit de la page, pour compter les parrainages.</li>
+  <li><b>Liens et offres partenaires :</b> quand vous voyez la fenêtre d'offre partenaire, copiez un code partenaire ou cliquez sur le lien d'une prop firm : ce qui s'est passé, quelle prop firm et quelle page, pour compter les parrainages. Sur les pages publiques ce comptage est anonyme (pas de compte, pas d'adresse IP, pas de cookie) ; dans l'appli, il est lié à votre compte.</li>
   <li><b>Liens partagés :</b> les liens de partage que vous créez vous-même.</li>
   <li><b>Votre consentement :</b> la version et la date des conditions et de la politique de confidentialité que vous avez acceptées, enregistrées sur votre compte comme preuve.</li>
   <li><b>Discord (facultatif) :</b> si vous rejoignez notre serveur Discord et ouvrez un ticket, Discord et notre propre bot de tickets traitent votre nom d'utilisateur Discord et les messages de ce ticket.</li>
@@ -199,6 +200,7 @@ footer a{color:var(--muted)}
   <li>Votre compte, votre journal et vos données de formation : tant que votre compte existe. Quand votre compte est supprimé, ils sont supprimés avec lui.</li>
   <li>Messages du centre d'aide : le temps nécessaire pour vous répondre et garder une trace de la demande.</li>
   <li>Rapports d'erreurs de l'app : 30 jours, puis supprimés automatiquement.</li>
+  <li>Comptage des clics partenaires : 13 mois, puis supprimé automatiquement.</li>
   <li>Sauvegardes : nous gardons des sauvegardes hebdomadaires privées de la base de données pour restaurer le service après une panne. Elles sont conservées en sécurité par l'équipe TRADEVERSITY, et des données que vous avez supprimées peuvent rester dans une ancienne sauvegarde pendant une durée limitée, jusqu'à son remplacement.</li>
 </ul>
 
@@ -235,7 +237,7 @@ footer a{color:var(--muted)}
   <li><b>التحقق الأمني:</b> عند إنشاء حساب أو تسجيل الدخول أو إعادة تعيين كلمة المرور، يتحقق Cloudflare Turnstile من أنك شخص وليس برنامجاً آلياً، ويعتمد في ذلك على إشارات تقنية من متصفحك.</li>
   <li><b>تسجيل الدخول بخطوتين (حسابات المشرفين):</b> يحتفظ مزوّد تسجيل الدخول بالمفتاح السري لتطبيق المصادقة.</li>
   <li><b>تقارير أخطاء التطبيق:</b> عندما تتعطل شاشة في الموقع، يُرسل الخطأ التقني إلى قاعدة بياناتنا لنصلحه: رسالة الخطأ، والملف والسطر، والصفحة (مثل "#journal")، ونسخة التطبيق، ونوع المتصفح، ومعرّف حسابك إذا كنت مسجلاً الدخول. تُخفى عناوين البريد الإلكتروني والأرقام الطويلة في الرسالة، ولا يُرسل أي محتوى من يومياتك.</li>
-  <li><b>روابط الشركاء:</b> عند الضغط على رابط شركة تمويل، أي شركة وفي أي مكان من الصفحة، لحساب الإحالات.</li>
+  <li><b>روابط وعروض الشركاء:</b> عند رؤية نافذة عرض الشريك، أو نسخ كود شريك، أو الضغط على رابط شركة تمويل: ما حدث، وأي شركة، وأي صفحة، لحساب الإحالات. في الصفحات العامة يكون هذا العدّ مجهول الهوية (بلا حساب ولا عنوان IP ولا ملف تعريف ارتباط)، وداخل التطبيق يرتبط بحسابك.</li>
   <li><b>الروابط التي تشاركها:</b> روابط المشاركة التي تنشئها بنفسك.</li>
   <li><b>موافقتك:</b> نسخة وتاريخ الشروط وسياسة الخصوصية التي وافقت عليها، محفوظة في حسابك كإثبات.</li>
   <li><b>ديسكورد (اختياري):</b> إذا انضممت إلى خادم ديسكورد الخاص بنا وفتحت تذكرة دعم، يعالج ديسكورد وبوت التذاكر الخاص بنا اسم المستخدم والرسائل في تلك التذكرة.</li>
@@ -282,6 +284,7 @@ footer a{color:var(--muted)}
   <li>حسابك ودفترك وبيانات الدورة: طالما بقي حسابك موجوداً. عند حذف حسابك، تُحذف معه.</li>
   <li>رسائل مركز المساعدة: المدة اللازمة للردّ عليك والاحتفاظ بسجلّ الطلب.</li>
   <li>تقارير أخطاء التطبيق: 30 يوماً، ثم تُحذف تلقائياً.</li>
+  <li>عدّ نقرات الشركاء: 13 شهراً، ثم يُحذف تلقائياً.</li>
   <li>النسخ الاحتياطية: نحتفظ بنسخ احتياطية أسبوعية خاصة لقاعدة البيانات لاستعادة الخدمة بعد أي عطل. يحفظها فريق TRADEVERSITY بشكل آمن، وقد تبقى بيانات حذفتها في نسخة احتياطية قديمة لمدة محدودة حتى يتم استبدالها.</li>
 </ul>
 
