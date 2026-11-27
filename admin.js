@@ -298,6 +298,7 @@ function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,dis
   [...el.querySelectorAll(":scope > .card, :scope > .grid")].forEach(n=>{if(n.querySelector("#aT"))put(n,"students");else if(/Group weak spots/.test(n.textContent))put(n,"overview");else if(n.classList.contains("grid")&&n.querySelector(".kpi"))n.remove()});
   if(!box.querySelector('[data-sec="requests"]').children.length)box.querySelector('[data-sec="requests"]').innerHTML=`<div class="card adm-empty">✅ <span>No pending requests.</span></div>`;
   if(!box.querySelector('[data-sec="affiliates"]').children.length)box.querySelector('[data-sec="affiliates"]').innerHTML=`<div class="card adm-empty"><span>No clicks recorded yet.</span></div>`;
+  {const c=document.createElement("div");c.className="card err-card";box.querySelector('[data-sec="settings"]').appendChild(c);admErrors(c)}
   /* 📣 announcements: send (server function: saves it + Telegram to all students), list, delete */
   {const list=box.querySelector("#annList");
    const draw=async()=>{let A=[];try{A=API.announcements?await API.announcements():[]}catch(e){list.innerHTML=`<p class="mut" style="font-size:12px">${esc(I18N.t("Announcements are not set up yet on the server."))}</p>`;return}
@@ -334,6 +335,15 @@ function admOrganize(el,D){const {profs,trades,plans,clicks,students,pending,dis
   mount3d("a3AdmOrb","disciplineOrb",classAvg.v,I18N.t("class score"));
   const show=k=>{S._admTab=k;$$(".adm-tabs [data-at]",box).forEach(b=>b.classList.toggle("on",b.dataset.at===k));$$(".adm-sec",box).forEach(s=>s.classList.toggle("on",s.dataset.sec===k))};
   $$("[data-at]",box).forEach(b=>b.onclick=()=>{show(b.dataset.at);window.scrollTo({top:0,behavior:"smooth"})});show(cur)}
+/* 🐞 app errors: screens that broke on members' devices (own error log: client_errors, kept 30 days, no personal data; admin-only read) */
+async function admErrors(c){const h=`<h3>🐞 <span>App errors · 7 days</span>`;c.innerHTML=h+`</h3><div class="empty">…</div>`;
+  let R=[];try{const{data,error}=await Cloud.sb.from("client_errors").select("at,ver,page,msg,src,line").gte("at",new Date(Date.now()-7*864e5).toISOString()).order("at",{ascending:false}).limit(300);if(error)throw error;R=data||[]}
+  catch(e){c.innerHTML=h+`</h3><p class="mut" style="font-size:12px;margin:0"><span>The error log is not set up yet on the server.</span></p>`;return}
+  const g={};R.forEach(r=>{const k=r.msg+"|"+r.src+"|"+r.line;const x=g[k]||(g[k]={n:0,r,last:r.at,pages:new Set(),vers:new Set()});x.n++;if(r.page)x.pages.add(r.page);if(r.ver)x.vers.add(r.ver)});
+  const L=Object.values(g).sort((a,b)=>b.n-a.n).slice(0,15);
+  c.innerHTML=h+` <span class="adm-n" data-notr>${R.length}</span></h3><p class="mut" style="font-size:12px;margin:0 0 8px"><span>Errors that happened on members' screens. Kept 30 days, no personal data. Copy them to Claude to fix them.</span></p>`+
+   (L.length?`<div class="tw"><table class="t"><tr><th>Error</th><th>Times</th><th>Where</th><th>Last seen</th></tr>${L.map(x=>`<tr><td data-notr><b>${esc(x.r.msg)}</b><br><small class="mut mono">${esc(String(x.r.src||"").split("/").pop())}${x.r.line?":"+x.r.line:""}${x.vers.size?" · v"+esc([...x.vers].join(", ")):""}</small></td><td data-notr>${x.n}</td><td data-notr>${esc([...x.pages].slice(0,3).join(" "))}</td><td data-notr>${esc(fmtDate(String(x.last).slice(0,10)))}</td></tr>`).join("")}</table></div>`
+    :`<div class="adm-empty">✅ <span>No errors in the last 7 days.</span></div>`)}
 async function courseAdmin(box,students){if(!box)return;box.innerHTML=`<h3 style="margin:0 0 8px">🎓 <span>Mentorship course</span></h3><div class="empty">…</div>`;
   const r=await CourseAPI.call("adminList");if(!box.isConnected)return;
   if(!r.ok){box.innerHTML=`<h3 style="margin:0 0 8px">🎓 <span>Mentorship course</span></h3><p class="mut" style="font-size:13px">${esc(r.error==="server"||r.error==="network"?I18N.t("The course server isn't set up yet."):cErr(r.error))}</p><button class="btn sm" id="crsLes">🎬 <span>Lessons</span></button>`;$("#crsLes",box).onclick=()=>courseLessonsBox();return}

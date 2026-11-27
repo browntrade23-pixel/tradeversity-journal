@@ -1,0 +1,82 @@
+# Uptime alerts for TRADEVERSITY (free, no extra account).
+# Every 15 minutes GitHub checks the site and the services it needs. If something is down
+# (after retries), it opens ONE issue "[Uptime] ... is down" and mentions the owner, so GitHub
+# emails you. When everything works again it comments "back up" and closes the issue.
+# Only public addresses are used (the Supabase key read from the live page is the public anon key).
+# Note: GitHub pauses scheduled jobs in a repo with no activity for 60 days; any push restarts them.
+name: Uptime check
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check the site and its services
+        id: check
+        shell: python
+        run: |
+          import json, os, re, time, urllib.request, urllib.error
+          SITE = "https://jointradeversity.com"; SB = "https://szovzzkukzuytkzieuae.supabase.co"
+          def req(url, method="GET", headers=None):
+              h = {"User-Agent": "TradeversityUptime/1.0", **(headers or {})}
+              for i in range(3):
+                  try:
+                      r = urllib.request.urlopen(urllib.request.Request(url, method=method, headers=h), timeout=25)
+                      return r.status, r.read()
+                  except urllib.error.HTTPError as e:
+                      if e.code < 500 or i == 2: return e.code, b""
+                  except Exception as e:
+                      if i == 2: return 0, str(e).encode()
+                  time.sleep(20)
+          fails, lines = [], []
+          def check(name, ok, detail):
+              lines.append(("OK   " if ok else "DOWN ") + name + " · " + detail)
+              if not ok: fails.append(f"- **{name}**: {detail}")
+          st, body = req(SITE + "/?uptime=" + str(int(time.time())))
+          check("Website (app)", st == 200, f"HTTP {st}")
+          m = re.search(rb"SUPABASE_ANON_KEY\s*:\s*\"(eyJ[^\"]+)\"", body or b"")
+          key = m.group(1).decode() if m else ""
+          st, _ = req(SITE + "/welcome.html"); check("Landing page", st == 200, f"HTTP {st}")
+          st, b = req(SITE + "/version.json?t=" + str(int(time.time())))
+          check("Version file", st == 200 and b"\"v\"" in (b or b""), f"HTTP {st}")
+          sbh = {"apikey": key, "Authorization": "Bearer " + key} if key else {}
+          st, _ = req(SB + "/auth/v1/health", headers=sbh); check("Sign-up and login (Supabase)", st == 200, f"HTTP {st}")
+          st, _ = req(SB + "/rest/v1/", headers=sbh); check("Database", st in (200, 401), f"HTTP {st}")
+          st, _ = req(SB + "/functions/v1/course", method="OPTIONS", headers={"Origin": SITE, "Access-Control-Request-Method": "POST"})
+          check("Course server", st in (200, 204), f"HTTP {st}")
+          st, b = req(SB + "/functions/v1/telegram-verify?check=telegram")
+          check("Telegram bot", st == 200, f"HTTP {st}")
+          st, _ = req(SITE + "/download/player.json"); check("Cerebra PC update feed", st == 200, f"HTTP {st}")
+          st, _ = req(SITE + "/download/android.json"); check("Cerebra Android update feed", st == 200, f"HTTP {st}")
+          print("\n".join(lines))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("down=" + ("1" if fails else "0") + "\n")
+              f.write("report<<EOF\n" + "\n".join(fails) + "\nEOF\n")
+      - name: Open or close the alert issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          DOWN: ${{ steps.check.outputs.down }}
+          REPORT: ${{ steps.check.outputs.report }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          open=$(gh issue list --state open --search "[Uptime] in:title" --json number --jq '.[0].number')
+          now=$(date -u +"%Y-%m-%d %H:%M UTC")
+          if [ "$DOWN" = "1" ]; then
+            if [ -z "$open" ]; then
+              printf '@%s TRADEVERSITY: something is down (checked %s, after 3 tries).\n\n%s\n\nThis issue closes by itself when everything works again.\n' "$OWNER" "$now" "$REPORT" > body.md
+              gh issue create --title "[Uptime] TRADEVERSITY: something is down" --body-file body.md
+            fi  # already open: stay quiet (no email every 15 minutes)
+          elif [ -n "$open" ]; then
+            gh issue comment "$open" --body "Back up: everything works again ($now)."
+            gh issue close "$open"
+          fi

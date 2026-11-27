@@ -2163,7 +2163,20 @@ html:not([data-theme=light]) .hub-tabs button.on{background:linear-gradient(135d
 <div id="toast"></div>
 <div id="ntfPanel" class="ntf-panel hidden" role="dialog" aria-label="Notifications"></div>
 
-<script src="i18n.js?v=2026-11-26p"></script>
+<script>/* app error log: when a screen breaks on a member's device, the error is saved (own database, kept 30 days)
+   so the admin sees it in Admin > Settings & updates. Max 5 per page load, no personal data: emails and long numbers are masked,
+   only the page route is sent (no query), plus app version and browser type. Browser-extension and empty "Script error." are ignored. */
+(function(){var Q=[],n=0,seen={},tries=0;
+ function clean(t,m){return String(t||"").replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g,"[email]").replace(/\d{6,}/g,"[n]").slice(0,m)}
+ function push(msg,src,line){msg=clean(msg,400);src=String(src||"");if(!msg||/^Script error\.?$/i.test(msg)||/ResizeObserver loop/i.test(msg)||/^(chrome|moz|safari)-extension:/.test(src)||n>=5)return;
+  try{src=src?new URL(src,location.href).pathname:""}catch(e){src=""}var k=msg+"|"+src+"|"+line;if(seen[k])return;seen[k]=1;n++;
+  Q.push({msg:msg,src:clean(src,200),line:line|0,page:clean(location.pathname+(location.hash||"").split("?")[0],100),ua:navigator.userAgent.slice(0,200)});send()}
+ function send(){if(!Q.length)return;var c=window.Cloud;if(!c||!c.sb){if(++tries<24)setTimeout(send,5000);return}
+  var rows=Q.splice(0,Q.length).map(function(r){r.ver=String(window.APP_V||"").slice(0,20);return r});c.sb.from("client_errors").insert(rows).then(function(){},function(){})}
+ addEventListener("error",function(e){if(e&&e.message)push(e.message,e.filename,e.lineno)});
+ addEventListener("unhandledrejection",function(e){var r=e&&e.reason;push("Unhandled: "+(r&&(r.message||r)),r&&r.stack&&(String(r.stack).match(/https?:[^\s)]+?\.js/)||[])[0],0)});
+ window.__errSend=send})();</script>
+<script src="i18n.js?v=2026-11-27a"></script>
 <!-- the firm list stays here (trade costs use it); news explanations, the indicator video, the tour video, the Cerebra intro and
      the prop firm prices / codes / translations load only when a page needs them (see need() in the app script) -->
 <script src="propfirms.js"></script>
@@ -2313,7 +2326,10 @@ const Cloud={
   async init(){await new Promise((res,rej)=>{const s=document.createElement("script");/* exact version + integrity hash: a changed or hijacked CDN file is refused instead of running with the login session */
     s.src="vendor/supabase.js";s.integrity="sha384-A97u3Qnt9GZHURO9YJZRe7VQgGUeFzcv6I1oIGnUTxQrCxnpQMwR0/G8F2zt9abZ";s.crossOrigin="anonymous";s.onload=res;s.onerror=rej;document.head.appendChild(s)});
     this.sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
-    this.sb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY")openNewPassword()});},
+    this.sb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY")openNewPassword();
+      /* login ended in the background (signed out in another tab, or the session was revoked): show the login page, not an empty screen */
+      if(ev==="SIGNED_OUT"&&!this._out&&typeof S!=="undefined"&&S.me&&!S._demo){S.me=null;S.subject=null;try{history.replaceState(null,"",location.pathname)}catch(e){}showAuth();setTimeout(()=>{const m=document.getElementById("authMsg");if(m)m.textContent=I18N.t("Your session ended. Please log in again.")},50)}});
+    window.Cloud=this;},
   async profile(id){const{data,error}=await this.sb.from("profiles").select("*").eq("id",id).single();if(error)throw error;return {id:data.id,name:data.full_name,telegram:data.telegram,email:data.email,role:data.role,status:data.status,created_at:data.created_at,tgOk:!!data.telegram_verified,emailOk:await this.emailOk(id),...pfFields(data)}},
   /* My profile: saved on the student's own row (private: only them and the admin can read it) */
   async saveProfile(id,p){const row={username:p.username||null,first_name:p.first||null,last_name:p.last||null,birth_date:p.birth||null,country:p.country||null,city:p.city||null,zip:p.zip||null,phone:p.phone||null,avatar:p.avatar||null};
@@ -2338,7 +2354,7 @@ const Cloud={
     if(!data.session)return {needsConfirm:true};return {user:await this.profile(data.user.id),needsConfirm:false}},
   async verifyCode(email,token){const{data,error}=await this.sb.auth.verifyOtp({email,token,type:"signup"});if(error)throw error;return await this.profile(data.user.id)},
   async resendCode(email){const{error}=await this.sb.auth.resend({type:"signup",email,options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error},
-  async signOut(){await this.sb.auth.signOut()},
+  async signOut(){this._out=true;try{await this.sb.auth.signOut()}finally{setTimeout(()=>{this._out=false},1500)}},
   fromRow(r){return {...(r.data||{}),id:r.id,user_id:r.user_id,shots:r.shots||[]}},
   toRow(t){const{shots,...rest}=t;return {id:t.id,user_id:t.user_id,trade_date:t.date,symbol:t.symbol,account:t.account||null,pnl:tradeNet(t),data:rest,shots:shots||[]}},
   async listTrades(uid_){const{data,error}=await this.sb.from("trades").select("*").eq("user_id",uid_).order("trade_date",{ascending:false}).limit(5000);if(error)throw error;return data.map(r=>this.fromRow(r))},
@@ -4058,7 +4074,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-26p";
+const APP_VER="2026-11-27a";window.APP_V=APP_VER;
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;
