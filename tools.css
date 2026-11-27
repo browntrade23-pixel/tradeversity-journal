@@ -22,7 +22,7 @@ a{color:var(--ch2)}
 .tnav a.on{background:var(--pearl);color:var(--ink)}
 h1{font-size:clamp(26px,5vw,38px);line-height:1.12;letter-spacing:-.03em;margin:4px 0 8px;font-weight:700}
 h2{font-size:21px;letter-spacing:-.02em;margin:28px 0 10px}
-h3{font-size:16px;margin:0 0 10px}
+h3,h2.h3{font-size:16px;margin:0 0 10px;letter-spacing:normal}
 .lead{color:#c9ccd5;margin:0 0 16px;max-width:720px}
 .card{background:var(--glass);border:1px solid var(--edge);border-radius:22px;padding:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 20px 40px -26px rgba(0,0,0,.9)}
 .grid{display:grid;gap:12px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}

@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="brand/logo-192.png">
 <link rel="stylesheet" href="fonts/fonts.css?v=1">
-<link rel="stylesheet" href="tools.css?v=1">
+<link rel="stylesheet" href="tools.css?v=2">
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebApplication","name":"Prop firm consistency rule calculator","url":"https://jointradeversity.com/consistency-rule.html","applicationCategory":"FinanceApplication","operatingSystem":"Any","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"TRADEVERSITY","url":"https://jointradeversity.com/"}},
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"TRADEVERSITY","item":"https://jointradeversity.com/welcome.html"},{"@type":"ListItem","position":2,"name":"Consistency rule calculator","item":"https://jointradeversity.com/consistency-rule.html"}]},
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
@@ -26,7 +26,7 @@
 {"@type":"Question","name":"Do all prop firms count the consistency rule the same way?","acceptedAnswer":{"@type":"Answer","text":"No. Most compare the best day with total net profit, some compare it with the profit target, and some only apply it on funded accounts or before a payout. Always read your firm's rules."}}]}]</script>
 </head>
 <body>
-<div class="wrap">
+<main class="wrap">
  <div class="top"><a class="brand" href="welcome.html"><i></i>TRADEVERSITY</a>
   <div class="langs" role="group" aria-label="Language"><button type="button" data-l="en">EN</button><button type="button" data-l="fr">FR</button><button type="button" data-l="ar">ع</button></div></div>
  <nav class="crumbs" aria-label="Breadcrumb"><a href="welcome.html">TRADEVERSITY</a> › <span data-t="crumb">Free tools</span></nav>
@@ -46,7 +46,7 @@
     <div class="pills" id="pills"></div>
    </div>
    <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0" data-t="dpl">Daily P/L</h3><button class="btn" id="add" type="button" data-t="add">+ Add day</button></div>
+    <div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 class="h3" style="margin:0" data-t="dpl">Daily P/L</h2><button class="btn" id="add" type="button" data-t="add">+ Add day</button></div>
     <div id="rows"></div>
     <div class="row" style="justify-content:space-between;margin-top:10px"><span class="mut" data-t="tot">Total net P/L</span><b class="mono" id="tot"></b></div>
    </div>
@@ -70,7 +70,7 @@
  <div class="card cta"><div><b data-t="ctah">Let the journal fill this for you</b><p data-t="ctap">In the free TRADEVERSITY journal, the consistency check reads your real daily P/L from your trades, per prop account.</p></div><a class="btn pri" href="index.html" data-t="ctab">Open the free journal</a></div>
  <p class="risk" data-t="risk">Education only, not financial advice. Prop firm rules change often: always check your firm's official rules before you trade.</p>
  <footer><span>© <span id="yr"></span> TRADEVERSITY</span><a href="welcome.html" data-t="home">Home</a><a href="support.html" data-t="help">Help</a><a href="privacy.html" data-t="priv">Privacy policy</a><a href="terms.html" data-t="terms">Terms and conditions</a></footer>
-</div>
+</main>
 <script>
 window.T={
 fr:{crumb:"Outils gratuits",n1:"Calculateur de risque",n2:"Règle de consistance",n3:"Codes promo prop firms",h1:"Calculateur de la règle de consistance des prop firms",
@@ -106,7 +106,7 @@ pass:"✔ تم بلوغ الهدف مع الثبات: يمكنك طلب السح
 share:"نسبة أفضل يوم",bestday:"أفضل يوم",max:"الحد",need:"الربح الكلي المطلوب",eqT:"= هدف الربح",yourBest:"أفضل يوم لك",today:"اليوم التالي: لا تتجاوز",todaySub:"فوق هذا المبلغ يصبح أفضل يوم جديد ويرفع الربح المطلوب.",
 tipT:"نصيحة",tip1:"للنجاح في حساب",tip2:"خلال",tip3:"أيام، استهدف أياماً بربح",rules:"القواعد",maxDay:"أقصى ربح في يوم واحد",noDay:"لا يمكن لأي يوم أن يتجاوز",noDay2:"من صافي ربحك الكلي.",diff:"بعض الشركات تحسبها بطريقة أخرى (مثلاً % من الهدف). تحقق دائماً من قواعد شركتك."}};
 </script>
-<script src="tools.js?v=1"></script>
+<script src="tools.js?v=2"></script>
 <script>
 (function(){
 var t=function(k,en){return TV.t(k,en)},M=TV.money,N=TV.num,P=TV.pct,E=TV.esc,$=function(s){return document.querySelector(s)},$$=function(s){return [].slice.call(document.querySelectorAll(s))};
@@ -126,7 +126,7 @@ function calc(){var Pc=N(c.pct)/100,T=N(c.target),vs=vals(),tot=vs.reduce(functi
  $("#tot").textContent=M(tot);$("#tot").style.color=tot>0?"var(--ok)":tot<0?"var(--bad)":"";
  var n=Pc>0?Math.ceil(1/Pc-1e-9):0;
  $("#side").innerHTML=(Pc>0&&T>0?'<div class="card" style="margin-bottom:12px"><b>💡 '+t("tipT","Tip")+'</b><p style="margin:6px 0 0;color:#cfd2da">'+t("tip1","To pass a")+' <b>'+kT(N(c.size))+'</b> '+t("tip2","account in")+' <b>'+n+'</b> '+t("tip3","days, aim for")+' <b class="mono">'+M(T/n,0)+'</b>.</p></div>':"")
-  +'<div class="card"><h3>'+t("rules","Rules")+'</h3><div class="row" style="justify-content:space-between"><span class="mut">'+t("size","Account size")+'</span><b>'+kT(N(c.size))+'</b></div>'
+  +'<div class="card"><h2 class="h3">'+t("rules","Rules")+'</h2><div class="row" style="justify-content:space-between"><span class="mut">'+t("size","Account size")+'</span><b>'+kT(N(c.size))+'</b></div>'
   +'<div class="row" style="justify-content:space-between"><span class="mut">'+t("tgt","Profit target $").replace(" $","")+'</span><b class="mono">'+M(T,0)+'</b></div>'
   +'<div class="row" style="justify-content:space-between"><span class="mut">'+t("rule","Consistency rule %").replace(" %","")+'</span><b>'+c.pct+'%</b></div>'
   +'<div class="row" style="justify-content:space-between"><span class="mut">'+t("maxDay","Max profit in one day")+'</span><b class="mono">'+M(T*Pc,0)+'</b></div>'

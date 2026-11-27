@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="brand/logo-192.png">
 <link rel="stylesheet" href="fonts/fonts.css?v=1">
-<link rel="stylesheet" href="tools.css?v=1">
+<link rel="stylesheet" href="tools.css?v=2">
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebApplication","name":"Futures & CFD risk calculator","url":"https://jointradeversity.com/risk-calculator.html","applicationCategory":"FinanceApplication","operatingSystem":"Any","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"TRADEVERSITY","url":"https://jointradeversity.com/"}},
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"TRADEVERSITY","item":"https://jointradeversity.com/welcome.html"},{"@type":"ListItem","position":2,"name":"Risk calculator","item":"https://jointradeversity.com/risk-calculator.html"}]},
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
@@ -26,7 +26,7 @@
 {"@type":"Question","name":"Does this calculator work for CFD lots (XAUUSD, NAS100, EURUSD)?","acceptedAnswer":{"@type":"Answer","text":"Yes. Switch to CFD lots: the calculator uses the dollar value of one pip for 1.00 lot. Brokers differ, so you can change that value to match your broker's contract specifications."}}]}]</script>
 </head>
 <body>
-<div class="wrap">
+<main class="wrap">
  <div class="top"><a class="brand" href="welcome.html"><i></i>TRADEVERSITY</a>
   <div class="langs" role="group" aria-label="Language"><button type="button" data-l="en">EN</button><button type="button" data-l="fr">FR</button><button type="button" data-l="ar">ع</button></div></div>
  <nav class="crumbs" aria-label="Breadcrumb"><a href="welcome.html">TRADEVERSITY</a> › <span data-t="crumb">Free tools</span></nav>
@@ -40,7 +40,7 @@
   <div class="card grid" id="form"></div>
   <div id="out"></div>
  </div>
- <div class="card" style="margin-top:14px"><h3 id="specT"></h3><div class="tw" id="specs"></div>
+ <div class="card" style="margin-top:14px"><h2 class="h3" id="specT"></h2><div class="tw" id="specs"></div>
   <p class="mut" style="font-size:12.5px;margin:8px 0 0" id="specN"></p></div>
 
  <section class="prose">
@@ -59,7 +59,7 @@
  <div class="card cta"><div><b data-t="ctah">Track every trade in the free TRADEVERSITY journal</b><p data-t="ctap">Journal, statistics, prop firm rules, news alerts and this calculator saved to your account.</p></div><a class="btn pri" href="index.html" data-t="ctab">Open the free journal</a></div>
  <p class="risk" data-t="risk">Education only, not financial advice. Trading futures and CFDs is risky: you can lose more than you expect. Check your broker's and prop firm's contract specifications.</p>
  <footer><span>© <span id="yr"></span> TRADEVERSITY</span><a href="welcome.html" data-t="home">Home</a><a href="support.html" data-t="help">Help</a><a href="privacy.html" data-t="priv">Privacy policy</a><a href="terms.html" data-t="terms">Terms and conditions</a></footer>
-</div>
+</main>
 <script>
 window.T={
 fr:{crumb:"Outils gratuits",n1:"Calculateur de risque",n2:"Règle de consistance",n3:"Codes promo prop firms",h1:"Calculateur de risque gratuit futures & CFD",
@@ -101,7 +101,7 @@ lotsize:"حجم اللوت",lots:"لوت",microlots:"مايكرو لوت",perlot
 spec_fut:"مواصفات العقود الآجلة",spec_cfd:"مواصفات لوتات CFD",specn_fut:"عقود CME القياسية. تحقق من حدود العقود والرسوم لدى شركة التمويل.",specn_cfd:"قيم شائعة لدى الوسطاء: تتغير حسب الوسيط وشركة التمويل. تحقق دائماً من مواصفات وسيطك.",
 th_sym:"الرمز",th_c:"العقد",th_dpp:"$ / نقطة",th_tick:"تيك",th_dpt:"$ / تيك",th_mk:"السوق",th_lot:"1.00 لوت =",th_pip:"بيب",pmove:"حركة سعر",wide4:"الستوب واسع جداً: حتى 0.01 لوت يخاطر بـ"}};
 </script>
-<script src="tools.js?v=1"></script>
+<script src="tools.js?v=2"></script>
 <script>
 (function(){
 var t=function(k,en){return TV.t(k,en)},M=TV.money,N=TV.num,P=TV.pct,E=TV.esc;
