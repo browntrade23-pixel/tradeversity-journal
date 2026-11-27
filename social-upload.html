@@ -57,12 +57,14 @@ function pub(path){return URL0+"/storage/v1/object/public/"+BUCKET+"/"+path.spli
 function gate(html){$("gate").innerHTML=html;$("gate").hidden=false;$("up").hidden=true}
 async function start(){
   var s=await sb.auth.getSession(),ses=s&&s.data&&s.data.session;
-  if(!ses){gate('You are not logged in here. <a class="btn" href="index.html" target="_blank" rel="noopener" style="margin-top:8px">Log in to TRADEVERSITY</a><p class="mut">Log in as admin (with your 6-digit code), then come back and reload this page.</p>');return}
+  if(!ses){if(openerOk){try{opener.postMessage({type:"tv-upload-failed",msg:"Log in to TRADEVERSITY as admin in this browser, then press Upload again."},"*")}catch(e){}}gate('You are not logged in here. <a class="btn" href="index.html" target="_blank" rel="noopener" style="margin-top:8px">Log in to TRADEVERSITY</a><p class="mut">Log in as admin (with your 6-digit code), then come back and reload this page.</p>');return}
   var lv=await sb.auth.mfa.getAuthenticatorAssuranceLevel();
   if(!lv.data||lv.data.currentLevel!=="aal2"){gate('Your 6-digit code is needed. Open the app, go to Admin and enter the code, then reload this page. <a class="btn" href="index.html#admin" target="_blank" rel="noopener" style="margin-top:8px">Open Admin</a>');return}
   var me=await sb.from("profiles").select("role").eq("id",ses.user.id).maybeSingle();
   if(!me.data||me.data.role!=="admin"){gate('Only TRADEVERSITY admins can upload here.');return}
-  token=ses.access_token;$("gate").hidden=true;$("up").hidden=false;list(true)}
+  token=ses.access_token;$("gate").hidden=true;$("up").hidden=false;list(true);
+  /* a file chosen in the command center arrives here and uploads straight away */
+  if(openerOk){addEventListener("message",function(e){if(e.source!==opener)return;var d=e.data;if(d&&d.type==="tv-upload-file"&&d.file instanceof Blob)upload(d.file)});try{opener.postMessage({type:"tv-upload-ready"},"*")}catch(e){openerOk=false}}}
 async function list(clean){
   var r=await sb.storage.from(BUCKET).list("",{limit:100,sortBy:{column:"created_at",order:"desc"}});
   if(r.error){$("list").innerHTML='<li class="err">'+(String(r.error.message).indexOf("not found")>=0?"The upload folder isn't set up yet: run social_uploads_2026-11-27.sql in Supabase.":esc(r.error.message))+'</li>';return}
@@ -87,7 +89,7 @@ function upload(f){
   x.onload=function(){if(x.status>=200&&x.status<300){var u=pub(name);lastUrl=u;$("pst").textContent="Done";$("done").hidden=false;$("plink").textContent=u;$("send").hidden=!openerOk;list(false);if(openerOk)use(u)}
     else{var m="";try{m=JSON.parse(x.responseText).message}catch(e){}alertMsg("Upload refused"+(m?": "+m:" (HTTP "+x.status+")")+(x.status===403?". Log in again as admin with your 6-digit code.":""))}};
   x.onerror=function(){alertMsg("The upload stopped (connection). Try again.")};x.send(f)}
-function alertMsg(m){$("prog").hidden=false;$("pst").innerHTML='<span class="err">'+esc(m)+'</span>'}
+function alertMsg(m){$("prog").hidden=false;$("pst").innerHTML='<span class="err">'+esc(m)+'</span>';if(openerOk){try{opener.postMessage({type:"tv-upload-failed",msg:m},"*")}catch(e){}}}
 $("file").onchange=function(){upload(this.files[0]);this.value=""};
 var d=$("drop");["dragover","dragenter"].forEach(function(e){d.addEventListener(e,function(ev){ev.preventDefault();d.classList.add("on")})});
 ["dragleave","drop"].forEach(function(e){d.addEventListener(e,function(ev){ev.preventDefault();d.classList.remove("on")})});
