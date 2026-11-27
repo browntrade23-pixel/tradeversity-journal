@@ -2268,7 +2268,7 @@ html:not([data-theme=light]) input[type=checkbox],html:not([data-theme=light]) i
  addEventListener("error",function(e){if(e&&e.message)push(e.message,e.filename,e.lineno)});
  addEventListener("unhandledrejection",function(e){var r=e&&e.reason;push("Unhandled: "+(r&&(r.message||r)),r&&r.stack&&(String(r.stack).match(/https?:[^\s)]+?\.js/)||[])[0],0)});
  window.__errSend=send})();</script>
-<script src="i18n.js?v=2026-11-27f"></script>
+<script src="i18n.js?v=2026-11-27g"></script>
 <!-- the firm list stays here (trade costs use it); news explanations, the indicator video, the tour video, the Cerebra intro and
      the prop firm prices / codes / translations load only when a page needs them (see need() in the app script) -->
 <script src="propfirms.js"></script>
@@ -2312,6 +2312,12 @@ const Captcha={_p:null,_id:null,_tok:null,_wait:[],_dead:false,
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+/* Network hiccups (Chrome just opened, PC waking up, Wi-Fi switching) make a request fail with "Failed to fetch".
+   withRetry waits for the connection and tries again a few times before an error is shown. */
+const isNetErr=e=>/Failed to fetch|NetworkError|Load failed|fetch failed|network ?error|ERR_NETWORK|ERR_INTERNET/i.test(String((e&&(e.message||e))||""));
+const waitOnline=ms=>new Promise(r=>{let done=false;const go=()=>{if(done)return;done=true;removeEventListener("online",go);setTimeout(r,navigator.onLine?ms:400)};
+  if(navigator.onLine){done=true;setTimeout(r,ms)}else{addEventListener("online",go);setTimeout(go,30000)}});
+async function withRetry(fn,onWait,tries=4){let last;for(let i=0;i<tries;i++){try{return await fn()}catch(e){last=e;if(!isNetErr(e)||i===tries-1)throw e;if(onWait)try{onWait(i+1)}catch(_){}await waitOnline([800,2000,4000][i]||4000)}}throw last}
 const num=v=>{if(v===""||v==null)return NaN;return Number(v)};
 const money=(v,d=2)=>{if(v==null||!isFinite(v))return "—";const s=Math.abs(v).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});return (v<0?"-$":"$")+s};
 const smoney=(v,d=2)=>(v>0?"+":"")+money(v,d);
@@ -4173,7 +4179,7 @@ document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&(e.key==="k"|
 /* 📨 admin: weekly summary ready to copy or share on Telegram */
 
 /* ============ UPDATE BANNER: version.json changes on every publish -> ask the user to refresh ============ */
-const APP_VER="2026-11-27f";window.APP_V=APP_VER;
+const APP_VER="2026-11-27g";window.APP_V=APP_VER;
 (function updWatch(){let shown=false;
   const show=()=>{if(shown||document.getElementById("updBar"))return;shown=true;const b=document.createElement("div");b.id="updBar";b.setAttribute("role","status");
     b.innerHTML=`<span class="ub-ico">🚀</span><span class="ub-txt"><b>${I18N.t("New update available")}</b><small>${I18N.t("Refresh to get the latest version.")}</small></span><button class="ub-go">${I18N.t("Refresh")}</button><button class="ub-x" aria-label="${I18N.t("Later")}">✕</button>`;

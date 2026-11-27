@@ -96,7 +96,12 @@ async function vAdmin(el){
     el.querySelector("#admMfaGo").onclick=async()=>{const lv=await MFA.level();if(lv.currentLevel==="aal2"){S._needMfa=false;vAdmin(el)}else toast(I18N.t("Set up the two-step login first."))};
     return}
   el.innerHTML='<div class="empty">Loading students…</div>';
-  let profs,trades,plans;try{[profs,trades,plans]=await Promise.all([API.listProfiles(),API.allTradesLite(),API.allPlans()])}catch(e){el.innerHTML=`<div class="card empty">Couldn't load: ${esc(e.message||e)}</div>`;return}
+  let profs,trades,plans;try{[profs,trades,plans]=await withRetry(()=>Promise.all([API.listProfiles(),API.allTradesLite(),API.allPlans()]),()=>{el.innerHTML=`<div class="empty">${esc(I18N.t("Reconnecting…"))}</div>`})}
+  catch(e){const net=isNetErr(e);
+    el.innerHTML=`<div class="card empty" style="display:grid;gap:12px;justify-items:center"><div>${esc(net?I18N.t("Couldn't reach the server. Check your internet connection, then try again."):I18N.t("Couldn't load the admin data.")+" "+String(e.message||e))}</div><button class="btn pri" type="button" id="admRetry">${esc(I18N.t("Try again"))}</button></div>`;
+    el.querySelector("#admRetry").onclick=()=>vAdmin(el);
+    if(net)addEventListener("online",()=>{if(el.isConnected&&el.querySelector("#admRetry"))vAdmin(el)},{once:true});
+    return}
   let clicks=null;try{clicks=API.affClicks?await API.affClicks():null}catch(e){clicks=null}
   S._rqReady=profs.filter(p=>p.role!=="admin"&&p.status==="pending"&&p.tgOk&&p.emailOk!==false).map(p=>({id:p.id,name:p.name}));setTimeout(ntfRefresh,0);
   const stOf=p=>p.status||"approved";
