@@ -50,6 +50,19 @@ details.q p{margin:0 0 14px;color:#d6dae5}
 .btn[disabled]{opacity:.6;cursor:wait}
 .msg{margin:6px 0 0;font-size:14px}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
 .note{font-size:12.5px;color:var(--mut);margin:10px 0 0}
+/* AI assistant (shown only when the server says it is on) */
+.ai{margin-top:16px}
+.ai h2{display:flex;align-items:center;gap:8px}
+.ai-log{display:grid;gap:8px;margin:12px 0 0;max-height:420px;overflow:auto}
+.ai-log:empty{display:none}
+.bub{padding:10px 13px;border-radius:14px;white-space:pre-wrap;word-break:break-word;max-width:92%;font-size:14.5px}
+.bub.me{justify-self:end;background:rgba(245,185,66,.14);border:1px solid rgba(245,185,66,.35)}
+.bub.ai{justify-self:start;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.bub.err{border-color:rgba(255,107,107,.45);color:#ffd2d2}
+.bub.wait{color:var(--mut)}
+.ai-f{display:flex;gap:8px;margin-top:12px;align-items:flex-end}
+.ai-f textarea{flex:1;min-width:0;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--tx);font:inherit;font-size:16px;resize:none;min-height:46px;max-height:140px}
+.ai-f textarea:focus{outline:2px solid var(--g);outline-offset:1px}
 footer{margin-top:28px;display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;color:var(--mut);font-size:13px}
 footer a{color:var(--mut)}
 </style>
@@ -63,6 +76,17 @@ footer a{color:var(--mut)}
   <p class="lead" data-t="lead">Quick answers to common questions. Still stuck? Write to the support team below.</p>
   <input class="search" id="q" type="search" data-tp="search" placeholder="Search: password, Telegram, new phone, install…" aria-label="Search the help center">
   <p class="none" id="none" data-t="none">No answer found. Write to the support team below.</p>
+
+  <section class="card ai" id="ai" hidden aria-labelledby="aiH">
+    <h2 id="aiH"><span aria-hidden="true">🤖</span><span data-t="ai_h">Ask the assistant</span></h2>
+    <p class="lead" style="margin:0" data-t="ai_l">Answers any time, in English, French or Arabic, from this help center.</p>
+    <div class="ai-log" id="aiLog" aria-live="polite"></div>
+    <form class="ai-f" id="aiForm" novalidate>
+      <textarea id="aiQ" rows="1" maxlength="600" data-tp="ai_ph" placeholder="Type your question…" aria-label="Your question"></textarea>
+      <button class="btn" id="aiGo" type="submit" data-t="ai_send">Ask</button>
+    </form>
+    <p class="note" data-t="ai_note">AI answers can be wrong. Don't type passwords, codes or personal details: your question is sent to Google Gemini to write the answer. For your own account, write to the support team below.</p>
+  </section>
 
   <div id="faq">
     <div class="cat" data-t="c1">Account</div>
@@ -105,7 +129,8 @@ footer a{color:var(--mut)}
 <script>
 (function(){
 var SB="https://szovzzkukzuytkzieuae.supabase.co",KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6b3Z6emt1a3p1eXRremlldWFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ3ODIyMTgsImV4cCI6MjExMDM1ODIxOH0.hEcb4PhOIrKOZiwvMG6YQQHdR2zr1AhHOHmWeCSKJG0";
-var T={fr:{h1:"Centre d'aide",lead:"Des réponses rapides aux questions courantes. Toujours bloqué ? Écrivez à l'équipe support plus bas.",search:"Rechercher : mot de passe, Telegram, nouveau téléphone, installation…",none:"Aucune réponse trouvée. Écrivez à l'équipe support plus bas.",
+var T={fr:{ai_h:"Demandez à l'assistant",ai_l:"Réponses à toute heure, en français, anglais ou arabe, à partir de ce centre d'aide.",ai_ph:"Tapez votre question…",ai_send:"Demander",ai_note:"Les réponses de l'IA peuvent être fausses. N'écrivez ni mot de passe, ni code, ni informations personnelles : votre question est envoyée à Google Gemini pour écrire la réponse. Pour votre propre compte, écrivez à l'équipe support ci-dessous.",ai_wait:"L'assistant écrit…",ai_limit:"Vous avez posé beaucoup de questions aujourd'hui. Écrivez à l'équipe support ci-dessous.",ai_busy:"L'assistant est occupé. Réessayez dans une minute.",ai_off:"L'assistant n'est pas disponible pour le moment. Utilisez la recherche ou écrivez à l'équipe support ci-dessous.",ai_short:"Écrivez votre question (au moins 2 caractères).",ai_who:"Assistant TRADEVERSITY",
+h1:"Centre d'aide",lead:"Des réponses rapides aux questions courantes. Toujours bloqué ? Écrivez à l'équipe support plus bas.",search:"Rechercher : mot de passe, Telegram, nouveau téléphone, installation…",none:"Aucune réponse trouvée. Écrivez à l'équipe support plus bas.",
 c1:"Compte",q1:"Je n'ai pas reçu l'e-mail de vérification",a1:"Vérifiez vos dossiers Spam et Promotions. Le code expire après 2 minutes : sur l'écran de vérification, touchez « Envoyer un nouveau code ». Vérifiez que l'adresse e-mail est bien écrite, ou touchez « Changer d'e-mail ».",
 q2:"J'ai oublié mon mot de passe",a2:"Sur l'écran de connexion, touchez « Mot de passe oublié ? » (ou ouvrez jointradeversity.com/reset-password.html), puis « Envoyer le code ». Tapez le code à 6 chiffres reçu par e-mail dans les 2 minutes et choisissez un nouveau mot de passe.",
 q3:"Mon compte attend l'approbation",a3:"Après la vérification de votre e-mail et de votre Telegram, l'équipe approuve les nouveaux membres. Vous pouvez utiliser l'appli dès que votre compte est approuvé.",
@@ -122,7 +147,8 @@ ch:"Contacter l'équipe support",cl:"Dites-nous ce qui s'est passé. Nous répon
 t1:"Compte et connexion",t2:"Vérification Telegram",t3:"Formation Mentorship",t4:"Appli Cerebra by TDV",t5:"Journal de trading",t6:"Autre chose",send:"Envoyer à l'équipe support",
 safe:"N'envoyez jamais votre mot de passe. L'équipe support ne vous le demandera jamais et ne vous enverra jamais l'appli en message privé.",home:"Accueil",priv:"Politique de confidentialité",terms:"Conditions générales",links:"Tous les liens",
 m_ok:"Merci ! Votre message est arrivé à l'équipe support. Nous vous répondons par e-mail.",m_email:"Écrivez une adresse e-mail valide.",m_msg:"Votre message doit faire au moins 10 caractères.",m_many:"Trop de messages ont été envoyés cette heure. Réessayez plus tard.",m_soon:"Le formulaire de contact ouvre très bientôt. Réessayez un peu plus tard.",m_err:"Envoi impossible. Vérifiez votre connexion et réessayez."},
-ar:{h1:"مركز المساعدة",lead:"إجابات سريعة على الأسئلة الشائعة. ما زلت عالقاً؟ اكتب لفريق الدعم في الأسفل.",search:"ابحث: كلمة المرور، تيليغرام، هاتف جديد، التثبيت…",none:"لم نجد إجابة. اكتب لفريق الدعم في الأسفل.",
+ar:{ai_h:"اسأل المساعد",ai_l:"إجابات في أي وقت، بالعربية أو الفرنسية أو الإنجليزية، من مركز المساعدة هذا.",ai_ph:"اكتب سؤالك…",ai_send:"اسأل",ai_note:"قد تخطئ إجابات الذكاء الاصطناعي. لا تكتب كلمة مرور أو رمزاً أو معلومات شخصية: يُرسل سؤالك إلى Google Gemini لكتابة الإجابة. لمشاكل حسابك، راسل فريق الدعم أدناه.",ai_wait:"المساعد يكتب…",ai_limit:"طرحت أسئلة كثيرة اليوم. راسل فريق الدعم أدناه.",ai_busy:"المساعد مشغول. أعد المحاولة بعد دقيقة.",ai_off:"المساعد غير متاح حالياً. استعمل البحث أو راسل فريق الدعم أدناه.",ai_short:"اكتب سؤالك (حرفان على الأقل).",ai_who:"مساعد TRADEVERSITY",
+h1:"مركز المساعدة",lead:"إجابات سريعة على الأسئلة الشائعة. ما زلت عالقاً؟ اكتب لفريق الدعم في الأسفل.",search:"ابحث: كلمة المرور، تيليغرام، هاتف جديد، التثبيت…",none:"لم نجد إجابة. اكتب لفريق الدعم في الأسفل.",
 c1:"الحساب",q1:"لم يصلني بريد التحقق",a1:"تحقق من مجلدات البريد المزعج والعروض. ينتهي الرمز بعد دقيقتين: في شاشة التحقق اضغط «إرسال رمز جديد». تأكد من كتابة بريدك بشكل صحيح، أو اضغط «تغيير البريد».",
 q2:"نسيت كلمة المرور",a2:"في شاشة تسجيل الدخول اضغط «نسيت كلمة المرور؟» (أو افتح jointradeversity.com/reset-password.html)، ثم «إرسال الرمز». اكتب الرمز المكوّن من 6 أرقام الذي يصلك في البريد خلال دقيقتين واختر كلمة مرور جديدة.",
 q3:"حسابي في انتظار الموافقة",a3:"بعد التحقق من بريدك وتيليغرام، يوافق الفريق على الأعضاء الجدد. يمكنك استخدام التطبيق بمجرد الموافقة على حسابك.",
@@ -139,7 +165,7 @@ ch:"تواصل مع فريق الدعم",cl:"أخبرنا بما حدث. نرد 
 t1:"الحساب وتسجيل الدخول",t2:"التحقق من تيليغرام",t3:"دورة الإرشاد",t4:"تطبيق Cerebra by TDV",t5:"يوميات التداول",t6:"شيء آخر",send:"أرسل إلى فريق الدعم",
 safe:"لا ترسل كلمة مرورك أبداً. لن يطلبها فريق الدعم منك، ولن يرسل لك التطبيق في رسالة خاصة.",home:"الرئيسية",priv:"سياسة الخصوصية",terms:"الشروط والأحكام",links:"كل الروابط",
 m_ok:"شكراً! وصلت رسالتك إلى فريق الدعم. سنرد عليك عبر البريد الإلكتروني.",m_email:"اكتب بريداً إلكترونياً صحيحاً.",m_msg:"يجب أن تكون رسالتك 10 أحرف على الأقل.",m_many:"أُرسلت رسائل كثيرة خلال هذه الساعة. حاول لاحقاً.",m_soon:"نموذج التواصل سيفتح قريباً جداً. حاول بعد قليل.",m_err:"تعذّر الإرسال. تحقق من اتصالك وحاول مجدداً."}};
-var EN={m_ok:"Thank you! Your message reached the support team. We will answer you by email.",m_email:"Write a valid email address.",m_msg:"Your message needs at least 10 characters.",m_many:"Too many messages were sent this hour. Please try again later.",m_soon:"The contact form opens very soon. Please try again a little later.",m_err:"Couldn't send. Check your connection and try again."};
+var EN={ai_wait:"The assistant is writing…",ai_limit:"You asked many questions today. Write to the support team below.",ai_busy:"The assistant is busy. Try again in a minute.",ai_off:"The assistant isn't available right now. Use the search or write to the support team below.",ai_short:"Write your question (at least 2 characters).",ai_who:"TRADEVERSITY assistant",m_ok:"Thank you! Your message reached the support team. We will answer you by email.",m_email:"Write a valid email address.",m_msg:"Your message needs at least 10 characters.",m_many:"Too many messages were sent this hour. Please try again later.",m_soon:"The contact form opens very soon. Please try again a little later.",m_err:"Couldn't send. Check your connection and try again."};
 document.querySelectorAll("[data-t]").forEach(function(e){EN[e.dataset.t]=e.textContent});
 document.querySelectorAll("[data-tp]").forEach(function(e){EN[e.dataset.tp]=e.placeholder});
 var lang="en";function tr(k){var d=lang==="en"?EN:T[lang];return (d&&d[k])||EN[k]||k}
@@ -172,6 +198,21 @@ var s=null;try{s=localStorage.getItem("tvj_lang")}catch(e){}var nav=(navigator.l
 var h=new URLSearchParams(location.search).get("lang");
 set(["en","fr","ar"].indexOf(h)>=0?h:["en","fr","ar"].indexOf(s)>=0?s:(["fr","ar"].indexOf(nav)>=0?nav:"en"));
 document.getElementById("yr").textContent=new Date().getFullYear();
+/* AI assistant: the box appears only if the server function is on (key set). Nothing is stored here or on our
+   server: the chat lives in this tab, the last 6 messages go with each question so the assistant keeps the thread. */
+(function(){var box=document.getElementById("ai"),log=document.getElementById("aiLog"),fm=document.getElementById("aiForm"),ta=document.getElementById("aiQ"),go=document.getElementById("aiGo"),FN=SB+"/functions/v1/help-ai",H={apikey:KEY,Authorization:"Bearer "+KEY},hist=[];
+  function bub(cls,text,who){var d=document.createElement("div");d.className="bub "+cls;if(who)d.setAttribute("aria-label",who);d.textContent=text;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+  fetch(FN,{headers:H}).then(function(r){return r.ok?r.json():null}).then(function(j){if(j&&j.ok)box.hidden=false}).catch(function(){});
+  ta.addEventListener("input",function(){ta.style.height="auto";ta.style.height=Math.min(140,ta.scrollHeight)+"px"});
+  ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();fm.requestSubmit()}});
+  fm.addEventListener("submit",function(e){e.preventDefault();var qq=ta.value.replace(/\s+/g," ").trim();
+    if(qq.length<2){bub("ai err",tr("ai_short"));return}
+    bub("me",qq);ta.value="";ta.style.height="auto";go.disabled=true;var w=bub("ai wait",tr("ai_wait"));
+    fetch(FN,{method:"POST",headers:Object.assign({"Content-Type":"application/json"},H),body:JSON.stringify({q:qq.slice(0,600),lang:lang,history:hist.slice(-6)})})
+    .then(function(r){return r.json().catch(function(){return {}})}).then(function(j){w.remove();
+      if(j&&j.answer){bub("ai",j.answer,tr("ai_who"));hist.push({role:"user",text:qq},{role:"ai",text:j.answer});hist=hist.slice(-6)}
+      else bub("ai err",tr(j&&j.error==="limit"?"ai_limit":j&&j.error==="busy"?"ai_busy":j&&j.error==="len"?"ai_short":"ai_off"))})
+    .catch(function(){w.remove();bub("ai err",tr("ai_busy"))}).then(function(){go.disabled=false;ta.focus()})})})();
 /* ?topic=course (e.g. the Mentorship button on the landing page) pre-selects the topic */
 var tp=new URLSearchParams(location.search).get("topic");if(["account","telegram","course","app","journal","other"].indexOf(tp)>=0)f.topic.value=tp;
 })();
