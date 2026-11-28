@@ -82,7 +82,7 @@ footer a{color:var(--mut)}
     <p class="lead" style="margin:0" data-t="ai_l">Answers any time, in English, French or Arabic, from this help center.</p>
     <div class="ai-log" id="aiLog" aria-live="polite"></div>
     <form class="ai-f" id="aiForm" novalidate>
-      <textarea id="aiQ" rows="1" maxlength="600" data-tp="ai_ph" placeholder="Type your question…" aria-label="Your question"></textarea>
+      <textarea id="aiQ" dir="auto" rows="1" maxlength="600" data-tp="ai_ph" placeholder="Type your question…" aria-label="Your question"></textarea>
       <button class="btn" id="aiGo" type="submit" data-t="ai_send">Ask</button>
     </form>
     <p class="note" data-t="ai_note">AI answers can be wrong. Don't type passwords, codes or personal details: your question is sent to Google Gemini to write the answer. For your own account, write to the support team below.</p>
@@ -201,7 +201,7 @@ document.getElementById("yr").textContent=new Date().getFullYear();
 /* AI assistant: the box appears only if the server function is on (key set). Nothing is stored here or on our
    server: the chat lives in this tab, the last 6 messages go with each question so the assistant keeps the thread. */
 (function(){var box=document.getElementById("ai"),log=document.getElementById("aiLog"),fm=document.getElementById("aiForm"),ta=document.getElementById("aiQ"),go=document.getElementById("aiGo"),FN=SB+"/functions/v1/help-ai",H={apikey:KEY,Authorization:"Bearer "+KEY},hist=[];
-  function bub(cls,text,who){var d=document.createElement("div");d.className="bub "+cls;if(who)d.setAttribute("aria-label",who);d.textContent=text;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+  function bub(cls,text,who){var d=document.createElement("div");d.className="bub "+cls;d.dir="auto";if(who)d.setAttribute("aria-label",who);d.textContent=text;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
   fetch(FN,{headers:H}).then(function(r){return r.ok?r.json():null}).then(function(j){if(j&&j.ok)box.hidden=false}).catch(function(){});
   ta.addEventListener("input",function(){ta.style.height="auto";ta.style.height=Math.min(140,ta.scrollHeight)+"px"});
   ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();fm.requestSubmit()}});
